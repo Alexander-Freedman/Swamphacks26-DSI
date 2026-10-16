@@ -11,7 +11,8 @@ Nothing is picked; I decide. This is built from the official guide, rules and De
 
 **Decisions so far:**
 - **Least Vibe Coded is out.** We use AI heavily and disclose it.
-- **Lean into prizes that reward AI:** the AI/ML track, Gemini, Auth0 for AI Agents, Vultr GPUs, DeepSpace's AI features, and sponsor challenges that require ML (Sperry).
+- **Lean into the challenges that reward AI:** Gemini, Auth0 for AI Agents, Vultr GPUs, DeepSpace's AI features, and sponsor challenges that require ML (Sperry). These stack with any track.
+- **Building with AI does NOT mean taking the AI/ML track.** We get one specialized track or none. Each stack below compares AI/ML (DSI reads the code, depth over polish, prize unclear) with Hardware, Entertainment and none, and picks by expected value.
 
 ## Every prize, one line each
 

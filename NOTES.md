@@ -29,5 +29,7 @@ Decisions + how to run things. Keep current.
 
 - Oct 16 7:20 PM: Least Vibe Coded is dropped completely; it's out of every stack. Lean into heavy-AI prizes (AI/ML track, Gemini, anything AI) plus the sponsor challenges.
 
+- Oct 16 7:20 PM: building with AI ≠ the AI/ML track. One specialized track or none; choose per stack by expected value, and don't default to AI/ML. Gemini/MLH prizes are challenges and stack with any track.
+
 ## How to run
 Nothing to run yet.
