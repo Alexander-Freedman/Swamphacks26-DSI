@@ -14,7 +14,7 @@ Hacking opens Friday evening and Devpost closes **Sun 8:00am**. All of this is t
   - ESP32 or Pi? A load cell?
   - How long can we keep them?
   - This decides Heat Badge and Bridge Oracle.
-- **Capital One table** (only if the Nessie idea is still alive): is the Nessie key handed out at the table?
+- **Capital One table** (only if the finance idea is alive): are you judging in person? $250/member or $1,000? (The Nessie key is self-serve via GitHub login on nessieisreal.com.)
 - **MLH table:**
   - Domain prize code.
   - Vultr credit code.
