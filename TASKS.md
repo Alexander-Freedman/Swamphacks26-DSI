@@ -7,7 +7,7 @@ Shared board. Every task is a GitHub issue; assign yourself + comment "on it" be
 | Issue | Task | Owner | Status |
 |---|---|---|---|
 | #2 | docs/strategy.md: how to win, SwampHacks, ranked project directions | @Alexander-Freedman | PR up, waiting on review |
-| #5 | Research round 2: teardowns, prizes, ideas, stress tests, pitch, feasibility, data check, scorecard, Friday checklist | @Alexander-Freedman | PR up, waiting on review |
+| #5 | Research round 2: teardowns, prizes, ideas (18 total), stress tests, pitch + demo moments, feasibility, data check, scorecard, judges, fact-check fixes, Friday checklist (start at docs/README.md) | @Alexander-Freedman | PR up, waiting on review |
 | #3 | docs/sponsor-tech.md: sponsor/MLH prize APIs, setup cost, worth it? | @luanamaldaner (proposed) | open; docs/prizes.md in #5 covers most of it |
 
 ## Next
