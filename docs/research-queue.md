@@ -14,10 +14,12 @@ Ranked by how much the answer changes what we do. Each pass takes the top open q
 26. Which sensors does the CpE lab actually have on request (temp/humidity? load cell? mic)? (Ask at 8:30 PM.) → scorecard.md
 27. What do the Sperry reps say at Company Connect about our board/index? (Sat 10:30.) → sperry-deep.md
 
-28. What are the exact first-30-minute setup steps at 8:30 PM for each top stack (accounts in order, env vars, repo skeleton, first deploy), so nobody waits? → kickoff.md
 29. For whichever stack is picked: which 2-3 Q&A questions will that sponsor's judges ask first, with answers drawn from our docs? (After the pick.) → pitch.md
 
+30. If Luana's side is offline at 8:30, which half of each stack can one person start alone without blocking the other? → kickoff.md
+
 ## Done
+- First 30-60 min setup steps at 8:30 → kickoff.md
 - What DSI judges check in a repo → ai-ml-track.md
 - Winners rarely quantify user testing (none gave counts or quotes) → 36-hour-plan.md B4
 - Go/no-go board layout + replay data plan → hazard-board-replay.md

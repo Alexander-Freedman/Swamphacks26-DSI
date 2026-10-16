@@ -18,6 +18,7 @@ Nothing is picked yet. Research continues until I say "we have an idea". Code fr
 | [ai-era.md](ai-era.md) | What judges reward once everyone ships fast; where AI tools are slow (with study numbers); realistic task ranges | Planning |
 | [strategy.md](strategy.md) | How judging works, SwampHacks XII rules/prizes/history, the playbook, the 36h plan, mistakes to avoid, the ranked directions | First |
 | [scorecard.md](scorecard.md) | Candidates scored against the 7 XII criteria, plus hours and risk | Picking the idea |
+| [kickoff.md](kickoff.md) | **8:30 PM: desk questions, accounts in order, skeleton + first deploy** | The minute coding opens |
 | [friday-checklist.md](friday-checklist.md) | First-hour questions for sponsors and the hardware desk, which accounts to make, the decision hard stop | Hacking opens |
 | [ideas.md](ideas.md) | 10 new ideas, plus a red-team of the hazard radar and Mental Models with 8 tough Q&A each | Picking the idea |
 | [prizes.md](prizes.md) | Every XII prize: the sponsor, what wins it, crowding, the Sperry brief in full | Choosing the prize stack |
