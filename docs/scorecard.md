@@ -20,6 +20,7 @@ Scores are 1-5 gut calls based on the research docs. They are not data.
 | **B. Mental Models Tool** (predict → sim → misconception) | 4 (hand-written sims + eval) | 3 (predict-first is known, the diagnosis isn't) | 4 | 4 | 4 (intro physics students, with a UF faculty hook) | AI/ML 3 (needs a real eval) | none | Overall, AI/ML, Gemini, domain, Auth0 | Low-medium: the sims are small |
 | **B+. Sketch-to-Sim** (B with a paper-drawing input) | 4 | **5** (no app does this) | 2-3 (camera under expo lighting is the risk) | 5 | 4 | AI/ML 4 or Entertainment 4 | DeepSpace (live classroom), maybe | Overall, AI/ML or Entertainment, Gemini, domain | High: computer-vision reliability |
 | **C. Bridge Oracle** (photo → truss solve → snap it) | 5 (a real solver) | 4 | 3 (glue joints make the load guess noisy) | 3 | 3 (education) | Hardware 4 | none | Overall, Hardware, Tiger Data, domain | Medium-high: needs craft supplies and a load cell |
+| **E. Beat the Fingerprint** (judge tries to evade an audio matcher) | 5 (real hashing algorithm + robustness eval) | 4 | 4 (offline, no network) | 3 | 3 (rights holders; thinner human benefit) | Entertainment 4 | none (Vobile flavor for Overall) | Overall, Entertainment, domain | Low-medium |
 | **D. Hold the Wire** (scam call → Nessie hold) | 3 | 2 (crowded) | 4 | 3 | 4 (elders) | AI/ML 3 | Capital One 4 | Overall, AI/ML, Capital One ×1, Auth0, domain | Low-medium |
 
 ## Hour estimates (docs/feasibility.md)
