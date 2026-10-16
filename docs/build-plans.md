@@ -19,8 +19,17 @@ Accounts we need (set up at the event): a hosting account (Vercel/Render or Vult
 | Wildfire incidents | NIFC WFIGS current incidents (ArcGIS FeatureServer, `POOState='US-FL'`) | No key, returns live FL incidents. NASA FIRMS hotspots need a free map key, which is optional. |
 | Wildlife | Static layer: FWC bear/snake/gator notes per county, or iNaturalist observations near the site | Keep it light; it's the least important hazard. |
 
+### Sperry brief requirements (from the challenge doc; see docs/prizes.md)
+These have to be in or the entry is weak on Sperry's criteria:
+- at least 50 real power plants from EIA-860M as sites
+- a lightning stop-work alert within 10 mi, with a 30-minute countdown that resets on each new strike
+- a 6 PM next-day safety briefing
+- crew photo hazard pins
+- a supervisor dashboard ranking sites by risk
+- an ML hazard index (0-10) trained on historical data (NOAA Storm Events, IEM NWS warning archive, OSHA severe injury reports as labels), evaluated on a held-out time period
+
 ### Features (demo path first)
-1. A map of ~10 seeded job sites in North Central FL, each colored by risk.
+1. A map of 50+ EIA-860M Florida plants/job sites, each colored by risk.
 2. Click a site to see a risk score (0-100) with a **"why" breakdown**: heat index 108°F, lightning potential high 2-5pm, flood warning polygon 3 mi away.
 3. A **safest window today** timeline per site (hourly risk bars), so crews can plan the job for 7-11am.
 4. An alert feed: a new NWS alert intersects a site, the site flips red, and a toast/SMS-style alert appears.
