@@ -27,5 +27,7 @@ Decisions + how to run things. Keep current.
 
 - Oct 16 7:10 PM: AI-tools disclosure wording gets decided at the end (B7, Sun ~4:30 AM). The draft is in #questions.
 
+- Oct 16 7:20 PM: Least Vibe Coded is dropped completely; it's out of every stack. Lean into heavy-AI prizes (AI/ML track, Gemini, anything AI) plus the sponsor challenges.
+
 ## How to run
 Nothing to run yet.
