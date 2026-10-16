@@ -1,10 +1,10 @@
 # User testing, prototypes, two-person workflow, sleep
 
-General, works for any idea. Feeds docs/48-hour-plan.md.
+General, works for any idea. Feeds docs/36-hour-plan.md.
 
 # Plan extras: user testing, prototypes, repo hygiene, sleep (Q5, Q6, Q14, Q18)
 
-These are for docs/48-hour-plan.md and stay general because no idea is picked. Times are H = hours after 8:30pm Fri. "Me" = my side, "L" = @luanamaldaner's side.
+These are for docs/36-hour-plan.md and stay general because no idea is picked. Times are H = hours after 8:30pm Fri. "Me" = my side, "L" = @luanamaldaner's side.
 Confidence tags: **[primary]** means I read the source itself. **[secondary]** means the number comes from a page that cites the original. **[reasoning]** means it's our own call with no source behind it.
 
 ---

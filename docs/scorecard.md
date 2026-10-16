@@ -1,5 +1,7 @@
 # Scorecard: candidates vs the XII rubric
 
+**Official update (Oct 16, 7 PM):** the criteria below match the official 7 on Devpost. The AI/ML track is run by UF DSI and says "depth over polish… we will be reading GitHubs and code", which raises the value of a measured eval and clean code for any AI/ML entry. The CpE lab lends ESP32/Pico/Arduino boards, with sensors on request, which makes A+ more plausible. Re-ranked directions are in docs/strategy.md ("Re-ranked directions vs the official tracks").
+
 Nothing is picked. This scores the strongest candidates from docs/strategy.md and docs/ideas.md against the 7 XII Devpost criteria, plus prize odds and build risk.
 
 Scores are 1-5 gut calls based on the research docs. They are not data.

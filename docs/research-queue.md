@@ -12,17 +12,17 @@ Ranked by how much the answer changes what we do. Each pass takes the top open q
 17. Do the Sperry reps accept NCEI strike tiles for training and a per-day index (vs per-hour)? (Ask Friday.) → hazard-ml.md
 18. If we pick the hazard radar, what should the go/no-go board look like (pattern examples from ops dashboards, weather apps)? → sperry-deep.md
 19. What exactly goes on the table tent card and the 10-20 s attract loop for the picked idea? (Do after the pick.) → expo-video.md
-20. How do we avoid the "default generated look" fast (one design reference, a type/color system in 30 min)? → 48-hour-plan.md B5
+20. How do we avoid the "default generated look" fast (one design reference, a type/color system in 30 min)? → 36-hour-plan.md B5
 21. What depth feature would judges poke at for each top idea? → scorecard.md
 
-23. Does the Vultr MLH credit need a credit card? (Ask at the MLH desk.) → 48-hour-plan.md
+23. Does the Vultr MLH credit need a credit card? (Ask at the MLH desk.) → 36-hour-plan.md
 24. What goes on the 1-page task card for user testing for the picked idea? (After the pick.) → plan-extras.md
-25. Which CI setup (GitHub Actions: lint + test + build) takes under 15 min to add for FastAPI + Vite? → 48-hour-plan.md
+25. Which CI setup (GitHub Actions: lint + test + build) takes under 15 min to add for FastAPI + Vite? → 36-hour-plan.md
 
 ## Done
-- User testing (2 rounds of 5), 2 timeboxed prototypes, repo rules for 2 people + 2 assistants, sleep schedule → plan-extras.md, 48-hour-plan.md
+- User testing (2 rounds of 5), 2 timeboxed prototypes, repo rules for 2 people + 2 assistants, sleep schedule → plan-extras.md, 36-hour-plan.md
 - Deploy path (Vultr + Caddy + sslip.io, Render fallback) and provenance UI patterns → deploy-provenance.md
-- Where AI tools are slow (METR, SO 2025, package/API errors, embedded), what judges reward once everyone ships fast, realistic task ranges → ai-era.md, 48-hour-plan.md
+- Where AI tools are slow (METR, SO 2025, package/API errors, embedded), what judges reward once everyone ships fast, realistic task ranges → ai-era.md, 36-hour-plan.md
 - Expo table craft, 2-hour video workflow with tested ffmpeg commands, Devpost checklist → expo-video.md
 - Sperry's last-challenge winners + spec for our entry (go/no-go board, provenance drawer, stop-work CI test) → sperry-deep.md
 - Hazard index design: label, leakage traps, model, eval, the calibration chart; GLM is too slow for training, NCEI strike tiles used instead → hazard-ml.md

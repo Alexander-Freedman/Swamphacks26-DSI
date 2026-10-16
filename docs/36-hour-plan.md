@@ -1,9 +1,17 @@
-# 48-hour plan (general, works for any idea)
+# 36-hour plan (general, works for any idea)
 
-Nothing is picked. This plan works for whatever we build. Hacking opens **~8:30pm Fri**, Devpost closes **8:00am Sun** (35.5h), and judging is Sunday morning. "My side" = me; "Luana's side" = @luanamaldaner.
+Nothing is picked; I decide the direction. Times are the official ones (hacker rules win over the schedule table):
+- **Code starts 8:30 PM Fri Oct 16.** No project code before then, or we're disqualified. Bringing an *idea* from before is allowed; every line of code has to be written during hacking.
+- **Hacking stops and Devpost closes at 8:30 AM Sun Oct 18.** A late submission isn't considered. After the deadline, only demo-breaking bug fixes are allowed.
+- **We submit by 7:30 AM Sun** (a 1h buffer), then only fix what breaks the demo.
+- **Expo + judging: Sun 10 AM-12 PM**, Reitz Grand/Rion Ballrooms, science-fair style. Each judge spends ~2-3 min at our table, and we get at least 3 judges plus a sponsor judge for each challenge we enter. Demo ≤3 min + 1 min Q&A. Showcase runs 12-12:45, and **closing + awards are 2:30 PM in CAR 100**.
+- **At least one of us must be at judging *and* at closing**, or we can't win prizes.
+- **AI tools must be credited/disclosed** on Devpost and in the README (draft in #questions for me to approve).
+
+"H" = hours after 8:30 PM Fri. "My side" = me; "Luana's side" = @luanamaldaner.
 
 ## The real goal
-A working first version is cheap now. Judges at 2026 events saw almost no broken demos and had to pick on something else ([Semgrep](https://semgrep.dev/blog/2026/the-ai-hackathon-effect)). XII's first criterion is **"could the team explain how and why they built it?"** (docs/teardowns.md). So the 35 hours are for the things the first version doesn't give us:
+A working first version is cheap now. Judges at 2026 events saw almost no broken demos and had to pick on something else ([Semgrep](https://semgrep.dev/blog/2026/the-ai-hackathon-effect)). XII's first criterion is **"could the team explain how and why they built it?"** (docs/teardowns.md). So the 36 hours are for the things the first version doesn't give us:
 1. **One demo moment** a judge remembers, which works every time.
 2. **One real technical core** we can explain and measure (a model or algorithm plus an eval number).
 3. **Proof it matters to a real person**: real data, plus 5-10 real students or users trying it at the event.
@@ -84,33 +92,38 @@ All of that fits 2 people × ~28 awake hours with ~15% slack, *if* we skip hand-
 - **Flaky live demos:** network, camera, mic, projector. A replay or fixture mode plus a recorded video are mandatory.
 - **Understanding generated code** (Technical Understanding is criterion 1): budget 1-2h for both of us to read and explain the core.
 
-## Blocks
-Each block has a goal, who does what, and **done when**. "H" = hours after 8:30pm Fri. Ranges are for the work itself, not including sleep.
+## Blocks (real clock times)
+Event fixtures we plan around:
+- **Fri:** dinner 8-9 PM (WERT lobby). DSI workshop 9:30 PM; DSI runs the AI/ML track. Reitz Union closes 11 PM, after which we're on the 2nd/3rd floors only, badge required, quiet hours.
+- **Sat:** breakfast 8-9 AM. **Company Connect 10:30 AM-12:30 PM** (Sperry, Vobile, Capital One, BNY, Roblox in REI 3315/3320). Lunch 1:30-2:30. **Sperry workshop 3:30-4:15 PM** (REI G320). Dinner 8-9 PM.
+- **Sun:** breakfast 8:45. Expo 10-12. Closing 2:30.
 
-| Block | When | Goal | My side | Luana's side | Done when |
+| Block | Clock (H) | Goal | My side | Luana's side | Done when |
 |---|---|---|---|---|---|
-| **B0 Decide + set up** | H0-1.5 (8:30-10pm) | Pick the idea, lock the prizes, get accounts | Ask sponsors and the hardware desk (docs/friday-checklist.md); accounts | Repo skeleton, empty deploy | One-liner in TASKS.md; issues opened from docs/first-6h.md; `/api/health` live on a URL (1-3h, so it may run into B1) |
-| **B1 Two timeboxed prototypes** | H1.5-4 (10pm-12:30am) | Find the demo moment fast | Ugly prototype A, end to end, **hard 90 min** | Ugly prototype B (a different interaction), **hard 90 min**; 3 static mockups of the demo screen generated in the background | 20-min pick at ~12:30am, scoring 1-3 each on: passersby react in 30 s / real, explainable core / data path works / known risk left / prize fit. Steal the loser's best bit, delete its branch, never start a third. (Parallel prototyping beat serial in Dow et al. 2010; no hackathon-specific evidence, so this is our call.) |
-| **B2 Core depth** | H5-9 (1:30-5:30am) | The technical core works on real data | Model/algorithm + eval v0 + label/split frozen | The real UI on the real API, the demo path | Eval number in the README; demo path runs on the deployed URL. Sleep in shifts: 3-4h each, staggered |
-| **B3 Checkpoint + harden** | H9-14 (5:30-10:30am Sat) | Demo-able from main at any moment | Fix integration bugs; replay/fixture mode | Loading, empty and error states; phone layout | At H12 we can honestly answer yes to "can we demo right now?", posted in the Plan issue |
-| **B4 Real users, round 1** | H14-19 (10:30am-3:30pm) | Evidence it matters | Test flow + logging; fix the top 3 (each ≤45 min) | Run **5 users at lunch** (~11:30-12:30) with a 5-min script: consent line, one task card, think-aloud, success/time/1-7 ease, one quote. No names/photos, 18+, IDs P1-P5 | `docs/user-testing.md` has the findings; top 3 fixed. 5 users find ~85% of usability issues (NN/g). This is product feedback, not a study, so don't call it research |
-| **B5 Depth + design + users round 2** | H19-24 (3:30-8:30pm) | Earn top marks on Tech and Design | One depth feature from the scorecard gap; eval on real data | Design polish pass; **round 2: 5 users at dinner (~6-7pm), same task card** | Scorecard re-graded; a before/after line for the pitch (e.g. "2/5 → 5/5, 74s → 31s"); Devpost draft started |
-| **B6 Freeze + backup** | H24-28 (8:30pm-12:30am) | Lock it, protect the demo | Feature freeze at H28; README, architecture diagram | **Record the backup demo video** (1.5-2.5h with edits) | Video uploaded unlisted **and its URL already in the Devpost draft** (YouTube processing can take hours; the video can't change after 8:00am); main tagged |
-| **B7 Polish + write** | H28-32 (12:30-4:30am Sun) | Submission-ready | Bug fixes only; final eval table | Devpost write-up (450-1,100 words, screenshots) | Draft complete; every sponsor tool named |
-| **B8 Submit + rehearse** | H32-35.5 (4:30-8:00am) | Ship early, then practice | **Submit by ~6:00am**, then edit until 8:00 | Rehearse the 3:00 and 1:30 pitches 3× each; "why did we do X" drill | Submitted; final edits done early (editing a live gallery entry unpublishes it until re-review); both of us can explain every part and give both pitches solo |
-| **Judging** | Sun morning | Win the table | Driver + technical Q&A | Narrator | — |
+| **B0 Decide + set up** | Fri 8:30-10:00 PM (H0-1.5) | Pick the idea, lock the prizes, get accounts | Ask sponsors and the hardware lab (docs/friday-checklist.md); accounts | Repo skeleton, empty deploy | One-liner in TASKS.md; issues opened from docs/first-6h.md; `/api/health` live on a URL (1-3h, so it may run into B1) |
+| **B1 Two timeboxed prototypes** | Fri 10:00 PM-12:30 AM (H1.5-4) | Find the demo moment | Ugly prototype A end to end, **hard 90 min** | Ugly prototype B (a different interaction), **hard 90 min** | 20-min pick at ~12:30 AM using the rubric in docs/plan-extras.md; loser branch deleted |
+| **B2 Core depth** | Sat 12:30-5:30 AM (H4-9) | The technical core works on real data | Model/algorithm + eval v0 + label/split frozen | The real UI on the real API (after their sleep) | Eval number in the README; demo path on the deployed URL |
+| **B3 Checkpoint + harden** | Sat 5:30-10:30 AM (H9-14) | Demo-able from main at any moment | Integration fixes; replay/fixture mode | Loading, empty and error states; phone layout | **8:00 AM after breakfast:** an honest yes to "can we demo right now?" in the Plan issue |
+| **B4 Sponsors + users round 1** | Sat 10:30 AM-3:30 PM (H14-19) | Outside evidence | One of us at **Company Connect** (10:30-12:30) shows the demo to the relevant reps; the other keeps building | **5 users at lunch (1:30-2:30)** with the 5-min script | `docs/user-testing.md` has round 1 + sponsor notes; top 3 fixes done |
+| **B5 Depth + design** | Sat 3:30-8:30 PM (H19-24) | Top marks on Technical Understanding + Design | One depth feature from the scorecard gap; eval on real data. If we're on Sperry: be at their **3:30 workshop** | Design pass (docs/design-depth.md) | Scorecard re-graded; biggest gap closed; Devpost draft started |
+| **B6 Users round 2 + freeze** | Sat 8:30 PM-12:30 AM Sun (H24-28) | Lock it, protect the demo | **5 users at dinner (8-9 PM)**, same task card; **feature freeze ~midnight** | Backup demo video recorded (≤2 min; the guide says video is optional, but it's our insurance) | Before/after line for the pitch; video uploaded unlisted and its URL in the Devpost draft; main tagged |
+| **B7 Polish + write** | Sun 12:30-4:30 AM (H28-32) | Submission-ready | Bug fixes only; final eval table; README with AI-tools section | Devpost write-up (450-1,100 words, screenshots) | Draft complete; every sponsor tool named; disclosure approved by me |
+| **B8 Submit** | Sun 4:30-7:30 AM (H32-35) | Ship with buffer | **Submit by 7:30 AM** | Final checks in a private window (repo public, video plays, every challenge we qualify for ticked) | "Submitted" tag on Devpost. After that only demo-breaking fixes until 8:30 |
+| **B9 Rehearse + set up** | Sun 7:30-10:00 AM | Win the table | Breakfast 8:45; table setup when organizers announce the number | Rehearse the 3:00 and 1:30 pitches 3× each; "why did we do X" drill | Both of us can give both pitches solo and explain every part |
+| **Judging** | Sun 10 AM-12 PM | — | Driver + technical Q&A | Narrator | — |
+| **Closing** | Sun 2:30 PM, CAR 100 | Be there to win | At least one of us present | | |
 
 ## Sleep (docs/plan-extras.md)
 The old plan had **no Saturday-night sleep**, and the sleep-deprived low hits Sunday ~6-10am, which is our submit and judging window. For reference: 17h awake ≈ 0.05% BAC, 24h ≈ 0.10% (Dawson & Reid 1997). This assumes we both woke ~8am Fri:
 
 | Time | My side | Luana's side |
 |---|---|---|
-| Sat 1:30-4:45am | awake | sleep ~3h |
-| Sat 4:45-8:00am | sleep ~3h | awake |
-| Sat ~2-3pm | 26-min nap (staggered) | 26-min nap (staggered) |
-| Sun 12:45-3:45am | sleep 3h | awake: write-up, no merges |
-| Sun 3:45-6:45am | awake: submit by ~6:00 | sleep 3h |
-| Sun 6:45am → judging | both up, rehearse | both up |
+| Sat 1:30-4:45 AM | awake | sleep ~3h (rest rooms REI 2355/2365) |
+| Sat 4:45-8:00 AM | sleep ~3h | awake |
+| Sat ~4:30-5:30 PM | 26-min nap (staggered) | 26-min nap (staggered) |
+| Sun 12:45-3:30 AM | sleep ~2.75h | awake: write-up, no merges |
+| Sun 3:30-6:30 AM | awake: submit by 7:30 | sleep 3h |
+| Sun 6:30 AM → judging | both up | both up |
 
 **Rules:**
 - Never both asleep at once.
@@ -133,7 +146,7 @@ One preprint on ~34k AI-written PRs found a **41.7% conflict rate** when two dif
 - **Fallback:** Render free (API) + a static frontend.
 - **Emergency:** a Cloudflare quick tunnel from a laptop.
 
-## Rules for the whole 35h
+## Rules for the whole 36h
 - **The demo script is the spec.** Build only what judges will see (docs/pitch.md for now; docs/demo-script.md once we pick).
 - **main always runs end to end**, so we're demo-able every hour.
 - **Cut early.** If a block runs past its upper range, cut the feature, not the sleep or the video.

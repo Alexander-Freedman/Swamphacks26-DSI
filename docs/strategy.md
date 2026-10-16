@@ -8,6 +8,73 @@ Research notes, Oct 16 2026. Sources are linked inline. Anything marked *(snippe
 
 ---
 
+## Official event facts (Oct 16, 7 PM; these override anything below)
+From the official hacker guide, hacker rules and Devpost page, in my own words. Full plan in docs/36-hour-plan.md.
+
+**Time:**
+- Code from **8:30 PM Fri** to **8:30 AM Sun**. Devpost closes 8:30 AM, and we submit by **7:30 AM**.
+- After the deadline, only demo-breaking fixes are allowed.
+- An idea from before is fine; no code from before.
+
+**Judging:**
+- Expo **Sun 10 AM-12 PM**, science-fair style. Each judge spends ~2-3 min at our table.
+- We get at least 3 judges, plus sponsor judges for each challenge we opt into.
+- Demo ≤3 min + 1 min Q&A.
+- **Closing 2:30 PM**: at least one of us must be at judging and at closing.
+
+**The 7 official criteria (Devpost):**
+1. **Technical Understanding:** can we explain how and why we built it?
+2. Innovation & Creativity.
+3. **Functionality:** did it work as demonstrated?
+4. Design & Usability.
+5. Purpose & Audience.
+6. Track & Challenge Relevance.
+7. Sponsor criteria, judged by sponsor judges.
+
+The rules page still lists an older 5-criteria version ("Technical Execution", "Clarity & Communication", equal weights, gut feeling allowed). Both reward the same thing: it works live, and we can explain it.
+
+**Tracks (pick at most ONE, plus General/Overall automatically):**
+- **Overall** (sponsored by Vobile): $1,000 / $750 / $500. Judged on innovation, technical achievement, impact, execution.
+- **AI/ML ("Most Creative Use of AI"), run by UF DSI:**
+  - AI must be central: fine-tuning, RAG, agents, custom models, evals.
+  - A public repo with a README is required.
+  - **"Depth over polish… we will be reading GitHubs and code"**: clean, documented code counts, and they want design choices and tradeoffs explained.
+  - Prize TBD.
+- **Hardware & Physical Computing:** Raspberry Pi 4 kits. The CpE lab in Wertheim lends ESP32-S3 / XIAO ESP32 / Pico W / Arduino Uno boards and battery packs, with sensors available on request.
+- **Entertainment & Creative Tech:** AirPods 4.
+- **First Timers:** only if half the team is at a first hackathon.
+
+**Challenges (any number we genuinely meet):**
+- **Sperry PlanIT Control:** iPad Air / AirPods / $100, and **internship interviews for all 3 places**.
+- **Capital One Nessie:** $250 per member.
+- **DeepSpace:** credits + $250 split + a call with the CEO; the SDK must do real work.
+- **Roblox:** Luau.
+- **Easy On The Eyes (UI/UX):** 27" monitors.
+- **Least Vibe Coded:** we won't claim it.
+- **MLH:** GoDaddy domain, Gemini, Vultr, Solana, Auth0, Tiger Data, DEV post.
+
+**Money:** the guide says Overall cash is split among team members, but the rules page says cash is split four ways regardless of team size. Still unconfirmed with organizers.
+
+**Other:**
+- **Video:** the guide says a recorded video isn't required; Devpost caps it at 2 min if we add one. We'll record one as a backup anyway.
+- **Disclosure:** AI tools must be credited on Devpost and in the README. Draft in #questions for me to approve.
+- **Sponsor face time:**
+  - **Company Connect Sat 10:30 AM-12:30 PM:** Sperry, Vobile, Capital One, BNY and Roblox reps.
+  - **Sperry workshop Sat 3:30-4:15 PM.**
+
+## Re-ranked directions vs the official tracks (nothing is picked; I decide)
+| Rank | Direction | Best single track | Challenges it honestly meets | Why this rank | Main risk |
+|---|---|---|---|---|---|
+| 1 | **Hazard radar for Sperry** (go/no-go board, provenance drawer, exact lightning rule, calibrated 0-10 index) | **AI/ML** (calibrated index + backtest; DSI reads code) or Hardware if we add a lab sensor | Sperry, Tiger Data, Auth0, Vultr, Gemini (briefing), domain, Easy On The Eyes | Most prize slots, interviews for all 3 Sperry places, 4 Sperry judges, and Company Connect + the Sperry workshop to get feedback mid-event | Big data plumbing (~42h estimate before cuts); FL judges have seen hazard maps, so the board has to give a decision |
+| 2 | **Mental Models Tool** (draw a prediction, the ghost replays it against the truth, measured misconception diagnosis) | **AI/ML** (a real eval on answers collected at the event fits DSI's "depth over polish" exactly) | Gemini, domain, Auth0, Easy On The Eyes; DeepSpace only with live classroom | Best fit for the AI/ML track's stated values and the UF teaching judges; lowest build risk (~28h) | Few challenges; "AI tutor" fatigue; needs real collected data by Sat evening |
+| 3 | **Beat the Fingerprint** (judge tries to evade our audio matcher; tempo/pitch read back) | Entertainment & Creative | domain, Easy On The Eyes, Vultr | Strong wow + Technical Understanding; Vobile (the Overall sponsor) gave the keynote and lives this problem | Weak Purpose; loud expo floor |
+| 4 | **Hazard radar + field sensor** | Hardware (lab ESP32 + a temp/humidity sensor if the lab has one on request) | same as #1 | Physical wins at SwampHacks; the CpE lab makes it possible | Sensor availability unknown until we ask; hardware time doubles |
+| 5 | **Nessie idea** | AI/ML | Capital One ($250/member), Auth0, domain | | Crowded, small prize |
+
+**To ask at 8:30 PM:** which judging sheet is used, the cash split, and what sensors the CpE lab actually has.
+
+---
+
 ## What this means for us (read this first)
 
 **The clock.** SwampHacks XII is *this weekend*: Oct 16-18 at Reitz Union, 36 hours, starting Friday evening. Devpost submissions open **Fri Oct 16 8:00pm** and close **Sun Oct 18 8:00am** (the Notion rules say 8:30, so we treat 8:00 as the deadline) ([dates](https://swamphacks-xii.devpost.com/details/dates), [rules](https://swamphack.notion.site/SwampHacks-XI-Hacker-Rules-2eb3b41de22f80e7a09bf2cf77a3980d)). **All code must be written during the hackathon**, so we can plan and pick an idea now, but we can't write project code until hacking opens.

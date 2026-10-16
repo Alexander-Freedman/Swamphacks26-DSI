@@ -21,7 +21,9 @@ Decisions + how to run things. Keep current.
 
 - Oct 16 6:40pm (replaces the 5:30pm rule): research runs full speed, several passes in parallel, until a USAGE WIND-DOWN line or until I say "we have an idea". Usage is in ~/hack/usage.txt on the bot box.
 
-- Oct 16 6:50pm: two modes. RESEARCH (now): work docs/research-queue.md top-down. BUILD (after I say "we have an idea" and hacking has opened): docs/demo-script.md + docs/scorecard.md drive the work. The plan for the 35h is docs/48-hour-plan.md.
+- Oct 16 6:50pm: two modes. RESEARCH (now): work docs/research-queue.md top-down. BUILD (after I say "we have an idea" and hacking has opened): docs/demo-script.md + docs/scorecard.md drive the work. The plan for the 35h is docs/36-hour-plan.md.
+
+- Oct 16 7 PM, official (hacker rules): code 8:30 PM Fri → 8:30 AM Sun; Devpost closes 8:30 AM, we submit by 7:30 AM; after that only demo-breaking fixes. Expo Sun 10-12, closing 2:30 PM (one of us at both). An idea from before is OK, code from before isn't. AI tools must be credited on Devpost/README. Max ONE specialized track + any challenges we meet.
 
 ## How to run
 Nothing to run yet.

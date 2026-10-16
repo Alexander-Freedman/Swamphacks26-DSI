@@ -1,8 +1,8 @@
 # docs index
 
-Nothing is picked yet. Research continues until I say "we have an idea". Hacking opens ~8:30pm Fri, and Devpost closes **Sun 8:00am**.
+Nothing is picked yet. Research continues until I say "we have an idea". Code from **8:30 PM Fri**; Devpost closes **8:30 AM Sun** (we submit by 7:30). Expo Sun 10-12, closing 2:30.
 
-**Plan for the weekend:** [48-hour-plan.md](48-hour-plan.md). **Open questions:** [research-queue.md](research-queue.md).
+**Plan for the weekend:** [36-hour-plan.md](36-hour-plan.md) (official times). **Open questions:** [research-queue.md](research-queue.md).
 
 **If you read one thing:** strategy.md, the top two sections ("What this means for us" and "Round 2 findings").
 
@@ -10,6 +10,7 @@ Nothing is picked yet. Research continues until I say "we have an idea". Hacking
 |---|---|---|
 | [plan-extras.md](plan-extras.md) | User-test script, prototype pick rubric, repo rules for 2 people, sleep schedule | Planning |
 | [deploy-provenance.md](deploy-provenance.md) | H0-2 deploy checklist with fallbacks, "where every number comes from" UI patterns | First hour + UI |
+| [design-depth.md](design-depth.md) | 30-min design system, avoiding the generic generated look, the one depth feature per candidate | Build |
 | [ai-era.md](ai-era.md) | What judges reward once everyone ships fast; where AI tools are slow (with study numbers); realistic task ranges | Planning |
 | [strategy.md](strategy.md) | How judging works, SwampHacks XII rules/prizes/history, the playbook, the 36h plan, mistakes to avoid, the ranked directions | First |
 | [scorecard.md](scorecard.md) | Candidates scored against the 7 XII criteria, plus hours and risk | Picking the idea |

@@ -1,6 +1,6 @@
 # How AI-heavy teams win, and where AI tools are slow
 
-General research, works for any idea. Feeds docs/48-hour-plan.md.
+General research, works for any idea. Feeds docs/36-hour-plan.md.
 
 # Hackathons when everyone builds with AI: what wins, where the time goes, what still breaks
 
