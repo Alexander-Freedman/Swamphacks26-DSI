@@ -77,3 +77,26 @@ Record Saturday night, edit it to 1:55, and upload unlisted.
 
 ## 90-second version (rushed judge)
 The hook, then "we built X", then the wow moment, then one sentence on the tech and sponsors, then stop.
+
+---
+
+## "Technical Understanding" drill (both of us, Sat night)
+XII's first criterion is "could the team explain how and why they built it?" Each of us should be able to answer these without looking:
+1. Draw the architecture on paper in 30 seconds: what calls what, and where the data lives.
+2. Why this model or algorithm over the obvious alternative? What did we try that didn't work?
+3. How did we check it's right? Give the eval number, how the split was done, and what the baseline was.
+4. What's live and what's replayed, seeded or mocked?
+5. What breaks first at 10x the data or users?
+6. Which part did each of us build, and what was the hardest bug?
+7. Which libraries and tools did we use, and for what? (Same list as the Devpost "Built with".)
+
+## Devpost write-up skeleton
+These are Devpost's default headings. Winners ran 450-1,100 words, with numbers bolded and 6+ captioned screenshots (docs/teardowns.md).
+- **Inspiration:** one real person and one real number. The Florida lightning-death stat, or the FCI misconception stat.
+- **What it does:** 3 bullets, each matching a demo beat.
+- **How we built it:** a pipeline diagram in a code block, every sponsor tool named with what it does here, and the eval table.
+- **Challenges we ran into:** 2 honest ones, e.g. sparse labels, or camera lighting.
+- **Accomplishments we're proud of:** the eval number and the replay.
+- **What we learned.**
+- **What's next:** the cut features, written as the roadmap.
+- **Built with:** the full list, plus the tools-used disclosure the rules require (wording is my call before submit).
