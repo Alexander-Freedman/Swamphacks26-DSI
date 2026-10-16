@@ -63,6 +63,8 @@ The rules page still lists an older 5-criteria version ("Technical Execution", "
   - **Sperry workshop Sat 3:30-4:15 PM.**
 
 ## Re-ranked directions vs the official tracks (nothing is picked; I decide)
+
+**Superseded by docs/prize-strategy.md (7:40 PM).** After the prize-by-prize research and a red team, the ranking is: 1) lean hazard radar for Sperry, 2) lean transfer-fraud interceptor (Capital One), 3) lean Mental Models. The track is chosen per stack, not defaulted to AI/ML. The table below is kept for history.
 | Rank | Direction | Best single track | Challenges it honestly meets | Why this rank | Main risk |
 |---|---|---|---|---|---|
 | 1 | **Hazard radar for Sperry** (go/no-go board, provenance drawer, exact lightning rule, calibrated 0-10 index) | **AI/ML** (calibrated index + backtest; DSI reads code) or Hardware if we add a lab sensor | Sperry, Tiger Data, Auth0, Vultr, Gemini (briefing), domain, Easy On The Eyes | Most prize slots, interviews for all 3 Sperry places, 4 Sperry judges, and Company Connect + the Sperry workshop to get feedback mid-event | Big data plumbing (~42h estimate before cuts); FL judges have seen hazard maps, so the board has to give a decision |
