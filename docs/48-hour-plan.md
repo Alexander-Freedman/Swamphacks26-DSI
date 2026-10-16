@@ -11,6 +11,8 @@ A working first version is cheap now. Judges at 2026 events saw almost no broken
 5. **The pitch**: rehearsed, with every number traceable to its source, and both of us able to defend every choice.
 6. **Prize fit**: every honest sponsor or MLH prize stacked and named.
 
+**Proof that AI-heavy teams can win this exact sponsor:** Sperry's last 1st place (Common Ground) says in its README it was built in ~31h by coding agents working from written specs. It won on one clear picture, sources behind every number, a test against the answer key, and changes made after asking Sperry's reviewers (docs/sperry-deep.md). The speed went into checking and feedback, not into more features.
+
 ## How long things actually take (evidence from this session, Oct 16)
 These come from git timestamps and run times in this repo today, not guesses.
 

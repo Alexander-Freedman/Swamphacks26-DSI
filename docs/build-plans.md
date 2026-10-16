@@ -31,7 +31,7 @@ These have to be in or the entry is weak on Sperry's criteria:
 
 ### Features (demo path first)
 1. A map of 50+ EIA-860M plants/job sites, each colored by risk. The brief's flood example is the Mississippi, so they may expect plants nationwide; ask. Satellite lightning is "flashes", not "strikes", so say so.
-2. Click a site to see a risk score (0-100) with a **"why" breakdown**: heat index 108°F, lightning potential high 2-5pm, flood warning polygon 3 mi away.
+2. Click a site to see a hazard index (0-10, as the brief requires) with a **"why" breakdown**: heat index 108°F, lightning potential high 2-5pm, flood warning polygon 3 mi away.
 3. A **safest window today** timeline per site (hourly risk bars), so crews can plan the job for 7-11am.
 4. An alert feed: a new NWS alert intersects a site, the site flips red, and a toast/SMS-style alert appears.
 5. A plain-language crew briefing for the morning (Gemini), grounded only on the numbers above.

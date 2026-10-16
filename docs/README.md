@@ -20,6 +20,7 @@ Nothing is picked yet. Research continues until I say "we have an idea". Hacking
 | [sketch-input.md](sketch-input.md) | Paper-card camera input: libraries, card design, stroke pipeline, 50-frame test, fallback ladder | Mental Models + paper only |
 | [deep-mental-models.md](deep-mental-models.md) | How Mental Models beats Loomin/Minerva: the ghost, 3 demo items, eval on real hacker data, instructor dashboard, build order | If we lean Mental Models |
 | [deep-fingerprint.md](deep-fingerprint.md) | Beat the Fingerprint: algorithms, FMA data, live demo, Q&A, build order | If we lean Fingerprint |
+| [sperry-deep.md](sperry-deep.md) | Sperry's last-challenge winners torn down, what Sperry values, the spec + 3-min demo for a PlanIT entry | Hazard radar only |
 | [hazard-ml.md](hazard-ml.md) | Hazard index: label, features, leakage traps, model, calibration chart | Hazard radar only |
 | [data-check.md](data-check.md) | Every Sperry-brief dataset checked as reachable, plus the replay day (Jul 21 2025) | Hazard radar only |
 | [judges.md](judges.md) | Who the 50 judges are (by org), what each org cares about, which pitch lands with whom, the Vobile angle | Pitch prep |
