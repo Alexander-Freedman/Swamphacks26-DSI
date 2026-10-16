@@ -67,6 +67,28 @@ Roles: **narrator** (talks, keeps time) and **driver** (runs the laptop, takes t
 
 ---
 
+## Candidate C: transfer-fraud interceptor (Capital One)
+
+### One-liner
+"When money is about to leave an account the way stolen money does, the bank holds it and tells you why in one sentence, before it's gone."
+
+### 3:00 table script
+| Time | Narrator says | Driver shows |
+|---|---|---|
+| 0:00 | "A takeover drains an account in two hops: into a mule account, then cashed out. By the time anyone notices, it's gone." | The customer screen with a normal balance. |
+| 0:12 | "We built [name]: a model that scores every outgoing transfer and puts the risky ones on hold, live, on Capital One's Nessie." | — |
+| 0:22 | "Watch this one." | **Send the seeded risky transfer.** The card flips to **HELD, score 0.94**, with the top 3 reasons in plain words. |
+| 0:45 | "Normal transfers go straight through. That matters: a fraud model that blocks everyone is useless." | Send a normal transfer; it goes through. Show the false-hold rate. |
+| 1:05 | "The bank side sees the queue. Releasing a hold needs a second login step." | The holds queue; release with Auth0 (if built). |
+| 1:30 | "Under the hood: trained on 6.3 million PaySim transactions, split by time. We report the version without the leaky balance features, against the built-in rule and logistic regression: PR-AUC [x], [y] false holds per 1,000 legit transfers. Nessie is only the live money rail; we never train or evaluate on its mock data." | Eval table. |
+| 2:15 | "Gemini only writes the hold message from our reason codes; it never decides." | The hold notice text. |
+| 2:35 | "What's next: plug in real transaction history and tune the operating point per customer." | Stop. |
+
+### Likely Q&A
+- **"Isn't this just a fraud classifier?"** "The classifier is half of it. The other half is the bank-side hold on a real pending transfer, with an operating point we chose and a measured false-hold cost."
+- **"PaySim is synthetic."** "Yes, and we say so. It's the standard public benchmark. Nessie data is shared mock data, so we never claim results on it."
+- **"What about false positives?"** Show holds per 1,000 legit transfers, and how the operating point moves it.
+
 ## 2:00 video outline (both)
 1. 0:00-0:10: the hook (the storm replay, or the ball question).
 2. 0:10-1:20: the screen recording of the happy path with voiceover. Wow moment by 0:30.
