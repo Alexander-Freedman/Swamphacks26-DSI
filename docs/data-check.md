@@ -22,3 +22,19 @@ I checked from a plain server with curl, no accounts, no keys. This only checks 
   - Train a gradient-boosted model.
   - Evaluate on a later time period than the training data.
 - The OSHA labels will be sparse per site. The fallback label is "a significant storm event within X mi", with OSHA used as a secondary check. Ask the Sperry reps which they'd rather see.
+
+## Replay day for the hazard radar demo
+I ranked 2025 FL warnings from the IEM archive (May-Sep) for the Jacksonville office, which covers Gainesville/Ocala:
+
+| Day (UTC) | Heat advisory counties | Severe t-storm | Flood adv. | Flash flood |
+|---|---|---|---|---|
+| **2025-07-21** | 32 | 17 | 5 | 0 |
+| 2025-08-16 | 32 | 4 | 18 | 3 |
+| 2025-07-22 | 32 | 0 | 21 | 4 |
+| 2025-07-14 | 0 | 18 | 7 | 0 |
+| 2025-05-10 | 0 | 24 | 0 | 0 |
+
+- **Jul 21 2025** has heat in the morning, then severe storms in the afternoon. That's the exact "safest window is 7-11am" story.
+- GOES-19 GLM files exist for that day: 180 files in the 20:00 UTC hour alone, prefix `GLM-L2-LCFA/2025/202/`.
+- Backup: **Aug 16** (heat + flooding).
+- If the hazard radar gets picked, we pull this day at the start, so the demo never depends on tonight's weather.
