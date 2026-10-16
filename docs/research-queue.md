@@ -3,11 +3,8 @@
 Ranked by how much the answer changes what we do. Each pass takes the top open question, answers it with sources into the right doc, marks it done, and adds the 2-3 new questions it raised. The queue is never empty.
 
 ## Open
-7. When is the expo on Sunday, how many judges visit each table, and is there a finals round? (Asked in #questions; also check the Devpost updates page.) → strategy.md.
-8. Which judging rubric do judges actually get: Devpost's 7 criteria or Notion's 5? (Asked in #questions.) → strategy.md.
-9. Is the cash really split 4 ways regardless of team size? (Asked in #questions.) → strategy.md, prizes.md.
-10. What does the hardware desk actually have tonight? → scorecard.md.
-12. How should we write the tools/AI disclosure on Devpost so it's honest and doesn't hurt us with judges? (I decide the wording.) → pitch.md.
+8. Which judging sheet do judges actually get: Devpost's 7 criteria or the rules page's 5? Both reward "works live + we can explain it". (Ask at the help desk.) → strategy.md.
+9. Cash split: the guide says among team members, the rules say four ways regardless of size. (Ask at the help desk.) → strategy.md, prizes.md.
 16. Which past SwampHacks winners did real user testing, and did they mention it in the pitch? → teardowns.md.
 17. Do the Sperry reps accept NCEI strike tiles for training and a per-day index (vs per-hour)? (Ask Friday.) → hazard-ml.md
 18. If we pick the hazard radar, what should the go/no-go board look like (pattern examples from ops dashboards, weather apps)? → sperry-deep.md
@@ -19,7 +16,13 @@ Ranked by how much the answer changes what we do. Each pass takes the top open q
 24. What goes on the 1-page task card for user testing for the picked idea? (After the pick.) → plan-extras.md
 25. Which CI setup (GitHub Actions: lint + test + build) takes under 15 min to add for FastAPI + Vite? → 36-hour-plan.md
 
+26. Which sensors does the CpE lab actually have on request (temp/humidity? load cell? mic)? (Ask at 8:30 PM.) → scorecard.md
+27. What do the Sperry reps say at Company Connect about our board/index? (Sat 10:30.) → sperry-deep.md
+
 ## Done
+- Official event facts: times, expo format, tracks, challenges, prizes, CpE lab hardware list, schedule → strategy.md, 36-hour-plan.md
+- AI-tools disclosure: draft sent to #questions for approval
+- Design method + one depth feature per candidate → design-depth.md
 - User testing (2 rounds of 5), 2 timeboxed prototypes, repo rules for 2 people + 2 assistants, sleep schedule → plan-extras.md, 36-hour-plan.md
 - Deploy path (Vultr + Caddy + sslip.io, Render fallback) and provenance UI patterns → deploy-provenance.md
 - Where AI tools are slow (METR, SO 2025, package/API errors, embedded), what judges reward once everyone ships fast, realistic task ranges → ai-era.md, 36-hour-plan.md
