@@ -32,6 +32,20 @@ Research notes, Oct 16 2026. Sources are linked inline. Anything marked *(snippe
 
 ---
 
+## Round 2 findings (Oct 16 afternoon)
+
+More detail in docs/teardowns.md, docs/ideas.md, docs/pitch.md. Nothing is picked yet.
+
+- **XII changed the rubric.** The first criterion is now **Technical Understanding: "could the team explain how and why they built it?"** (in XI it was Technical Execution). Functionality ("did it work as demonstrated") and Design & Usability are separate criteria now. That, plus the Least Vibe Coded award, means **both of us have to be able to defend every design choice at the table.** We pick a stack we can explain, keep the architecture small, and do a "why did we do X" drill before judging.
+- **Physical or hands-on wins the top spot.** About 60% of recent top winners had hardware or a hands-on interaction: ReStory, SignHero, Rubbish, A.N.R. (HackUSF 2026 1st), Dose (HackGT 12 1st), Alleaf (Hacklytics 2026 1st), Shepherd.
+- **Train or tune one model ourselves, and use the LLM only for explanation.** That was the pattern in SignHero, Rubbish, Aegis and VigilEyes. An eval number goes in the README.
+- **Florida judges have seen a lot of hazard dashboards.** HackUSF 2026 had T.I.T.A.N., Crisis-Net and others. A Sperry entry has to give a **crew decision** (go/no-go, safest window, reason), not another map of layers.
+- **Hazard radar stress test:** DTN, Tomorrow.io and Earth Networks already do paid, single-hazard crew alerting. Our gap is free data, every hazard on one screen, and plan-oriented output. Don't use Blitzortung, whose terms ban warning systems. Use NOAA GOES GLM satellite lightning plus Open-Meteo lightning potential.
+- **Mental Models stress test:** predict-first is standard teaching practice (PhET's teacher guide recommends it), and Gemini generates simulations. Our real edge is the misconception diagnosis with a measured eval. The strongest version is **Sketch-to-Sim** (draw on paper and the physics runs on your drawing).
+- **New ideas worth a look:** Heat Badge (measured heat stress at the job site vs forecast; bolts onto the hazard radar for the Hardware track), Sketch-to-Sim, and Bridge Oracle (predict which member snaps, then snap it). The full list of 10 is in docs/ideas.md.
+
+---
+
 ## Ranked project directions
 
 The rankings use what we know about SwampHacks XII's tracks, its judges and past winners. "Stack" means the prizes a direction can honestly enter.
