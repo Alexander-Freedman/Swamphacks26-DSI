@@ -24,4 +24,5 @@ Nothing is picked yet. Research continues until I say "we have an idea". Hacking
 | [hazard-ml.md](hazard-ml.md) | Hazard index: label, features, leakage traps, model, calibration chart | Hazard radar only |
 | [data-check.md](data-check.md) | Every Sperry-brief dataset checked as reachable, plus the replay day (Jul 21 2025) | Hazard radar only |
 | [judges.md](judges.md) | Who the 50 judges are (by org), what each org cares about, which pitch lands with whom, the Vobile angle | Pitch prep |
+| [expo-video.md](expo-video.md) | Table setup, handling judge queues, 2-hour video workflow (tested ffmpeg commands), Devpost submit checklist | Sat evening + Sun |
 | [pitch.md](pitch.md) | 3:00 table scripts, Q&A, video outline, Technical Understanding drill, Devpost skeleton | Sat night |

@@ -51,9 +51,9 @@ Each block has a goal, who does what, and **done when**. "H" = hours after 8:30p
 | **B3 Checkpoint + harden** | H9-14 (5:30-10:30am Sat) | Demo-able from main at any moment | Fix integration bugs; replay/fixture mode | Loading, empty and error states; phone layout | At H12 we can honestly answer yes to "can we demo right now?", posted in the Plan issue |
 | **B4 Real users** | H14-19 (10:30am-3:30pm) | Evidence it matters | Collection page or test flow; logging | Run 5-10 students through it at lunch; write notes | `docs/user-testing.md` has the findings; top 3 issues filed and fixed |
 | **B5 Depth + design** | H19-24 (3:30-8:30pm) | Earn top marks on Tech and Design | One depth feature from the scorecard gap; eval on real data | Design polish pass (type, color, spacing, motion) | Scorecard re-graded; the biggest gap closed; Devpost draft started |
-| **B6 Freeze + backup** | H24-28 (8:30pm-12:30am) | Lock it, protect the demo | Feature freeze at H28; README, architecture diagram | **Record the backup demo video** (1.5-2.5h with edits) | Video uploaded unlisted; main tagged |
+| **B6 Freeze + backup** | H24-28 (8:30pm-12:30am) | Lock it, protect the demo | Feature freeze at H28; README, architecture diagram | **Record the backup demo video** (1.5-2.5h with edits) | Video uploaded unlisted **and its URL already in the Devpost draft** (YouTube processing can take hours; the video can't change after 8:00am); main tagged |
 | **B7 Polish + write** | H28-32 (12:30-4:30am Sun) | Submission-ready | Bug fixes only; final eval table | Devpost write-up (450-1,100 words, screenshots) | Draft complete; every sponsor tool named |
-| **B8 Submit + rehearse** | H32-35.5 (4:30-8:00am) | Ship early, then practice | **Submit by ~6:00am**, then edit until 8:00 | Rehearse the 3:00 and 1:30 pitches 3× each; "why did we do X" drill | Submitted; both of us can explain every part |
+| **B8 Submit + rehearse** | H32-35.5 (4:30-8:00am) | Ship early, then practice | **Submit by ~6:00am**, then edit until 8:00 | Rehearse the 3:00 and 1:30 pitches 3× each; "why did we do X" drill | Submitted; final edits done early (editing a live gallery entry unpublishes it until re-review); both of us can explain every part and give both pitches solo |
 | **Judging** | Sun morning | Win the table | Driver + technical Q&A | Narrator | — |
 
 ## Rules for the whole 35h

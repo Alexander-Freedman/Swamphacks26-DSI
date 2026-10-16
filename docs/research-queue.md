@@ -15,13 +15,14 @@ Ranked by how much the answer changes what we do. Each pass takes the top open q
 12. How should we write the tools/AI disclosure on Devpost so it's honest and doesn't hurt us with judges? (I decide the wording.) → pitch.md.
 13. What's the best way to show "every number traces to its source" in a UI (pattern examples)? → build-plans.md.
 14. How do top teams handle two people + two coding assistants on one repo without merge pain (file ownership, contract-first, PR size)? → 48-hour-plan.md.
-15. What makes a demo video score well when judges watch 50+ (first 10 seconds, captions, length)? → pitch.md. *(expo/video pass running)*
 16. Which past SwampHacks winners did real user testing, and did they mention it in the pitch? → teardowns.md.
 17. Do the Sperry reps accept NCEI strike tiles for training and a per-day index (vs per-hour)? (Ask Friday.) → hazard-ml.md
 18. If we pick the hazard radar, what should the go/no-go board look like (pattern examples from ops dashboards, weather apps)? → sperry-deep.md
-19. What sleep schedule do repeat winners use for ~36h with 2 people, and when is the worst time to be asleep? → 48-hour-plan.md.
+19. What exactly goes on the table tent card and the 10-20 s attract loop for the picked idea? (Do after the pick.) → expo-video.md
+20. What sleep schedule do repeat winners use for ~36h with 2 people, and when is the worst time to be asleep? → 48-hour-plan.md.
 
 ## Done
+- Expo table craft, 2-hour video workflow with tested ffmpeg commands, Devpost checklist → expo-video.md
 - Sperry's last-challenge winners + spec for our entry (go/no-go board, provenance drawer, stop-work CI test) → sperry-deep.md
 - Hazard index design: label, leakage traps, model, eval, the calibration chart; GLM is too slow for training, NCEI strike tiles used instead → hazard-ml.md
 - How judges score (all events), SwampHacks XII rules, prizes and history → strategy.md
