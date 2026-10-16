@@ -65,9 +65,19 @@ Expected value (EV) is **reliability-adjusted**: a shaky demo keeps ~40% of its 
 
 \* Vultr only if its credit code needs no card (no-spend rule); otherwise Render.
 
+**Best Overall simulation** (3 judges per table, each judge's top 3 of ~7 tables; estimates for ranking only):
+
+| Stack | P(top 3 Overall) | Best ≤3h upgrade (only after the Sat 8 AM gate passes) | Total EV A / B |
+|---|---|---|---|
+| L1 hazard radar | ~7% | The judge's own phone gets the full-screen STOP WORK, and the countdown resets on replay strikes (~9%) | ~$275 / $296 |
+| L-F1 fraud interceptor | ~5% (fraud detection is a cliché; 3 Nessie "hold" projects this month) | A "beat the model" game + a live hold-threshold slider (~6.5%) | ~$220 / $237 (~$337 if Capital One's full $1,000 goes to us) |
+| M1 Mental Models | ~9.5% (the judge draws; UF judges like it) | "You vs the room": where the judge's prediction falls among answers collected at the event (~11%) | ~$130 / $191 |
+
+The ranking holds: L1 > L-F1 > M1. M1 has the best Overall odds but the thinnest challenge stack. It becomes the alternative only if the 8:30 desk answers weaken the Sperry challenge.
+
 **L1 vs L-F1 comes down to the Capital One amount.**
 - At $500, L-F1 needs ~33% Capital One odds to beat L1. We estimate ~22%: 3 Nessie "hold" projects were posted in the last two weeks, and Capital One reps have seen the idea.
-- If the help desk says the full $1,000 goes to us, L-F1 ties or edges L1.
+- If the help desk says the full $1,000 goes to us, it's about a coin flip with L1 (L-F1's Overall odds are lower).
 
 **Decision gates for L1** (from the red team):
 
