@@ -14,7 +14,8 @@ Accounts we need (set up at the event): a hosting account (Vercel/Render or Vult
 | Hazard | Source | Notes |
 |---|---|---|
 | Watches/warnings (flood, wind, heat, tornado, severe storms) | NWS `https://api.weather.gov/alerts/active?area=FL` | Returned 4 live FL alerts today. Needs a User-Agent header. Polygons included. |
-| Heat index, lightning potential, CAPE, wind, rain (hourly forecast) | Open-Meteo `api.open-meteo.com/v1/forecast` (`apparent_temperature`, `lightning_potential`, `cape`) | No key. Gives us the per-site "safest window" timeline. |
+| Heat index, CAPE, thunderstorm codes, wind, rain (hourly forecast) | Open-Meteo `api.open-meteo.com/v1/forecast` (`apparent_temperature`, `cape`, `weather_code` 95-99) | No key. Gives us the per-site "safest window" timeline. `lightning_potential` is null for FL (European models only), so don't use it. |
+| Observed lightning | NOAA GOES-19 GLM L2 on the public `noaa-goes19` S3 bucket | ~30-45 s latency, ~4 km accuracy, ~74% detection in FL. Total lightning, not just ground strikes, so the 10 mi rule alerts more than a ground network would. Say so in the pitch. |
 | Flooding / river stage | USGS NWIS instantaneous values, `waterservices.usgs.gov/nwis/iv/?stateCd=fl&parameterCd=00065` | Gauge height. Compare against flood stage where known. |
 | Wildfire incidents | NIFC WFIGS current incidents (ArcGIS FeatureServer, `POOState='US-FL'`) | No key, returns live FL incidents. NASA FIRMS hotspots need a free map key, which is optional. |
 | Wildlife | Static layer: FWC bear/snake/gator notes per county, or iNaturalist observations near the site | Keep it light; it's the least important hazard. |
@@ -26,7 +27,7 @@ These have to be in or the entry is weak on Sperry's criteria:
 - a 6 PM next-day safety briefing
 - crew photo hazard pins
 - a supervisor dashboard ranking sites by risk
-- an ML hazard index (0-10) trained on historical data (NOAA Storm Events, IEM NWS warning archive, OSHA severe injury reports as labels), evaluated on a held-out time period
+- an ML hazard index (0-10) trained on historical data, evaluated on a held-out time period. Labels come mainly from the **IEM warning archive** (14k FL rows for 2025, including heat advisories). Storm Events is too sparse in FL: only 23 lightning events and no heat events in 2025. OSHA is a secondary check. See docs/feasibility.md.
 
 ### Features (demo path first)
 1. A map of 50+ EIA-860M Florida plants/job sites, each colored by risk.
