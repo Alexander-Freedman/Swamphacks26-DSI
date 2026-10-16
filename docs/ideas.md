@@ -227,7 +227,7 @@ Account note: Tiger Data, Auth0, Gemini, Vultr and FIRMS keys all need a sign-up
 The honest gap these leave:
 - (a) They're expensive, sales-led enterprise products ([RFP comparison note on pricing](https://www.rfp.wiki/specialty-industries/energy-utilities-software/weather-data-solutions-for-energy-and-utilities/tomorrow-io/alternatives-and-competitors)).
 - (b) Each is mostly single-hazard, or weather-only. Wildlife and wildfire smoke/perimeter sit outside them.
-- (c) They alert, but rarely explain or plan the day. "Do the pole job 7-10am, then switch to indoor work" is a scheduling output, not an alert.
+- (c) They mostly alert. DTN does advertise a "Daily Planner", so planning alone isn't a gap; the gap is the per-job plan with the reason attached, on free data. "Do the pole job 7-10am, then switch to indoor work" is a scheduling output, not an alert.
 - (d) There's no crew-side ground truth, such as a measured WBGT at the site.
 
 **Data-licensing traps:**
@@ -288,7 +288,7 @@ The honest gap these leave:
 - No sponsor challenge fits, so the prize stack is thin (General, AI/ML, Gemini, domain).
 
 **8 toughest questions and strong answers:**
-1. **"Gemini already makes physics sims. Why does this exist?"** Gemini shows you the right answer. We make you commit to a wrong one first, then name *which* misconception produced it and come back to it later. Generating a sim is free now; diagnosing the misconception is the hard part. Unrestricted GPT-4 tutoring left students 17% worse once it was removed ([Bastani et al., PNAS 2025](https://papers.ssrn.com/abstract=4895486)); we never hand over the answer.
+1. **"Gemini already makes physics sims. Why does this exist?"** Gemini shows you the right answer. We make you commit to a wrong one first, then name *which* misconception produced it and come back to it later. Generating a sim is free now; diagnosing the misconception is the hard part. Unrestricted GPT-4 tutoring left ~1,000 high-school math students 17% worse once it was removed, while a guarded tutor mostly avoided it ([Bastani et al., PNAS 2025](https://papers.ssrn.com/abstract=4895486)); we never hand over the answer.
 2. **"How's this different from PhET?"** PhET is the sim. A teacher has to supply the predict step and diagnose the misconception. We automate that: forced prediction, error scoring, and misconception labels mapped to FCI codes, so it works without a teacher.
 3. **"How accurate is the misconception classifier?"** We hand-labeled N explanations across 6-8 FCI misconceptions. Macro-F1 is X and the confusion matrix is here. If confidence is low, it asks a follow-up instead of guessing. **(Needs a real eval set; it's the single most important artifact.)**
 4. **"LLMs fail the FCI themselves. Why trust one to diagnose?"** It doesn't solve physics. The sim is hand-checked code, and the model only picks a label from a fixed list given the student's text, the prediction and the true outcome. That's a much easier classification task, and we measured it.

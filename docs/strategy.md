@@ -27,7 +27,7 @@ Research notes, Oct 16 2026. Sources are linked inline. Anything marked *(snippe
 **Our plan in one paragraph.** Pick an idea that fits General, one track and 2-4 sponsor/MLH prizes *naturally*. Lock the idea before hacking opens. Have a deployed URL by hour 6. Freeze features around hour 28. Record a backup demo video Saturday night. Submit early Sunday (~6am), then rehearse the 3-minute table pitch. Both of us talk to the Sperry Tech, Capital One and MLH reps Friday night before committing.
 
 **Two rules we must not trip on:**
-- **AI tool disclosure.** SwampHacks rules: "AI/LLM tools may be used but must be disclosed" on Devpost, and they monitor for cheating "manually and using automated tools." MLH guidance says uncredited AI use gets a team disqualified and reported ([Devpost rules](https://swamphacks-xii.devpost.com/rules), [MLH rules](https://guide.mlh.com/general-information/judging-and-submissions/rules-for-your-hackathon)). The XI submission form had an explicit "which AI tools did you use" question. I decide the disclosure wording before submitting. We're not going for the "Least Vibe Coded" award.
+- **AI tool disclosure.** SwampHacks rules: "AI/LLM tools may be used but must be disclosed" on Devpost, and the Notion hacker rules say they monitor for cheating "manually and using automated tools." MLH guidance says uncredited AI use gets a team disqualified and reported ([Devpost rules](https://swamphacks-xii.devpost.com/rules), [Notion rules](https://swamphack.notion.site/SwampHacks-XI-Hacker-Rules-2eb3b41de22f80e7a09bf2cf77a3980d), [MLH rules](https://guide.mlh.com/general-information/judging-and-submissions/rules-for-your-hackathon)). The XI submission form had an explicit "which AI tools did you use" question. I decide the disclosure wording before submitting. We're not going for the "Least Vibe Coded" award.
 - **At least one of us must be at judging *and* at closing,** or we forfeit prizes (Notion rules).
 
 ---
@@ -51,7 +51,7 @@ More detail in docs/teardowns.md, docs/ideas.md, docs/pitch.md. Nothing is picke
     - crew photo hazard pins
     - a supervisor dashboard ranking sites by risk
     - an **ML hazard index (0-10) trained on historical data** (NOAA Storm Events, NWS warning archive, OSHA severe injury reports)
-  - **What won their last run:** they ran a $5,000 challenge at ShellHacks 2026. The winners used real public data at scale, showed their evidence, and replayed real past events (Mr.Gridy replayed 14 hurricanes). Two of the four used Tiger Data.
+  - **What won their last run:** they ran a $5,000 challenge at ShellHacks 2026. **1st was Common Ground**: no trained model, no replay. It won on one visual idea (a 3D map that raises each planned line to its in-service date) and on tracing every fact back to its source filing. 2nd was UtiliTies; Mr.Gridy (hurricane replay) and ContractMap tied for 3rd. **Lesson: show the source behind every number.** ML depth and replays come second. One of the 4 Sperry judges appears to be on that 1st-place team.
   - **Odds:** an estimated 5-12 entries for 3 prize slots, all with interviews. That's the best odds per entry at the event.
   - **Questions for the Sperry reps Friday night:** what hazard-index granularity they want, whether GOES satellite lightning is OK, and whether 50 plants is a hard minimum.
 - **Crowding at XI (111 projects):** Gemini was used by 48%, so its prize is crowded. Auth0 had 1 project, and Tiger Data and Vultr had none, so those are nearly uncontested. Nessie is *required* for the Capital One prize this year (it was optional at XI). Past Nessie winners use it as the money step inside a real flow, not as a budgeting dashboard.
@@ -83,7 +83,7 @@ The rankings use what we know about SwampHacks XII's tracks, its judges and past
 **Why it ranks first:**
 - It's a specific sponsor brief with **3 prize tiers plus internship interviews**, and 4 Sperry judges at the event.
 - Specific-brief sponsor challenges at SwampHacks draw few teams. Last year Morgan & Morgan's brief had exactly 3 winners. Bounties with specific requirements are consistently the least crowded prizes ([Ray Deck](https://sustained.substack.com/p/lessons-from-winning-five-hackathons), [freeCodeCamp](https://www.freecodecamp.org/news/a-simple-checklist-to-help-you-win-or-have-fun-at-hackathons-98030be1a6c8)).
-- It also reads as safety and social good for Overall, the same shape as past winners like Prometheus (wildfire), resQ (campus safety) and Atmosphere (air quality).
+- It also reads as safety and social good for Overall, the same shape as past winners like resQ (campus safety) and Atmosphere (air quality).
 - The data is free and public: NWS alerts API, NASA FIRMS fires, USGS water gauges, and heat index from NWS/Open-Meteo.
 
 **Stack:**
@@ -113,8 +113,8 @@ The rankings use what we know about SwampHacks XII's tracks, its judges and past
 5. The next question targets that misconception. A "your mental model" graph shows misconceptions going red to green.
 
 **Why it's a real contender:**
-- The learning science is strong and on our side. Mental models are things you "run" to predict ([Forbus](https://www.qrg.northwestern.edu/papers/Files/qr-workshops/QR97/Forbus_1997_Qualitative_Mental_Models.pdf)). People overrate their causal understanding until forced to explain it ([illusion of explanatory depth](https://en.wikipedia.org/wiki/Illusion_of_explanatory_depth)). Interactive-engagement physics roughly doubles learning gains ([Hake 1998](https://web.mit.edu/jrankin/www/Active_Learning/hake_active_phys.pdf)). An unrestricted GPT-4 tutor left students 17% *worse* once it was taken away ([Bastani et al., PNAS 2025](https://papers.ssrn.com/abstract=4895486)). That last one is our pitch line: we never hand you the answer.
-- The judge-participation hook is great. "Quick: ball at the top of its arc. Which way is the force?" Most people get some Force Concept Inventory item wrong ([FCI](https://physport.org/assessments/FCI)), so the judge feels the gap personally.
+- The learning science is strong and on our side. Mental models are things you "run" to predict ([Forbus](https://www.qrg.northwestern.edu/papers/Files/qr-workshops/QR97/Forbus_1997_Qualitative_Mental_Models.pdf)). People overrate their causal understanding until forced to explain it ([illusion of explanatory depth](https://en.wikipedia.org/wiki/Illusion_of_explanatory_depth)). Interactive-engagement physics roughly doubles learning gains ([Hake 1998](https://web.mit.edu/jrankin/www/Active_Learning/hake_active_phys.pdf)). An unrestricted GPT-4 tutor left ~1,000 high-school *math* students 17% *worse* on exams once it was taken away, while a guarded tutor mostly avoided the harm ([Bastani et al., PNAS 2025](https://papers.ssrn.com/abstract=4895486)). That last one is our pitch line: we never hand you the answer.
+- The judge-participation hook is great. "Quick: ball at the top of its arc. Which way is the force?" Most people get some Force Concept Inventory-style item wrong ([FCI](https://physport.org/assessments/FCI); the real FCI is restricted to faculty, so we write our own items aimed at the same misconceptions and never publish FCI questions), so the judge feels the gap personally.
 - UF DSI and faculty judges are the audience most likely to care.
 
 **Why it's #2, not #1 (honest version):**
@@ -431,7 +431,7 @@ Short naps beat none: a 26-minute nap gave NASA pilots up to 54% better alertnes
   - Gallery: [swamphacks-xi.devpost.com/project-gallery](https://swamphacks-xi.devpost.com/project-gallery).
 - **X (Jan 2025):**
   - Top three: 1st Rubbish (a YOLOv11 + Arduino recycling-bin lid), 2nd Atmosphere (air-quality forecasting with a custom TensorFlow model), 3rd MathWhiz (AI-generated Manim math videos).
-  - Track winners included a neural-net visualizer (AI), Horus (a Pi + YOLO aid for blind users), and Prometheus (a wildfire CNN).
+  - Track 1sts: Neural Network Visualizer (AI), WasteWize (Environment), Better Gator (Health), Debug Demolition (Education), Ask a Duck (Social Good). MLH prizes went to Horus (Terraform, a Pi + YOLO aid for blind users) and Prometheus (Auth0, a wildfire CNN).
   - Source: [x.swamphacks.com/recap](https://x.swamphacks.com/recap).
 - **IX (2023) and earlier:** winners included Blue Note (lecture summaries), GatorGuesser (GeoGuessr for UF), resQ (UF Blue Phone safety), Get The Buggies (a retro game), vaporizer, ComicFi, and Wi-Fido (a Pi network-breach detector).
 - **Recurring MLH prizes:** domain name (every year), Gemini/Google Cloud, Solana, Auth0.

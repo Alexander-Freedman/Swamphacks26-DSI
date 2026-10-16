@@ -30,7 +30,7 @@ These have to be in or the entry is weak on Sperry's criteria:
 - an ML hazard index (0-10) trained on historical data, evaluated on a held-out time period. Labels come mainly from the **IEM warning archive** (14k FL rows for 2025, including heat advisories). Storm Events is too sparse in FL: only 23 lightning events and no heat events in 2025. OSHA is a secondary check. See docs/feasibility.md.
 
 ### Features (demo path first)
-1. A map of 50+ EIA-860M Florida plants/job sites, each colored by risk.
+1. A map of 50+ EIA-860M plants/job sites, each colored by risk. The brief's flood example is the Mississippi, so they may expect plants nationwide; ask. Satellite lightning is "flashes", not "strikes", so say so.
 2. Click a site to see a risk score (0-100) with a **"why" breakdown**: heat index 108°F, lightning potential high 2-5pm, flood warning polygon 3 mi away.
 3. A **safest window today** timeline per site (hourly risk bars), so crews can plan the job for 7-11am.
 4. An alert feed: a new NWS alert intersects a site, the site flips red, and a toast/SMS-style alert appears.
@@ -63,7 +63,7 @@ POST /api/replay {date}             -> switches the data source to a recorded da
 1. Pick a concept (mechanics only for the demo).
 2. **Predict** with the simulation hidden: a slider, drag-the-landing-point, or multiple choice, plus one sentence of "why".
 3. **Reveal**: the simulation runs, with the student's guess drawn as a ghost over the true result.
-4. **Explain the miss**: the student's sentence is classified against a fixed misconception list (FCI-based), with structured output and reasoning shown. It never gives the answer.
+4. **Explain the miss**: the student's sentence is classified against a fixed misconception list (FCI taxonomy, with our own items; the real FCI is faculty-restricted, so never publish it), with structured output and reasoning shown. It never gives the answer.
 5. **Target**: the next question is the one that best separates the suspected misconception.
 6. **Mental model graph**: misconception nodes go red, then green, with a prediction-accuracy chart.
 

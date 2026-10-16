@@ -139,7 +139,7 @@ https://devpost.com/software/neural-network-visualizer
 - **Better Gator** (1st Health): a UF-student mental health iOS app. https://devpost.com/software/better-gator-7angv3
 - **Ask a Duck!** (1st Social Good + Best Beginner, stacked): health insurance explained simply. https://devpost.com/software/ask-a-duck
 - **WAYE - What Are You Eating?** (Best Use of Gen AI): https://devpost.com/software/waye-what-are-you-eating
-- **Prometheus** (Environmental track entry, winner badge): fire and smoke detection. It reads like a full README, with a table of contents, Architecture, and **Model Performance Analysis** comparing VGG16 and InceptionV3. About 1,975 words. https://devpost.com/software/prometheus-rh7oxz
+- **Prometheus** (won MLH Best Use of Auth0): fire and smoke detection. It reads like a full README, with a table of contents, Architecture, and **Model Performance Analysis** comparing VGG16 and InceptionV3. About 1,975 words. https://devpost.com/software/prometheus-rh7oxz
 - **WatchDog.AI** (winner badge): violence detection with a fine-tuned ResNet-50 at "~99.7% accuracy" that saves only 5 s before and 10 s after an event (privacy angle). https://devpost.com/software/watchdog-umt3en
 
 ### Older SwampHacks winners (history)

@@ -55,8 +55,8 @@ Roles: **narrator** (talks, keeps time) and **driver** (runs the laptop, takes t
 | 0:45 | "Now tell it why you thought that." | Type the judge's reason, or a canned one. The tool names the misconception ("motion implies force") without giving the answer. |
 | 1:05 | "It picks the next question to test exactly that idea." | Next item, same misconception, different situation. |
 | 1:25 | "This is your mental model: red is a wrong idea you hold, green is fixed." | Graph view, with a node going red to green after the right prediction. |
-| 1:45 | "Why it works: interactive physics roughly doubles learning gains over lecture (Hake, 6,000 students). And unrestricted AI tutors made students 17% worse once the AI was taken away (PNAS 2025). So ours never gives you the answer first." | — |
-| 2:10 | "Under the hood: hand-checked simulations, so the physics is always right. The language model only picks and parameterizes them. Misconceptions come from the Force Concept Inventory, and we eval'd the classifier on [N] labeled explanations: [accuracy]." | Eval table. |
+| 1:45 | "Why it works: interactive physics roughly doubles learning gains over lecture (Hake, 6,000 students). And in a 1,000-student math study, an unrestricted AI tutor left students 17% worse once it was taken away, while a guarded one didn't (PNAS 2025). So ours never gives you the answer first." | — |
+| 2:10 | "Under the hood: hand-checked simulations, so the physics is always right. The language model only picks and parameterizes them. Misconceptions follow the Force Concept Inventory taxonomy (our own items, since the FCI itself is restricted), and we eval'd the classifier on [N] labeled explanations: [accuracy]." | Eval table. |
 | 2:35 | "Mechanics today. Every subject with a simulation and a list of common wrong ideas next." | Back to the start. Stop. |
 
 ### Likely Q&A
