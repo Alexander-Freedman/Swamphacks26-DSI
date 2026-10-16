@@ -43,5 +43,40 @@ Nothing is picked; I decide. This is built from the official guide, rules and De
 3. **CpE lab** (Wertheim): is there a temp/humidity sensor on request?
 4. **Sperry, Capital One and DeepSpace tables:** are you judging in person? For Sperry: is 50 plants a hard minimum, and is satellite lightning OK?
 
-## Top stacks
-*(being finalized; posted to #questions at the usage wind-down or 8:30 PM)*
+## Top stacks (ranked by expected prize value; win odds are gut estimates for *ranking*, not forecasts)
+Cash is shown two ways because the docs disagree. **A** = split four ways regardless of team size (rules page), so we get half. **B** = split among members (guide), so we get all of it. Physical prizes count once per member.
+
+| Rank | Stack (idea + track + challenges) | Best track and why | EV (A / B) | Person-hours (we have ~48-56 awake) | Biggest risk |
+|---|---|---|---|---|---|
+| **1** | **Hazard radar for Sperry, with DeepSpace as the crew channel.**<br>• Vultr: the Python data + ML worker (lightning poller, 0-10 index with a time-split eval) writing to **Tiger Data**.<br>• **DeepSpace**: the crew app (login, live site rooms where a photo hazard pin hits every phone instantly, photo storage, the 6 PM briefing job, live stop-work countdown).<br>• **Gemini**: tags crew photos, writes the briefing from our numbers only, answers questions about the board through tool calls.<br>• Plus **GoDaddy domain**, **Easy On The Eyes**, and a **DEV** post after. | **AI/ML** (~+$11 for ~2h, since the model + eval *are* the Sperry core). Hardware is worth more (~+$39) but costs ~8.5h, which we don't have unless we cut DeepSpace and the CpE lab has a sensor. Entertainment doesn't fit. | ~$370 / $429 | ~46-48 (the whole budget) | DeepSpace is an alpha SDK, so it gets a 4h timebox with stack 2 as the fallback |
+| **2** | **Hazard radar for Sperry, with a Gemini safety agent + Auth0 for AI Agents.**<br>• Same build, with Auth0 instead of DeepSpace.<br>• The agent can *propose* a stop-work; a supervisor approves it through Auth0's agent flow.<br>• **Tiger Data, Vultr, Gemini, domain, Easy On The Eyes, DEV.** | **AI/ML** (same reasoning as stack 1) | ~$346 / $380 | ~47 | Auth0's agent API needs checking on site. This is the fallback for stack 1 |
+| **3** | **Mental Models live classroom.**<br>• **DeepSpace** rooms: the teacher opens a room, students lock in predictions, then the sim reveals the truth.<br>• A **Gemini** misconception classifier with a real eval on answers collected at the event.<br>• Plus **domain, Easy On The Eyes, DEV.** | **AI/ML vs Entertainment is a near-tie** (~$14 vs ~$18). Take AI/ML only if the eval table on real data is done by Sat night, because DSI reads the code; otherwise Entertainment. | ~$150 / $220 | ~34 | Thin sponsor stack; needs 40+ real answers by Sat evening |
+| alt 3 | **Beat the Fingerprint arena** (DeepSpace rooms + a matcher on Vultr) | **Entertainment** (fingerprinting is signal processing, not ML) | ~$173 / $239 | ~31 | Gemini has no honest job, so it fits the "lean into AI" decision worse; a loud hall |
+
+**Track choice (general):**
+- The track is worth roughly $10-50 in EV for every idea. **The challenges carry the stacks.**
+- AI/ML only pays if our core really is a model with an eval that DSI can read in the repo.
+- **First Timers beats any of them (+~$40-50 for 0h) if we qualify.** @luanamaldaner please confirm whether this is your first hackathon.
+- The track box is ticked on Devpost, so the final choice can wait until ~7 AM Sun.
+
+**Why stacks 1-2 are ~2x the rest:**
+- Sperry has 3 places, interviews for all of them, ~5-12 entries and 4 judges of its own.
+- Tiger Data, Vultr and Auth0 were nearly unused at XI.
+- The ML index makes AI/ML nearly free.
+
+**What would change the ranking (ask at the desks at 8:30):**
+- the cash split
+- whether Sperry's iPad is per member (≈+$128 to stacks 1-2)
+- the actual AI/ML prize
+- whether the CpE lab has a sensor
+- whether the Vultr code needs a card
+- whether the DeepSpace and Capital One judges are there in person
+
+**Compatibility rules we used:**
+- DeepSpace and Auth0 are two login systems: pick one.
+- DeepSpace and Vultr only together with a real split (DeepSpace can't run Python ML).
+- Gemini only where it does a central job; tagging it on is ~2% odds at 48% crowding.
+- Nessie doesn't fit Sperry: "hazard pay via Nessie" scored *lower* than without it.
+- Roblox excludes almost everything else.
+- Solana never fits.
+- Least Vibe Coded is dropped.
