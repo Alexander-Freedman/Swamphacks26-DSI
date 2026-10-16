@@ -51,6 +51,25 @@ Split for both: **me = backend/data/model**, **@luanamaldaner = frontend/demo**.
 
 ---
 
+## Transfer-fraud interceptor (Capital One, lean L-F1)
+
+### H0-1 (both)
+- Repo skeleton (`api/` FastAPI + `web/` React) + CI (docs/ci.md).
+- Accounts: Nessie key (self-serve GitHub login on nessieisreal.com, **https only**), Auth0, Tiger Cloud, Gemini key, domain.
+
+### Me
+1. **Nessie gate (H1, Fri ~10 PM):** create our own customer + account; test whether a transfer's status can be set to pending/held and changed later. *Done when:* the answer is in NOTES.md. If it can't, the hold lives in our DB and Nessie only gets the transfer on release.
+2. **Data:** PaySim from the no-account mirror (`theman10/paysim`, ~494 MB). Verify 6,362,620 rows and 8,213 fraud. *Done when:* the row counts are in NOTES.md.
+3. **Leak check + split (H4):** time split; flag the balance columns that probably leak. Two feature sets, leading with the non-leaky one; scale-free features only. *Done when:* the split and positive rate are in NOTES.md.
+4. **Baseline eval (H6):** the built-in rule vs logistic regression vs LightGBM; PR-AUC and holds per 1,000 legit transfers. *Done when:* the eval table is in the README.
+5. **Score endpoint:** `POST /api/score` returns the score + top 3 reasons, and above the operating point it creates a held transfer. *Done when:* a seeded risky transfer comes back held.
+
+### @luanamaldaner
+1. **Mock + UI:** a transfer screen for the "customer" and a holds queue for the "bank". *Done when:* it runs on the mock.
+2. **Hold card:** score, top 3 reasons in plain words, false-hold rate, release button. *Done when:* driven by the API.
+3. **Auth0 login** (customer vs bank roles); step-up to release is a stretch. *Done when:* both roles log in.
+4. **Live money moment:** the demo button sends a seeded risky transfer and the card flips to HELD. *Done when:* it works on a phone on the hotspot.
+
 ## Checkpoint at H6 (both)
 - The deployed URL works end to end on the happy path.
 - Answer "can we demo right now?" honestly in the Plan issue.
