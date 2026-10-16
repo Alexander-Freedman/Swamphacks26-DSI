@@ -3,14 +3,13 @@
 Ranked by how much the answer changes what we do. Each pass takes the top open question, answers it with sources into the right doc, marks it done, and adds the 2-3 new questions it raised. The queue is never empty.
 
 ## Open
+0. **What will the DSI judges look for when they read our repo for the AI/ML track** (README, results table, layout, eval honesty)? → strategy.md. *(pass running)*
 8. Which judging sheet do judges actually get: Devpost's 7 criteria or the rules page's 5? Both reward "works live + we can explain it". (Ask at the help desk.) → strategy.md.
 9. Cash split: the guide says among team members, the rules say four ways regardless of size. (Ask at the help desk.) → strategy.md, prizes.md.
 16. Which past SwampHacks winners did real user testing, and did they mention it in the pitch? → teardowns.md.
 17. Do the Sperry reps accept NCEI strike tiles for training and a per-day index (vs per-hour)? (Ask Friday.) → hazard-ml.md
 18. If we pick the hazard radar, what should the go/no-go board look like (pattern examples from ops dashboards, weather apps)? → sperry-deep.md
 19. What exactly goes on the table tent card and the 10-20 s attract loop for the picked idea? (Do after the pick.) → expo-video.md
-20. How do we avoid the "default generated look" fast (one design reference, a type/color system in 30 min)? → 36-hour-plan.md B5
-21. What depth feature would judges poke at for each top idea? → scorecard.md
 
 23. Does the Vultr MLH credit need a credit card? (Ask at the MLH desk.) → 36-hour-plan.md
 24. What goes on the 1-page task card for user testing for the picked idea? (After the pick.) → plan-extras.md
