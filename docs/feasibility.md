@@ -112,7 +112,7 @@ Versions are the current stable releases on PyPI/npm as of Oct 16. Re-check mode
 **Hosting FastAPI**
 - Packages: `fastapi` 0.143.3 + `uvicorn` 0.54.0.
 - **Vultr:**
-  - $100 credits via the MLH coach code with no card, per [MLH](https://www.mlh.com/partners/vultr). Vultr's normal signup asks for a payment method ([Vultr docs](https://docs.vultr.com/platform/create-an-account.md)), so a human has to do this signup at the desk.
+  - $100 credits via the MLH promo code ([MLH](https://www.mlh.com/partners/vultr)). The MLH page never says "no card", and Vultr's normal signup asks for a payment method ([Vultr docs](https://docs.vultr.com/platform/create-an-account.md)). Unconfirmed: ask at the MLH desk. If a card is needed, use the Render fallback (no-spend rule).
   - It's a plain VPS: ~1 h for Docker/Caddy (auto-TLS for the GoDaddy domain) plus systemd.
   - It's always on, so background pollers (GLM every 20 s, the 6 PM briefing cron) just work. It also qualifies for the Vultr prize.
 - **Render free:**
@@ -256,7 +256,7 @@ Versions are the current stable releases on PyPI/npm as of Oct 16. Re-check mode
    - Build the join on 10 sites first and print the positive rate. If it's under ~1%, go to site x 3 h windows or widen the radius.
    - Have a logistic-regression baseline number by H6, so the LightGBM result has something to beat. Ask the Sperry reps Friday night which label they prefer.
 3. **Account and infra signups stall (Vultr, Tiger Cloud, Auth0, GoDaddy, Gemini key).**
-   - Hour 0-1: I do every signup at the desk in one sitting. The Vultr MLH code supposedly needs no card.
+   - Hour 0-1: I do every signup at the desk in one sitting. Ask at the MLH desk whether the Vultr credit needs a card.
    - Deploy a hello-world FastAPI + empty React to Vultr with Caddy TLS on the domain by H2.
    - Create the hypertable + cagg with `autocommit=True` by H3, and confirm the 750 MiB free cap is fine (store only FL-bbox flashes).
    - Fallback at each step: Docker Timescale on Vultr; Render free for the API, with a pinger only for the demo window.
