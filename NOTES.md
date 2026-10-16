@@ -25,5 +25,7 @@ Decisions + how to run things. Keep current.
 
 - Oct 16 7 PM, official (hacker rules): code 8:30 PM Fri → 8:30 AM Sun; Devpost closes 8:30 AM, we submit by 7:30 AM; after that only demo-breaking fixes. Expo Sun 10-12, closing 2:30 PM (one of us at both). An idea from before is OK, code from before isn't. AI tools must be credited on Devpost/README. Max ONE specialized track + any challenges we meet.
 
+- Oct 16 7:10 PM: AI-tools disclosure wording gets decided at the end (B7, Sun ~4:30 AM). The draft is in #questions.
+
 ## How to run
 Nothing to run yet.
