@@ -71,7 +71,7 @@ Cloudflare Workers for Platforms plus Durable Objects (SQLite). React 19, Vite 8
 
 ### AI chat
 - The scaffold ships `/api/ai/chat` (streamed, multi-turn, tool use over our records, persisted in `ai-chats`/`ai-messages`) plus a ChatPanel. The worker side uses `streamDeepSpaceAgent`, `createDeepSpaceAI(env,'anthropic'|'openai')` and `generateText`.
-- Models come from `listDeepSpaceAgentModels('application')`; the docs mention claude-sonnet-5, claude-haiku-4-5 and gpt-5.6-terra. `useVoiceAgent()` gives realtime voice. All of it bills credits; AI from cron or actions bills the owner.
+- Models come from `listDeepSpaceAgentModels('application')`; the docs list several hosted LLM models. `useVoiceAgent()` gives realtime voice. All of it bills credits; AI from cron or actions bills the owner.
 
 ### Local dev, deploy, cost
 - Scaffold: `npm create deepspace my-app`, then `npm run dev` (= `deepspace dev start`, local Cloudflare runtime on port 8780). Deploy is `npx deepspace deploy` (= `npm run deploy`) and takes "a few seconds" per the quickstart. The CLI then polls `/.well-known/deepspace/release.json` until the new release is `confirmed`; other regions can lag. `deepspace rollback` exists.
