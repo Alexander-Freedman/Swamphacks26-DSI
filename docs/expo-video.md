@@ -171,7 +171,7 @@ Research notes, 2026-10-16. For SwampHacks XII (Reitz Union). Judging is a scien
 ### Ground rules
 - **Devpost wants a screencast with narration**, not a marketing video. Pitch what it does in the first few seconds, edit out the messy parts, and script and rehearse first ([Devpost best practices](https://help.devpost.com/article/84-video-making-best-practices)).
 - **MLH:** "Their video should be a demo of their hack, not a presentation" ([MLH](https://guide.mlh.com/general-information/judging-and-submissions/judging-plan)).
-- **Databricks judge:** she liked videos that "demo their code" or voice over the components, and "the storytelling component is huge" ([Devpost judges interview](https://info.devpost.com/blog/hackathon-judging-tips)).
+- **Databricks judge:** they liked videos that "demo their code" or voice over the components, and "the storytelling component is huge" ([Devpost judges interview](https://info.devpost.com/blog/hackathon-judging-tips)).
 - **Our limit is 2:00 hard** ([XII rules](https://swamphacks-xii.devpost.com/rules)). Target 1:50-1:55. The outline is in pitch.md (hook 0-10 s, happy path with VO, wow by 0:30, architecture + sponsors, eval number + close).
 - **Upload only from an account Alex already has.** Rule: no new accounts. The default YouTube upload limit is 15 min, which is fine for us; verification only matters for longer videos and custom thumbnails ([YouTube](https://support.google.com/youtube/answer/71673)).
 
