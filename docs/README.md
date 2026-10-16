@@ -12,6 +12,7 @@ Nothing is picked yet. Research continues until I say "we have an idea". Hacking
 | [ideas.md](ideas.md) | 10 new ideas, plus a red-team of the hazard radar and Mental Models with 8 tough Q&A each | Picking the idea |
 | [prizes.md](prizes.md) | Every XII prize: the sponsor, what wins it, crowding, the Sperry brief in full | Choosing the prize stack |
 | [teardowns.md](teardowns.md) | ~30 winning projects broken down, plus judge quotes; XII's rubric change | Pitch + write-up |
+| [first-6h.md](first-6h.md) | Ready-to-open issues for the first 6 hours of either top idea, split by person, each with "done when" | The minute we pick |
 | [build-plans.md](build-plans.md) | Features, API contract and issue split for the top two | Right after picking |
 | [feasibility.md](feasibility.md) | Libraries and versions, hour estimates, top 5 technical risks | Right after picking |
 | [data-check.md](data-check.md) | Every Sperry-brief dataset checked as reachable, plus the replay day (Jul 21 2025) | Hazard radar only |
