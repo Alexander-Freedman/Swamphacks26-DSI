@@ -46,3 +46,24 @@ Keys go in `.env` (never committed). `.env.example` lists the names.
 Open the first-6-hour issues from docs/first-6h.md for the picked stack, assign them (claim lock: assign + "on it"), and start B1 (docs/36-hour-plan.md).
 
 **Dinner is 8:00-9:00 PM (grab + go).** One of us grabs food for both.
+
+## If @luanamaldaner's side isn't online yet at 8:30
+My half (backend/data/model) starts alone for every stack and doesn't block the frontend:
+- **L1 hazard radar:**
+  - EIA plant list → `data/plants.csv`
+  - replay-day pull (GLM + IEM + Open-Meteo + USGS)
+  - the lightning stop-work rule plus its test
+  - label + time split
+  - API with fixtures
+- **L-F1 fraud interceptor:**
+  - the Nessie hold test
+  - PaySim pull + row-count check
+  - leak check + split
+  - baseline eval
+  - `/api/score` with fixtures
+- **M1 Mental Models:**
+  - misconception list + our own items
+  - the classifier endpoint + eval set v0
+  - the API contract with fixtures
+
+I also commit the API contract and JSON fixtures in the first hour. Then the frontend can start against the mock the moment @luanamaldaner's side is up, with no handoff meeting.

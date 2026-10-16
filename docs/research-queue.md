@@ -16,9 +16,11 @@ Ranked by how much the answer changes what we do. Each pass takes the top open q
 
 29. For whichever stack is picked: which 2-3 Q&A questions will that sponsor's judges ask first, with answers drawn from our docs? (After the pick.) → pitch.md
 
-30. If Luana's side is offline at 8:30, which half of each stack can one person start alone without blocking the other? → kickoff.md
+
+31. After the pick: which public dataset/API calls should run in the first hour so they're cached before venue wifi gets busy? → kickoff.md
 
 ## Done
+- What one person can start alone at 8:30 → kickoff.md
 - First 30-60 min setup steps at 8:30 → kickoff.md
 - What DSI judges check in a repo → ai-ml-track.md
 - Winners rarely quantify user testing (none gave counts or quotes) → 36-hour-plan.md B4
