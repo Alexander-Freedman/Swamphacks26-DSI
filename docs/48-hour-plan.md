@@ -1,0 +1,62 @@
+# 48-hour plan (general, works for any idea)
+
+Nothing is picked. This plan works for whatever we build. Hacking opens **~8:30pm Fri**, Devpost closes **8:00am Sun** (35.5h), and judging is Sunday morning. "My side" = me; "Luana's side" = @luanamaldaner.
+
+## The real goal
+A working first version is cheap now. Judges at 2026 events saw almost no broken demos and had to pick on something else ([Semgrep](https://semgrep.dev/blog/2026/the-ai-hackathon-effect)). XII's first criterion is **"could the team explain how and why they built it?"** (docs/teardowns.md). So the 35 hours are for the things the first version doesn't give us:
+1. **One demo moment** a judge remembers, which works every time.
+2. **One real technical core** we can explain and measure (a model or algorithm plus an eval number).
+3. **Proof it matters to a real person**: real data, plus 5-10 real students or users trying it at the event.
+4. **Polish and reliability**: design, seeded data, a backup video, the obvious detours hardened.
+5. **The pitch**: rehearsed, with every number traceable to its source, and both of us able to defend every choice.
+6. **Prize fit**: every honest sponsor or MLH prize stacked and named.
+
+## How long things actually take (evidence from this session, Oct 16)
+These come from git timestamps and run times in this repo today, not guesses.
+
+| Task | What happened today | Range to budget |
+|---|---|---|
+| Research pass (one question, cited) | 15 passes ran 3 to 27 min each, median ~8 min | 5-30 min |
+| Turn findings into a committed doc | Most docs landed 2-10 min after their research | 5-15 min |
+| First big deliverable from zero (strategy doc + issue + PR) | Kickoff 13:37 to PR 14:04 = 27 min, with 5 passes in parallel | 30-60 min |
+| Tiny script that "should just work" (docs → PDF, ~40 lines) | 2 bugs (variable clash, list rendering), ~8 min to working | 10-30 min, never 2 |
+| Third-party data source | 3 of ~8 sources surprised us: OSHA blocks scripts (403), Open-Meteo lightning is null for FL, the first IEM query form returned ~nothing | +30-60 min per source; expect 1 in 3 to misbehave |
+| Tooling friction | `gh pr edit` failed silently and needed an API fallback; a restart killed 5 running passes | 5-15 min, a few times a night |
+| Facts from generated research | Fact-check found 3 of 24 key claims wrong (~12%) | Verify anything that goes on a slide |
+| Human setup (machines, accounts, access) | @luanamaldaner's side took ~3h ("spent all my time figuring ts out") | 1-3h; do it once, early |
+| Waiting on a review | PR #4 has been open 4h+ with no review | Never block on a review for non-risky work |
+
+## Where AI is slow or unreliable, so we budget extra
+Outside evidence is being added (research queue Q1). From today plus common experience:
+- **Deploy + HTTPS + domain + env vars:** 1-3h the first time, so do it in H0-2, not H30.
+- **Auth (Auth0 roles, callbacks):** 1-3h, and roles aren't in the token by default (docs/feasibility.md). Only add it if it's a prize we're going for.
+- **Integration between our two halves:** each contract mismatch costs 30-90 min. Agree the API first and build against a mock.
+- **Data plumbing:** see the 1-in-3 surprise rate above.
+- **Rate limits and API keys** (Gemini etc.): cache responses, and keep an offline or fixture path for the demo.
+- **Hardware:** the standard MLH lab lacks most of what we'd want. Double every estimate, or skip it.
+- **Design taste:** generated UI is generic. A human eye plus 2-4h of polish is needed.
+- **Flaky live demos:** network, camera, mic, projector. A replay or fixture mode plus a recorded video are mandatory.
+- **Understanding generated code** (Technical Understanding is criterion 1): budget 1-2h for both of us to read and explain the core.
+
+## Blocks
+Each block has a goal, who does what, and **done when**. "H" = hours after 8:30pm Fri. Ranges are for the work itself, not including sleep.
+
+| Block | When | Goal | My side | Luana's side | Done when |
+|---|---|---|---|---|---|
+| **B0 Decide + set up** | H0-1.5 (8:30-10pm) | Pick the idea, lock the prizes, get accounts | Ask sponsors and the hardware desk (docs/friday-checklist.md); accounts | Repo skeleton, empty deploy | One-liner in TASKS.md; issues opened from docs/first-6h.md; `/api/health` live on a URL (1-3h, so it may run into B1) |
+| **B1 Two quick prototypes** | H1.5-5 (10pm-1:30am) | Find the demo moment fast | Prototype A of the core interaction, end to end and ugly | Prototype B (a different interaction or visual) against the mock | Both shown to each other (and 2-3 people nearby) at ~1:30am; one picked, the other deleted. 2-3h each |
+| **B2 Core depth** | H5-9 (1:30-5:30am) | The technical core works on real data | Model/algorithm + eval v0 + label/split frozen | The real UI on the real API, the demo path | Eval number in the README; demo path runs on the deployed URL. Sleep in shifts: 3-4h each, staggered |
+| **B3 Checkpoint + harden** | H9-14 (5:30-10:30am Sat) | Demo-able from main at any moment | Fix integration bugs; replay/fixture mode | Loading, empty and error states; phone layout | At H12 we can honestly answer yes to "can we demo right now?", posted in the Plan issue |
+| **B4 Real users** | H14-19 (10:30am-3:30pm) | Evidence it matters | Collection page or test flow; logging | Run 5-10 students through it at lunch; write notes | `docs/user-testing.md` has the findings; top 3 issues filed and fixed |
+| **B5 Depth + design** | H19-24 (3:30-8:30pm) | Earn top marks on Tech and Design | One depth feature from the scorecard gap; eval on real data | Design polish pass (type, color, spacing, motion) | Scorecard re-graded; the biggest gap closed; Devpost draft started |
+| **B6 Freeze + backup** | H24-28 (8:30pm-12:30am) | Lock it, protect the demo | Feature freeze at H28; README, architecture diagram | **Record the backup demo video** (1.5-2.5h with edits) | Video uploaded unlisted; main tagged |
+| **B7 Polish + write** | H28-32 (12:30-4:30am Sun) | Submission-ready | Bug fixes only; final eval table | Devpost write-up (450-1,100 words, screenshots) | Draft complete; every sponsor tool named |
+| **B8 Submit + rehearse** | H32-35.5 (4:30-8:00am) | Ship early, then practice | **Submit by ~6:00am**, then edit until 8:00 | Rehearse the 3:00 and 1:30 pitches 3× each; "why did we do X" drill | Submitted; both of us can explain every part |
+| **Judging** | Sun morning | Win the table | Driver + technical Q&A | Narrator | — |
+
+## Rules for the whole 35h
+- **The demo script is the spec.** Build only what judges will see (docs/pitch.md for now; docs/demo-script.md once we pick).
+- **main always runs end to end**, so we're demo-able every hour.
+- **Cut early.** If a block runs past its upper range, cut the feature, not the sleep or the video.
+- **Don't block on reviews** for low-risk PRs. Merge and keep going, and review after.
+- **Verify any number that goes on a slide** (12% of generated claims were wrong today).

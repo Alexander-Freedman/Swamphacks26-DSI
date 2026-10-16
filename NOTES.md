@@ -1,3 +1,5 @@
+Mode: RESEARCH
+
 # Notes
 
 Decisions + how to run things. Keep current.
@@ -18,6 +20,8 @@ Decisions + how to run things. Keep current.
 - Oct 16 4pm: hacking (code allowed) starts ~8:30pm Fri, matching the Notion rules. Doors and check-in are earlier. No project code before 8:30pm.
 
 - Oct 16 6:40pm (replaces the 5:30pm rule): research runs full speed, several passes in parallel, until a USAGE WIND-DOWN line or until I say "we have an idea". Usage is in ~/hack/usage.txt on the bot box.
+
+- Oct 16 6:50pm: two modes. RESEARCH (now): work docs/research-queue.md top-down. BUILD (after I say "we have an idea" and hacking has opened): docs/demo-script.md + docs/scorecard.md drive the work. The plan for the 35h is docs/48-hour-plan.md.
 
 ## How to run
 Nothing to run yet.
