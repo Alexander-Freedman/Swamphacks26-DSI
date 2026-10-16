@@ -7,7 +7,8 @@ Shared board. Every task is a GitHub issue; assign yourself + comment "on it" be
 | Issue | Task | Owner | Status |
 |---|---|---|---|
 | #2 | docs/strategy.md: how to win, SwampHacks, ranked project directions | @Alexander-Freedman | PR up, waiting on review |
-| #3 | docs/sponsor-tech.md: sponsor/MLH prize APIs, setup cost, worth it? | @luanamaldaner (proposed) | open |
+| #5 | Research round 2: teardowns, prizes, ideas, stress tests, pitch, feasibility, data check, scorecard, Friday checklist | @Alexander-Freedman | PR up, waiting on review |
+| #3 | docs/sponsor-tech.md: sponsor/MLH prize APIs, setup cost, worth it? | @luanamaldaner (proposed) | open; docs/prizes.md in #5 covers most of it |
 
 ## Next
 - Research keeps going until I say "we have an idea". Nothing is picked; hazard radar and Mental Models Tool are candidates only. Going deeper: winner teardowns, judge/organizer interviews, per-prize analysis, new ideas, stress tests, pitch outlines + demo scripts.
