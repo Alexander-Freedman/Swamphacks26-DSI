@@ -42,6 +42,20 @@ More detail in docs/teardowns.md, docs/ideas.md, docs/pitch.md. Nothing is picke
 - **Florida judges have seen a lot of hazard dashboards.** HackUSF 2026 had T.I.T.A.N., Crisis-Net and others. A Sperry entry has to give a **crew decision** (go/no-go, safest window, reason), not another map of layers.
 - **Hazard radar stress test:** DTN, Tomorrow.io and Earth Networks already do paid, single-hazard crew alerting. Our gap is free data, every hazard on one screen, and plan-oriented output. Don't use Blitzortung, whose terms ban warning systems. Use NOAA GOES GLM satellite lightning plus Open-Meteo lightning potential.
 - **Mental Models stress test:** predict-first is standard teaching practice (PhET's teacher guide recommends it), and Gemini generates simulations. Our real edge is the misconception diagnosis with a measured eval. The strongest version is **Sketch-to-Sim** (draw on paper and the physics runs on your drawing).
+- **The Sperry brief is detailed** (full breakdown in docs/prizes.md).
+  - **Who they are:** Sperry Tech (sperrytech.ai) is a 5-person AI/ML team inside a Florida construction business. Their stated values: "shipped beats clever" and "what runs in production". They have no hazard product of their own.
+  - **What the brief asks for:**
+    - at least 50 real power plants (EIA-860M)
+    - a lightning stop-work alert within 10 mi, with a 30-minute countdown that resets on each strike
+    - a 6 PM next-day safety briefing
+    - crew photo hazard pins
+    - a supervisor dashboard ranking sites by risk
+    - an **ML hazard index (0-10) trained on historical data** (NOAA Storm Events, NWS warning archive, OSHA severe injury reports)
+  - **What won their last run:** they ran a $5,000 challenge at ShellHacks 2026. The winners used real public data at scale, showed their evidence, and replayed real past events (Mr.Gridy replayed 14 hurricanes). Two of the four used Tiger Data.
+  - **Odds:** an estimated 5-12 entries for 3 prize slots, all with interviews. That's the best odds per entry at the event.
+  - **Questions for the Sperry reps Friday night:** what hazard-index granularity they want, whether GOES satellite lightning is OK, and whether 50 plants is a hard minimum.
+- **Crowding at XI (111 projects):** Gemini was used by 48%, so its prize is crowded. Auth0 had 1 project, and Tiger Data and Vultr had none, so those are nearly uncontested. Nessie is *required* for the Capital One prize this year (it was optional at XI). Past Nessie winners use it as the money step inside a real flow, not as a budgeting dashboard.
+- **DeepSpace** is an alpha real-time SDK (auth, live sync, presence, AI chat). It fits a live-classroom version of the Mental Models Tool (Entertainment track instead of AI/ML).
 - **New ideas worth a look:** Heat Badge (measured heat stress at the job site vs forecast; bolts onto the hazard radar for the Hardware track), Sketch-to-Sim, and Bridge Oracle (predict which member snaps, then snap it). The full list of 10 is in docs/ideas.md.
 
 ---
