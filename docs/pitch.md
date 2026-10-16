@@ -100,3 +100,48 @@ These are Devpost's default headings. Winners ran 450-1,100 words, with numbers 
 - **What we learned.**
 - **What's next:** the cut features, written as the roadmap.
 - **Built with:** the full list, plus the tools-used disclosure the rules require (wording is my call before submit).
+
+---
+
+## Table demo moments (ranked)
+What made past expo winners memorable (SignHero, Rubbish, A.N.R., Shepherd, Duet, Common Ground):
+- the judge's own body or input drives it
+- the outcome is visible and binary
+- something keeps running on its own
+- there's one comparison number
+- the judge leaves holding something
+
+### Hazard radar (Jul 21 2025 replay)
+1. **"You're the foreman."**
+   - The judge circles a work window on a printed card for that day, then holds the crew phone while we replay the day at 120x.
+   - STOP WORK buzzes in their hand, and the 30-min countdown visibly resets on each flash.
+   - We show their exposed minutes vs our safest window. Every number links to its NWS/GLM source (Sperry's last winner won on traceability).
+2. **Photo hazard pin.** The judge snaps a printed gator photo on the crew phone. It lands on the supervisor map and re-ranks the sites in ~2 s.
+3. **"Pick any plant."** The judge picks one and gets the 0-10 index, the why, and a printed 6 PM briefing card to keep.
+
+**Props:**
+- a laptop dashboard
+- a second screen looping the replay to pull judges in
+- a crew phone, plus a hotspot phone
+- printed briefing cards
+
+All replay data is pre-pulled and served locally.
+
+**Fallbacks:**
+- The crew view polls instead of using push.
+- A second browser window can stand in for the phone.
+- Pre-loaded photos and cached briefings.
+- A recorded replay.
+
+### Mental Models
+1. **Prediction cards.** Pre-printed scenario cards with corner markers. The judge draws only their predicted arrow, so the camera finds one stroke on a known layout.
+   - Their arrow appears as a ghost next to the real force. They give a one-line reason and it names the misconception.
+   - A second card then catches "right answer, wrong reason".
+2. **Free-form Sketch-to-Sim** (the ball rolls down the ramp they drew). Only open with this if it passes 20/20 sheets in bright and dim light by Sat noon.
+3. **Aisle-wide phone poll.** Everyone nearby votes via QR, and a live histogram fills before the sim settles it.
+
+**Fallbacks:**
+- Tablet + stylus input.
+- A fast local classifier, so the language model isn't on the critical path.
+- A harder card for judges who answer right.
+- A recorded run.

@@ -309,3 +309,23 @@ The honest gap these leave:
 - The new idea that most raises odds is **Heat Badge** bolted onto it: physical, honest about WBGT, keyless data.
 - If I go with the learning direction, **Sketch-to-Sim + misconception eval** is the version that can beat "Gemini already does that".
 - Avoid paid or restricted lightning feeds. Blitzortung's terms ban warning systems; use GOES GLM + Open-Meteo LPI/CAPE.
+
+---
+
+## Round 2 ideas (Oct 16 evening)
+None beats the Sperry hazard radar on prize count. The first three are at or above the Mental Models core for Best Overall.
+
+| # | Idea | Odds | Wow | Core | Stack | Risk |
+|---|---|---|---|---|---|---|
+| 1 | **Beat the Fingerprint** | 7 | The judge speeds a clip up 8% and drops it 2 semitones, plays it aloud, and it's still identified with "1.08x, -2 st" on screen; then they push until it breaks | Wang 2003 landmark hashing vs Panako-style triplet hashing (robust to pitch and tempo), with a robustness eval on held-out FMA (Creative Commons) tracks | Entertainment & Creative, Overall. The only idea with a natural Vobile story (their core is fingerprinting) | Shazam clones exist; the "try to evade it" game is the new part |
+| 2 | **Fake Flip** | 6.5 | The judge types 100 "random" coin flips and in ~2 s gets "human, 96%" with the reasons | A classifier trained on sequences collected from hackers at the event (held-out AUC), plus 4-5 predict-then-10,000-sims traps scored with a proper scoring rule | AI/ML or Entertainment | Cheap (~15-20h). Could be the second domain inside Mental Models |
+| 3 | **Patient Zero** | 6.5 (8 if 150+ play, 4 if ~20) | A harmless QR "virus" spreads through the venue all weekend. Judges predict the curve, then see the real one plus a "30% masked" replay | A stochastic model on the real contact network, fitted to observed infection times | Entertainment, DeepSpace (genuinely central) | Needs launching Fri night and an organizer OK. Operation Outbreak exists |
+| 4 | **Prairie Smoke** | 5.5 | A superfog risk forecast for I-75 at Paynes Prairie, replaying the Jan 29 2012 pileup | GNV visibility history (IEM, no key) + FFS burn authorizations | AI/ML | No ground truth for superfog; FDOT is adding sensors |
+| 5 | **Hear the Graph** | 5.5 | Screenshot any chart and explore it by sound (blind STEM students) | DePlot chart-to-table + an extraction eval | AI/ML | Existing sonification tools need the raw data; ours doesn't |
+| 6 | **Which Bus** | 5 | The camera reads an approaching RTS bus number for blind riders | OCR + GTFS (free) | AI/ML | No public realtime RTS feed; Oculis exists |
+| 7 | **Say It Back** | 5 | Post-stroke speech practice game | wav2vec2 phoneme scoring | AI/ML | The Speakery exists; expo noise |
+| 8 | **Chord Lock** | 4.5 | Phones sing a chord that "locks" when in tune | DeepSpace sync | Entertainment | Thin core, loud venue |
+
+**Combos:**
+- Mental Models + Fake Flip as its second domain. That gives a 10-second hook and answers "does it generalize?".
+- Patient Zero + Fake Flip as one "chance & contagion" project (Entertainment + DeepSpace).
