@@ -12,6 +12,7 @@ Nothing is picked yet. Research continues until I say "we have an idea". Code fr
 | [deploy-provenance.md](deploy-provenance.md) | H0-2 deploy checklist with fallbacks, "where every number comes from" UI patterns | First hour + UI |
 | [design-depth.md](design-depth.md) | 30-min design system, avoiding the generic generated look, the one depth feature per candidate | Build |
 | [prize-strategy.md](prize-strategy.md) | **Every prize + the ranked stacks to pick from** | Picking the idea |
+| [prize-stacks-redteam.md](prize-stacks-redteam.md) / [prize-stack-finance.md](prize-stack-finance.md) | Red team of the stacks + lean versions with gates | Picking the idea |
 | [deepspace.md](deepspace.md) | DeepSpace SDK reality check: APIs, hours, demo risks | If a stack uses DeepSpace |
 | [ai-ml-track.md](ai-ml-track.md) | What DSI judges look for when reading the repo | If we take AI/ML |
 | [ai-era.md](ai-era.md) | What judges reward once everyone ships fast; where AI tools are slow (with study numbers); realistic task ranges | Planning |

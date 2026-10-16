@@ -58,12 +58,16 @@ Expected value (EV) is **reliability-adjusted**: a shaky demo keeps ~40% of its 
 |---|---|---|---|---|---|
 | **1** | **Lean hazard radar for Sperry** (L1): one go/no-go board with a "why" drawer that opens the raw source, the exact lightning stop-work rule tested on a recorded storm day, replay mode, a calibrated daily 0-10 index with a time-split eval, phone crew reports. FastAPI on Vultr, Tiger as the only DB, React/Leaflet. **No agent.** | **AI/ML** ~+$12 for 1-2h, since the eval *is* the Sperry core. Hardware ~+$39 but 8.5h+ and no listed humidity sensor. Entertainment doesn't fit. First Timers beats all of them if we qualify. | Sperry (3 places + interviews), Tiger Data, Vultr*, GoDaddy, Gemini (briefing wording only), Easy On The Eyes, DEV; stretch: Auth0 supervisor login | ~33 (~37) | ~$280 / $306 |
 | 1b | **Same + DeepSpace crew channel** (L1+DS): only if a 90-min spike passes by **Sat 12:30 AM** *and* DeepSpace confirms in-person judging. Otherwise drop it for good. **The docs check says a full crew app on DeepSpace is 12-15h, not 4-8h** (docs/deepspace.md), so this is probably over budget unless it's a thin crew-report channel only. | AI/ML | L1 + DeepSpace | ~40-45 | below L1 once those hours are counted |
-| **2** | *(pending: lean finance interceptor, being scored in the same format)* | | | | |
+| **2** | **Lean transfer-fraud interceptor** (L-F1): a model trained on PaySim (a no-account mirror is checked), an honest time-split eval that reports the leaky-feature version separately, and a risky **Nessie** transfer placed on hold live with the score + top 3 reasons and a visible false-hold rate. Release needs Auth0 step-up (stretch). Gemini only words the hold notice. Details: docs/prize-stack-finance.md | **First Timers if eligible; else AI/ML** (~+$12, if the Sat 12:30 AM eval gate passes); else none. Entertainment doesn't fit | Capital One (1 winner, no interviews), Auth0, Tiger Data, Gemini, GoDaddy, Easy On The Eyes | ~30 (~34) | ~$232 / $261 at Capital One = $500; ~$361 if the full $1,000 goes to us |
 | **3** | **Lean Mental Models** (M1): draw your prediction, the ghost replays it against the truth, a misconception card, and an eval on answers collected from hackers at the event. DeepSpace is either the backend from the start or not used. | **AI/ML if ≥40 labeled real answers with agreement by Sat 9 PM; otherwise Entertainment** (a near-tie on EV) | Gemini (classifier), GoDaddy, Easy On The Eyes, DEV; maybe DeepSpace | ~30 (~34) | ~$132 / $194 |
 | alt | **Beat the Fingerprint** (the judge tries to evade our audio matcher; tempo/pitch read back) | Entertainment | Domain, Easy On The Eyes, Vultr (no honest Gemini job) | ~31 | ~$173 / $239 before the reliability adjustment |
 | alt | **Roblox "Call It"** (lobby bets on the physics outcome, then the round plays out) | Entertainment | Roblox (~45% odds, ~$400 total), domain. Needs a Win/Mac laptop and an age-checked Roblox account ≥2 days old | ~32 | ~$120 |
 
 \* Vultr only if its credit code needs no card (no-spend rule); otherwise Render.
+
+**L1 vs L-F1 comes down to the Capital One amount.**
+- At $500, L-F1 needs ~33% Capital One odds to beat L1. We estimate ~22%: 3 Nessie "hold" projects were posted in the last two weeks, and Capital One reps have seen the idea.
+- If the help desk says the full $1,000 goes to us, L-F1 ties or edges L1.
 
 **Decision gates for L1** (from the red team):
 
