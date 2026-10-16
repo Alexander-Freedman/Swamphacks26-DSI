@@ -17,5 +17,7 @@ Decisions + how to run things. Keep current.
 
 - Oct 16 4pm: hacking (code allowed) starts ~8:30pm Fri, matching the Notion rules. Doors and check-in are earlier. No project code before 8:30pm.
 
+- Oct 16 5:30pm: research runs until 90% usage, the usage reset, or 8:30pm, whichever comes first. Then everything pauses until I say resume.
+
 ## How to run
 Nothing to run yet.
