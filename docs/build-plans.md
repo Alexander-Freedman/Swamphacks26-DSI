@@ -1,10 +1,10 @@
 # Build plans for the top two directions
 
-Prep only. No project code until hacking opens (event rule). Whichever direction Alex picks, the split below turns straight into issues.
+Prep only. No project code until hacking opens (event rule). Whichever direction I pick, the split below turns straight into issues.
 
-Split for both: **Alex = backend/data/model**, **Luana = frontend/demo/pitch assets**. We agree the API contract (below) in the first 30 minutes, so the frontend can build against a mock right away.
+Split for both: **me = backend/data/model**, **@luanamaldaner = frontend/demo/pitch assets**. We agree the API contract (below) in the first 30 minutes, so the frontend can build against a mock right away.
 
-Accounts we need (people do these at the event, not us): a hosting account (Vercel/Render or Vultr for the MLH prize), Auth0, Tiger Data (direction 1), a Gemini API key, and a GoDaddy domain via the MLH code.
+Accounts we need (set up at the event): a hosting account (Vercel/Render or Vultr for the MLH prize), Auth0, Tiger Data (direction 1), a Gemini API key, and a GoDaddy domain via the MLH code.
 
 ---
 
@@ -42,8 +42,8 @@ POST /api/replay {date}             -> switches the data source to a recorded da
 ```
 
 ### Issues to open on pick
-- Alex: data ingest (NWS, Open-Meteo, USGS, NIFC) → normalized hazard table · risk scoring + window · alerts intersect · replay recorder · eval script + numbers · briefing endpoint.
-- Luana: map UI (Leaflet) + site panel · risk timeline chart · alert feed + toast · auth screen · landing/Devpost assets · video.
+- Me: data ingest (NWS, Open-Meteo, USGS, NIFC) → normalized hazard table · risk scoring + window · alerts intersect · replay recorder · eval script + numbers · briefing endpoint.
+- @luanamaldaner: map UI (Leaflet) + site panel · risk timeline chart · alert feed + toast · auth screen · landing/Devpost assets · video.
 
 ---
 
@@ -79,8 +79,8 @@ GET  /api/model/:user_id                 -> {nodes:[{id, label, state}], accurac
 ```
 
 ### Issues to open on pick
-- Alex: misconception taxonomy + seed items · classifier endpoint · eval set + script · item selection · user model storage.
-- Luana: sim renderer (canvas) for 3 templates with ghost overlay · prediction inputs · graph view · landing/Devpost assets · video.
+- Me: misconception taxonomy + seed items · classifier endpoint · eval set + script · item selection · user model storage.
+- @luanamaldaner: sim renderer (canvas) for 3 templates with ghost overlay · prediction inputs · graph view · landing/Devpost assets · video.
 
 ---
 

@@ -2,9 +2,9 @@
 
 Research notes, Oct 16 2026. Sources are linked inline. Anything marked *(snippet)* came from a search excerpt rather than a full page read, so weigh it lower.
 
-> **Updates from Alex (Oct 16):**
+> **Updates (Oct 16):**
 > 1. Scope is all hackathons (MLH, Devpost, university, corporate), not just SwampHacks. Broad research first, applied to SwampHacks at the end.
-> 2. Rough direction, not locked: the Mental Models Tool, a study tool that helps students build deep, runnable mental models of hard concepts (understanding you can simulate and apply), not flashcards. It's ranked below against the alternatives.
+> 2. Rough direction, not locked: my Mental Models Tool, a study tool that helps students build deep, runnable mental models of hard concepts (understanding you can simulate and apply), not flashcards. It's ranked below against the alternatives.
 
 ---
 
@@ -27,7 +27,7 @@ Research notes, Oct 16 2026. Sources are linked inline. Anything marked *(snippe
 **Our plan in one paragraph.** Pick an idea that fits General, one track and 2-4 sponsor/MLH prizes *naturally*. Lock the idea before hacking opens. Have a deployed URL by hour 6. Freeze features around hour 28. Record a backup demo video Saturday night. Submit early Sunday (~6am), then rehearse the 3-minute table pitch. Both of us talk to the Sperry Tech, Capital One and MLH reps Friday night before committing.
 
 **Two rules we must not trip on:**
-- **AI tool disclosure.** SwampHacks rules: "AI/LLM tools may be used but must be disclosed" on Devpost, and they monitor for cheating "manually and using automated tools." MLH guidance says uncredited AI use gets a team disqualified and reported ([Devpost rules](https://swamphacks-xii.devpost.com/rules), [MLH rules](https://guide.mlh.com/general-information/judging-and-submissions/rules-for-your-hackathon)). The XI submission form had an explicit "which AI tools did you use" question. Alex decides the disclosure wording before submitting. We're not going for the "Least Vibe Coded" award.
+- **AI tool disclosure.** SwampHacks rules: "AI/LLM tools may be used but must be disclosed" on Devpost, and they monitor for cheating "manually and using automated tools." MLH guidance says uncredited AI use gets a team disqualified and reported ([Devpost rules](https://swamphacks-xii.devpost.com/rules), [MLH rules](https://guide.mlh.com/general-information/judging-and-submissions/rules-for-your-hackathon)). The XI submission form had an explicit "which AI tools did you use" question. I decide the disclosure wording before submitting. We're not going for the "Least Vibe Coded" award.
 - **At least one of us must be at judging *and* at closing,** or we forfeit prizes (Notion rules).
 
 ---
@@ -127,7 +127,7 @@ The rankings use what we know about SwampHacks XII's tracks, its judges and past
 
 ### 4. Capital One Nessie challenge ($1,000 cash)
 
-**The idea.** A finance app on Capital One's Nessie mock banking API. One fit with Alex's idea: a "runnable money model", where you predict where your balance lands after a decision and then the simulation of your real transactions shows you.
+**The idea.** A finance app on Capital One's Nessie mock banking API. One fit with my idea: a "runnable money model", where you predict where your balance lands after a decision and then the simulation of your real transactions shows you.
 
 **Why it's #4:**
 - The cash is good.
@@ -144,7 +144,7 @@ The rankings use what we know about SwampHacks XII's tracks, its judges and past
 - The Roblox prize requires core logic in Luau in Roblox Studio. That's a niche stack (so uncrowded), but it's slow to iterate and hard to test outside Studio.
 - A non-Roblox game only has the Entertainment track (AirPods).
 
-**Recommendation:** directions 1 and 2 are the real choices. Number 1 has the better odds; number 2 is the better story. Number 3 is an upgrade to number 1 if hardware is available. Alex picks.
+**Recommendation:** directions 1 and 2 are the real choices. Number 1 has the better odds; number 2 is the better story. Number 3 is an upgrade to number 1 if hardware is available. I'll pick before hacking starts.
 
 ---
 
