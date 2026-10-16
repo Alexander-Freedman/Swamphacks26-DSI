@@ -43,19 +43,43 @@ Nothing is picked; I decide. This is built from the official guide, rules and De
 3. **CpE lab** (Wertheim): is there a temp/humidity sensor on request?
 4. **Sperry, Capital One and DeepSpace tables:** are you judging in person? For Sperry: is 50 plants a hard minimum, and is satellite lightning OK?
 
-## Top stacks (ranked by expected prize value; win odds are gut estimates for *ranking*, not forecasts)
-Cash is shown two ways because the docs disagree. **A** = split four ways regardless of team size (rules page), so we get half. **B** = split among members (guide), so we get all of it. Physical prizes count once per member.
+## Top stacks (after the red team; nothing is picked)
+The first version of stack 1 (hazard radar + DeepSpace + a Gemini agent + Tiger + Vultr) failed review (docs/prize-stacks-redteam.md):
+- **Over budget.** The real build budget is ~37-41 person-hours after meals, write-up, video, user tests and buffer. That stack needed ~46-48.
+- **Sprawl.** It meant ~9-10 things to show in 3 minutes, which is the sprawl Sperry's panel warned against.
+- **A shaky demo.** ~50% odds of one.
+- **The agent version was a safety problem.** It put an LLM plus an approval step in front of the lightning stop-work rule, which has to stay deterministic.
 
-| Rank | Stack (idea + track + challenges) | Best track and why | EV (A / B) | Person-hours (we have ~48-56 awake) | Biggest risk |
+Lean versions keep almost all of the expected value with ~14 fewer hours.
+
+Expected value (EV) is **reliability-adjusted**: a shaky demo keeps ~40% of its value. "A" assumes cash is split four ways regardless of team size; "B" assumes it's split among members. Odds are gut estimates for *ranking* only.
+
+| Rank | Stack | Track (compared, not defaulted) | Prizes | Core hours (+buffer) | Adj. EV A / B |
 |---|---|---|---|---|---|
-| **1** | **Hazard radar for Sperry, with DeepSpace as the crew channel.**<br>• Vultr: the Python data + ML worker (lightning poller, 0-10 index with a time-split eval) writing to **Tiger Data**.<br>• **DeepSpace**: the crew app (login, live site rooms where a photo hazard pin hits every phone instantly, photo storage, the 6 PM briefing job, live stop-work countdown).<br>• **Gemini**: tags crew photos, writes the briefing from our numbers only, answers questions about the board through tool calls.<br>• Plus **GoDaddy domain**, **Easy On The Eyes**, and a **DEV** post after. | **AI/ML** (~+$11 for ~2h, since the model + eval *are* the Sperry core). Hardware is worth more (~+$39) but costs ~8.5h, which we don't have unless we cut DeepSpace and the CpE lab has a sensor. Entertainment doesn't fit. | ~$370 / $429 | ~46-48 (the whole budget) | DeepSpace is an alpha SDK, so it gets a 4h timebox with stack 2 as the fallback |
-| **2** | **Hazard radar for Sperry, with a Gemini safety agent + Auth0 for AI Agents.**<br>• Same build, with Auth0 instead of DeepSpace.<br>• The agent can *propose* a stop-work; a supervisor approves it through Auth0's agent flow.<br>• **Tiger Data, Vultr, Gemini, domain, Easy On The Eyes, DEV.** | **AI/ML** (same reasoning as stack 1) | ~$346 / $380 | ~47 | Auth0's agent API needs checking on site. This is the fallback for stack 1 |
-| **3** | **Mental Models live classroom.**<br>• **DeepSpace** rooms: the teacher opens a room, students lock in predictions, then the sim reveals the truth.<br>• A **Gemini** misconception classifier with a real eval on answers collected at the event.<br>• Plus **domain, Easy On The Eyes, DEV.** | **AI/ML vs Entertainment is a near-tie** (~$14 vs ~$18). Take AI/ML only if the eval table on real data is done by Sat night, because DSI reads the code; otherwise Entertainment. | ~$150 / $220 | ~34 | Thin sponsor stack; needs 40+ real answers by Sat evening |
-| alt 3 | **Beat the Fingerprint arena** (DeepSpace rooms + a matcher on Vultr) | **Entertainment** (fingerprinting is signal processing, not ML) | ~$173 / $239 | ~31 | Gemini has no honest job, so it fits the "lean into AI" decision worse; a loud hall |
+| **1** | **Lean hazard radar for Sperry** (L1): one go/no-go board with a "why" drawer that opens the raw source, the exact lightning stop-work rule tested on a recorded storm day, replay mode, a calibrated daily 0-10 index with a time-split eval, phone crew reports. FastAPI on Vultr, Tiger as the only DB, React/Leaflet. **No agent.** | **AI/ML** ~+$12 for 1-2h, since the eval *is* the Sperry core. Hardware ~+$39 but 8.5h+ and no listed humidity sensor. Entertainment doesn't fit. First Timers beats all of them if we qualify. | Sperry (3 places + interviews), Tiger Data, Vultr*, GoDaddy, Gemini (briefing wording only), Easy On The Eyes, DEV; stretch: Auth0 supervisor login | ~33 (~37) | ~$280 / $306 |
+| 1b | **Same + DeepSpace crew channel** (L1+DS): only if a 90-min spike passes by **Sat 12:30 AM** *and* DeepSpace confirms in-person judging. Otherwise drop it for good. | AI/ML | L1 + DeepSpace | ~38-40 | ~$290 / $329 (more variance) |
+| **2** | *(pending: lean finance interceptor, being scored in the same format)* | | | | |
+| **3** | **Lean Mental Models** (M1): draw your prediction, the ghost replays it against the truth, a misconception card, and an eval on answers collected from hackers at the event. DeepSpace is either the backend from the start or not used. | **AI/ML if ≥40 labeled real answers with agreement by Sat 9 PM; otherwise Entertainment** (a near-tie on EV) | Gemini (classifier), GoDaddy, Easy On The Eyes, DEV; maybe DeepSpace | ~30 (~34) | ~$132 / $194 |
+| alt | Beat the Fingerprint / Roblox "Call It" | Entertainment | see rows above | ~31-32 | ~$120-240, lower Overall odds |
 
-| alt 3b | **Transfer-fraud interceptor (finance).**<br>• A model trained on *public* fraud data (PaySim / Kaggle credit-card), with an honest PR-AUC / recall-at-precision eval.<br>• A risky transfer becomes a **held** transfer on **Nessie** live, showing the score + top 3 reasons.<br>• Plus **Auth0, Tiger Data** (transaction time series), **Gemini** (a plain-language explanation of the hold), **domain, Easy On The Eyes**. | **AI/ML** fits best (a real model on real data, which is exactly what DSI reads for) | Capital One is ~$500-1,000 (the guide says $250/member, Devpost says $1,000 total), ~8-15 entries; no Sperry interviews | ~30-34 | Nessie's own data is shared mock junk, so never train or eval on it (it's only the live money rail). It's a crowded "fraud detector" archetype, so the bank-side hold is the hook. Capital One has no judge on the published list, so pitch their rep at Company Connect |
+\* Vultr only if its credit code needs no card (no-spend rule); otherwise Render.
 
-| alt 3c | **"Call It": a predict-then-watch physics arena in Roblox.** Everyone in the lobby stakes a guess (landing spot, which ramp wins), then the round runs in Roblox physics; the closest guess scores, and a replay overlays the textbook model. Plus **domain** (a teacher landing page), maybe **Easy On The Eyes**. | **Entertainment** (a game; Roblox excludes the web sponsors anyway) | Roblox ~$400 total at ~45% odds (2 of 111 used Roblox at XI) + AirPods track | ~32 | Studio runs on **Win/Mac only** (our build box is Linux). Team Create and going public need an **age-checked account ≥2 days old**, so a private game run from the owner's laptop is the realistic demo. Roblox physics is "truth" only for gravity/projectile rounds |
+**Decision gates for L1** (from the red team):
+
+| When | Gate |
+|---|---|
+| Fri 9:30 PM | Vultr card + Tiger signup |
+| Fri 10:30 PM | Sperry answers (in-person judging, 50 plants, satellite lightning) |
+| Sat 12:30 AM | Recorded storm day parses; the stop-work rule passes on it |
+| Sat 5:30 AM | First eval number in the README |
+| **Sat 8 AM** | **Demo runs from main on the URL, or all stretch work freezes** |
+| Sat 12:30 PM | Stretch only if ≥3h of buffer is unspent |
+| Sat 4:15 PM | Last scope change (after the Sperry workshop) |
+| Midnight | Feature freeze + video |
+
+**Never cut:** the board + source drawer, the tested lightning rule, replay, the eval table, phone crew report, the deployed URL, the backup video.
+
+**Model fix:** the index is *daily* per site. The hourly strip is a separate forecast-based "likely window", labeled as such.
 
 **Track choice (general):**
 - The track is worth roughly $10-50 in EV for every idea. **The challenges carry the stacks.**
