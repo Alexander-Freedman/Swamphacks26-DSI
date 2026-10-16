@@ -370,7 +370,7 @@ Agree the answers to these in advance ([AngelHack](https://angelhack.com/blog/10
 
 ## Part 5: our 36-hour plan (2 people, Fri evening to Sun 8am)
 
-This is adapted from [Reskilll](https://blogs.reskilll.com/hackathon-preparation-checklist-2026-before-during-after/), [Kim](https://getpushtoprod.substack.com/p/how-to-win-hackathons), [Eden](https://shkspr.mobi/blog/2019/11/how-to-present-at-a-hack-day/) and [dev.to](https://dev.to/jacklyn/how-to-make-your-devpost-submissions-not-suck-37i0). "H" is hours after hacking opens (~8pm Fri).
+This is adapted from [Reskilll](https://blogs.reskilll.com/hackathon-preparation-checklist-2026-before-during-after/), [Kim](https://getpushtoprod.substack.com/p/how-to-win-hackathons), [Eden](https://shkspr.mobi/blog/2019/11/how-to-present-at-a-hack-day/) and [dev.to](https://dev.to/jacklyn/how-to-make-your-devpost-submissions-not-suck-37i0). "H" is hours after hacking opens (~8:30pm Fri). Submit by 8:00am Sun, so it's really ~35.5h.
 
 | When | Builder A (core + wow) | Builder B (integrations + pitch) |
 |---|---|---|

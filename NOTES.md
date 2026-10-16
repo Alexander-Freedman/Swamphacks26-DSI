@@ -15,5 +15,7 @@ Decisions + how to run things. Keep current.
 
 - Oct 16: nothing is picked. Research continues nonstop until I say "we have an idea". Hazard radar and Mental Models Tool are candidates, not decisions.
 
+- Oct 16 4pm: hacking (code allowed) starts ~8:30pm Fri, matching the Notion rules. Doors and check-in are earlier. No project code before 8:30pm.
+
 ## How to run
 Nothing to run yet.
