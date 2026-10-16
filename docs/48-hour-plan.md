@@ -90,15 +90,48 @@ Each block has a goal, who does what, and **done when**. "H" = hours after 8:30p
 | Block | When | Goal | My side | Luana's side | Done when |
 |---|---|---|---|---|---|
 | **B0 Decide + set up** | H0-1.5 (8:30-10pm) | Pick the idea, lock the prizes, get accounts | Ask sponsors and the hardware desk (docs/friday-checklist.md); accounts | Repo skeleton, empty deploy | One-liner in TASKS.md; issues opened from docs/first-6h.md; `/api/health` live on a URL (1-3h, so it may run into B1) |
-| **B1 Demo moment first** | H1.5-5 (10pm-1:30am) | Find the demo moment fast | The core interaction end to end, ugly | A second take on the *visual* of the demo moment against the mock (no evidence that whole parallel prototypes win more, so we only fork the visual) | Shown to 2-3 people nearby at ~1:30am; one visual picked. 2-3h |
+| **B1 Two timeboxed prototypes** | H1.5-4 (10pm-12:30am) | Find the demo moment fast | Ugly prototype A, end to end, **hard 90 min** | Ugly prototype B (a different interaction), **hard 90 min**; 3 static mockups of the demo screen generated in the background | 20-min pick at ~12:30am, scoring 1-3 each on: passersby react in 30 s / real, explainable core / data path works / known risk left / prize fit. Steal the loser's best bit, delete its branch, never start a third. (Parallel prototyping beat serial in Dow et al. 2010; no hackathon-specific evidence, so this is our call.) |
 | **B2 Core depth** | H5-9 (1:30-5:30am) | The technical core works on real data | Model/algorithm + eval v0 + label/split frozen | The real UI on the real API, the demo path | Eval number in the README; demo path runs on the deployed URL. Sleep in shifts: 3-4h each, staggered |
 | **B3 Checkpoint + harden** | H9-14 (5:30-10:30am Sat) | Demo-able from main at any moment | Fix integration bugs; replay/fixture mode | Loading, empty and error states; phone layout | At H12 we can honestly answer yes to "can we demo right now?", posted in the Plan issue |
-| **B4 Real users** | H14-19 (10:30am-3:30pm) | Evidence it matters | Collection page or test flow; logging | Run 5-10 students through it at lunch; write notes | `docs/user-testing.md` has the findings; top 3 issues filed and fixed |
-| **B5 Depth + design** | H19-24 (3:30-8:30pm) | Earn top marks on Tech and Design | One depth feature from the scorecard gap; eval on real data | Design polish pass (type, color, spacing, motion) | Scorecard re-graded; the biggest gap closed; Devpost draft started |
+| **B4 Real users, round 1** | H14-19 (10:30am-3:30pm) | Evidence it matters | Test flow + logging; fix the top 3 (each ≤45 min) | Run **5 users at lunch** (~11:30-12:30) with a 5-min script: consent line, one task card, think-aloud, success/time/1-7 ease, one quote. No names/photos, 18+, IDs P1-P5 | `docs/user-testing.md` has the findings; top 3 fixed. 5 users find ~85% of usability issues (NN/g). This is product feedback, not a study, so don't call it research |
+| **B5 Depth + design + users round 2** | H19-24 (3:30-8:30pm) | Earn top marks on Tech and Design | One depth feature from the scorecard gap; eval on real data | Design polish pass; **round 2: 5 users at dinner (~6-7pm), same task card** | Scorecard re-graded; a before/after line for the pitch (e.g. "2/5 → 5/5, 74s → 31s"); Devpost draft started |
 | **B6 Freeze + backup** | H24-28 (8:30pm-12:30am) | Lock it, protect the demo | Feature freeze at H28; README, architecture diagram | **Record the backup demo video** (1.5-2.5h with edits) | Video uploaded unlisted **and its URL already in the Devpost draft** (YouTube processing can take hours; the video can't change after 8:00am); main tagged |
 | **B7 Polish + write** | H28-32 (12:30-4:30am Sun) | Submission-ready | Bug fixes only; final eval table | Devpost write-up (450-1,100 words, screenshots) | Draft complete; every sponsor tool named |
 | **B8 Submit + rehearse** | H32-35.5 (4:30-8:00am) | Ship early, then practice | **Submit by ~6:00am**, then edit until 8:00 | Rehearse the 3:00 and 1:30 pitches 3× each; "why did we do X" drill | Submitted; final edits done early (editing a live gallery entry unpublishes it until re-review); both of us can explain every part and give both pitches solo |
 | **Judging** | Sun morning | Win the table | Driver + technical Q&A | Narrator | — |
+
+## Sleep (docs/plan-extras.md)
+The old plan had **no Saturday-night sleep**, and the sleep-deprived low hits Sunday ~6-10am, which is our submit and judging window. For reference: 17h awake ≈ 0.05% BAC, 24h ≈ 0.10% (Dawson & Reid 1997). This assumes we both woke ~8am Fri:
+
+| Time | My side | Luana's side |
+|---|---|---|
+| Sat 1:30-4:45am | awake | sleep ~3h |
+| Sat 4:45-8:00am | sleep ~3h | awake |
+| Sat ~2-3pm | 26-min nap (staggered) | 26-min nap (staggered) |
+| Sun 12:45-3:45am | sleep 3h | awake: write-up, no merges |
+| Sun 3:45-6:45am | awake: submit by ~6:00 | sleep 3h |
+| Sun 6:45am → judging | both up, rehearse | both up |
+
+**Rules:**
+- Never both asleep at once.
+- Nobody sleeps during B0/B1, the H12 checkpoint, freeze + video, or the 90 min before judging.
+- Stop big caffeine ~6h before your sleep block.
+- After ~17h awake, no deploy, migration, contract change or git surgery without the other person.
+
+## Repo rules for two people + two assistants (docs/plan-extras.md)
+One preprint on ~34k AI-written PRs found a **41.7% conflict rate** when two different assistants worked in parallel vs 19.8% for one (not peer reviewed). So:
+- **Folder ownership**, written in NOTES.md and in each side's assistant instructions.
+- **Contract first**, frontend against a mock.
+- **One task = one branch = one worktree.**
+- **PRs under ~200 lines**, branches under 2-3h.
+- **CI and a formatter in hour 1.**
+- **One owner per lockfile.**
+- **Demo flag `?demo=1`.**
+
+## Deploy (docs/deploy-provenance.md)
+- **Vultr + Caddy + docker compose:** HTTPS first on `<ip>.sslip.io`, then switch to the domain once DNS resolves. Ask at the MLH desk whether the Vultr credit needs a card; if it does, use the fallback (no-spend rule).
+- **Fallback:** Render free (API) + a static frontend.
+- **Emergency:** a Cloudflare quick tunnel from a laptop.
 
 ## Rules for the whole 35h
 - **The demo script is the spec.** Build only what judges will see (docs/pitch.md for now; docs/demo-script.md once we pick).
