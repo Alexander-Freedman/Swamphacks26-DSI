@@ -13,5 +13,7 @@ Decisions + how to run things. Keep current.
 
 - Oct 16 ~2pm: I'm deciding the direction later; event starts at 4pm. Build plans for the top two are in docs/build-plans.md.
 
+- Oct 16: nothing is picked. Research continues nonstop until I say "we have an idea". Hazard radar and Mental Models Tool are candidates, not decisions.
+
 ## How to run
 Nothing to run yet.

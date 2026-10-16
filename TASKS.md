@@ -10,6 +10,7 @@ Shared board. Every task is a GitHub issue; assign yourself + comment "on it" be
 | #3 | docs/sponsor-tech.md: sponsor/MLH prize APIs, setup cost, worth it? | @luanamaldaner (proposed) | open |
 
 ## Next
-- I pick a direction from docs/strategy.md (ranked: 1 hazard radar for Sperry, 2 Mental Models Tool, 3 hazard radar + sensor, 4 Nessie, 5 Roblox/game)
+- Research keeps going until I say "we have an idea". Nothing is picked; hazard radar and Mental Models Tool are candidates only. Going deeper: winner teardowns, judge/organizer interviews, per-prize analysis, new ideas, stress tests, pitch outlines + demo scripts.
+- Then I pick a direction from docs/strategy.md (ranked: 1 hazard radar for Sperry, 2 Mental Models Tool, 3 hazard radar + sensor, 4 Nessie, 5 Roblox/game)
 - No project code until hacking opens Fri ~8pm (event rule)
 - Split phase 2 build into issues (likely frontend/demo vs backend/data)
