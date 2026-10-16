@@ -62,6 +62,18 @@ More detail in docs/teardowns.md, docs/ideas.md, docs/pitch.md. Nothing is picke
 
 ## Ranked project directions
 
+**Current ranking after round 2** (details in docs/scorecard.md; nothing is picked):
+
+| Rank | Direction | Why | Biggest risk |
+|---|---|---|---|
+| 1 | Hazard radar built to the Sperry brief, replaying Jul 21 2025 | Best prize count: Sperry ×3 + interviews, AI/ML, near-empty MLH prizes. Every data source is checked. | Florida judges have seen hazard maps, so it has to output a crew decision; ~42h of work |
+| 2 | Mental Models Tool (core: predict → sim → misconception eval) | Lowest risk (~28h), strong research story, UF faculty judges | Thin prize stack; "Gemini already does sims" |
+| 3 | Mental Models with Sketch-to-Sim input | Most memorable at a table, and no app does it | Camera reliability under expo lighting |
+| 4 | Hazard radar + Heat Badge | Hardware wins at SwampHacks | The standard MLH lab has no humidity sensor/ESP32; only works with our own parts |
+| 5 | Bridge Oracle / Nessie scam hold / Roblox | See docs/ideas.md | Weaker sponsor fit or crowded |
+
+The original write-ups follow.
+
 The rankings use what we know about SwampHacks XII's tracks, its judges and past winners. "Stack" means the prizes a direction can honestly enter.
 
 ### 1. Field-crew hazard radar (Sperry Tech "PlanIT Control" challenge)
