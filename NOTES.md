@@ -11,5 +11,7 @@ Decisions + how to run things. Keep current.
 
 - Event facts (from docs/strategy.md): SwampHacks XII is Oct 16-18 2026 at Reitz Union. Devpost opens Fri 8:00pm, closes **Sun 8:00am** (target submit ~6am). All code must be written during the event: no project code before hacking opens. Expo judging: 3 min demo + 1 min Q&A, video 2 min max. General + max one track, unlimited sponsor/MLH prizes. One of us must be at judging and closing. Tool use must be credited on Devpost; Alex decides the wording before submit.
 
+- Alex (Discord, Oct 16 ~2pm): direction decided later; event starts at 4pm. Build plans for the top two are in docs/build-plans.md.
+
 ## How to run
 Nothing to run yet.
