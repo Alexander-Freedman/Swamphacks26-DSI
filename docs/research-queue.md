@@ -8,9 +8,9 @@ Ranked by how much the answer changes what we do. Each pass takes the top open q
 4. What exactly did Sperry's ShellHacks 1st place (Common Ground) build and show, and what should our entry's single visual idea be? → prizes.md. *(pass running)*
 5. How do we run 5-10 real-user tests at a hackathon in 1 hour (recruiting, script, consent, what to measure)? → 48-hour-plan.md B4.
 6. Is it worth building 2 quick prototypes in B1, or just one? Evidence from teams that did it. → 48-hour-plan.md.
-7. When is the expo on Sunday, how many judges visit each table, and is there a finals round? (Ask organizers on Discord; check the Devpost updates page.) → strategy.md.
-8. Which judging rubric do judges actually get: Devpost's 7 criteria or Notion's 5? → strategy.md.
-9. Is the cash really split 4 ways regardless of team size? → strategy.md, prizes.md.
+7. When is the expo on Sunday, how many judges visit each table, and is there a finals round? (Asked in #questions; also check the Devpost updates page.) → strategy.md.
+8. Which judging rubric do judges actually get: Devpost's 7 criteria or Notion's 5? (Asked in #questions.) → strategy.md.
+9. Is the cash really split 4 ways regardless of team size? (Asked in #questions.) → strategy.md, prizes.md.
 10. What does the hardware desk actually have tonight? → scorecard.md.
 11. What's the fastest reliable deploy for a FastAPI + React app with HTTPS on a custom domain (Vultr vs Render vs others) on venue wifi? → feasibility.md.
 12. How should we write the tools/AI disclosure on Devpost so it's honest and doesn't hurt us with judges? (I decide the wording.) → pitch.md.
