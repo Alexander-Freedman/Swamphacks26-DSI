@@ -60,7 +60,8 @@ Expected value (EV) is **reliability-adjusted**: a shaky demo keeps ~40% of its 
 | 1b | **Same + DeepSpace crew channel** (L1+DS): only if a 90-min spike passes by **Sat 12:30 AM** *and* DeepSpace confirms in-person judging. Otherwise drop it for good. | AI/ML | L1 + DeepSpace | ~38-40 | ~$290 / $329 (more variance) |
 | **2** | *(pending: lean finance interceptor, being scored in the same format)* | | | | |
 | **3** | **Lean Mental Models** (M1): draw your prediction, the ghost replays it against the truth, a misconception card, and an eval on answers collected from hackers at the event. DeepSpace is either the backend from the start or not used. | **AI/ML if ≥40 labeled real answers with agreement by Sat 9 PM; otherwise Entertainment** (a near-tie on EV) | Gemini (classifier), GoDaddy, Easy On The Eyes, DEV; maybe DeepSpace | ~30 (~34) | ~$132 / $194 |
-| alt | Beat the Fingerprint / Roblox "Call It" | Entertainment | see rows above | ~31-32 | ~$120-240, lower Overall odds |
+| alt | **Beat the Fingerprint** (the judge tries to evade our audio matcher; tempo/pitch read back) | Entertainment | Domain, Easy On The Eyes, Vultr (no honest Gemini job) | ~31 | ~$173 / $239 before the reliability adjustment |
+| alt | **Roblox "Call It"** (lobby bets on the physics outcome, then the round plays out) | Entertainment | Roblox (~45% odds, ~$400 total), domain. Needs a Win/Mac laptop and an age-checked Roblox account ≥2 days old | ~32 | ~$120 |
 
 \* Vultr only if its credit code needs no card (no-spend rule); otherwise Render.
 
