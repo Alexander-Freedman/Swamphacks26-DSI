@@ -24,7 +24,7 @@ Scores are 1-5 gut calls based on the research docs. They are not data.
 | **D. Hold the Wire** (scam call → Nessie hold) | 3 | 2 (crowded) | 4 | 3 | 4 (elders) | AI/ML 3 | Capital One 4 | Overall, AI/ML, Capital One ×1, Auth0, domain | Low-medium |
 
 ## Hour estimates (docs/feasibility.md)
-We have ~48 usable person-hours. A is ~42h (cut: storm-cell clustering). A+ adds ~8.5h. B core + eval is ~28h. B with Sketch-to-Sim + DeepSpace is ~42-46h (cut: sketch capture).
+We have ~48 usable person-hours. A is ~42h (cut: storm-cell clustering). A+ adds ~8.5h. B core + eval is ~28h. B with Sketch-to-Sim + DeepSpace is ~42-46h (cut: sketch capture). The paper-card input alone is ~10-13h once done properly (docs/sketch-input.md), so build the on-screen canvas first.
 
 ## Reading it
 - **Best expected prize count:** A or A+. Sperry has 3 slots plus interviews and an estimated 5-12 entries, and those stack with AI/ML or Hardware plus the near-empty MLH prizes.
