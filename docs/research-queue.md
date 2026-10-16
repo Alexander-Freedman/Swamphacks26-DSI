@@ -5,7 +5,6 @@ Ranked by how much the answer changes what we do. Each pass takes the top open q
 ## Open
 1. **Where are AI coding tools actually slow or unreliable** (deploy, auth, integration, rate limits, design, live demos), with numbers? → 48-hour-plan.md. *(pass running)*
 2. **Once everyone ships fast, what do judges reward**, and how do AI-heavy winners spend the extra time? Real timelines. → 48-hour-plan.md, strategy.md. *(pass running)*
-3. What will the hazard index's label, features and eval look like, and is the GOES-16 lightning archive usable for training? → build-plans.md. *(pass running)*
 4. What exactly did Sperry's ShellHacks 1st place (Common Ground) build and show, and what should our entry's single visual idea be? → prizes.md. *(pass running)*
 5. How do we run 5-10 real-user tests at a hackathon in 1 hour (recruiting, script, consent, what to measure)? → 48-hour-plan.md B4.
 6. Is it worth building 2 quick prototypes in B1, or just one? Evidence from teams that did it. → 48-hour-plan.md.
@@ -19,9 +18,11 @@ Ranked by how much the answer changes what we do. Each pass takes the top open q
 14. How do top teams handle two people + two coding assistants on one repo without merge pain (file ownership, contract-first, PR size)? → 48-hour-plan.md.
 15. What makes a demo video score well when judges watch 50+ (first 10 seconds, captions, length)? → pitch.md. *(expo/video pass running)*
 16. Which past SwampHacks winners did real user testing, and did they mention it in the pitch? → teardowns.md.
-17. What sleep schedule do repeat winners use for ~36h with 2 people, and when is the worst time to be asleep? → 48-hour-plan.md.
+17. Do the Sperry reps accept NCEI strike tiles for training and a per-day index (vs per-hour)? (Ask Friday.) → hazard-ml.md
+18. What sleep schedule do repeat winners use for ~36h with 2 people, and when is the worst time to be asleep? → 48-hour-plan.md.
 
 ## Done
+- Hazard index design: label, leakage traps, model, eval, the calibration chart; GLM is too slow for training, NCEI strike tiles used instead → hazard-ml.md
 - How judges score (all events), SwampHacks XII rules, prizes and history → strategy.md
 - Winner teardowns, judge quotes → teardowns.md
 - Per-prize analysis, Sperry brief → prizes.md
