@@ -3,8 +3,6 @@
 Ranked by how much the answer changes what we do. Each pass takes the top open question, answers it with sources into the right doc, marks it done, and adds the 2-3 new questions it raised. The queue is never empty.
 
 ## Open
-1. **Where are AI coding tools actually slow or unreliable** (deploy, auth, integration, rate limits, design, live demos), with numbers? → 48-hour-plan.md. *(pass running)*
-2. **Once everyone ships fast, what do judges reward**, and how do AI-heavy winners spend the extra time? Real timelines. → 48-hour-plan.md, strategy.md. *(pass running)*
 5. How do we run 5-10 real-user tests at a hackathon in 1 hour (recruiting, script, consent, what to measure)? → 48-hour-plan.md B4.
 6. Is it worth building 2 quick prototypes in B1, or just one? Evidence from teams that did it. → 48-hour-plan.md.
 7. When is the expo on Sunday, how many judges visit each table, and is there a finals round? (Asked in #questions; also check the Devpost updates page.) → strategy.md.
@@ -19,9 +17,12 @@ Ranked by how much the answer changes what we do. Each pass takes the top open q
 17. Do the Sperry reps accept NCEI strike tiles for training and a per-day index (vs per-hour)? (Ask Friday.) → hazard-ml.md
 18. If we pick the hazard radar, what should the go/no-go board look like (pattern examples from ops dashboards, weather apps)? → sperry-deep.md
 19. What exactly goes on the table tent card and the 10-20 s attract loop for the picked idea? (Do after the pick.) → expo-video.md
-20. What sleep schedule do repeat winners use for ~36h with 2 people, and when is the worst time to be asleep? → 48-hour-plan.md.
+20. How do we avoid the "default generated look" fast (one design reference, a type/color system in 30 min)? → 48-hour-plan.md B5
+21. What depth feature would judges poke at for each top idea? → scorecard.md
+22. What sleep schedule do repeat winners use for ~36h with 2 people, and when is the worst time to be asleep? → 48-hour-plan.md.
 
 ## Done
+- Where AI tools are slow (METR, SO 2025, package/API errors, embedded), what judges reward once everyone ships fast, realistic task ranges → ai-era.md, 48-hour-plan.md
 - Expo table craft, 2-hour video workflow with tested ffmpeg commands, Devpost checklist → expo-video.md
 - Sperry's last-challenge winners + spec for our entry (go/no-go board, provenance drawer, stop-work CI test) → sperry-deep.md
 - Hazard index design: label, leakage traps, model, eval, the calibration chart; GLM is too slow for training, NCEI strike tiles used instead → hazard-ml.md

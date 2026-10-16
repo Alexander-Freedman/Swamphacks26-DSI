@@ -28,8 +28,52 @@ These come from git timestamps and run times in this repo today, not guesses.
 | Human setup (machines, accounts, access) | @luanamaldaner's side took ~3h ("spent all my time figuring ts out") | 1-3h; do it once, early |
 | Waiting on a review | PR #4 has been open 4h+ with no review | Never block on a review for non-risky work |
 
+## What judges reward once everyone ships fast (docs/ai-era.md)
+- **A working demo is table stakes.** A Semgrep judge at two 2026 events saw *every* team with working code, a polished UI and real data, and no crashes. Winners stood out on product sense: problem, why existing fixes fail, and the fix in one sentence, with tight scope ([Semgrep](https://semgrep.dev/blog/2026/the-ai-hackathon-effect/)).
+- **Judges now mark down:**
+  - the default generated look (purple gradients, Inter, three icon cards)
+  - 8-10 features that don't connect
+  - a chatbot where a form would do
+  - AI voiceovers
+  - **a team that can't explain its own code** (a 24h event in Mar 2026 was lost for exactly that)
+- **Real problems + real users win.** An AI lab's 2026 hackathon had 4 of 5 winners who weren't professional devs, working on problems they knew firsthand. An ElevenLabs hackathon winner tested on real call recipients and reworked the product after people hung up.
+- **Evidence over claims.** Some organizers now check the repo against the pitch automatically. MLH requires AI use to be disclosed and credited in the README.
+
 ## Where AI is slow or unreliable, so we budget extra
-Outside evidence is being added (research queue Q1). From today plus common experience:
+**Outside evidence (docs/ai-era.md):**
+
+| Study | Finding |
+|---|---|
+| METR RCT 2025 (experienced devs, own repos) | **19% slower**, while believing they were 20% faster |
+| Greenfield Copilot RCT | 55.8% faster |
+| Stack Overflow 2025 | 66% get "almost right" code; 45% say debugging AI code takes longer; 76% won't use AI for deployment |
+| Package and API errors | 5-20% of samples invent packages; 25-38% use deprecated APIs; accuracy drops sharply on APIs newer than the model |
+| Embedded | best 56% pass@1, ESP-IDF 29% |
+| Long tasks | agents finish ~1-2 human-hour chunks at ~50% reliability |
+
+So AI is fast at greenfield scaffolding and slow at the last 30%: integration, deploy, debugging, new APIs and hardware.
+
+**Realistic ranges with AI** (no source measures these directly; these are estimates anchored on the evidence above):
+
+| Task | Range |
+|---|---|
+| Scaffold + first deploy | 0.5-1.5h |
+| Managed auth (Auth0) | 0.5-1.5h |
+| Hand-rolled OAuth | 2-5h (avoid) |
+| DB setup | 0.5-2h |
+| Map UI | 1-3h, +2-4h for custom layers |
+| ML baseline + eval | 3-6h, including 1-3h of labeling |
+| LLM feature with caching | 1-3h |
+| Hardware sensor → app | 3-8h |
+| Design pass | 2-4h |
+| Demo/replay mode | ~1h |
+| Demo video | 2-3h |
+| Devpost write-up | 1-1.5h |
+| **Integration-surprise buffer** | **3-4h** |
+
+All of that fits 2 people × ~28 awake hours with ~15% slack, *if* we skip hand-rolled auth and do at most one hardware sensor.
+
+**Where to budget extra, from today plus the evidence:**
 - **Deploy + HTTPS + domain + env vars:** 1-3h the first time, so do it in H0-2, not H30.
 - **Auth (Auth0 roles, callbacks):** 1-3h, and roles aren't in the token by default (docs/feasibility.md). Only add it if it's a prize we're going for.
 - **Integration between our two halves:** each contract mismatch costs 30-90 min. Agree the API first and build against a mock.
@@ -46,7 +90,7 @@ Each block has a goal, who does what, and **done when**. "H" = hours after 8:30p
 | Block | When | Goal | My side | Luana's side | Done when |
 |---|---|---|---|---|---|
 | **B0 Decide + set up** | H0-1.5 (8:30-10pm) | Pick the idea, lock the prizes, get accounts | Ask sponsors and the hardware desk (docs/friday-checklist.md); accounts | Repo skeleton, empty deploy | One-liner in TASKS.md; issues opened from docs/first-6h.md; `/api/health` live on a URL (1-3h, so it may run into B1) |
-| **B1 Two quick prototypes** | H1.5-5 (10pm-1:30am) | Find the demo moment fast | Prototype A of the core interaction, end to end and ugly | Prototype B (a different interaction or visual) against the mock | Both shown to each other (and 2-3 people nearby) at ~1:30am; one picked, the other deleted. 2-3h each |
+| **B1 Demo moment first** | H1.5-5 (10pm-1:30am) | Find the demo moment fast | The core interaction end to end, ugly | A second take on the *visual* of the demo moment against the mock (no evidence that whole parallel prototypes win more, so we only fork the visual) | Shown to 2-3 people nearby at ~1:30am; one visual picked. 2-3h |
 | **B2 Core depth** | H5-9 (1:30-5:30am) | The technical core works on real data | Model/algorithm + eval v0 + label/split frozen | The real UI on the real API, the demo path | Eval number in the README; demo path runs on the deployed URL. Sleep in shifts: 3-4h each, staggered |
 | **B3 Checkpoint + harden** | H9-14 (5:30-10:30am Sat) | Demo-able from main at any moment | Fix integration bugs; replay/fixture mode | Loading, empty and error states; phone layout | At H12 we can honestly answer yes to "can we demo right now?", posted in the Plan issue |
 | **B4 Real users** | H14-19 (10:30am-3:30pm) | Evidence it matters | Collection page or test flow; logging | Run 5-10 students through it at lunch; write notes | `docs/user-testing.md` has the findings; top 3 issues filed and fixed |
