@@ -104,7 +104,7 @@ Event fixtures we plan around:
 | **B1 Two timeboxed prototypes** | Fri 10:00 PM-12:30 AM (H1.5-4) | Find the demo moment | Ugly prototype A end to end, **hard 90 min** | Ugly prototype B (a different interaction), **hard 90 min** | 20-min pick at ~12:30 AM using the rubric in docs/plan-extras.md; loser branch deleted |
 | **B2 Core depth** | Sat 12:30-5:30 AM (H4-9) | The technical core works on real data | Model/algorithm + eval v0 + label/split frozen | The real UI on the real API (after their sleep) | Eval number in the README; demo path on the deployed URL |
 | **B3 Checkpoint + harden** | Sat 5:30-10:30 AM (H9-14) | Demo-able from main at any moment | Integration fixes; replay/fixture mode | Loading, empty and error states; phone layout | **8:00 AM after breakfast:** an honest yes to "can we demo right now?" in the Plan issue |
-| **B4 Sponsors + users round 1** | Sat 10:30 AM-3:30 PM (H14-19) | Outside evidence | One of us at **Company Connect** (10:30-12:30) shows the demo to the relevant reps; the other keeps building | **5 users at lunch (1:30-2:30)** with the 5-min script | `docs/user-testing.md` has round 1 + sponsor notes; top 3 fixes done |
+| **B4 Sponsors + users round 1** | Sat 10:30 AM-3:30 PM (H14-19) | Outside evidence | One of us at **Company Connect** (10:30-12:30) shows the demo to the relevant reps; the other keeps building | **5 users at lunch (1:30-2:30)** with the 5-min script | `docs/user-testing.md` has round 1 + sponsor notes; top 3 fixes done. No SwampHacks winner we sampled gave a tester count or a real quote, so "5 testers, 2/5 → 5/5, one quote with the person's role, tied to a change we made" would stand out |
 | **B5 Depth + design** | Sat 3:30-8:30 PM (H19-24) | Top marks on Technical Understanding + Design | One depth feature from the scorecard gap; eval on real data. If we're on Sperry: be at their **3:30 workshop** | Design pass (docs/design-depth.md) | Scorecard re-graded; biggest gap closed; Devpost draft started |
 | **B6 Users round 2 + freeze** | Sat 8:30 PM-12:30 AM Sun (H24-28) | Lock it, protect the demo | **5 users at dinner (8-9 PM)**, same task card; **feature freeze ~midnight** | Backup demo video recorded (≤2 min; the guide says video is optional, but it's our insurance) | Before/after line for the pitch; video uploaded unlisted and its URL in the Devpost draft; main tagged |
 | **B7 Polish + write** | Sun 12:30-4:30 AM (H28-32) | Submission-ready | Bug fixes only; final eval table; README with AI-tools section | Devpost write-up (450-1,100 words, screenshots) | Draft complete; every sponsor tool named; AI-tools disclosure wording decided by me now (draft is in #questions) |
@@ -137,7 +137,7 @@ One preprint on ~34k AI-written PRs found a **41.7% conflict rate** when two dif
 - **Contract first**, frontend against a mock.
 - **One task = one branch = one worktree.**
 - **PRs under ~200 lines**, branches under 2-3h.
-- **CI and a formatter in hour 1.**
+- **CI and a formatter in hour 1** (docs/ci.md: ~1 min runs; add a /health smoke test so pytest doesn't fail on zero tests).
 - **One owner per lockfile.**
 - **Demo flag `?demo=1`.**
 
