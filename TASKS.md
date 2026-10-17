@@ -1,6 +1,6 @@
 # Tasks
 
-> **Direction:** Mental Models, general version. **Track:** Entertainment & Creative. Name TBD (my call); working name `mm`.
+> **Direction:** Mental Models, general version. **Track:** Entertainment & Creative. Name: **Onionskin** (onionskin.study); rename from `mm` after the session PRs merge.
 > **Goal now (11:40 PM re-plan, CONTRIBUTING.md):** short, visual sessions that take someone from not getting a concept to a model they can run: guess first, a concrete example you manipulate, push it to the extremes, your model drawn next to reality, your exact mistake named. Every task starts with a plan comment (goal fit, steps, done + screenshot).
 > **By morning:** the live site shows at least one full session built from the storyboard. Design stops ~1:00 AM.
 
@@ -13,7 +13,7 @@ Shared board. Every task is a GitHub issue; assign yourself + comment "on it" be
 | — | docs/experience.md storyboard | @Alexander-Freedman | in progress |
 | #75 | Look + interactive mockups for all 3 showcases (docs/experience-look.md, docs/mockups/) | @luanamaldaner | merged (#79) |
 | #81 | Coin streak session (`web/src/sessions/coin/`) | @luanamaldaner | PR #107 (review) |
-| #78 | Birthday session (`web/src/sessions/birthday/`) | @Alexander-Freedman | PR #101 |
+| #78 | Birthday session (`web/src/sessions/birthday/`) | @Alexander-Freedman | merged (#101) |
 | #82 | Positive test session (`web/src/sessions/positive/`) | @luanamaldaner | PR #99 (review) |
 
 ## Build (B1-B3)
