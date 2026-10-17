@@ -285,7 +285,11 @@ function AreaStep({ guess, setGuess, onNext }: { guess: number | null; setGuess:
       </div>
       {filling && maxN >= 100 && (
         <p className="calc-hand">
-          <span className="calc-hl">More rectangles, less overshoot.</span> The sum settles on {exact.toFixed(3)}; it never grows past it.
+          {rule === 'left' ? (
+            <><span className="calc-hl">More rectangles, less overshoot.</span> The sum shrinks toward {exact.toFixed(3)} and never drops below it.</>
+          ) : (
+            <><span className="calc-hl">Midpoints land just under.</span> The sum climbs toward {exact.toFixed(3)} and never goes past it.</>
+          )}
         </p>
       )}
       <div className="calc-row">
@@ -311,7 +315,7 @@ function CardStep({ slope, area, guess, sketch, onNext }: { slope: SlopeRead; ar
           <div className={'calc-k' + (slope.mistake ? ' calc-red' : '')}>slope · {slope.mistake ? 'the mistake' : 'the right model'}</div>
           <h3 className="calc-named">{slope.mistake ? <>“<span className="calc-hl">{LABELS[slope.mistake]}</span>”</> : <>Your slope had the <span className="calc-hl">right shape</span>.</>}</h3>
           <p>{slopeLine(slope, hill)}</p>
-          <p className="calc-fix"><b>Fix:</b> {slopeFix(slope)}</p>
+          <p className="calc-fix"><b>{slope.mistake ? 'Fix:' : 'The rule:'}</b> {slopeFix(slope)}</p>
           <MiniTangent at={slope.mistake === 'slope-sign-flipped' || slope.mistake === 'slope-never-negative' ? 2 : 1} note={slope.mistake === 'slope-sign-flipped' || slope.mistake === 'slope-never-negative' ? 'going downhill: slope −1.5' : 'highest point, slope 0'} />
         </div>
         <div className="calc-card calc-verdict">
@@ -327,7 +331,7 @@ function CardStep({ slope, area, guess, sketch, onNext }: { slope: SlopeRead; ar
                 ? 'You counted squares under the curve, not the rectangle above it.'
                 : 'Count the whole squares under the curve, then the pieces.'}
           </p>
-          <p className="calc-fix"><b>Fix:</b> rectangles only estimate the area; as they get thinner the sum closes in on one exact number.</p>
+          <p className="calc-fix"><b>{area.mistake || !area.close ? 'Fix:' : 'The rule:'}</b> rectangles only estimate the area; as they get thinner the sum closes in on one exact number.</p>
           <MiniRects />
         </div>
       </div>
