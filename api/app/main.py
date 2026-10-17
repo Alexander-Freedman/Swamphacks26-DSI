@@ -20,7 +20,7 @@ from app.rounds import extra_for_topic, extra_rounds, showcase_rounds
 from app.schema import Round
 from app.truth import band_for
 
-app = FastAPI(title="mm API")
+app = FastAPI(title="Onionskin API")
 app.add_middleware(
     CORSMiddleware,
     allow_origins=[
