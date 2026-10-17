@@ -17,6 +17,8 @@
 > | #24 | Truth-reveal UI patterns | @luanamaldaner |
 > | #25 | 3-minute demo | @luanamaldaner |
 > | #26 | Visual/brand direction | @luanamaldaner |
+>
+> My #22-#26 are done in PR #30 (docs/research/). The visual direction needs my sign-off before building.
 
 Shared board. Every task is a GitHub issue; assign yourself + comment "on it" before starting. Plan: #1.
 
