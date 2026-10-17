@@ -214,18 +214,29 @@ const RAW: Record<MechId, Mech> = {
 /** Room around the outermost atom centers: an atom disc plus its lone pairs. */
 const MARGIN = 40
 
+const span = (v: number[]) => [Math.min(...v), Math.max(...v)] as const
+/** Shift that centers [a0, a1] in [0, size], nudged so [b0, b1] (every keyframe) stays inside the margins when it can. */
+function shift(a0: number, a1: number, b0: number, b1: number, size: number) {
+  const want = size / 2 - (a0 + a1) / 2
+  const lo = MARGIN - b0
+  const hi = size - MARGIN - b1
+  return Math.round(lo <= hi ? Math.min(hi, Math.max(lo, want)) : (lo + hi) / 2)
+}
+
 /**
- * Centers a mechanism in the frame: one shift for every keyframe (so nothing jumps between steps),
- * chosen so the box around all positions sits in the middle. The frame grows taller if it has to.
+ * Centers a mechanism in the frame: the starting picture (what you draw on) goes in the middle,
+ * with one shift for every keyframe so nothing jumps between steps. The frame grows taller if it has to.
  */
 function centered(m: Mech): Mech {
-  const pts = m.atoms.flatMap((a) => a.at)
-  const xs = pts.map((p) => p.x)
-  const ys = pts.map((p) => p.y)
-  const [x0, x1, y0, y1] = [Math.min(...xs), Math.max(...xs), Math.min(...ys), Math.max(...ys)]
+  const all = m.atoms.flatMap((a) => a.at)
+  const start = m.atoms.map((a) => a.at[0])
+  const [x0, x1] = span(all.map((p) => p.x))
+  const [y0, y1] = span(all.map((p) => p.y))
+  const [sx0, sx1] = span(start.map((p) => p.x))
+  const [sy0, sy1] = span(start.map((p) => p.y))
   const vh = Math.max(m.vh, y1 - y0 + 2 * MARGIN)
-  const dx = Math.round(VW / 2 - (x0 + x1) / 2)
-  const dy = Math.round(vh / 2 - (y0 + y1) / 2)
+  const dx = shift(sx0, sx1, x0, x1, VW)
+  const dy = shift(sy0, sy1, y0, y1, vh)
   const move = (p: Pt): Pt => ({ x: p.x + dx, y: p.y + dy })
   return {
     ...m,
