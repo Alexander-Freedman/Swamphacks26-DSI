@@ -1,0 +1,38 @@
+# docs index
+
+Nothing is picked yet. Research continues until I say "we have an idea". Code from **8:30 PM Fri**; Devpost closes **8:30 AM Sun** (we submit by 7:30). Expo Sun 10-12, closing 2:30.
+
+**Plan for the weekend:** [36-hour-plan.md](36-hour-plan.md) (official times). **Open questions:** [research-queue.md](research-queue.md).
+
+**If you read one thing:** strategy.md, the top two sections ("What this means for us" and "Round 2 findings").
+
+| File | What's in it | Read when |
+|---|---|---|
+| [plan-extras.md](plan-extras.md) | User-test script, prototype pick rubric, repo rules for 2 people, sleep schedule | Planning |
+| [deploy-provenance.md](deploy-provenance.md) | H0-2 deploy checklist with fallbacks, "where every number comes from" UI patterns | First hour + UI |
+| [design-depth.md](design-depth.md) | 30-min design system, avoiding the generic generated look, the one depth feature per candidate | Build |
+| [prize-strategy.md](prize-strategy.md) | **Every prize + the ranked stacks to pick from** | Picking the idea |
+| [prize-stacks-redteam.md](prize-stacks-redteam.md) / [prize-stack-finance.md](prize-stack-finance.md) | Red team of the stacks + lean versions with gates | Picking the idea |
+| [deepspace.md](deepspace.md) | DeepSpace SDK reality check: APIs, hours, demo risks | If a stack uses DeepSpace |
+| [ai-ml-track.md](ai-ml-track.md) | What DSI judges look for when reading the repo | If we take AI/ML |
+| [ai-era.md](ai-era.md) | What judges reward once everyone ships fast; where AI tools are slow (with study numbers); realistic task ranges | Planning |
+| [strategy.md](strategy.md) | How judging works, SwampHacks XII rules/prizes/history, the playbook, the 36h plan, mistakes to avoid, the ranked directions | First |
+| [scorecard.md](scorecard.md) | Candidates scored against the 7 XII criteria, plus hours and risk | Picking the idea |
+| [kickoff.md](kickoff.md) | **8:30 PM: desk questions, accounts in order, skeleton + first deploy** | The minute coding opens |
+| [friday-checklist.md](friday-checklist.md) | First-hour questions for sponsors and the hardware desk, which accounts to make, the decision hard stop | Hacking opens |
+| [ideas.md](ideas.md) | 10 new ideas, plus a red-team of the hazard radar and Mental Models with 8 tough Q&A each | Picking the idea |
+| [prizes.md](prizes.md) | Every XII prize: the sponsor, what wins it, crowding, the Sperry brief in full | Choosing the prize stack |
+| [teardowns.md](teardowns.md) | ~30 winning projects broken down, plus judge quotes; XII's rubric change | Pitch + write-up |
+| [first-6h.md](first-6h.md) | Ready-to-open issues for the first 6 hours of either top idea, split by person, each with "done when" | The minute we pick |
+| [build-plans.md](build-plans.md) | Features, API contract and issue split for the top two | Right after picking |
+| [feasibility.md](feasibility.md) | Libraries and versions, hour estimates, top 5 technical risks | Right after picking |
+| [sketch-input.md](sketch-input.md) | Paper-card camera input: libraries, card design, stroke pipeline, 50-frame test, fallback ladder | Mental Models + paper only |
+| [deep-mental-models.md](deep-mental-models.md) | How Mental Models beats Loomin/Minerva: the ghost, 3 demo items, eval on real hacker data, instructor dashboard, build order | If we lean Mental Models |
+| [deep-fingerprint.md](deep-fingerprint.md) | Beat the Fingerprint: algorithms, FMA data, live demo, Q&A, build order | If we lean Fingerprint |
+| [sperry-deep.md](sperry-deep.md) | Sperry's last-challenge winners torn down, what Sperry values, the spec + 3-min demo for a PlanIT entry | Hazard radar only |
+| [hazard-board-replay.md](hazard-board-replay.md) | Board layout for a 1080p projector, color scale with contrast, replay-day data URLs and sizes | Hazard radar only |
+| [hazard-ml.md](hazard-ml.md) | Hazard index: label, features, leakage traps, model, calibration chart | Hazard radar only |
+| [data-check.md](data-check.md) | Every Sperry-brief dataset checked as reachable, plus the replay day (Jul 21 2025) | Hazard radar only |
+| [judges.md](judges.md) | Who the 50 judges are (by org), what each org cares about, which pitch lands with whom, the Vobile angle | Pitch prep |
+| [expo-video.md](expo-video.md) | Table setup, handling judge queues, 2-hour video workflow (tested ffmpeg commands), Devpost submit checklist | Sat evening + Sun |
+| [pitch.md](pitch.md) | 3:00 table scripts, Q&A, video outline, Technical Understanding drill, Devpost skeleton | Sat night |
