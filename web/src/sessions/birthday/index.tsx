@@ -82,6 +82,7 @@ function Birthday({ onDone }: SessionProps) {
         <>
           <Rematch
             curve={curve}
+            skipped={skipped}
             picked={picked}
             onPick={(more) => {
               setPicked(more)

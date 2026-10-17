@@ -19,7 +19,15 @@
       "why_tempting": "50% sounds like it should take half the days.",
       "refutation": "The chance grows with the number of pairs, not people, so it passes 50% at 23 and 99% at 57.",
       "source_url": "https://www.livescience.com/what-is-birthday-paradox",
-      "source_note": "Many people intuitively guess ~183 (teaching observation, not a survey)"
+      "source_note": "Many people intuitively guess ~183; teaching observation, not a survey"
+    },
+    {
+      "id": "fifty-is-not-certain",
+      "label": "A coin flip needs a full year",
+      "why_tempting": "With 365 days, it feels like you need about a person per day before matches show up, which mixes up a 50% chance with a sure thing.",
+      "refutation": "366 people make a match certain (100%): there are only 365 days. A 50% chance needs just 23 people, and 57 already reach 99%.",
+      "source_url": "https://en.wikipedia.org/wiki/Birthday_problem",
+      "source_note": "366 people for 100% is in the standard table; the 50%-vs-certain mix-up is a teaching observation, unverified"
     },
     {
       "id": "a-handful-is-enough",
@@ -40,12 +48,13 @@
         {"min": 2, "max": 17, "misconception_id": "a-handful-is-enough"},
         {"min": 18, "max": 30, "misconception_id": null},
         {"min": 31, "max": 150, "misconception_id": "its-about-my-birthday"},
-        {"min": 151, "max": 366, "misconception_id": "half-of-365"}
+        {"min": 151, "max": 249, "misconception_id": "half-of-365"},
+        {"min": 250, "max": 366, "misconception_id": "fifty-is-not-certain"}
       ],
       "truth": {"widget": "curve", "preset": "birthday_match_probability", "x_min": 2, "x_max": 80, "x_label": "people in the room", "y_label": "chance two share a birthday"},
       "answer_claimed": 23,
       "explore": {"param": "group_size", "label": "people in the room", "min": 2, "max": 80, "step": 1},
-      "targets": ["its-about-my-birthday", "half-of-365"]
+      "targets": ["its-about-my-birthday", "half-of-365", "fifty-is-not-certain"]
     }
   ]
 }
