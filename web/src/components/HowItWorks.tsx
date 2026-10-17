@@ -121,15 +121,24 @@ function ComputedSide({ item, round, truth }: { item: Item; round: Round; truth:
   const bands = [...(item.bands ?? [])].sort((a, b) => a.min - b.min)
   const hit = value == null ? -1 : bands.findIndex((b) => value >= b.min && value <= b.max)
   const stated = answerValue(item)
+  const right = item.input_type === 'choice' ? item.options?.find((o) => o.misconception_id === null) : undefined
   return (
     <div className="hiw-computed">
       <p className="hiw-value">
         {value == null ? (
           <span>No single number: this one is a worked example.</span>
+        ) : truth.kind === 'distribution' && truth.stat === 'average' ? (
+          // Nothing says which statistic answers it, so no number is headlined as the answer.
+          <span data-testid="hiw-no-headline">
+            No single number answers this one{right ? <>: the right choice is <strong>{right.text}</strong></> : ''}. The simulation is below
+            (<span className="hiw-mono">average {n(Number(truth.hist.mean.toFixed(2)))}</span>).
+          </span>
         ) : (
           <>
             <strong data-testid="hiw-value">{withUnit(value, unit)}</strong>
             {label && <span className="hiw-unit"> {label}</span>}
+            {truth.kind === 'distribution' && truth.stat === 'mode' && <span className="hiw-unit"> most common (the tallest bar)</span>}
+            {truth.kind === 'distribution' && truth.stat === 'mean' && <span className="hiw-unit"> average</span>}
           </>
         )}
       </p>
@@ -151,7 +160,7 @@ function ComputedSide({ item, round, truth }: { item: Item; round: Round; truth:
       {item.answer_claimed != null && value != null && (
         <p className="hiw-note">
           {near(value, item.answer_claimed) ? 'Matches' : 'Differs from'} the round's stated {n(item.answer_claimed)}
-          {stated != null && item.answer_expr ? ' (the formula is recomputed here, the claim is only a cross-check)' : ''}.
+          {stated != null && item.answer_expr ? ' (the formula is evaluated here, the claim is only a cross-check)' : ''}.
         </p>
       )}
       {bands.length > 0 && (
@@ -198,7 +207,7 @@ function GeneratedChecks({ item, report }: { item: Item; report: ChecksReport | 
   if (!report) {
     return (
       <p>
-        Built automatically. No check report came with this round (it was cached before reports were stored, or it was opened from a link), so we can't show what was checked. Our code still recomputes every answer from its formula or simulation on this page.
+        Built automatically. No check report came with this round (it was cached before reports were stored, or it was opened from a link), so we can't show what was checked. Our code still evaluates each stated formula (or runs the simulation) on this page.
       </p>
     )
   }
@@ -255,7 +264,7 @@ function HandChecked({ item, round }: { item: Item; round: Round }) {
   return (
     <>
       <p>
-        <strong>Hand-checked:</strong> every answer recomputed by our code, and a person checked the numbers and sources. Sources:
+        <strong>Hand-checked:</strong> our code evaluates the stated formula (or runs the simulation), and a person checked the numbers and sources. Sources:
       </p>
       <ul className="hiw-sources">
         {truthSource && (
@@ -284,16 +293,15 @@ function HandChecked({ item, round }: { item: Item; round: Round }) {
 
 const FOCUSABLE = 'a[href], button:not([disabled]), summary, input, [tabindex]:not([tabindex="-1"])'
 
-/** The drawer itself. `locked` false = the guess isn't in yet, so the answer side waits. */
-export function HowItWorks({ round, item, locked, onClose }: { round: Round; item: Item; locked: boolean; onClose: () => void }) {
-  const [peek, setPeek] = useState(false)
-  const show = locked || peek
-  const truth = useMemo(() => (show ? computeTruth(item) : null), [item, show])
+/** The drawer frame: scrim, focus trap, Esc, page scroll locked while it's open. */
+export function DrawerShell({ onClose, children }: { onClose: () => void; children: ReactNode }) {
   const panel = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
     const back = document.activeElement as HTMLElement | null
     panel.current?.querySelector<HTMLElement>('.hiw-close')?.focus()
+    const overflow = document.body.style.overflow
+    document.body.style.overflow = 'hidden'
     const onKey = (e: KeyboardEvent) => {
       if (e.key === 'Escape') {
         e.preventDefault()
@@ -316,6 +324,7 @@ export function HowItWorks({ round, item, locked, onClose }: { round: Round; ite
     document.addEventListener('keydown', onKey)
     return () => {
       document.removeEventListener('keydown', onKey)
+      document.body.style.overflow = overflow
       back?.focus?.()
     }
   }, [onClose])
@@ -329,6 +338,32 @@ export function HowItWorks({ round, item, locked, onClose }: { round: Round; ite
             Close <kbd>Esc</kbd>
           </button>
         </header>
+        {children}
+      </div>
+    </div>
+  )
+}
+
+/** Shown in place of the answer until the guess is locked; the reader can still peek. */
+export function Wait({ text, onPeek }: { text: string; onPeek: () => void }) {
+  return (
+    <div className="hiw-wait">
+      <p>{text}</p>
+      <button className="hiw-peek" onClick={onPeek}>
+        Show it anyway (spoils this one)
+      </button>
+    </div>
+  )
+}
+
+/** The drawer itself. `locked` false = the guess isn't in yet, so the answer side waits. */
+export function HowItWorks({ round, item, locked, onClose }: { round: Round; item: Item; locked: boolean; onClose: () => void }) {
+  const [peek, setPeek] = useState(false)
+  const show = locked || peek
+  const truth = useMemo(() => (show ? computeTruth(item) : null), [item, show])
+
+  return (
+    <DrawerShell onClose={onClose}>
         <p className="hiw-q">{item.prompt}</p>
         <div className="hiw-cols">
           <section aria-labelledby="hiw-spec-h">
@@ -344,12 +379,7 @@ export function HowItWorks({ round, item, locked, onClose }: { round: Round; ite
             {truth ? (
               <ComputedSide item={item} round={round} truth={truth} />
             ) : (
-              <div className="hiw-wait">
-                <p>Lock in your guess first: the answer is only computed after that.</p>
-                <button className="hiw-peek" onClick={() => setPeek(true)}>
-                  Show it anyway (spoils this one)
-                </button>
-              </div>
+              <Wait text="Lock in your guess first: the answer is only computed after that." onPeek={() => setPeek(true)} />
             )}
           </section>
         </div>
@@ -357,7 +387,6 @@ export function HowItWorks({ round, item, locked, onClose }: { round: Round; ite
           <h3 id="hiw-checks-h">Checks</h3>
           {round.reviewed ? <HandChecked item={item} round={round} /> : <GeneratedChecks item={item} report={checksFor(round.slug)} />}
         </section>
-      </div>
-    </div>
+    </DrawerShell>
   )
 }

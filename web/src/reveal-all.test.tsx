@@ -47,6 +47,14 @@ describe('every extra round reveals the truth', () => {
 })
 
 describe('reality numbers match the data', () => {
+  it('dice sums: the most common total is 7 (the mode), not the 6.96 average', () => {
+    const q = item('dice-sums', 'most-common-total')
+    const t = computeTruth(q)
+    expect(t.kind === 'distribution' && t.stat).toBe('mode')
+    expect(t.value).toBe(7)
+    reveal('dice-sums', q)
+    expect(document.querySelector('.reality-value')!.textContent).toBe('7')
+  })
   it('Monty Hall: switching wins 66.7%, with the guess and the gap', () => {
     const q = item('monty-hall', 'switch-win-chance')
     reveal('monty-hall', q, { value: 50, optionId: null, confidence: 'certain' })

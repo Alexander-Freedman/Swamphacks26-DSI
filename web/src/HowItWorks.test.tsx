@@ -65,15 +65,15 @@ describe('How it works drawer', () => {
     const btn = screen.getByRole('button', { name: /How it works/ })
     btn.focus()
     fireEvent.keyDown(btn, { key: 'd' })
-    expect(dialog()).toBeTruthy()
-    expect(document.activeElement?.className).toBe('hiw-close')
+    await waitFor(() => expect(dialog()).toBeTruthy())
+    await waitFor(() => expect(document.activeElement?.className).toBe('hiw-close'))
     fireEvent.keyDown(document.activeElement!, { key: 'Escape' })
-    expect(dialog()).toBeNull()
+    await waitFor(() => expect(dialog()).toBeNull())
     expect(document.activeElement).toBe(btn)
     fireEvent.keyDown(document.body, { key: 'D' })
-    expect(dialog()).toBeTruthy()
+    await waitFor(() => expect(dialog()).toBeTruthy())
     fireEvent.keyDown(document.body, { key: 'd' })
-    expect(dialog()).toBeNull()
+    await waitFor(() => expect(dialog()).toBeNull())
   })
 
   it('keeps Tab inside the drawer', async () => {
@@ -144,6 +144,38 @@ describe('How it works drawer', () => {
         unmount()
       }
     }
+  })
+
+  it('dice sums "most often": headlines the mode 7, not the average', () => {
+    const r = dice as unknown as Round
+    const q = r.items.find((i) => i.id === 'most-common-total')!
+    render(<HowItWorks round={r} item={q} locked onClose={() => {}} />)
+    expect(screen.getByTestId('hiw-value').textContent).toBe('7')
+    expect(screen.getByText(/most common/)).toBeTruthy()
+  })
+
+  it('a distribution with nothing saying which statistic headlines no number, only "average"', () => {
+    const all = import.meta.glob<Round>('../../data/rounds/extra/*.json', { eager: true, import: 'default' })
+    const r = Object.values(all).find((x) => x.slug === 'small-samples')!
+    const q = r.items.find((i) => i.id === 'rural-counties')!
+    render(<HowItWorks round={r} item={q} locked onClose={() => {}} />)
+    expect(screen.queryByTestId('hiw-value')).toBeNull()
+    expect(screen.getByTestId('hiw-no-headline').textContent).toMatch(/the right choice is .*average \d/)
+  })
+
+  it('the wording says what is actually computed', () => {
+    const r = monty as unknown as Round
+    render(<HowItWorks round={r} item={r.items[0]} locked onClose={() => {}} />)
+    expect(screen.getByText(/our code evaluates the stated formula \(or runs the simulation\), and a person checked the numbers and sources/)).toBeTruthy()
+    expect(screen.queryByText(/every answer recomputed/)).toBeNull()
+  })
+
+  it('locks page scroll while open', () => {
+    const r = monty as unknown as Round
+    const { unmount } = render(<HowItWorks round={r} item={r.items[0]} locked onClose={() => {}} />)
+    expect(document.body.style.overflow).toBe('hidden')
+    unmount()
+    expect(document.body.style.overflow).toBe('')
   })
 
   it('pretty-prints formulas', () => {

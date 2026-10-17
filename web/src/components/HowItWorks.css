@@ -56,3 +56,4 @@
   .hiw-cols { grid-template-columns: 1fr; }
   .hiw-close kbd { display: none; }
 }
+.hiw-result { font-size: 1.15rem; }

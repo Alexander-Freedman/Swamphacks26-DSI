@@ -193,8 +193,35 @@ export function curvePoint(item: Item, t: CurveTruth, f: (x: number) => number, 
   return xHit ? at(value, 'x') : null
 }
 
+// Which statistic of a simulated distribution answers the question:
+// 'stated' = the item's answer_expr; 'mode' = "which comes up most often"; 'mean' = the item asks
+// for an average/expected value (or states one); 'average' = nothing says which, so the mean is
+// only context and must not be shown as the answer.
+export type DistStat = 'stated' | 'mode' | 'mean' | 'average'
+
+export function mode(h: Histogram): number {
+  let best = h.min
+  let top = -1
+  for (const [v, c] of h.counts) if (c > top || (c === top && v < best)) [best, top] = [v, c]
+  return best
+}
+
+const MOST = /\bmost (often|common|commonly|likely|frequent|frequently)\b|\bmost[- ]common\b/i
+const AVERAGE = /\b(average|on average|expected|expect|mean|typical(ly)?)\b/i
+
+export function distributionAnswer(item: Item, hist: Histogram): { value: number; stat: DistStat } {
+  // A stated answer (P(9+ boys) = 15.1%) beats any summary of the histogram.
+  const stated = item.answer_expr ? answerValue(item) : null
+  if (stated != null) return { value: stated, stat: 'stated' }
+  if (MOST.test(item.prompt)) return { value: mode(hist), stat: 'mode' }
+  const c = item.answer_claimed
+  const claimsMean = c != null && Math.abs(c - hist.mean) <= Math.max(0.05 * Math.abs(c), 0.1)
+  if (AVERAGE.test(item.prompt) || claimsMean) return { value: hist.mean, stat: 'mean' }
+  return { value: hist.mean, stat: 'average' }
+}
+
 export type Computed =
-  | { kind: 'distribution'; hist: Histogram; value: number }
+  | { kind: 'distribution'; hist: Histogram; value: number; stat: DistStat }
   | { kind: 'icons'; counts: ReturnType<typeof baseRate>; value: number }
   | { kind: 'curve'; f: (x: number) => number; value: number | null; point: CurvePoint | null }
   | { kind: 'estimate'; value: number | null }
@@ -209,9 +236,8 @@ export function computeTruth(item: Item): Computed {
       return { kind: 'icons', counts, value: counts.truth * 100 }
     }
     const hist = simulate(t)
-    // A stated answer (P(9+ boys) = 15.1%) beats the average, which answers a different question.
-    const stated = item.answer_expr ? answerValue(item) : null
-    return { kind: 'distribution', hist, value: stated ?? hist.mean }
+    const { value, stat } = distributionAnswer(item, hist)
+    return { kind: 'distribution', hist, value, stat }
   }
   if (t.widget === 'curve') {
     const f = curveFn(t, knobsFor(item))

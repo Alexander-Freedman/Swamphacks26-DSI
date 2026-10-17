@@ -3,6 +3,9 @@ import { AnyTopic, BuildReady } from './components/AnyTopic'
 import { BackendDot } from './components/BackendDot'
 import { CheckedTag } from './components/CheckedTag'
 import { HowItWorks } from './components/HowItWorks'
+import { useDrawerKey } from './components/drawerKey'
+import { SessionHowItWorks } from './components/SessionHowItWorks'
+import { sessionHowItWorks } from './components/sessionSpecs'
 import { NotebookLink, NotebookScreen } from './components/Notebook'
 import { useReset } from './reset'
 import { Predict, type Answer } from './components/Predict'
@@ -65,19 +68,7 @@ function Player({ round, onDone }: { round: Round; onDone: () => void }) {
   useEffect(() => () => clearTimeout(beat.current), [])
   const [drawer, setDrawer] = useState(false)
   const closeDrawer = useCallback(() => setDrawer(false), [])
-  // D toggles "How it works" (not while typing; a focused slider or button still counts).
-  useEffect(() => {
-    const onKey = (e: KeyboardEvent) => {
-      if (e.key.toLowerCase() !== 'd' || e.ctrlKey || e.metaKey || e.altKey || e.repeat) return
-      const el = e.target as HTMLElement | null
-      const typing = !!el && (el.isContentEditable || el.tagName === 'TEXTAREA' || (el.tagName === 'INPUT' && !/^(range|radio|checkbox|button)$/.test((el as HTMLInputElement).type)))
-      if (typing) return
-      e.preventDefault()
-      setDrawer((o) => !o)
-    }
-    window.addEventListener('keydown', onKey)
-    return () => window.removeEventListener('keydown', onKey)
-  }, [])
+  useDrawerKey(useCallback(() => setDrawer((o) => !o), []))
 
   const lock = (answer: Answer) => {
     setPhase({ kind: 'locked', answer })
@@ -120,6 +111,23 @@ function Player({ round, onDone }: { round: Round; onDone: () => void }) {
   )
 }
 
+// The "How it works" button + D key around a session (the session's own files don't change).
+function SessionDrawer({ slug }: { slug: string }) {
+  const [open, setOpen] = useState(false)
+  // Once shown, the numbers stay shown for this session visit.
+  const [shown, setShown] = useState(false)
+  const close = useCallback(() => setOpen(false), [])
+  useDrawerKey(useCallback(() => setOpen((o) => !o), []))
+  return (
+    <>
+      <button className="hiw-btn" onClick={() => setOpen(true)} aria-haspopup="dialog">
+        How it works <kbd aria-hidden="true">D</kbd>
+      </button>
+      {open && <SessionHowItWorks slug={slug} onClose={close} shown={shown} onShow={() => setShown(true)} />}
+    </>
+  )
+}
+
 export default function App() {
   const [urlScreen, setScreen] = useState<Screen>(() => readScreen(location.search))
   // An old ?round= link whose slug now has a session opens the session instead.
@@ -156,6 +164,7 @@ export default function App() {
       <main className="app">
         <header className="topbar">
           <button className="logo" style={{ border: 0, background: 'none', padding: 0 }} onClick={home}>Onionskin</button>
+          {sessionHowItWorks[session.slug] && <SessionDrawer key={session.slug} slug={session.slug} />}
         </header>
         <session.Component key={session.slug} onDone={home} />
         <BuildReady onOpen={(slug) => go({ kind: 'round', slug })} />
