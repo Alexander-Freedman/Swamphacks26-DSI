@@ -38,6 +38,15 @@ export type Card = {
 // Session-only misconceptions that aren't in a round JSON.
 const EXTRA_LABELS: Record<string, string> = {
   'too-few': 'A handful of people is enough',
+  // calculus (sessions/calculus/math.ts MISTAKES)
+  'derivative-is-height': 'The derivative is the curve’s height',
+  'sign-flip': 'Uphill and downhill swapped',
+  'wrong-scale': 'Right shape, wrong steepness',
+  'flat-not-zero': 'Flat spots aren’t at zero',
+  'not-the-slope': 'Drew a shape, not the slope',
+  'whole-box': 'Counted the whole box',
+  'straight-line': 'Treated the curve as a straight line',
+  'same-shape': 'A graph and its rate look alike',
 }
 
 function store(): Storage | null {

@@ -32,3 +32,7 @@ A square grid of thirty-six large round dots in six rows of six (a crowd), drawn
 ## Generation log (this pass)
 
 5 images: one first pass per session, then one retry each for coin streak and positive test (first passes had shapes too thin to read at 120px: 6 coins in a thin row, ~80 tiny dots). Birthday first pass kept.
+
+### session-calculus (drawn, not generated)
+
+`web/public/art/session-calculus-{256,512}.webp` is a hand-built SVG (graph paper, the curve x² with six midpoint rectangles in pencil grey, one navy tangent with a marker-yellow swash and a navy dot), rasterized to webp in a headless browser. No image generation used; the image count above is unchanged.
