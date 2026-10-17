@@ -34,18 +34,31 @@ async function getJson<T>(url: string, init?: RequestInit): Promise<T> {
 
 let indexPromise: Promise<ExtraTopic[]> | null = null
 
-/** The reviewed extra topics: the static index first, then GET /api/rounds (dev), else none. */
+// The reviewed extras' names, baked in at build time (named JSON imports, so only these fields
+// ship, not the rounds). Used only when there's a backend but no static index next to the page
+// (a backend-only deploy): the backend serves the rounds themselves at GET /api/rounds/{slug}.
+// (import.meta.glob needs literal options, hence one call per field.)
+const slugs = import.meta.glob<string>('../../data/rounds/extra/*.json', { eager: true, import: 'slug' })
+const topics = import.meta.glob<string>('../../data/rounds/extra/*.json', { eager: true, import: 'topic' })
+const aliases = import.meta.glob<string[] | undefined>('../../data/rounds/extra/*.json', { eager: true, import: 'aliases' })
+const reviewed = import.meta.glob<boolean>('../../data/rounds/extra/*.json', { eager: true, import: 'reviewed' })
+function bundledIndex(): ExtraTopic[] {
+  return Object.keys(slugs)
+    .sort()
+    .filter((path) => reviewed[path] === true)
+    .map((path) => ({ slug: slugs[path], topic: topics[path], aliases: aliases[path] ?? [] }))
+}
+
+/**
+ * The reviewed extra topics: the static index (Pages, dev) first. If it isn't there and a backend
+ * is configured, the names baked into the bundle (the backend serves those rounds). Else none.
+ */
 export function loadExtraIndex(): Promise<ExtraTopic[]> {
   indexPromise ??= (async () => {
     try {
       return await getJson<ExtraTopic[]>(`${base()}rounds/extra/index.json`)
     } catch {
-      try {
-        const list = await getJson<{ slug: string; topic: string; reviewed: boolean }[]>(`${apiBase() ?? ''}/api/rounds`)
-        return list.filter((r) => r.reviewed && !showcaseRound(r.slug)).map((r) => ({ slug: r.slug, topic: r.topic, aliases: [] }))
-      } catch {
-        return []
-      }
+      return apiBase() === null ? [] : bundledIndex()
     }
   })()
   return indexPromise
@@ -70,15 +83,18 @@ export function cachedRound(slug: string): Round | undefined {
   return loaded.get(slug)
 }
 
-/** An extra round by slug: static file first, then GET /api/rounds/{slug}. */
+/** An extra round by slug: static file first, then GET /api/rounds/{slug} if there's a backend. */
 export async function loadExtraRound(slug: string): Promise<Round> {
   const hit = loaded.get(slug)
   if (hit) return hit
   let round: Round
   try {
     round = await getJson<Round>(`${base()}rounds/extra/${encodeURIComponent(slug)}.json`)
-  } catch {
-    round = await getJson<Round>(`${apiBase() ?? ''}/api/rounds/${encodeURIComponent(slug)}`)
+  } catch (err) {
+    // No backend (Pages): never ask the page's own origin for /api, it can only 404.
+    const api = apiBase()
+    if (api === null) throw err
+    round = await getJson<Round>(`${api}/api/rounds/${encodeURIComponent(slug)}`)
   }
   if (!round?.slug || !Array.isArray(round.items)) throw new Error(`round ${slug}: not a round`)
   loaded.set(slug, round)

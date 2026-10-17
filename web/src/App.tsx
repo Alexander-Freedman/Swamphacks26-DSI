@@ -16,6 +16,8 @@ import './App.css'
 const BEAT_MS = 400
 
 function Home({ onPick, onSession, onNotebook }: { onPick: (slug: string) => void; onSession: (slug: string) => void; onNotebook: () => void }) {
+  // Showcases with a session open that instead; only ones without one get a plain round button.
+  const rounds = showcaseSlugs.filter((slug) => !sessionFor(slug))
   return (
     <div className="home sheet">
       <h1>Bet on your gut. Then watch reality.</h1>
@@ -30,13 +32,15 @@ function Home({ onPick, onSession, onNotebook }: { onPick: (slug: string) => voi
           ))}
         </div>
       )}
-      <div className="showcases">
-        {showcaseSlugs.filter((slug) => !sessionFor(slug)).map((slug) => (
-          <button key={slug} className="showcase" onClick={() => onPick(slug)}>
-            {showcaseRound(slug)!.topic}
-          </button>
-        ))}
-      </div>
+      {rounds.length > 0 && (
+        <div className="showcases">
+          {rounds.map((slug) => (
+            <button key={slug} className="showcase" onClick={() => onPick(slug)}>
+              {showcaseRound(slug)!.topic}
+            </button>
+          ))}
+        </div>
+      )}
       <AnyTopic onOpen={onPick} />
       <NotebookLink onOpen={onNotebook} />
     </div>

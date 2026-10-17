@@ -5,7 +5,7 @@ import './AnyTopic.css'
 
 const FIRST_CHIPS = 4
 
-// Under the session cards on Home: a small, secondary box. Chips open reviewed extra rounds;
+// Under the session cards on Home: a small, secondary box. Chips open hand-checked extra rounds;
 // typed text opens a cached match, or (only with a backend) asks POST /api/rounds to build one.
 export function AnyTopic({ onOpen, timeoutMs }: { onOpen: (slug: string) => void; timeoutMs?: number }) {
   const [extras, setExtras] = useState<ExtraTopic[]>([])
@@ -16,6 +16,9 @@ export function AnyTopic({ onOpen, timeoutMs }: { onOpen: (slug: string) => void
   // True while this box (still on screen) is waiting on a build it started: then open it directly.
   const waiting = useRef(false)
   const id = useId()
+  const input = useRef<HTMLInputElement>(null)
+  // Only a backend can build (and so auto-check) a round; on Pages every round is hand-checked.
+  const canBuild = apiBase() !== null
 
   useEffect(() => {
     let live = true
@@ -44,6 +47,8 @@ export function AnyTopic({ onOpen, timeoutMs }: { onOpen: (slug: string) => void
     if (hit) return onOpen(hit)
     if (apiBase() === null) return setOffline(topic)
     waiting.current = true
+    // Go gets disabled while it builds, so keep focus in the (read-only) box, not on <body>.
+    input.current?.focus()
     void startBuild(topic, timeoutMs)
   }
 
@@ -57,7 +62,12 @@ export function AnyTopic({ onOpen, timeoutMs }: { onOpen: (slug: string) => void
   return (
     <section className="anytopic" aria-labelledby={`${id}-h`}>
       <h2 id={`${id}-h`} className="anytopic-title">
-        Try any topic <span className="anytopic-tag">auto-checked</span>
+        Try any topic
+        {canBuild && (
+          <span className="anytopic-tag" title="New topics are built on the spot and checked by code before you see them">
+            auto-checked
+          </span>
+        )}
       </h2>
       <form className="anytopic-form" onSubmit={submit}>
         <label htmlFor={`${id}-in`} className="sr-only">
@@ -70,7 +80,9 @@ export function AnyTopic({ onOpen, timeoutMs }: { onOpen: (slug: string) => void
           maxLength={80}
           autoComplete="off"
           placeholder="e.g. Monty Hall, compound interest"
-          disabled={building}
+          readOnly={building}
+          aria-busy={building}
+          ref={input}
           onChange={(e) => {
             setText(e.target.value)
             setOffline(null)
@@ -83,9 +95,9 @@ export function AnyTopic({ onOpen, timeoutMs }: { onOpen: (slug: string) => void
       </form>
       <p className="anytopic-status" aria-live="polite">
         {offline !== null ? (
-          <>No round on “{offline}” yet on this site. Pick one of these, each one checked by hand:</>
+          <>No round on “{offline}” yet on this site. Pick one of these, each one hand-checked:</>
         ) : build.kind === 'building' ? (
-          <>Building your round on “{build.topic}” (can take up to a minute). Play a reviewed one while you wait:</>
+          <>Building your round on “{build.topic}” (can take up to a minute). Play a hand-checked one while you wait:</>
         ) : build.kind === 'failed' ? (
           <>Couldn't build “{build.topic}” right now. Try one of these instead:</>
         ) : build.kind === 'ready' ? (
@@ -99,11 +111,11 @@ export function AnyTopic({ onOpen, timeoutMs }: { onOpen: (slug: string) => void
             </button>
           </>
         ) : (
-          chips.length > 0 && <>Ready now, each one checked by hand:</>
+          chips.length > 0 && <>Ready now, each one hand-checked:</>
         )}
       </p>
       {chips.length > 0 && (
-        <div className="anytopic-chips" role="group" aria-label="Reviewed topics">
+        <div className="anytopic-chips" role="group" aria-label="Hand-checked topics">
           {shown.map((slug) => (
             <button key={slug} type="button" className={`anytopic-chip ${suggested.includes(slug) ? 'suggested' : ''}`} onClick={() => onOpen(slug)}>
               {topicName(slug)}
@@ -126,11 +138,16 @@ export function BuildReady({ onOpen }: { onOpen: (slug: string) => void }) {
   if (build.kind !== 'ready') return null
   return (
     <div className="anytopic-ready" role="status">
-      Your topic's ready: “{build.topic}”
-      <button type="button" onClick={() => {
-              clearBuild()
-              onOpen(build.slug)
-            }}>
+      <span className="anytopic-ready-text" title={build.topic}>
+        Your topic's ready: “{build.topic}”
+      </span>
+      <button
+        type="button"
+        onClick={() => {
+          clearBuild()
+          onOpen(build.slug)
+        }}
+      >
         Open
       </button>
       <button type="button" aria-label="Dismiss" onClick={clearBuild}>

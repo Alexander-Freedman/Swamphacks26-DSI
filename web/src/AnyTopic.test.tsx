@@ -43,7 +43,7 @@ describe('Try any topic', () => {
     fireEvent.click(await screen.findByRole('button', { name: 'Sums of dice' }))
     expect(here()).toBe(`${BASE}?round=dice-sums`)
     expect(await screen.findByText(/Sums of dice · 1 of 3/)).toBeTruthy()
-    expect(screen.getByText('reviewed')).toBeTruthy()
+    expect(screen.getByText(/^(reviewed|hand-checked)$/)).toBeTruthy()
   })
 
   it('a refresh on an extra round reopens it', async () => {
@@ -70,6 +70,70 @@ describe('Try any topic', () => {
     expect(screen.getByRole('button', { name: 'Sums of dice' })).toBeTruthy()
     expect(screen.getByRole('button', { name: 'The Monty Hall problem' })).toBeTruthy()
     expect(posts()).toHaveLength(0)
+  })
+
+  it('on Pages (no backend) the box says nothing about auto-checking', async () => {
+    render(<App />)
+    await screen.findByRole('button', { name: 'Sums of dice' })
+    expect(screen.queryByText('auto-checked')).toBeNull()
+    expect(screen.getByText(/each one hand-checked/)).toBeTruthy()
+    expect(screen.getByRole('group', { name: 'Hand-checked topics' })).toBeTruthy()
+  })
+
+  it('with a backend, the box shows the auto-checked tag with a tooltip', async () => {
+    vi.stubEnv('VITE_API_BASE', 'http://api.test')
+    render(<AnyTopic onOpen={() => {}} />)
+    await screen.findByRole('button', { name: 'Sums of dice' })
+    expect(screen.getByText('auto-checked').getAttribute('title')).toMatch(/checked by code/)
+  })
+
+  it('with no backend, an unknown ?round= never asks the page origin for /api', async () => {
+    history.replaceState(null, '', `${BASE}?round=no-such-round`)
+    render(<App />)
+    await waitFor(() => expect(here()).toBe(BASE))
+    const urls = fetchMock.mock.calls.map(([u]) => String(u))
+    expect(urls).toContain(`${BASE}rounds/extra/no-such-round.json`)
+    expect(urls.some((u) => u.includes('/api/'))).toBe(false)
+  })
+
+  it('with no backend and no static index, there are no chips and no /api call', async () => {
+    fetchMock.mockImplementation(async () => json({}, 404))
+    render(<AnyTopic onOpen={() => {}} />)
+    await waitFor(() => expect(fetchMock).toHaveBeenCalled())
+    await new Promise((r) => setTimeout(r, 20))
+    expect(screen.queryByRole('group', { name: 'Hand-checked topics' })).toBeNull()
+    expect(fetchMock.mock.calls.some(([u]) => String(u).includes('/api/'))).toBe(false)
+  })
+
+  it('backend-only deploy (no static files): chips come from the bundle, rounds from the API', async () => {
+    vi.stubEnv('VITE_API_BASE', 'http://api.test')
+    fetchMock.mockImplementation(async (url: string) =>
+      url === 'http://api.test/api/rounds/monty-hall' ? json(monty) : json({}, 404),
+    )
+    render(<App />)
+    // every reviewed extra in data/rounds/extra/ is offered
+    fireEvent.click(await screen.findByRole('button', { name: /more$/ }))
+    expect(screen.getByRole('button', { name: 'Sums of dice' })).toBeTruthy()
+    fireEvent.click(screen.getByRole('button', { name: 'The Monty Hall problem' }))
+    expect(await screen.findByText(/The Monty Hall problem · 1 of 3/)).toBeTruthy()
+  })
+
+  it('while building, the box stays focused and read-only (not disabled)', async () => {
+    vi.stubEnv('VITE_API_BASE', 'http://api.test')
+    fetchMock.mockImplementation(async (url: string, init?: RequestInit) =>
+      init?.method === 'POST' ? new Promise<Response>(() => {}) : url in files ? json(files[url]) : json({}, 404),
+    )
+    render(<AnyTopic onOpen={() => {}} />)
+    await screen.findByRole('button', { name: 'Sums of dice' })
+    const box = screen.getByLabelText(/topic you want/) as HTMLInputElement
+    fireEvent.change(box, { target: { value: 'tides' } })
+    const go = screen.getByRole('button', { name: 'Go' })
+    go.focus()
+    fireEvent.click(go)
+    await screen.findByText(/Building your round on “tides”/)
+    expect(box.disabled).toBe(false)
+    expect(box.readOnly).toBe(true)
+    expect(document.activeElement).toBe(box)
   })
 
   it('a slow build times out to the chips', async () => {

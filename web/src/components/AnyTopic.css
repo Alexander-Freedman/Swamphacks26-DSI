@@ -4,10 +4,11 @@
 .anytopic-tag { font-family: var(--font-body); font-size: 0.75rem; font-weight: 400; padding: 1px 8px; border: 1.5px solid var(--ink-soft); border-radius: 999px; color: var(--ink-soft); }
 .anytopic-form { display: flex; gap: 8px; }
 .anytopic-form input { flex: 1; min-width: 0; padding: 10px 12px; font: inherit; color: var(--ink); background: var(--card); border: 2px solid var(--ink); border-radius: 10px; }
+.anytopic-form input:read-only { color: var(--ink-soft); }
 .anytopic-form input::placeholder { color: var(--pencil); }
 .anytopic-form button { padding: 10px 16px; font-weight: 700; border: 2px solid var(--ink); border-radius: 10px; background: var(--marker); }
 .anytopic-form button:disabled { opacity: 0.45; cursor: not-allowed; }
-.anytopic-status { font-size: 0.9rem; color: var(--ink-soft); margin: 8px 0; min-height: 0; }
+.anytopic-status { overflow-wrap: anywhere; font-size: 0.9rem; color: var(--ink-soft); margin: 8px 0; min-height: 0; }
 .anytopic-status:empty { margin: 4px 0; }
 .anytopic-chips { display: flex; flex-wrap: wrap; gap: 8px; }
 .anytopic-chip { padding: 6px 12px; min-height: 36px; font-size: 0.85rem; border: 1.5px solid var(--ink); border-radius: 999px; background: var(--card); }
@@ -19,3 +20,10 @@
 .anytopic-ready { position: fixed; left: 50%; bottom: 24px; transform: translateX(-50%); z-index: 10; display: flex; align-items: center; gap: 8px; max-width: calc(100vw - 32px); padding: 6px 8px 6px 16px; border: 2px solid var(--ink); border-radius: 999px; background: var(--card); box-shadow: 0 3px 0 var(--ink); font-weight: 600; font-size: 0.9rem; }
 .anytopic-ready button { padding: 4px 12px; font-weight: 700; border: 2px solid var(--ink); border-radius: 999px; background: var(--marker); }
 .anytopic-ready button[aria-label='Dismiss'] { background: var(--card); padding: 4px 10px; }
+/* The topic is one line, cut with an ellipsis; the buttons never shrink. */
+.anytopic-ready-text { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.anytopic-ready button { flex: none; }
+/* Phones: a full-width bar along the bottom instead of a pill squeezed over Lock. */
+@media (max-width: 560px) {
+  .anytopic-ready { left: 0; right: 0; bottom: 0; transform: none; max-width: none; border-radius: 14px 14px 0 0; border-bottom: 0; box-shadow: 0 -3px 0 var(--ink); padding: 10px 12px calc(10px + env(safe-area-inset-bottom)) 16px; }
+}
