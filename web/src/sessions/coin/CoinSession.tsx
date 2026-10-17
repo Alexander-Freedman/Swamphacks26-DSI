@@ -1,13 +1,15 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
-import { record as save } from '../../notebook'
+import { amend, record as save } from '../../notebook'
 import { showcaseRound } from '../../rounds'
 import { misconceptionFor } from '../../verdict'
 import { ConfidencePicker, EndBar, Frame, LockButton, SessionHead, StampRow, Title } from '../../components/session/Shell'
+import { Compare, type CompareAnswer, type CompareOption } from '../../components/session/Compare'
 import { cardGuide, lockLabel, type Confidence } from '../../components/session/copy'
 import { shellVerdict } from '../../components/session/verdict'
 import { ExtremeChart, KMAX, RunHistogram } from './Charts'
 import { CoinGrid, Track } from './CoinGrid'
-import { fmt, pct, reducedMotion, sampleLabel } from './hooks'
+import { fmt, pBeatLabel, pct, reducedMotion, sampleLabel } from './hooks'
+import { ShotRow } from './Shots'
 import {
   expectedLongest,
   flipSeq,
@@ -25,10 +27,11 @@ import {
 import './coin.css'
 
 const N = 100
+const now = () => new Date().toISOString()
 const MIN_TAPS = 20
 const E100 = expectedLongest(N)
 const P5 = pLongestAtLeast(N, 5)
-const STEPS = ['Be a coin', 'Flip it', 'Yours vs real', 'Extremes', 'Your mistake'] as const
+const STEPS = ['Be a coin', 'Flip it', 'Yours vs real', 'Extremes', 'Your mistake', 'Same idea, new case'] as const
 /** The verdict's "close" window: 15% of the 1-20 slider. */
 const WINDOW = 0.15 * 19
 
@@ -55,6 +58,9 @@ export function CoinSession({ onDone }: { onDone: () => void }) {
   const [newest, setNewest] = useState(0)
   const [running, setRunning] = useState(false)
   const heading = useRef<HTMLHeadingElement>(null)
+  const [rematch, setRematch] = useState<'right' | 'wrong' | null>(null)
+  const [cmp, setCmp] = useState<CompareAnswer | null>(null)
+  const savedAt = useRef<string | null>(null) // one notebook entry per play; the compare answer is added to it
   const model = mine // you can only lock (and leave step 1) with 20+ taps of your own
 
   const dealRow = useCallback((n: number) => {
@@ -154,6 +160,9 @@ export function CoinSession({ onDone }: { onDone: () => void }) {
   }
 
   const restart = () => {
+    savedAt.current = null
+    setRematch(null)
+    setCmp(null)
     setMine([])
     setDeal([])
     setLocked(false)
@@ -173,11 +182,24 @@ export function CoinSession({ onDone }: { onDone: () => void }) {
     ['Your coin vs the real coin', 'Your row next to a real 100, runs of 5 or more marked. Which one clumps?'],
     ['More flips, longer streaks?', 'Drag to flip more or fewer coins. Watch how slowly, but surely, streaks grow.'],
     ['What happened in your head', cardGuide(misId === null)],
+    ['One more case: a 50% shooter', "A made-up shooter who makes exactly half her shots, next to your real coin. Look at both: what's the same?"],
   ]
   const [title, sub] = TITLES[step]
+  // Storyboard screens for the Ask panel: step 1 holds C1 (tapping) and C3 (the guess).
+  const screen = step === 0 ? (locked ? 'C2' : mine.length < len ? 'C1' : 'C3') : ['', 'C4', 'C2', 'C5', 'C6', 'C6'][step]
+  const record = (r: 'right' | 'wrong' | null, c: CompareAnswer | null = cmp) => {
+    if (savedAt.current) return
+    savedAt.current = now()
+    save({ session: 'coin-streak', at: savedAt.current, guess, confidence: conf ?? 'pretty sure', switchRate: Math.round(sw * 100) / 100, misconception: misId, rematch: r, ...(c ? compareFields(c) : {}) })
+  }
+  const answerCompare = (a: CompareAnswer) => {
+    setCmp(a)
+    if (savedAt.current) amend('coin-streak', savedAt.current, compareFields(a))
+  }
+  const caught = round.misconceptions.find((x) => x.id === misId)?.label ?? null
   return (
     <Frame className="coin-session">
-      <SessionHead chip="Coin streak" step={step + 1} total={STEPS.length} labels={STEPS} canGo={(i) => i === 0 || locked} onGo={go} />
+      <SessionHead chip="Coin streak" step={step + 1} total={STEPS.length} labels={STEPS} canGo={(i) => i === 0 || locked} onGo={go} help={{ screen, locked, guess: guessSet }} />
       <Title h={title} sub={sub} id="coin-h" headingRef={heading} />
       {locked && (
         <p className="pencil-strip" aria-label="your model">
@@ -186,7 +208,7 @@ export function CoinSession({ onDone }: { onDone: () => void }) {
           <span>your longest <b>{longestRun(model)}</b></span>
         </p>
       )}
-      <section className={step === 4 ? 'coin-step' : 'coin-step card'} aria-labelledby="coin-h">
+      <section className={step >= 4 ? 'coin-step' : 'coin-step card'} aria-labelledby="coin-h">
         {step === 0 && (
           <TapStep len={len} pickLen={pickLen} deal={deal} dealKey={dealKey} onDeal={() => dealRow(len)} mine={mine} setMine={editMine} tap={tap} guess={guessSet} setGuess={setGuessSet} conf={conf} setConf={setConf} locked={locked} onLock={lock} onNext={() => go(1)} />
         )}
@@ -206,7 +228,7 @@ export function CoinSession({ onDone }: { onDone: () => void }) {
             <Legend items={[['truth', 'real coin'], ['you', 'your guess'], ['gap', 'the gap']]} />
             <p className="simnote" aria-live="polite">
               {sampleLabel(sim, flipped)}, <b className="num">{pct(hist.reduce((s, c, k) => s + (k > guess ? c : 0), 0) / Math.max(1, total))}</b> beat your guess of {guess}.
-              Exact: a run of 5+ shows up <b className="num">{pct(P5, 1)}</b> of the time.
+              Exact: a run longer than your {guess} shows up <b className="num">{pBeatLabel(1 - pLongestAtMost(N, guess))}</b> of the time.
             </p>
             <Next onClick={() => go(2)}>Next: your coin vs the real one</Next>
           </>
@@ -214,7 +236,40 @@ export function CoinSession({ onDone }: { onDone: () => void }) {
         {step === 2 && <CompareStep model={model} real={real} onNext={() => go(3)} />}
         {step === 3 && <ExtremeStep model={model} guess={guess} onNext={() => go(4)} />}
         {step === 4 && (
-          <CardStep model={model} guess={guess} round={round} conf={conf ?? 'pretty sure'} verdict={shellVerdict(misId, guess, E100, WINDOW)} misId={misId} onRestart={restart} onDone={onDone} />
+          <CardStep
+            model={model}
+            guess={guess}
+            round={round}
+            conf={conf ?? 'pretty sure'}
+            verdict={shellVerdict(misId, guess, E100, WINDOW)}
+            misId={misId}
+            rematch={rematch}
+            onPick={(right) => {
+              setRematch(right ? 'right' : 'wrong')
+              record(right ? 'right' : 'wrong')
+            }}
+            onRestart={restart}
+            onNext={() => go(5)}
+          />
+        )}
+        {step === 5 && (
+          <ShooterCompare real={real} onAnswer={answerCompare}>
+            {rematch != null ? (
+              <EndBar caught={caught} rematch={rematch} remix="Come back tomorrow for a remix with new rows." onDone={onDone} />
+            ) : (
+              <div className="row">
+                <button
+                  className="btn small"
+                  onClick={() => {
+                    record(null)
+                    onDone()
+                  }}
+                >
+                  Done
+                </button>
+              </div>
+            )}
+          </ShooterCompare>
         )}
       </section>
     </Frame>
@@ -251,6 +306,12 @@ function TapStep(p: { len: number; pickLen: (n: number) => void; deal: Side[]; d
     seenDeal.current = dealKey
     realRef.current?.scrollIntoView?.({ block: 'nearest', behavior: reducedMotion() ? 'auto' : 'smooth' })
   }, [full, dealKey])
+  // Phone (#175): after the deal the guess sits a screen or two down; this cue takes you there.
+  const guessRef = useRef<HTMLDivElement>(null)
+  const toGuess = () => {
+    guessRef.current?.scrollIntoView?.({ block: 'start', behavior: reducedMotion() ? 'auto' : 'smooth' })
+    guessRef.current?.querySelector<HTMLInputElement>('#coin-guess')?.focus({ preventScroll: true })
+  }
   // Same lock copy as the other sessions once your 20 taps are in; before that the note under the button says why it waits.
   const lockText = mine.length < MIN_TAPS ? 'Lock it in' : lockLabel(guess != null, conf)
   return (
@@ -280,6 +341,11 @@ function TapStep(p: { len: number; pickLen: (n: number) => void; deal: Side[]; d
             your longest: <b className="you">{longestRun(mine)}</b> · real: <b className="ink">{longestRun(deal)}</b>
             <button className="btn ghost small" onClick={onDeal}>Flip again</button>
           </p>
+          {!locked && (
+            <div className="row">
+              <button className="btn small to-guess" onClick={toGuess}>Next: guess the big one ↓</button>
+            </div>
+          )}
           <p className="note">
             In {len} real flips the longest run averages {expectedLongest(len).toFixed(2)} (exact). You switched {pct(switchRate(mine))} of the time; a coin switches 50%.
           </p>
@@ -290,8 +356,8 @@ function TapStep(p: { len: number; pickLen: (n: number) => void; deal: Side[]; d
         <span>side switches <b>{mine.length > 1 ? pct(switchRate(mine)) : '-'}</b></span>
         <span>your longest run <b>{longestRun(mine)}</b></span>
       </div>
-      <p className="note">Keys H and T work too. Your taps are your model of randomness: they stay in pencil the whole session.</p>
-      <div className={`card guessbox ${locked ? 'is-locked' : ''}`}>
+      <p className="note"><span className="keyhint">Keys H and T work too. </span>Your taps are your model of randomness: they stay in pencil the whole session.</p>
+      <div className={`card guessbox ${locked ? 'is-locked' : ''}`} ref={guessRef}>
         <p className="guide">Guess first: in 100 flips, what's the longest run of the same side? Your guess stays on screen.</p>
         <label htmlFor="coin-guess" className="q">Longest run in 100 real flips?</label>
         <div className="guessnum">
@@ -416,18 +482,13 @@ function CardStep(p: {
   round: NonNullable<ReturnType<typeof showcaseRound>>
   verdict: 'called' | 'close' | 'off'
   misId: string | null
+  rematch: 'right' | 'wrong' | null
+  onPick: (right: boolean) => void
   onRestart: () => void
-  onDone: () => void
+  onNext: () => void
 }) {
-  const { model, guess, conf, round, verdict, misId, onRestart, onDone } = p
+  const { model, guess, conf, round, verdict, misId, rematch, onPick, onRestart, onNext } = p
   const m = round.misconceptions.find((x) => x.id === misId)
-  const [picked, setPicked] = useState<boolean | null>(null)
-  const saved = useRef(false)
-  const record = (rematch: 'right' | 'wrong' | null) => {
-    if (saved.current) return
-    saved.current = true
-    save({ session: 'coin-streak', at: new Date().toISOString(), guess, confidence: conf, switchRate: Math.round(switchRate(model) * 100) / 100, misconception: misId, rematch })
-  }
   const sw = switchRate(model)
   const pPast = 1 - pLongestAtMost(N, guess)
   const pReach = pLongestAtLeast(N, guess)
@@ -460,35 +521,12 @@ function CardStep(p: {
           {m?.source_url ? <><a href={m.source_url} target="_blank" rel="noreferrer">Source</a>: {m.source_note}. </> : null}
           Numbers here are exact (dynamic programming over run length) unless marked simulated.
         </p>
-        <WhichIsReal
-          round={round}
-          onPick={(right) => {
-            setPicked(right)
-            record(right ? 'right' : 'wrong')
-          }}
-        />
+        <WhichIsReal round={round} onPick={onPick} />
       </div>
-      {picked != null ? (
-        <EndBar
-          caught={m?.label ?? null}
-          rematch={picked ? 'right' : 'wrong'}
-          remix="Come back tomorrow for a remix with new rows."
-          onDone={onDone}
-        />
-      ) : (
-        <div className="row">
-          <button className="btn ghost small" onClick={onRestart}>Tap a new row</button>
-          <button
-            className="btn small"
-            onClick={() => {
-              record(null)
-              onDone()
-            }}
-          >
-            Done
-          </button>
-        </div>
-      )}
+      <div className="row card-next">
+        {rematch == null && <button className="btn ghost small" onClick={onRestart}>Tap a new row</button>}
+        <button className="btn" onClick={onNext}>Next: one more case →</button>
+      </div>
     </>
   )
 }
@@ -539,5 +577,79 @@ function WhichIsReal({ round, onPick }: { round: NonNullable<ReturnType<typeof s
         )}
       </p>
     </div>
+  )
+}
+
+/** The compare answer, as extra fields on the notebook entry (the notebook's catch/bust rules ignore them). */
+function compareFields(a: CompareAnswer) {
+  return { comparePick: a.pick, compareRight: a.right, ...(a.text ? { compareText: a.text } : {}) }
+}
+
+const SHOOTER: CompareOption[] = [
+  { id: 'got-hot', text: 'A streak means it got hot', why: 'Nothing changed: every try here is the same 50/50, and the streaks came anyway.' },
+  { id: 'no-memory', text: 'Each try ignores the last one', right: true },
+  { id: 'due', text: 'After a run, the other side is due', why: 'Neither one remembers: after 5 heads or 5 misses, the next try is still 50%.' },
+  { id: 'rare-rows', text: 'Long runs are rare, so these rows are odd', why: `In 100 tries at 50/50, a run of 5+ shows up ${pct(P5, 1)} of the time (exact). These rows are typical.` },
+]
+
+function ShooterCompare({ real, onAnswer, children }: { real: Side[]; onAnswer: (a: CompareAnswer) => void; children: React.ReactNode }) {
+  const [rand] = useState(() => rng(5)) // seed: the first 100 shots top out at a 7-shot streak, 49 made
+  const [shots, setShots] = useState<Side[]>(() => flipSeq(N, rand))
+  const [seen, setSeen] = useState<number[]>(() => [longestRun(shots)])
+  const again = () => {
+    const s = flipSeq(N, rand)
+    setShots(s)
+    setSeen((x) => [...x, longestRun(s)].slice(-8))
+  }
+  const L = longestRun(shots)
+  const made = shots.filter((s) => s === 'H').length
+  return (
+    <Compare
+      cases={[
+        {
+          tag: 'case 1: your real coin',
+          title: '100 flips',
+          body: (
+            <>
+              <CoinGrid seq={real} mini hiLongest label={`100 real flips, longest run ${longestRun(real)} marked`} />
+              <p><span className="cmp-big num">{longestRun(real)}</span> <span className="cmp-lbl">in a row, this coin's longest run</span></p>
+            </>
+          ),
+        },
+        {
+          tag: 'case 2: a 50% shooter',
+          title: '100 shots',
+          body: (
+            <>
+              <ShotRow seq={shots} label={`100 shots, ${made} made, longest streak ${L} marked`} />
+              <p className="legend shots-legend">
+                <span><i className="sw-made" />made</span>
+                <span><i className="sw-missed" />missed</span>
+                <span><i className="l-gap" />longest streak</span>
+              </p>
+              <p>
+                <span className="cmp-big num">{L}</span> <span className="cmp-lbl">in a row (made or missed), {made} of 100 made</span>
+              </p>
+              <div className="row">
+                <button className="btn ghost small" onClick={again}>Shoot 100 again</button>
+                {seen.length > 1 && <span className="cmp-lbl" aria-live="polite">longest so far: {seen.join(', ')}</span>}
+              </div>
+              <p className="cmp-fine">Made-up shooter: every shot is 50%, no matter the last one. Simulated rows; illustrative, not data on real players.</p>
+            </>
+          ),
+        },
+      ]}
+      options={SHOOTER}
+      principle="Each flip or shot ignores the last, so long runs are normal, not a sign of anything."
+      detail={
+        <>
+          Same exact math for both: in 100 tries at 50/50 the longest run averages <b className="num">{E100.toFixed(2)}</b>, and a run of 5+ shows up{' '}
+          <b className="num">{pct(P5, 1)}</b> of the time. A coin, a free throw, rainy days with no memory: same streaks.
+        </>
+      }
+      onAnswer={onAnswer}
+    >
+      {children}
+    </Compare>
   )
 }

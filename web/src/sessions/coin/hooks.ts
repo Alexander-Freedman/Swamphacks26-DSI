@@ -30,3 +30,6 @@ export function sampleLabel(sim: number, flipped: number): string {
   if (!flipped) return `Simulated: ${runsOf(sim)} of 100 flips`
   return `Simulated: ${runsOf(sim)} + ${fmt(flipped)} you flipped, of 100 flips each`
 }
+
+/** One decimal, but never "100.0%" or "0.0%" for something that isn't certain (#174, #161). */
+export const pBeatLabel = (p: number) => (p >= 1 ? '100%' : p > 0.999 ? '>99.9%' : p <= 0 ? '0%' : p < 0.001 ? '<0.1%' : pct(p, 1))

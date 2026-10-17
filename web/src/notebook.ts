@@ -76,6 +76,32 @@ export function record(entry: Entry & Record<string, unknown>): void {
   }
 }
 
+/** Fields an amend never touches: the ones the notebook's catch and bust rules read. */
+const CORE = new Set(['session', 'at', 'guess', 'confidence', 'misconception', 'rematch'])
+
+/**
+ * Adds extra fields (e.g. the compare step's answer) to the entry saved earlier with this
+ * session + `at`. Core fields are never changed, so catching and busting work exactly as before.
+ */
+export function amend(session: string, at: string, fields: Record<string, unknown>): void {
+  try {
+    const s = store()
+    const raw = s?.getItem(KEY)
+    const all: unknown = raw ? JSON.parse(raw) : null
+    if (!s || !Array.isArray(all)) return
+    for (let i = all.length - 1; i >= 0; i--) {
+      const e = all[i]
+      if (!valid(e) || e.session !== session || e.at !== at) continue
+      const extra = Object.fromEntries(Object.entries(fields).filter(([k]) => !CORE.has(k)))
+      all[i] = { ...e, ...extra }
+      s.setItem(KEY, JSON.stringify(all))
+      return
+    }
+  } catch {
+    // blocked or full storage: the session still ends fine
+  }
+}
+
 /** Clears the notebook and any other answers this app keeps (every `mm.` key). */
 export function reset(): void {
   try {
