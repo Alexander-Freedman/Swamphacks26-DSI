@@ -4,6 +4,19 @@
 > - **Track:** Entertainment & Creative Technology.
 > - **Mode:** RESEARCH; no project code until I say "start building".
 > - **Next:** the research issues below, then docs/product-spec.md for my review.
+>
+> | Issue | Research | Owner |
+> |---|---|---|
+> | #17 | Entertainment track judges + past creative winners | @Alexander-Freedman |
+> | #18 | Learning science for prediction-first | @Alexander-Freedman |
+> | #19 | Misconceptions + detecting the exact one | @Alexander-Freedman |
+> | #20 | Any-topic engine + accuracy | @Alexander-Freedman |
+> | #21 | Add-on prizes that fit | @Alexander-Freedman |
+> | #22 | What makes study apps addictive | @luanamaldaner |
+> | #23 | Competitors / not a chatbot | @luanamaldaner |
+> | #24 | Truth-reveal UI patterns | @luanamaldaner |
+> | #25 | 3-minute demo | @luanamaldaner |
+> | #26 | Visual/brand direction | @luanamaldaner |
 
 Shared board. Every task is a GitHub issue; assign yourself + comment "on it" before starting. Plan: #1.
 
