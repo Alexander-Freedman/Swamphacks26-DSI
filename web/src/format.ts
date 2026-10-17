@@ -1,3 +1,4 @@
+import { parse } from 'mathjs'
 import type { Computed } from './truth'
 import type { Item } from './types'
 
@@ -51,4 +52,13 @@ export function answerUnit(item: Item, truth: Computed): { unit: string; label: 
 export function gapText(guess: number, truth: number, unit: string): string {
   const d = Math.abs(guess - truth)
   return unit.trim().startsWith('%') ? `${num(d, 'pct')} points` : withUnit(d, unit)
+}
+
+/** A mathjs expression as people write it: 100 × 1.02 ^ x, not 100*1.02^x. Falls back to the text. */
+export function prettyFormula(expr: string): string {
+  try {
+    return parse(expr).toString({ parenthesis: 'auto', implicit: 'hide' }).replace(/ \* /g, ' × ').replace(/ \/ /g, ' ÷ ')
+  } catch {
+    return expr
+  }
 }

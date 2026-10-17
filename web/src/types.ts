@@ -70,3 +70,16 @@ export type Round = {
 }
 
 export type Confidence = 'guessing' | 'pretty sure' | 'certain'
+
+// POST /api/rounds `checks` (shared/schema/README.md): what the generator's checks did. null for
+// hand-checked rounds and for rounds cached before reports were stored.
+export type ChecksReport = {
+  kept: number
+  dropped: { item_id: string; reason: string }[]
+  blind_checked: boolean
+  blind_ok: number
+  blind_failed: number
+  unchecked: string[]
+  model: string
+  seconds: number
+}

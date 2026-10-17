@@ -1,6 +1,8 @@
-import { useEffect, useRef, useState } from 'react'
+import { useCallback, useEffect, useRef, useState } from 'react'
 import { AnyTopic, BuildReady } from './components/AnyTopic'
+import { BackendDot } from './components/BackendDot'
 import { CheckedTag } from './components/CheckedTag'
+import { HowItWorks } from './components/HowItWorks'
 import { NotebookLink, NotebookScreen } from './components/Notebook'
 import { useReset } from './reset'
 import { Predict, type Answer } from './components/Predict'
@@ -61,6 +63,21 @@ function Player({ round, onDone }: { round: Round; onDone: () => void }) {
   const beat = useRef<ReturnType<typeof setTimeout> | undefined>(undefined)
   // Leaving mid-beat (logo, Done) must not fire a reveal into an unmounted round.
   useEffect(() => () => clearTimeout(beat.current), [])
+  const [drawer, setDrawer] = useState(false)
+  const closeDrawer = useCallback(() => setDrawer(false), [])
+  // D toggles "How it works" (not while typing; a focused slider or button still counts).
+  useEffect(() => {
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key.toLowerCase() !== 'd' || e.ctrlKey || e.metaKey || e.altKey || e.repeat) return
+      const el = e.target as HTMLElement | null
+      const typing = !!el && (el.isContentEditable || el.tagName === 'TEXTAREA' || (el.tagName === 'INPUT' && !/^(range|radio|checkbox|button)$/.test((el as HTMLInputElement).type)))
+      if (typing) return
+      e.preventDefault()
+      setDrawer((o) => !o)
+    }
+    window.addEventListener('keydown', onKey)
+    return () => window.removeEventListener('keydown', onKey)
+  }, [])
 
   const lock = (answer: Answer) => {
     setPhase({ kind: 'locked', answer })
@@ -79,7 +96,13 @@ function Player({ round, onDone }: { round: Round; onDone: () => void }) {
 
   return (
     <div className="sheet">
-      <p className="progress">{round.topic} · {idx + 1} of {round.items.length}</p>
+      <div className="player-bar">
+        <p className="progress">{round.topic} · {idx + 1} of {round.items.length}</p>
+        <button className="hiw-btn" onClick={() => setDrawer(true)} aria-haspopup="dialog">
+          How it works <kbd aria-hidden="true">D</kbd>
+        </button>
+      </div>
+      {drawer && <HowItWorks round={round} item={item} locked={phase.kind !== 'predict'} onClose={closeDrawer} />}
       {phase.kind === 'predict' && <Predict key={item.id} item={item} onLock={lock} />}
       {phase.kind !== 'predict' && <h2 className="prompt">{item.prompt}</h2>}
       {phase.kind !== 'predict' && (
@@ -144,6 +167,7 @@ export default function App() {
       <header className="topbar">
         <button className="logo" style={{ border: 0, background: 'none', padding: 0 }} onClick={home}>Onionskin</button>
         {round && <CheckedTag reviewed={round.reviewed} />}
+        {screen.kind === 'home' && <BackendDot />}
       </header>
       {cleared && <p className="nb-toast" role="status">Notebook cleared</p>}
       {screen.kind !== 'home' && <BuildReady onOpen={(slug) => go({ kind: 'round', slug })} />}
