@@ -17,7 +17,10 @@ import json
 import logging
 import os
 import re
+import tempfile
+import threading
 import time
+import unicodedata
 from dataclasses import dataclass
 from datetime import datetime
 from pathlib import Path
@@ -83,7 +86,10 @@ class GenResult:
 
 
 def normalize_topic(topic: str) -> str:
-    return re.sub(r"\s+", " ", re.sub(r"[^a-z0-9 ]", " ", topic.lower())).strip()
+    """Case/space-insensitive key that keeps +, # and non-Latin letters (C++ != C)."""
+    text = unicodedata.normalize("NFKC", topic).casefold()
+    text = "".join(ch if ch.isalnum() or ch in "+#" else " " for ch in text)
+    return re.sub(r"\s+", " ", text).strip()
 
 
 def _cache_path(topic: str) -> Path:
@@ -91,12 +97,28 @@ def _cache_path(topic: str) -> Path:
     return CACHE_DIR / "rounds" / f"{key}.json"
 
 
+def _atomic_write(path: Path, text: str) -> None:
+    path.parent.mkdir(parents=True, exist_ok=True)
+    fd, tmp = tempfile.mkstemp(dir=path.parent, prefix=".tmp-")
+    with os.fdopen(fd, "w") as f:
+        f.write(text)
+    os.replace(tmp, path)
+
+
 def _quota_day() -> str:
     return datetime.now(PACIFIC).strftime("%Y-%m-%d")
 
 
+_USAGE_LOCK = threading.Lock()
+
+
 class Usage:
-    """Per-quota-day call counter and per-model exhaustion flags, stored on disk."""
+    """Per-quota-day call counter and per-model exhaustion flags, stored on disk.
+
+    Writes are atomic and serialized; an unreadable file never resets the count.
+    """
+
+    _last_good: dict | None = None
 
     def __init__(self, path: Path | None = None) -> None:
         self.path = path or CACHE_DIR / "usage.json"
@@ -104,15 +126,18 @@ class Usage:
     def _load(self) -> dict:
         try:
             data = json.loads(self.path.read_text())
-        except (OSError, ValueError):
+            Usage._last_good = data
+        except FileNotFoundError:
             data = {}
+        except (OSError, ValueError):
+            data = dict(Usage._last_good or {})
         if data.get("day") != _quota_day():
             data = {"day": _quota_day(), "calls": {}, "exhausted": []}
         return data
 
     def _save(self, data: dict) -> None:
-        self.path.parent.mkdir(parents=True, exist_ok=True)
-        self.path.write_text(json.dumps(data))
+        _atomic_write(self.path, json.dumps(data))
+        Usage._last_good = data
 
     def total(self) -> int:
         return sum(self._load()["calls"].values())
@@ -121,15 +146,17 @@ class Usage:
         return self._load()
 
     def record(self, model: str) -> None:
-        data = self._load()
-        data["calls"][model] = data["calls"].get(model, 0) + 1
-        self._save(data)
+        with _USAGE_LOCK:
+            data = self._load()
+            data["calls"][model] = data["calls"].get(model, 0) + 1
+            self._save(data)
 
     def exhaust(self, model: str) -> None:
-        data = self._load()
-        if model not in data["exhausted"]:
-            data["exhausted"].append(model)
-        self._save(data)
+        with _USAGE_LOCK:
+            data = self._load()
+            if model not in data["exhausted"]:
+                data["exhausted"].append(model)
+            self._save(data)
 
     def available(self, model: str) -> bool:
         return model not in self._load()["exhausted"]
@@ -389,26 +416,47 @@ def _is_daily_quota(err: Exception) -> bool:
     return "429" in text and ("per day" in text or "perday" in text or "daily" in text)
 
 
+FAILED_TTL_S = 3600
+
+
+def _failed_path(topic: str) -> Path:
+    return _cache_path(topic).with_suffix(".failed")
+
+
 def generate_round(topic: str, usage: Usage | None = None) -> GenResult:
-    """Return a schema-valid Round for a topic: cache first, then the model chain."""
+    """Return a schema-valid, checked Round: cache first, then the model chain.
+
+    Each model gets one try for content problems (bad JSON/schema/checks) and
+    one quick retry for a per-minute 429. A topic that fails everywhere is
+    remembered for an hour so repeated requests can't burn the daily quota.
+    """
+    from app import checks
+
     started = time.monotonic()
     topic = topic.strip()[:120]
     if not normalize_topic(topic):
         raise GenerationError("empty topic")
     cached = _cache_path(topic)
     if cached.exists():
-        r = Round.model_validate_json(cached.read_text())
-        return GenResult(r, "cache", time.monotonic() - started)
+        try:
+            r = Round.model_validate_json(cached.read_text())
+            return GenResult(r, "cache", time.monotonic() - started)
+        except (ValidationError, ValueError, OSError):
+            cached.unlink(missing_ok=True)  # stale or torn; regenerate
+    failed = _failed_path(topic)
+    if failed.exists() and time.time() - failed.stat().st_mtime < FAILED_TTL_S:
+        raise GenerationError("recently failed")
     if offline():
         raise GenerationError("offline: no live generation")
     usage = usage or Usage()
-    if usage.total() >= DAILY_SOFT_CAP:
-        raise GenerationError("daily cap reached")
+    checks.on_blind_call = usage.record
     last_err: Exception | None = None
     for model in MODEL_CHAIN:
         if not usage.available(model):
             continue
         for attempt in range(2):
+            if usage.total() >= DAILY_SOFT_CAP:
+                raise GenerationError("daily cap reached")
             usage.record(model)
             try:
                 raw = _call_model(model, topic)
@@ -418,7 +466,7 @@ def generate_round(topic: str, usage: Usage | None = None) -> GenResult:
             except (ValidationError, ValueError, GenerationError, CheckFailed) as err:
                 last_err = err
                 log.warning("bad round from %s: %s", model, str(err).replace("\n", " ")[:300])
-                continue
+                break  # content problem: move to the next model, don't repeat this one
             except Exception as err:  # API errors
                 last_err = err
                 if _is_daily_quota(err):
@@ -429,7 +477,7 @@ def generate_round(topic: str, usage: Usage | None = None) -> GenResult:
                     continue
                 log.warning("api error from %s: %s", model, type(err).__name__)
                 break
-            cached.parent.mkdir(parents=True, exist_ok=True)
-            cached.write_text(r.model_dump_json(indent=2))
+            _atomic_write(cached, r.model_dump_json(indent=2))
             return GenResult(r, model, time.monotonic() - started)
+    _atomic_write(failed, "")
     raise GenerationError(f"all models failed: {type(last_err).__name__ if last_err else 'none'}")

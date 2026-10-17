@@ -177,3 +177,47 @@ def test_checks_drop_bad_items() -> None:
     assert set(report.dropped) == {"lying", "outside"}
     with pytest.raises(CheckFailed):
         check_round(to_round({**base, "questions": [lying]}), blind=False)
+
+
+@pytest.mark.parametrize("bad", ["2x", "x²", "5!", "-" * 3000 + "1", "2**3", "1_000"])
+def test_eval_expr_rejects_outside_subset(bad) -> None:
+    with pytest.raises(ValueError):
+        eval_expr(bad, x=1)
+
+
+def test_normalize_topic_keeps_symbols_and_unicode() -> None:
+    from app.gen import normalize_topic
+
+    assert normalize_topic("C++") != normalize_topic("C")
+    assert normalize_topic("  Café  ") == "café"
+    assert normalize_topic("量子力学") == "量子力学"
+
+
+def test_band_gap_is_caught() -> None:
+    from app.checks import check_item
+    from app.gen import to_round
+
+    r = to_round(
+        {
+            "slug": "g",
+            "topic": "g",
+            "concept": "c",
+            "misconceptions": [{"id": "m", "label": "l", "why_tempting": "w", "refutation": "r"}],
+            "questions": [
+                {
+                    "id": "q",
+                    "prompt": "p",
+                    "input_type": "slider",
+                    "slider_min": 0,
+                    "slider_max": 100,
+                    "bands": [
+                        {"min": 0, "max": 10, "misconception_id": "m"},
+                        {"min": 20, "max": 100, "misconception_id": None},
+                    ],
+                    "widget": "estimate",
+                    "answer_expr": "50",
+                }
+            ],
+        }
+    )
+    assert check_item(r.items[0]) == "bands leave a gap the slider can land in"

@@ -29,6 +29,7 @@ log = logging.getLogger("mm.checks")
 
 BLIND_MODEL = "gemma-4-31b-it"
 BLIND_TIMEOUT_S = 8
+on_blind_call = None  # set by the generator to count blind calls in the daily usage
 REQUIRED_PARAMS = {
     Sampler.coin_longest_run: ("n",),
     Sampler.base_rate_test: ("base_rate", "sensitivity", "false_positive_rate"),
@@ -88,6 +89,9 @@ def check_item(item: Item) -> str | None:
         bands = sorted(item.bands, key=lambda b: b.min)
         if bands[0].min > item.slider.min + 1e-9 or bands[-1].max < item.slider.max - 1e-9:
             return "bands don't cover the slider"
+        for lo, hi in zip(bands, bands[1:], strict=False):
+            if hi.min - lo.max > item.slider.step + 1e-9:
+                return "bands leave a gap the slider can land in"
         correct = [b for b in bands if b.misconception_id is None]
         if len(correct) != 1:
             return "slider needs exactly one correct band"
@@ -118,23 +122,31 @@ def _blind_answer(item: Item) -> str | float | None:
     else:
         ask = f'{item.prompt}\nReply with JSON {{"answer": <number>}} only.'
     client = genai.Client(api_key=os.environ["GEMINI_API_KEY"])
+    if on_blind_call is not None:
+        on_blind_call(BLIND_MODEL)
     resp = client.models.generate_content(
         model=BLIND_MODEL,
         contents=ask,
         config=types.GenerateContentConfig(
-            response_mime_type="application/json", max_output_tokens=200
+            response_mime_type="application/json",
+            max_output_tokens=200,
+            http_options=types.HttpOptions(timeout=BLIND_TIMEOUT_S * 1000),
         ),
     )
     text = (resp.text or "").strip().removeprefix("```json").removesuffix("```")
     return json.loads(text).get("answer")
 
 
-def blind_disagrees(item: Item) -> str | None:
+_UNCHECKED = object()
+
+
+def blind_disagrees(item: Item):
+    """Reason to drop, None if it agrees, or _UNCHECKED if the check couldn't run."""
     try:
         ans = _blind_answer(item)
     except Exception as err:  # the blind check is best effort
         log.warning("blind check skipped: %s", type(err).__name__)
-        return None
+        return _UNCHECKED
     if item.input_type is InputType.choice:
         correct = next(o.id for o in item.options if o.misconception_id is None)
         return None if str(ans) == correct else f"blind check picked {ans}, key says {correct}"
@@ -146,24 +158,38 @@ def blind_disagrees(item: Item) -> str | None:
     return None
 
 
+def _needs_blind(item: Item) -> bool:
+    try:
+        return true_value(item) is None
+    except ValueError:
+        return False
+
+
 def check_round(r: Round, blind: bool | None = None) -> tuple[Round, Report]:
     """Drop failing items; raise CheckFailed if none survive."""
     if blind is None:
         blind = bool(os.environ.get("GEMINI_API_KEY")) and os.environ.get("MM_OFFLINE") != "1"
-    report = Report(blind_checked=blind)
+    report = Report(blind_checked=False)
     kept: list[Item] = []
     reasons = {item.id: check_item(item) for item in r.items}
     if blind:
-        # Run blind checks in parallel and time-box them: a slow check is skipped, not fatal.
-        todo = [i for i in r.items if reasons[i.id] is None]
+        # Only items without a computed truth need a second opinion: when code
+        # computes the answer, code wins (counterintuitive items would otherwise
+        # be dropped because the checker falls for the same misconception).
+        # Run in parallel, time-boxed; a slow or failed check is skipped, not fatal.
+        todo = [i for i in r.items if reasons[i.id] is None and _needs_blind(i)]
         pool = ThreadPoolExecutor(max_workers=3)
         futures = {i.id: pool.submit(blind_disagrees, i) for i in todo}
         deadline = time.monotonic() + BLIND_TIMEOUT_S
         for iid, fut in futures.items():
             try:
-                reasons[iid] = fut.result(timeout=max(0.0, deadline - time.monotonic()))
+                result = fut.result(timeout=max(0.0, deadline - time.monotonic()))
             except FutureTimeout:
                 log.warning("blind check timed out for %s", iid)
+                continue
+            if result is not _UNCHECKED:
+                report.blind_checked = True
+                reasons[iid] = result
         # Don't wait for stragglers; their answers are simply ignored.
         pool.shutdown(wait=False, cancel_futures=True)
     for item in r.items:

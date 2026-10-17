@@ -6,6 +6,7 @@ from __future__ import annotations
 import ast
 import math
 import operator
+import re
 
 _BIN = {
     ast.Add: operator.add,
@@ -30,7 +31,12 @@ _FUNCS = {
 
 def eval_expr(expr: str, **names: float) -> float:
     """Evaluate the shared mathjs subset: numbers, + - * / ^, a few functions, named vars."""
-    tree = ast.parse(expr.replace("^", "**"), mode="eval")
+    if len(expr) > 200 or "**" in expr or re.search(r"\d_\d", expr):
+        raise ValueError("expression outside the shared subset")
+    try:
+        tree = ast.parse(expr.replace("^", "**"), mode="eval")
+    except (SyntaxError, RecursionError) as err:
+        raise ValueError(f"unparseable expression: {type(err).__name__}") from err
 
     def ev(node: ast.AST) -> float:
         if isinstance(node, ast.Expression):
@@ -53,7 +59,10 @@ def eval_expr(expr: str, **names: float) -> float:
             return float(_FUNCS[node.func.id](*(ev(a) for a in node.args)))
         raise ValueError(f"unsupported expression: {ast.dump(node)[:80]}")
 
-    return ev(tree)
+    try:
+        return ev(tree)
+    except RecursionError as err:
+        raise ValueError("expression too deep") from err
 
 
 def coin_longest_run_expected(n: int) -> float:
@@ -90,3 +99,14 @@ def birthday_match_probability(group_size: int, days: int = 365) -> float:
     for i in range(group_size):
         p_none *= (days - i) / days
     return 1 - p_none
+
+
+def band_for(bands, value: float):
+    """The band a slider answer falls in: bands sorted by min, inclusive, first match.
+
+    Mirrored in the frontend; documented in shared/schema/README.md.
+    """
+    for b in sorted(bands, key=lambda b: b.min):
+        if b.min <= value <= b.max:
+            return b
+    return None
