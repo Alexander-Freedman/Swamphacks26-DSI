@@ -196,3 +196,15 @@
 .calc-ask { font: 700 17px/1.4 var(--font-body); margin: 6px 0 0; }
 .calc-picks-row { grid-template-columns: repeat(3, minmax(0, 1fr)); }
 .calc-range { display: grid; grid-template-columns: 5.5em 1fr; align-items: center; gap: 10px; margin-top: 10px; font: 700 15px var(--font-mono); }
+
+/* Calc 3 fits one screen: surface on the left, question + small slices on the right */
+.calc-3d-layout { display: grid; grid-template-columns: minmax(0, 1.25fr) minmax(320px, 1fr); gap: 16px; align-items: start; }
+@media (max-width: 900px) { .calc-3d-layout { grid-template-columns: minmax(0, 1fr); } }
+.calc-3d-layout .calc-3d { max-height: min(54vh, 460px); margin: 0 auto; }
+.calc-3d-side { display: grid; gap: 12px; min-width: 0; }
+.calc-3d-side > .calc-card { margin: 0; }
+.calc-3d-side .calc-slices { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
+.calc-3d-side .calc-slice { max-height: 18vh; }
+.calc-3d-side .calc-pair { font-size: 13px; }
+.calc-3d-side .calc-picks-row { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+.calc-3d-side .calc-rule { font-size: 16px; }
