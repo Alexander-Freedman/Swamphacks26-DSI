@@ -2,6 +2,7 @@
 import { cleanup, fireEvent, render, screen } from '@testing-library/react'
 import { afterEach, describe, expect, it, vi } from 'vitest'
 import { cardGuide, endLine, lockLabel } from './copy'
+import { percent } from './percent'
 import { EndBar, SessionHead } from './Shell'
 import { isClose, rematchVerdict, shellVerdict } from './verdict'
 
@@ -47,7 +48,11 @@ describe('session shell copy', () => {
   })
 
   it('end line covers the first guess and the rematch (#148)', () => {
-    expect(endLine(null, 'wrong')).toBe('Your first guess called it. Rematch missed; it stays in your notebook to try again.')
+    // only promises the notebook when something is in it (#162)
+    expect(endLine(null, 'wrong')).toBe('Your first guess called it. Rematch missed; try it again tomorrow.')
+    expect(endLine(null, 'wrong', 'Y')).toBe('Your first guess called it. Rematch missed: “Y” is in your notebook to try again.')
+    expect(endLine('X', 'wrong')).toBe('Caught: “X”. Rematch missed; it stays in your notebook to try again.')
+    expect(endLine('X', 'wrong', 'Y')).toBe('Caught: “X”. Rematch missed; it stays in your notebook to try again.')
     expect(endLine(null, 'right')).toBe('Your first guess called it. Rematch: right.')
     expect(endLine('X', 'right')).toBe('Caught: “X”. Rematch: right.')
     expect(endLine('X', 'close')).toBe('Caught: “X”. Rematch: close.')
@@ -55,11 +60,26 @@ describe('session shell copy', () => {
   })
 })
 
+describe('percent (#161)', () => {
+  it('never rounds a chance below 1 up to 100%, or one above 0 down to 0%', () => {
+    expect(percent(0.99972)).toBe('>99.9%')
+    expect(percent(0.9994)).toBe('99.9%')
+    expect(percent(0.996, 0)).toBe('>99%')
+    expect(percent(0.972)).toBe('97.2%')
+    expect(percent(0.5, 0)).toBe('50%')
+    expect(percent(0.00004)).toBe('<0.1%')
+    expect(percent(0.004, 0)).toBe('<1%')
+    expect(percent(1)).toBe('100%')
+    expect(percent(0)).toBe('0%')
+    expect(percent(Number.NaN)).toBe('-')
+  })
+})
+
 describe('session shell parts', () => {
   it('end bar: saved, the line, the remix, open notebook, done', () => {
     const done = vi.fn()
     const { container } = render(<EndBar caught={null} rematch="wrong" remix="Come back tomorrow." onDone={done} />)
-    expect(container.textContent).toContain('Saved to your notebook. Your first guess called it. Rematch missed; it stays in your notebook to try again. Come back tomorrow.')
+    expect(container.textContent).toContain('Saved to your notebook. Your first guess called it. Rematch missed; try it again tomorrow. Come back tomorrow.')
     expect(screen.getByText('Open notebook').getAttribute('href')).toContain('?notebook=1')
     fireEvent.click(screen.getByText('Done'))
     expect(done).toHaveBeenCalled()

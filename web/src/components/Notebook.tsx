@@ -1,6 +1,6 @@
 import type { MouseEvent } from 'react'
 import { BUST_AFTER, NOTEBOOK_HREF, entries, notebook, type Card } from '../notebook'
-import { sessionFor } from '../sessions/registry'
+import { sessionFor, sessions } from '../sessions/registry'
 import './Notebook.css'
 
 const BASE = import.meta.env.BASE_URL
@@ -57,7 +57,11 @@ function MistakeCard({ c }: { c: Card }) {
 
 export function NotebookScreen({ onHome }: { onHome?: () => void }) {
   const cards = notebook()
-  const played = entries().length
+  const all = entries()
+  const played = all.length
+  // Empty state (#162): count missed rematches honestly and point at a session not played yet.
+  const missed = all.filter((e) => e.rematch === 'wrong').length
+  const next = sessions.find((s) => !all.some((e) => e.session === s.slug)) ?? sessions[0]
   const caught = cards.filter((c) => c.status === 'caught')
   const busted = cards.filter((c) => c.status === 'busted')
   return (
@@ -71,10 +75,14 @@ export function NotebookScreen({ onHome }: { onHome?: () => void }) {
           <p className="nb-empty-hand">Nothing caught yet.</p>
           <p>
             {played > 0
-              ? `You've played ${played} ${played === 1 ? 'session' : 'sessions'} and called ${played === 1 ? 'it' : 'them'}. Try another one: the mistakes worth catching are the confident ones.`
+              ? `You've played ${played} ${played === 1 ? 'session' : 'sessions'} and your first guess called ${played === 1 ? 'it' : 'every one'}${missed ? ` (${missed} ${missed === 1 ? 'rematch' : 'rematches'} missed)` : ''}. Try another one: the mistakes worth catching are the confident ones.`
               : 'Play a session: guess first, watch reality, and if your guess misses, the idea behind it shows up here.'}
           </p>
-          <a className="nb-btn" href={`${BASE}?session=birthday`}>Start with the birthday problem</a>
+          {next && (
+            <a className="nb-btn" href={`${BASE}?session=${next.slug}`}>
+              {played > 0 ? `Next: ${next.title}` : 'Start with the birthday problem'}
+            </a>
+          )}
         </div>
       ) : (
         <>

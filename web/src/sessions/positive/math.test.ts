@@ -52,6 +52,11 @@ describe('positive test math', () => {
     expect(exact(ppv(CARD))).toBe('9.2%')
     expect(exact(0.003)).toBe('0.3%')
     expect(exact(NaN)).toBe('-')
+    // capped, never "100.0%" or "0.0%" for a chance strictly between 0 and 1 (#161)
+    expect(exact(0.9997)).toBe('>99.9%')
+    expect(exact(0.0004)).toBe('<0.1%')
+    expect(pct(0.996)).toBe('>99%')
+    expect(pct(0.0004)).toBe('<0.1%')
   })
 
   it('rematch: 2% sick, 95% caught, 5% false alarms → 27.9%, 19 of 68 per 1,000', () => {
