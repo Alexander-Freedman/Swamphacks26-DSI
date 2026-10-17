@@ -39,5 +39,7 @@ Decisions + how to run things. Keep current.
   - **Paused:** Luana's #11-#16 and PR #10.
   - **Research mode** until I say "start building"; the product spec (docs/product-spec.md) gets my review before anything is built.
 
+- Oct 16 ~10:10 PM, approval rule: I post the product spec + build plan in #questions with an @. If there's no answer in 30 min, it counts as approved: set "Mode: BUILD (auto-approved at <time>)" here, comment on #1 that building starts and which issues are @luanamaldaner's, open the build issues, and build through the night (claim lock, small PRs, main always runs, hourly digests). A later answer from me overrides the plan.
+
 ## How to run
 Nothing to run yet. Build box tooling (my side): Python 3.12, uv 0.13, Node 22.23 / npm 10.9 in `~/.local/bin` (DeepSpace would also need `npm i -g npm@11`). No Docker on the build box; deploys go to Vultr/Render. The box is 1 CPU, so heavy model training should be kept small or run on Vultr.
