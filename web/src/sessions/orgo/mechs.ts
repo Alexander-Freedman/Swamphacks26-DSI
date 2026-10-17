@@ -1,5 +1,5 @@
 import { ELEMENTS, formalCharge, sameBond, type Arrow, type El, type MechHint, type MechMistake, type Pt, type Source, type Target } from './chem'
-import { ease, type SAtom, type SBond, type Scene } from './sn2'
+import { ease, VW, type SAtom, type SBond, type Scene } from './sn2'
 
 // SN1, E2 and E1 as keyframes: key 0 = reactants, one more key per step. Positions move between
 // keys; lone pairs, bonds and charges switch over around the middle of each step. Charges come
@@ -44,7 +44,7 @@ const IONIZE_CAP = (u: number) => (u < 0.5 ? 'C–Br breaks on its own. Br takes
 const CH3 = (id: string, name: string, at: Pt[]): KAtom => ({ id, el: 'C', label: 'CH₃', name, at, lp: at.map(() => []) })
 const BR = (at: Pt[], keys: number): KAtom => ({ id: 'lg', el: 'Br', name: 'Br', at, lp: at.map((_, k) => (k < keys ? [90, 0, 270] : [90, 0, 270, 180])) })
 
-export const MECHS: Record<MechId, Mech> = {
+const RAW: Record<MechId, Mech> = {
   sn1: {
     id: 'sn1',
     vh: 190,
@@ -210,6 +210,32 @@ export const MECHS: Record<MechId, Mech> = {
     ],
   },
 }
+
+/** Room around the outermost atom centers: an atom disc plus its lone pairs. */
+const MARGIN = 40
+
+/**
+ * Centers a mechanism in the frame: one shift for every keyframe (so nothing jumps between steps),
+ * chosen so the box around all positions sits in the middle. The frame grows taller if it has to.
+ */
+function centered(m: Mech): Mech {
+  const pts = m.atoms.flatMap((a) => a.at)
+  const xs = pts.map((p) => p.x)
+  const ys = pts.map((p) => p.y)
+  const [x0, x1, y0, y1] = [Math.min(...xs), Math.max(...xs), Math.min(...ys), Math.max(...ys)]
+  const vh = Math.max(m.vh, y1 - y0 + 2 * MARGIN)
+  const dx = Math.round(VW / 2 - (x0 + x1) / 2)
+  const dy = Math.round(vh / 2 - (y0 + y1) / 2)
+  const move = (p: Pt): Pt => ({ x: p.x + dx, y: p.y + dy })
+  return {
+    ...m,
+    vh,
+    atoms: m.atoms.map((a) => ({ ...a, at: a.at.map(move) })),
+    stages: m.stages.map((st) => ({ ...st, real: st.real.map((r) => (r.bend ? { ...r, bend: move(r.bend) } : r)) })),
+  }
+}
+
+export const MECHS = Object.fromEntries(Object.entries(RAW).map(([id, m]) => [id, centered(m)])) as Record<MechId, Mech>
 
 // ---------- grading ----------
 
