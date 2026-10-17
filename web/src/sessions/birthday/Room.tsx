@@ -88,7 +88,7 @@ export function Room({ guess, onMatchState, onNext }: Props) {
           {matched ? (
             <div className="bday-stampwrap">
               <span key={tries.length} className="bday-stamp bday-stamp-match">
-                {shared.length > 1 ? `${shared.length} matches` : `match · ${dayLabel(firstDay!)}`}
+                {shared.length > 1 ? `${shared.length} shared days` : `match · ${dayLabel(firstDay!)}`}
               </span>
             </div>
           ) : null}
@@ -196,6 +196,8 @@ function Calendar({ width, room, shared, firstDay, pair }: { width: number; room
   const r = Math.max(3.2, Math.min(7, cell * 0.36))
   const pts = room.map(center)
   const isShared = new Set(shared)
+  // keep the web readable as the room grows: lines fade so 4,950 pairs don't turn into a solid block
+  const fade = Math.min(1, Math.sqrt(253 / Math.max(1, pairs(room.length))))
   const lines: ReactNode[] = []
   for (let i = 0; i < pts.length; i++)
     for (let j = i + 1; j < pts.length; j++) {
@@ -216,7 +218,7 @@ function Calendar({ width, room, shared, firstDay, pair }: { width: number; room
           ))}
         </g>
       ))}
-      <g>{lines}</g>
+      <g style={{ opacity: fade }}>{lines}</g>
       {shared.map((day) => (
         <g key={day} className="bday-ring">
           <circle cx={center(day)[0]} cy={center(day)[1]} r={day === firstDay ? Math.max(13, cell * 1.3) : Math.max(10, cell)} fill="var(--marker-soft)" stroke="var(--marker)" strokeWidth={day === firstDay ? 5 : 3.5} />

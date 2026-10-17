@@ -100,7 +100,7 @@ export function Draw({ guess, onDone }: { guess: number; onDone: (curve: number[
           }}
         >
           {!pts.length && (
-            <text className="bday-h bday-drawhint" x={(f.l + f.w - f.r) / 2} y={sy(f, 0.78)} textAnchor="middle">
+            <text className="bday-h bday-drawhint" x={(f.l + f.w - f.r) / 2} y={sy(f, 0.66)} textAnchor="middle">
               drag from left to right ✎
             </text>
           )}
