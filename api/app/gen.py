@@ -460,7 +460,6 @@ def generate_round(topic: str, usage: Usage | None = None) -> GenResult:
     one quick retry for a per-minute 429. A topic that fails everywhere is
     remembered for an hour so repeated requests can't burn the daily quota.
     """
-    from app import checks
 
     started = time.monotonic()
     topic = topic.strip()[:120]
@@ -479,7 +478,6 @@ def generate_round(topic: str, usage: Usage | None = None) -> GenResult:
     if offline():
         raise GenerationError("offline: no live generation")
     usage = usage or Usage()
-    checks.on_blind_call = usage.record
     last_err: Exception | None = None
     for model in MODEL_CHAIN:
         if not usage.available(model):
@@ -491,7 +489,7 @@ def generate_round(topic: str, usage: Usage | None = None) -> GenResult:
             try:
                 raw = _call_model(model, topic)
                 data = json.loads(raw.strip().removeprefix("```json").removesuffix("```"))
-                r, report = check_round(to_round(data))
+                r, report = check_round(to_round(data), usage=usage)
                 log.info("checks for %r: %s", topic, report.as_dict())
             except (ValidationError, ValueError, GenerationError, CheckFailed) as err:
                 last_err = err
