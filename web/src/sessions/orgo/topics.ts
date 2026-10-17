@@ -4,7 +4,7 @@
 
 import type { MechId } from './mechs'
 
-export type OrgoStep = 'build' | 'push' | 'compare'
+export type OrgoStep = 'build' | 'push' | 'compare' | 'contrast'
 
 export type OrgoTopic = {
   id: string
@@ -35,6 +35,7 @@ export const SECTIONS: OrgoSection[] = [
       { id: 'sn1', title: 'SN1', blurb: 'Two steps: the leaving group goes first, then the carbocation is attacked.', steps: ['push'], ready: true, mech: 'sn1' },
       { id: 'e2', title: 'E2', blurb: 'One step: a base pulls a proton as the double bond forms.', steps: ['push'], ready: true, mech: 'e2' },
       { id: 'e1', title: 'E1', blurb: 'Two steps: carbocation first, then a proton leaves.', steps: ['push'], ready: true, mech: 'e1' },
+      { id: 'sn2-vs-e2', title: 'SN2 vs E2', blurb: 'Same HO⁻, two carbons. Predict the path for each, then watch both.', steps: ['contrast'], ready: true },
     ],
   },
   {

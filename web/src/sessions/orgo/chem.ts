@@ -275,9 +275,10 @@ export function tapVerdict(map: PartMap, part: Part, atom: string): { ok: boolea
 // ---------- SN1, E2, E1 (mechs.ts) ----------
 
 export type MechMistake = 'sn1-attack-first' | 'e1-base-first' | 'e1-base-hits-carbon' | 'e2-base-hits-carbon' | 'e2-not-anti' | 'ch-bond-lost'
+export type ContrastMistake = 'crowding-ignored' | 'no-neighbor-h'
 export type MechHint = 'mech-leave' | 'mech-attack' | 'mech-base' | 'mech-ch'
 
-export const MISTAKES: Record<BuildMistake | ArrowMistake | TapMistake | MechMistake, { label: string; line: string }> = {
+export const MISTAKES: Record<BuildMistake | ArrowMistake | TapMistake | MechMistake | ContrastMistake, { label: string; line: string }> = {
   'carbon-five-bonds': { label: 'A carbon with 5 bonds', line: 'Carbon has 4 slots. A 5th bond has no electrons to use.' },
   'hydrogen-two-bonds': { label: 'Hydrogen with 2 bonds', line: 'Hydrogen holds exactly one bond.' },
   'oxygen-three-bonds': { label: 'Oxygen with 3 bonds, no charge', line: 'Three bonds on oxygen make it O⁺: FC = 6 − 2 − 3 = +1. Ethanol has no charge.' },
@@ -295,6 +296,8 @@ export const MISTAKES: Record<BuildMistake | ArrowMistake | TapMistake | MechMis
   'e2-base-hits-carbon': { label: 'Base attacks the carbon', line: 'That’s SN2, and this carbon is too crowded for it. A strong base pulls an H off the carbon next door.' },
   'e2-not-anti': { label: 'Not the H across from Br', line: 'E2 needs the H and Br on opposite sides, lined up (anti). Pull the H straight across from Br.' },
   'ch-bond-lost': { label: 'The C–H electrons go nowhere', line: 'When the H⁺ leaves, its bond’s two electrons swing in between the carbons. That’s the new C=C.' },
+  'crowding-ignored': { label: 'Crowding ignored', line: 'Three CH₃ groups block the back of that carbon, so SN2 can’t happen there. HO⁻ acts as a base: E2.' },
+  'no-neighbor-h': { label: 'Elimination with no neighbor H', line: 'CH₃Br has only one carbon. E2 needs an H on the carbon next door, so HO⁻ swaps in: SN2.' },
 }
 
 export const HINTS: Record<BuildHint | ArrowHint | MechHint, string> = {

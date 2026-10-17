@@ -4,6 +4,7 @@ import { EndBar, Frame, SessionHead, Title } from '../../components/session/Shel
 import { BuildStep } from './BuildStep'
 import { MISTAKES } from './chem'
 import { CompareStep } from './CompareStep'
+import { ContrastStep } from './ContrastStep'
 import { MechStep } from './MechStep'
 import { MECHS } from './mechs'
 import { PushStep } from './PushStep'
@@ -11,12 +12,13 @@ import { SECTIONS, type OrgoStep, type OrgoTopic } from './topics'
 import './orgo.css'
 
 export const SLUG = 'orgo'
-const LABEL: Record<OrgoStep, string> = { build: 'Build', push: 'Push', compare: 'Compare' }
+const LABEL: Record<OrgoStep, string> = { build: 'Build', push: 'Push', compare: 'Compare', contrast: 'Contrast' }
 // Short captions only: the pictures do the explaining.
 const TITLES: Record<OrgoStep, [string, string]> = {
   build: ['Build ethanol', 'Drag atoms onto the paper and bond them until every slot is full.'],
   push: ['Push the electrons', 'Draw the curved arrows for HO⁻ + CH₃Br. Then watch it happen.'],
   compare: ['Same pattern', 'A new reaction. Find the same three parts.'],
+  contrast: ['SN2 or E2?', 'Pick a path for each, then run both.'],
 }
 const REMIX: Record<string, string> = {
   'build-ethanol': 'Next: push the electrons in a real mechanism.',
@@ -25,6 +27,7 @@ const REMIX: Record<string, string> = {
   sn1: 'Next: E1. Same carbocation, a different ending.',
   e1: 'Next: E2. A strong base skips the carbocation.',
   e2: 'Next: SN1. Weak nucleophile, same crowded carbon.',
+  'sn2-vs-e2': 'Next: draw the E2 arrows yourself.',
 }
 type M = keyof typeof MISTAKES
 
@@ -131,6 +134,11 @@ function OrgoTopicRun({ topic, onTopics, onDone }: { topic: OrgoTopic; onTopics:
       {at('compare') > 0 && reached >= at('compare') && (
         <div hidden={step !== at('compare')}>
           <CompareStep onMistake={(m) => caught([m])} onDone={finish} />
+        </div>
+      )}
+      {at('contrast') > 0 && reached >= at('contrast') && (
+        <div hidden={step !== at('contrast')}>
+          <ContrastStep onMistake={(m) => caught([m])} onDone={finish} />
         </div>
       )}
       {finished && last && (

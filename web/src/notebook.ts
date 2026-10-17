@@ -56,6 +56,8 @@ const EXTRA_LABELS: Record<string, string> = {
   'e2-base-hits-carbon': 'Base attacks the carbon',
   'e2-not-anti': 'Not the H across from Br',
   'ch-bond-lost': 'The C–H electrons go nowhere',
+  'crowding-ignored': 'Crowding ignored',
+  'no-neighbor-h': 'Elimination with no neighbor H',
 }
 
 function store(): Storage | null {
