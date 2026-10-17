@@ -2,6 +2,7 @@ import { useMemo, useState } from 'react'
 import { Predict, type Answer } from './components/Predict'
 import { Reveal } from './components/Reveal'
 import { showcaseRound, showcaseSlugs } from './rounds'
+import { sessionFor, sessions } from './sessions/registry'
 import { computeTruth, type Computed } from './truth'
 import type { Round } from './types'
 import { misconceptionFor } from './verdict'
@@ -9,11 +10,21 @@ import './App.css'
 
 const BEAT_MS = 400
 
-function Home({ onPick }: { onPick: (slug: string) => void }) {
+function Home({ onPick, onSession }: { onPick: (slug: string) => void; onSession: (slug: string) => void }) {
   return (
     <div className="home sheet">
       <h1>Bet on your gut. Then watch reality.</h1>
       <p className="concept">Predict first, lock it in, and see exactly where your intuition breaks.</p>
+      {sessions.length > 0 && (
+        <div className="showcases sessions">
+          {sessions.map((s) => (
+            <button key={s.slug} className="showcase" onClick={() => onSession(s.slug)}>
+              {s.title}
+              <span className="blurb">{s.blurb}</span>
+            </button>
+          ))}
+        </div>
+      )}
       <div className="showcases">
         {showcaseSlugs.map((slug) => (
           <button key={slug} className="showcase" onClick={() => onPick(slug)}>
@@ -71,13 +82,29 @@ function Player({ round, onDone }: { round: Round; onDone: () => void }) {
 export default function App() {
   const [slug, setSlug] = useState<string | null>(() => new URLSearchParams(location.search).get('round'))
   const round = useMemo(() => (slug ? showcaseRound(slug) : undefined), [slug])
+  const [sessionSlug, setSessionSlug] = useState<string | null>(() => new URLSearchParams(location.search).get('session'))
+  const session = sessionFor(sessionSlug)
+  const home = () => {
+    setSlug(null)
+    setSessionSlug(null)
+  }
+  if (session) {
+    return (
+      <main className="app">
+        <header className="topbar">
+          <button className="logo" style={{ border: 0, background: 'none', padding: 0 }} onClick={home}>mm</button>
+        </header>
+        <session.Component onDone={home} />
+      </main>
+    )
+  }
   return (
     <main className="app">
       <header className="topbar">
-        <button className="logo" style={{ border: 0, background: 'none', padding: 0 }} onClick={() => setSlug(null)}>mm</button>
+        <button className="logo" style={{ border: 0, background: 'none', padding: 0 }} onClick={home}>mm</button>
         {round && <span className={`chip ${round.reviewed ? 'reviewed' : ''}`}>{round.reviewed ? 'reviewed' : 'auto-checked'}</span>}
       </header>
-      {round ? <Player key={round.slug} round={round} onDone={() => setSlug(null)} /> : <Home onPick={setSlug} />}
+      {round ? <Player key={round.slug} round={round} onDone={() => setSlug(null)} /> : <Home onPick={setSlug} onSession={setSessionSlug} />}
     </main>
   )
 }

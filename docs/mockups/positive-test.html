@@ -1,0 +1,367 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Positive Test Mockup</title>
+<link rel="stylesheet" href="look.css">
+<!--
+  Math check (python3, Oct 16 2026):
+  b, s, f = 0.01, 0.9, 0.09
+  b*s = 0.009 ; (1-b)*f = 0.0891 ; 0.009/0.0981 = 0.091743 -> 9.2%
+  counts per 1,000: 10 sick -> 9 positive ; 990 healthy -> 89.1 -> 89 positive ; 9/98 = 0.091837
+  trust line (P(sick|+) = 50%): b = f/(s+f) = 0.0909 -> about 9.1% of people sick
+  at b = 50%: 0.45/(0.45+0.045) = 0.9091 -> 91% (the "90%" answer is right only for a coin-flip crowd)
+  second positive test, prior 0.0917: 0.5025 -> 50%
+-->
+<style>
+  body { overflow-x: hidden; }
+  .lede { color: var(--ink-soft); margin: 0 0 16px; max-width: 56ch; }
+  .row { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
+  .big { font: 800 clamp(44px, 12vw, 72px)/1 var(--font-display); }
+  .readout { display: flex; align-items: baseline; gap: 12px; flex-wrap: wrap; margin: 12px 0 4px; }
+  .readout .sub { color: var(--ink-soft); }
+  svg { display: block; width: 100%; height: auto; }
+  .grid-svg { touch-action: none; user-select: none; -webkit-user-select: none; }
+  .dot { fill: #ddd6c6; }
+  .dot.sk { fill: var(--pencil); }
+  .dot.hp { fill: var(--card); stroke: var(--pencil); stroke-width: 1.6; stroke-dasharray: 2 1.6; }
+  .dot.sick { fill: var(--ink); }
+  .dot.miss { fill: var(--card); stroke: var(--ink); stroke-width: 1.4; }
+  .dot.tp { fill: var(--ink); stroke: var(--called); stroke-width: 1.6; }
+  .dot.fp { fill: var(--marker); stroke: var(--ink-soft); stroke-width: 1; }
+  .dot.fade { opacity: .35; }
+  .mv { transition: transform .9s cubic-bezier(.3,.1,.2,1), opacity .4s, fill .3s; }
+  @keyframes flash { 0%,100% { opacity: 1 } 50% { opacity: .2 } }
+  .flash { animation: flash .35s 3; }
+  .seg { display: inline-flex; border: 2px solid var(--ink); border-radius: 999px; overflow: hidden; }
+  .seg button { font: 700 14px var(--font-body); background: var(--card); color: var(--ink); border: 0; padding: 8px 12px; }
+  .seg button + button { border-left: 2px solid var(--ink); }
+  .seg button[aria-pressed=true] { background: var(--ink); color: var(--paper); }
+  .step { display: grid; grid-template-columns: 1fr auto; gap: 8px 12px; align-items: center; margin-top: 12px; }
+  .step .ctl { display: flex; gap: 6px; }
+  .mini { font: 700 14px var(--font-mono); width: 40px; height: 34px; border: 2px solid var(--ink); background: var(--card); color: var(--ink); border-radius: 8px; box-shadow: 0 2px 0 var(--ink); }
+  .mini:active { transform: translateY(2px); box-shadow: none; }
+  .legend i.sw, .sw { display: inline-block; width: 12px; height: 12px; border-radius: 50%; vertical-align: -1px; margin-right: 6px; }
+  .sw.sk { background: var(--pencil); } .sw.hp { border: 2px dashed var(--pencil); background: var(--card); }
+  .sw.sick { background: var(--ink); } .sw.fp { background: var(--marker); border: 1px solid var(--ink-soft); }
+  .sw.miss { border: 2px solid var(--ink); background: var(--card); } .sw.plain { background: #ddd6c6; }
+  .logslab { position: relative; height: 18px; display: block; }
+  .logslab span { position: absolute; transform: translateX(-50%); }
+  .logslab span:first-child { transform: none; } .logslab span:last-child { transform: translateX(-100%); }
+  .slab { display: flex; justify-content: space-between; font-size: 14px; color: var(--ink-soft); margin-top: 4px; }
+  .guessval { font: 800 34px var(--font-display); }
+  .card + .card { margin-top: 14px; }
+  .k { font: 600 12px var(--font-mono); text-transform: uppercase; letter-spacing: .06em; color: var(--ink-soft); }
+  .verdict { display: flex; justify-content: space-between; align-items: flex-start; gap: 12px; }
+  .named { font: 800 clamp(22px, 5.4vw, 28px)/1.15 var(--font-display); margin: 6px 0 10px; }
+  .next { margin-top: 14px; padding: 12px 14px; border: 3px dashed var(--pencil); border-radius: var(--radius); background: var(--card); }
+  .src { font-size: 13px; color: var(--ink-soft); }
+  .src a { color: var(--ink); }
+  .pill { font: 600 13px var(--font-mono); padding: 3px 8px; border-radius: 999px; border: 2px solid var(--ink); background: var(--card); }
+  .pill.ok { background: var(--called); color: #fff; border-color: var(--called); }
+  label.lab { font-weight: 700; display: block; margin: 14px 0 2px; }
+  svg text { font-family: var(--font-body); }
+  .ax { stroke: var(--ink-soft); stroke-width: 1; }
+  .axt { font: 11px var(--font-mono); fill: var(--ink-soft); }
+</style>
+</head>
+<body>
+
+<!-- 1. GUESS + SKETCH -->
+<section class="screen" id="s1">
+  <div class="tag">Move 1 · guess first, sketch your model</div>
+  <h1>You tested positive.</h1>
+  <p class="lede">1 in 100 people have it. The test catches <b>90%</b> of real cases, and wrongly says yes to <b>9%</b> of healthy people.</p>
+
+  <div class="card">
+    <label class="lab" for="guess">Chance you're actually sick?</label>
+    <div class="row" style="justify-content:space-between">
+      <span class="guessval num" id="guessOut">90%</span>
+      <span class="note">gut call, no math</span>
+    </div>
+    <input type="range" id="guess" min="0" max="100" step="1" value="90" aria-describedby="guessOut">
+    <div class="slab"><span>0%</span><span>50%</span><span>100%</span></div>
+  </div>
+
+  <div class="card">
+    <div class="row" style="justify-content:space-between">
+      <b>Sketch it: who lights up positive?</b>
+      <span class="seg" role="group" aria-label="brush">
+        <button data-brush="1" aria-pressed="true">sick +</button><button data-brush="2" aria-pressed="false">healthy +</button><button data-brush="0" aria-pressed="false">erase</button>
+      </span>
+    </div>
+    <p class="note" style="margin:8px 0">drag across the 1,000 people to paint</p>
+    <svg class="grid-svg" id="sketch" viewBox="0 0 400 250" aria-label="1000 dot sketch grid"></svg>
+    <div class="step">
+      <span><i class="sw sk"></i>positive &amp; sick <b class="num" id="nSk">0</b></span>
+      <span class="ctl"><button class="mini" data-add="1" data-n="-1">−1</button><button class="mini" data-add="1" data-n="1">+1</button><button class="mini" data-add="1" data-n="10">+10</button></span>
+      <span><i class="sw hp"></i>positive &amp; healthy <b class="num" id="nHp">0</b></span>
+      <span class="ctl"><button class="mini" data-add="2" data-n="-1">−1</button><button class="mini" data-add="2" data-n="1">+1</button><button class="mini" data-add="2" data-n="10">+10</button></span>
+    </div>
+    <p style="margin:12px 0 0">Your sketch says <b class="num hl" id="sketchPct">-</b> of positives are sick.</p>
+  </div>
+</section>
+
+<!-- 2. RUN IT -->
+<section class="screen" id="s2">
+  <div class="tag">Move 2 · a concrete example you can watch</div>
+  <h2>Test all 1,000.</h2>
+  <div class="row"><button class="btn" id="run">Test everyone</button><button class="btn ghost" id="reset">Reset</button></div>
+  <div class="legend" style="margin-top:12px">
+    <span><i class="sw sick"></i>sick</span><span><i class="sw fp"></i>healthy, but positive</span><span><i class="sw plain"></i>healthy, negative</span>
+  </div>
+  <div class="card" style="margin-top:10px;padding:10px">
+    <svg id="runGrid" viewBox="0 0 400 420" aria-label="1000 people tested, positives move into a pile"></svg>
+  </div>
+  <div class="readout" id="runOut" aria-live="polite">
+    <span class="big num" id="runBig">? / ?</span>
+    <span class="sub" id="runSub">press the button</span>
+  </div>
+</section>
+
+<!-- 3. MODEL VS REALITY -->
+<section class="screen" id="s3">
+  <div class="tag">Move 4 · your model drawn next to reality</div>
+  <h2>Your pile vs the real pile.</h2>
+  <div class="legend"><span><i class="l-you"></i>your guess</span><span><i class="l-truth"></i>reality</span><span><i class="l-gap"></i>the gap</span></div>
+  <div class="card" style="margin-top:10px">
+    <svg id="cmpBar" viewBox="0 0 400 96" aria-label="your guess vs reality on a 0 to 100 percent line"></svg>
+  </div>
+  <div class="card">
+    <svg id="cmpPiles" viewBox="0 0 400 250" aria-label="98 positives: your split vs the real split"></svg>
+  </div>
+</section>
+
+<!-- 4. EXTREMES -->
+<section class="screen" id="s4">
+  <div class="tag">Move 3 · push it until it breaks</div>
+  <h2>Same test. Change the crowd.</h2>
+  <div class="card">
+    <label class="lab" for="br">How common it is: <span class="num hl" id="brOut">1%</span></label>
+    <input type="range" id="br" min="0" max="1000" step="1" value="0">
+    <div class="slab logslab"><span style="left:0%">0.1%</span><span style="left:37%">1%</span><span style="left:74%">10%</span><span style="left:100%">50%</span></div>
+    <label class="lab" for="fpr">False alarm rate: <span class="num" id="fpOut">9%</span></label>
+    <input type="range" id="fpr" min="1" max="30" step="1" value="9">
+    <div class="slab"><span>1%</span><span>30%</span></div>
+    <div class="readout">
+      <span class="big num" id="exBig">9 / 98</span>
+      <span class="sub">positives are sick · <b class="num" id="exPct">9.2%</b> exact</span>
+      <span class="pill" id="trust">don't trust it yet</span>
+    </div>
+    <svg id="exGrid" viewBox="0 0 400 250" aria-label="1000 people at the chosen base rate"></svg>
+  </div>
+  <div class="card">
+    <svg id="curve" viewBox="0 0 400 250" aria-label="chance you are sick given positive, against how common it is"></svg>
+    <p class="hand" style="margin:4px 0 0;font-size:18px"><span class="hl">the test didn't change, the crowd did.</span> <span class="note">past the green line, a positive means more likely sick than not.</span></p>
+  </div>
+</section>
+
+<!-- 5. MISTAKE NAMED -->
+<section class="screen" id="s5">
+  <div class="tag">Move 5 · your exact mistake, named</div>
+  <div class="card">
+    <div class="verdict">
+      <div>
+        <div class="k">you said <span id="vSaid">90%</span> · reality <span id="vTrue">9.2%</span></div>
+        <div class="named" id="vName">The test's accuracy is my chance</div>
+      </div>
+      <span class="stamp off" id="vStamp">way off</span>
+    </div>
+    <p id="vLine" style="margin:0 0 10px"></p>
+    <p class="hand" style="margin:0 0 10px;font-size:17px" id="vWhy"></p>
+    <p class="src" id="vSrc"></p>
+  </div>
+  <div class="next">
+    <div class="k">next challenge</div>
+    <p style="margin:6px 0 0"><b>You test positive again, on a second, independent test.</b> Now what's the chance? Guess first.</p>
+  </div>
+</section>
+
+<script>
+(() => {
+const SENS = 0.9, POP = 1000, COLS = 40;
+const FINAL = new URLSearchParams(location.search).has('final'); // ?final = jump to end state (screenshots)
+const RM = FINAL || matchMedia('(prefers-reduced-motion: reduce)').matches;
+const NS = 'http://www.w3.org/2000/svg';
+const $ = id => document.getElementById(id);
+const el = (tag, attrs, parent) => { const e = document.createElementNS(NS, tag); for (const k in attrs) e.setAttribute(k, attrs[k]); if (parent) parent.appendChild(e); return e; };
+const xy = i => [5 + (i % COLS) * 10, 5 + Math.floor(i / COLS) * 10];
+const ppv = (b, f) => b * SENS / (b * SENS + (1 - b) * f);
+const counts = (b, f) => { const sick = Math.round(POP * b), tp = Math.round(sick * SENS), fp = Math.round((POP - sick) * f); return { sick, tp, fp }; };
+const pct = p => (p * 100 < 10 ? (p * 100).toFixed(1) : Math.round(p * 100)) + '%';
+
+// seeded shuffle so "who is sick" is stable
+let seed = 7; const rnd = () => (seed = (seed * 16807) % 2147483647) / 2147483647;
+const order = [...Array(POP).keys()]; for (let i = POP - 1; i > 0; i--) { const j = Math.floor(rnd() * (i + 1)); [order[i], order[j]] = [order[j], order[i]]; }
+
+function grid(svg) { const dots = []; for (let i = 0; i < POP; i++) { const [x, y] = xy(i); dots.push(el('circle', { cx: x, cy: y, r: 3.6, class: 'dot' }, svg)); } return dots; }
+
+// ---------- state ----------
+const st = { guess: 90, sketch: new Uint8Array(POP) };
+// prefilled typical sketch: 9 sick-positive, 1 healthy-positive (what a 90% guess looks like)
+for (let k = 0; k < 9; k++) st.sketch[order[500 + k]] = 1; st.sketch[order[600]] = 2;
+
+// ---------- 1. guess + sketch ----------
+const sk = $('sketch'), skDots = grid(sk); let brush = 1, painting = false;
+function drawSketch() {
+  let a = 0, h = 0;
+  st.sketch.forEach((v, i) => { skDots[i].setAttribute('class', 'dot' + (v === 1 ? ' sk' : v === 2 ? ' hp' : '')); if (v === 1) a++; if (v === 2) h++; });
+  $('nSk').textContent = a; $('nHp').textContent = h;
+  $('sketchPct').textContent = a + h ? pct(a / (a + h)) + ' (' + a + ' of ' + (a + h) + ')' : '-';
+  st.a = a; st.h = h; drawCompare(); drawVerdict();
+}
+function paintAt(evt) {
+  const r = sk.getBoundingClientRect(), x = (evt.clientX - r.left) / r.width * 400, y = (evt.clientY - r.top) / r.height * 250;
+  const c = Math.floor(x / 10), rw = Math.floor(y / 10); if (c < 0 || c >= COLS || rw < 0 || rw >= 25) return;
+  const i = rw * COLS + c; if (st.sketch[i] !== brush) { st.sketch[i] = brush; drawSketch(); }
+}
+sk.addEventListener('pointerdown', e => { painting = true; sk.setPointerCapture(e.pointerId); paintAt(e); });
+sk.addEventListener('pointermove', e => painting && paintAt(e));
+addEventListener('pointerup', () => painting = false);
+document.querySelectorAll('[data-brush]').forEach(b => b.onclick = () => { brush = +b.dataset.brush; document.querySelectorAll('[data-brush]').forEach(o => o.setAttribute('aria-pressed', o === b)); });
+document.querySelectorAll('[data-add]').forEach(b => b.onclick = () => {
+  const kind = +b.dataset.add; let n = +b.dataset.n;
+  for (const i of order) { if (n > 0 && st.sketch[i] === 0) { st.sketch[i] = kind; n--; } else if (n < 0 && st.sketch[i] === kind) { st.sketch[i] = 0; n++; } if (!n) break; }
+  drawSketch();
+});
+$('guess').oninput = e => { st.guess = +e.target.value; $('guessOut').textContent = st.guess + '%'; drawCompare(); drawVerdict(); };
+
+// ---------- 2. run it ----------
+const B0 = 0.01, F0 = 0.09, C0 = counts(B0, F0); // 10 sick, 9 tp, 89 fp
+const truth0 = ppv(B0, F0);                       // 0.0917...
+const rg = $('runGrid'), rDots = grid(rg);
+const sickSet = order.slice(0, C0.sick), tpSet = sickSet.slice(0, C0.tp);
+const healthy = order.slice(C0.sick), fpSet = healthy.slice(0, C0.fp);
+el('line', { x1: 0, x2: 400, y1: 262, y2: 262, stroke: 'var(--grid)', 'stroke-width': 2, 'stroke-dasharray': '4 4' }, rg);
+const pileLab = [el('text', { x: 10, y: 284, 'font-size': 13, 'font-weight': 700, fill: 'var(--ink)', opacity: 0 }, rg), el('text', { x: 120, y: 284, 'font-size': 13, 'font-weight': 700, fill: 'var(--ink)', opacity: 0 }, rg)];
+pileLab[0].textContent = 'sick + positive'; pileLab[1].textContent = 'healthy + positive';
+const pileNote = el('text', { x: 300, y: 412, 'font-size': 15, fill: 'var(--ink-soft)', 'font-family': 'var(--font-hand)', 'text-anchor': 'middle', opacity: 0 }, rg);
+pileNote.textContent = 'false alarms, all healthy';
+rDots.forEach(d => d.classList.add('mv'));
+let timers = [];
+function resetRun() {
+  timers.forEach(clearTimeout); timers = [];
+  rDots.forEach(d => { d.setAttribute('class', 'dot mv'); d.style.transform = ''; });
+  pileLab.forEach(t => t.setAttribute('opacity', 0)); pileNote.setAttribute('opacity', 0);
+  $('runBig').textContent = '? / ?'; $('runSub').textContent = 'press the button';
+}
+function at(ms, fn) { timers.push(setTimeout(fn, RM ? 0 : ms)); }
+function run() {
+  resetRun();
+  $('runSub').textContent = 'finding the 10 sick people…';
+  at(50, () => sickSet.forEach(i => rDots[i].setAttribute('class', 'dot mv miss')));
+  at(900, () => { tpSet.forEach(i => rDots[i].setAttribute('class', 'dot mv tp')); $('runSub').textContent = C0.tp + ' of ' + C0.sick + ' sick test positive'; });
+  at(1900, () => { fpSet.forEach(i => rDots[i].setAttribute('class', 'dot mv fp' + (RM ? '' : ' flash'))); $('runSub').textContent = '…and ' + C0.fp + ' healthy people get a false alarm'; });
+  at(3500, () => {
+    const pos = new Set([...tpSet, ...fpSet]);
+    rDots.forEach((d, i) => { if (!pos.has(i) && !sickSet.includes(i)) d.classList.add('fade'); });
+    tpSet.forEach((i, k) => move(i, 20 + (k % 3) * 12, 300 + Math.floor(k / 3) * 12));
+    fpSet.forEach((i, k) => move(i, 130 + (k % 10) * 12, 300 + Math.floor(k / 10) * 12));
+    pileLab.forEach(t => t.setAttribute('opacity', 1));
+  });
+  at(4600, () => {
+    pileNote.setAttribute('opacity', 1);
+    $('runBig').textContent = C0.tp + ' / ' + (C0.tp + C0.fp);
+    $('runSub').innerHTML = 'positives are actually sick. That\'s <b class="hl num">' + pct(truth0) + '</b>.';
+  });
+}
+function move(i, x, y) { const [x0, y0] = xy(i); rDots[i].style.transform = `translate(${x - x0}px, ${y - y0}px)`; }
+$('run').onclick = run; $('reset').onclick = resetRun;
+
+// ---------- 3. model vs reality ----------
+function drawCompare() {
+  const bar = $('cmpBar'); bar.innerHTML = '';
+  const X = p => 20 + p * 360, g = st.guess / 100;
+  el('line', { x1: 20, x2: 380, y1: 52, y2: 52, class: 'ax' }, bar);
+  [0, 25, 50, 75, 100].forEach(v => { el('line', { x1: X(v / 100), x2: X(v / 100), y1: 48, y2: 56, class: 'ax' }, bar); const t = el('text', { x: X(v / 100), y: 72, class: 'axt', 'text-anchor': 'middle' }, bar); t.textContent = v + '%'; });
+  el('rect', { x: X(Math.min(g, truth0)), y: 34, width: Math.abs(g - truth0) * 360, height: 36, class: 'gap' }, bar);
+  el('line', { x1: X(truth0), x2: X(truth0), y1: 26, y2: 78, class: 'truth' }, bar);
+  el('line', { x1: X(g), x2: X(g), y1: 26, y2: 78, class: 'you' }, bar);
+  const tt = el('text', { x: X(truth0) + 4, y: 20, 'font-size': 13, 'font-weight': 700, fill: 'var(--ink)', 'text-anchor': 'start' }, bar); tt.textContent = 'real ' + pct(truth0);
+  const yt = el('text', { x: X(g) + (g > .7 ? -4 : 4), y: 20, 'font-size': 13, fill: 'var(--ink-soft)', 'text-anchor': g > .7 ? 'end' : 'start', 'font-family': 'var(--font-hand)' }, bar); yt.textContent = 'you ' + st.guess + '%';
+  if (Math.abs(g - truth0) > .12) { const m = el('text', { x: X((g + truth0) / 2), y: 92, 'font-size': 13, 'text-anchor': 'middle', fill: 'var(--ink)', 'font-family': 'var(--font-hand)' }, bar); m.textContent = Math.round(Math.abs(g * 100 - truth0 * 100)) + ' points of gap'; }
+
+  // piles: 98 positives, your split (from sketch, else slider) vs the real 9 / 89
+  const P = $('cmpPiles'); P.innerHTML = '';
+  const N = C0.tp + C0.fp, share = st.a + st.h ? st.a / (st.a + st.h) : g, yourSick = Math.round(N * share);
+  const pile = (ox, nSick, mine) => { for (let k = 0; k < N; k++) { const x = ox + (k % 10) * 15, y = 40 + Math.floor(k / 10) * 15, sick = k < nSick; const wrong = mine && sick && k >= C0.tp;
+      if (wrong) el('rect', { x: x - 7, y: y - 7, width: 14, height: 14, fill: 'var(--marker)' }, P);
+      if (mine) el('circle', { cx: x, cy: y, r: 4.6, fill: sick ? 'var(--pencil)' : 'none', stroke: 'var(--pencil)', 'stroke-width': 1.6, 'stroke-dasharray': sick ? '' : '2.4 1.8' }, P);
+      else el('circle', { cx: x, cy: y, r: 4.6, fill: sick ? 'var(--ink)' : 'var(--card)', stroke: 'var(--ink)', 'stroke-width': 1.4 }, P); } };
+  pile(14, yourSick, true); pile(244, C0.tp, false);
+  const t1 = el('text', { x: 8, y: 20, 'font-size': 14, fill: 'var(--ink-soft)', 'font-family': 'var(--font-hand)' }, P); t1.textContent = 'your model: ' + yourSick + ' sick of ' + N;
+  const t2 = el('text', { x: 238, y: 20, 'font-size': 14, 'font-weight': 700, fill: 'var(--ink)' }, P); t2.textContent = 'reality: ' + C0.tp + ' sick of ' + N;
+  // annotation arrow at the 89
+  el('path', { d: 'M 216 208 C 200 196, 214 184, 240 180', fill: 'none', stroke: 'var(--ink)', 'stroke-width': 2 }, P);
+  el('path', { d: 'M 232 175 L 241 180 L 233 186', fill: 'none', stroke: 'var(--ink)', 'stroke-width': 2 }, P);
+  const a = el('text', { x: 392, y: 214, 'font-size': 15, 'text-anchor': 'end', fill: 'var(--ink)', 'font-family': 'var(--font-hand)' }, P);
+  a.innerHTML = '<tspan class="hl">these ' + C0.fp + ' were never sick</tspan>';
+  const a2 = el('text', { x: 392, y: 236, 'font-size': 13, 'text-anchor': 'end', fill: 'var(--ink-soft)', 'font-family': 'var(--font-hand)' }, P); a2.textContent = 'false alarms from 990 healthy people';
+}
+
+// ---------- 4. extremes ----------
+const exDots = grid($('exGrid'));
+const toB = t => 0.001 * Math.pow(500, t / 1000), fromB = b => Math.log(b / 0.001) / Math.log(500) * 1000;
+const cv = $('curve'), LX = b => 44 + (Math.log10(b) + 3) / (Math.log10(0.5) + 3) * 336, LY = p => 200 - p * 176;
+function drawEx() {
+  const b = toB(+$('br').value), f = +$('fpr').value / 100, c = counts(b, f), p = ppv(b, f);
+  $('brOut').textContent = (b < .01 ? (b * 100).toFixed(1) : b < .1 ? (b * 100).toFixed(1) : Math.round(b * 100)) + '%';
+  $('fpOut').textContent = Math.round(f * 100) + '%';
+  $('exBig').textContent = c.tp + ' / ' + (c.tp + c.fp);
+  $('exPct').textContent = pct(p);
+  const tr = $('trust'); tr.textContent = p >= .5 ? 'positive = probably sick' : "don't trust it yet"; tr.className = 'pill' + (p >= .5 ? ' ok' : '');
+  const sick = new Set(order.slice(0, c.sick)), tp = new Set(order.slice(0, c.tp)), fp = new Set(order.slice(c.sick, c.sick + c.fp));
+  exDots.forEach((d, i) => d.setAttribute('class', 'dot' + (tp.has(i) ? ' tp' : sick.has(i) ? ' miss' : fp.has(i) ? ' fp' : '')));
+  // curve
+  cv.innerHTML = '';
+  el('line', { x1: 44, x2: 380, y1: 200, y2: 200, class: 'ax' }, cv); el('line', { x1: 44, x2: 44, y1: 24, y2: 200, class: 'ax' }, cv);
+  [[0.001, '0.1%'], [0.01, '1%'], [0.1, '10%'], [0.5, '50%']].forEach(([v, s]) => { const t = el('text', { x: LX(v), y: 216, class: 'axt', 'text-anchor': 'middle' }, cv); t.textContent = s; el('line', { x1: LX(v), x2: LX(v), y1: 200, y2: 204, class: 'ax' }, cv); });
+  [0, .5, 1].forEach(v => { const t = el('text', { x: 38, y: LY(v) + 4, class: 'axt', 'text-anchor': 'end' }, cv); t.textContent = v * 100 + '%'; });
+  const xl = el('text', { x: 212, y: 240, 'font-size': 12, fill: 'var(--ink-soft)', 'text-anchor': 'middle' }, cv); xl.textContent = 'how common it is (log scale)';
+  const yl = el('text', { x: 48, y: 16, 'font-size': 12, fill: 'var(--ink-soft)' }, cv); yl.textContent = 'chance you\'re sick if positive';
+  // trust line where ppv = 50%
+  const bStar = f / (SENS + f);
+  if (bStar >= .001 && bStar <= .5) { el('line', { x1: LX(bStar), x2: LX(bStar), y1: 24, y2: 200, stroke: 'var(--called)', 'stroke-width': 1.5, 'stroke-dasharray': '3 3' }, cv);
+    const t = el('text', { x: LX(bStar) - 4, y: 196, 'font-size': 11, 'text-anchor': 'end', fill: 'var(--called)' }, cv); t.textContent = 'trust past ' + (bStar * 100).toFixed(1) + '%'; }
+  let d = ''; for (let k = 0; k <= 120; k++) { const bb = 0.001 * Math.pow(500, k / 120); d += (k ? 'L' : 'M') + LX(bb).toFixed(1) + ' ' + LY(ppv(bb, f)).toFixed(1); }
+  el('path', { d, class: 'truth' }, cv);
+  // gap between your guess and truth at 1%
+  const g = st.guess / 100, tx = LX(0.01), pt = ppv(0.01, f);
+  el('rect', { x: tx - 5, y: LY(Math.max(g, pt)), width: 10, height: Math.abs(LY(g) - LY(pt)), class: 'gap' }, cv);
+  el('circle', { cx: tx, cy: LY(g), r: 6, fill: 'var(--card)', class: 'you' }, cv);
+  const yt = el('text', { x: tx - 10, y: LY(g) + 4, 'text-anchor': 'end', 'font-size': 13, fill: 'var(--ink-soft)', 'font-family': 'var(--font-hand)' }, cv); yt.textContent = 'you, ' + st.guess + '%';
+  el('circle', { cx: LX(b), cy: LY(p), r: 6, fill: 'var(--ink)' }, cv);
+  el('circle', { cx: LX(.5), cy: LY(ppv(.5, f)), r: 3.5, fill: 'var(--ink)' }, cv);
+  const n2 = el('text', { x: 340, y: 40, 'font-size': 12, 'text-anchor': 'end', fill: 'var(--ink-soft)', 'font-family': 'var(--font-hand)' }, cv);
+  n2.textContent = st.guess + '% is right only here →';
+}
+$('br').oninput = drawEx; $('fpr').oninput = drawEx;
+
+// ---------- 5. verdict ----------
+const MIS = {
+  'accuracy-is-my-chance': { label: "The test's accuracy is my chance", why: 'A 90% accurate test that says yes sounds like 90% sure.', src: 'https://www.psychologicalscience.org/observer/helping-physicians-understand-screening-tests-will-improve-health-care', note: "In a similar mammography case (Eddy, 1982), about 95 of 100 physicians guessed around 75%; the answer was 7.7%" },
+  'ignores-false-alarms': { label: 'False alarms are too rare to matter', why: '9% false positives sounds small.', src: null, note: 'Arithmetic from the numbers on the card' }
+};
+function drawVerdict() {
+  const g = st.guess, s = $('vStamp');
+  const id = g <= 20 ? null : g <= 59 ? 'ignores-false-alarms' : 'accuracy-is-my-chance';
+  $('vSaid').textContent = g + '%'; $('vTrue').textContent = pct(truth0);
+  if (!id) { s.className = 'stamp called'; s.textContent = 'called it'; $('vName').textContent = 'You counted the crowd';
+    $('vLine').innerHTML = 'You weighed the <b>' + C0.fp + '</b> false alarms against the <b>' + C0.tp + '</b> real hits.'; $('vWhy').textContent = ''; $('vSrc').textContent = ''; return; }
+  const m = MIS[id]; s.className = 'stamp ' + (id === 'ignores-false-alarms' ? 'close' : 'off'); s.textContent = id === 'ignores-false-alarms' ? 'getting there' : 'way off';
+  $('vName').textContent = m.label;
+  $('vLine').innerHTML = id === 'accuracy-is-my-chance'
+    ? 'You read the test\'s accuracy as your chance: <span class="hl">you skipped the 990 healthy people</span>. 9% of them is <b>' + C0.fp + '</b> false alarms, next to only <b>' + C0.tp + '</b> real cases.'
+    : 'You saw the false alarms but shrank them: <span class="hl">9% of 990 is ' + C0.fp + ' people</span>, about ten times the ' + C0.tp + ' real cases.';
+  $('vWhy').textContent = 'why it felt right: ' + m.why.toLowerCase();
+  $('vSrc').innerHTML = m.src ? 'Source: <a href="' + m.src + '">' + m.note + '</a>' : m.note;
+}
+
+$('br').value = Math.round(fromB(0.01)); drawSketch(); drawEx();
+if (RM) run();
+else new IntersectionObserver((es, o) => { if (es[0].isIntersecting) { o.disconnect(); setTimeout(run, 400); } }, { threshold: .5 }).observe($('runGrid'));
+})();
+</script>
+</body>
+</html>

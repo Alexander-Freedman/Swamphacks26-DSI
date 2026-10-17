@@ -28,7 +28,7 @@ Confidence tags: **[primary]** means I read the source itself. **[secondary]** m
 Hallway or guerrilla sessions usually run ~10 min ([Glasgow UX guide](https://www.gla.ac.uk/myglasgow/ux/deliver/guerrillatesting), [Adobe](https://xd.adobe.com/ideas/process/user-testing/hallway-usability-test-guerrilla-testing)) **[secondary]**. Keeping ours to 5 min means **one task only** **[reasoning]**.
 
 ### Recruiting at the venue
-- **Where:** the meal lines (lunch Sat ~12pm, dinner ~6pm) and the sponsor-table and hardware-desk queues. People already standing in line are the easiest asks. Also: the hacker area, mentors, and volunteers. Volunteers are UF students and often the closest match to "real users" **[reasoning]**.
+- **Where:** the meal lines (Sat lunch 1:30-2:30pm, dinner 8-9pm, WERT Lab Lobby per event/hacker-guide.md) and the sponsor-table and hardware-desk queues. People already standing in line are the easiest asks. Also: the hacker area, mentors, and volunteers. Volunteers are UF students and often the closest match to "real users" **[reasoning]**.
 - **Ask:** "Got 5 minutes to try a thing we built and tell us where it's confusing? It's anonymous." Offer something small that we already have, like spare swag or a snack from the venue. **Don't spend money** (repo rule).
 - **Screen in one question:** "Are you 18 or older?" If they say no, thank them and skip them. Optionally add one more question that fits the idea, such as "Do you ever do X?". Note their answer, not their name.
 - **Expect** ~1 in 2 people asked to say yes, so ask ~10 to get 5 **[reasoning, no source]**.
@@ -69,7 +69,7 @@ Hallway or guerrilla sessions usually run ~10 min ([Glasgow UX guide](https://ww
 - Judges' rubrics ask about impact ("Would real people use this?") ([Reskilll judging breakdown](https://blogs.reskilll.com/what-hackathon-judges-look-for-complete-judging-criteria-breakdown-2026/)) **[secondary]**. I couldn't find a Devpost winner write-up that quantifies hallway testing, which suggests few teams do it, so it's a differentiator **[reasoning]**.
 - Keep the raw tally in `docs/user-testing.md` so every number on the slide traces back to it (matches the plan rule).
 
-**Drop-in for B4:** "Round 1 at lunch (~11:30am-12:30pm, H15-16): 5 users, one task, success/time/SEQ/quote → 3 `UT` issues fixed by ~3pm. Round 2 at dinner (~6-7pm, H21.5-22.5): same task, 5 new users. Done when docs/user-testing.md has both rounds and the before/after line is on the pitch slide."
+**Drop-in for B4:** "Round 1 at lunch (1:30-2:30pm, H17-18): 5 users, one task, success/time/SEQ/quote → 3 `UT` issues fixed by ~5pm. Round 2 at dinner (8-9pm, H23.5-24.5): same task, 5 new users. Done when docs/user-testing.md has both rounds and the before/after line is on the pitch slide."
 
 ---
 
@@ -165,8 +165,8 @@ Assumes we both wake ~8am Fri. Replace the "Sleep in shifts" note in B2 and add 
 | **1:30-4:45am** (H5-8.25) | awake: model/eval runs, data jobs, **no deploys or merges to main** | **sleep 3h** (2 cycles + ~15 min to fall asleep) | the sleeper takes the worst circadian hours; the person awake does low-risk solo work |
 | **4:45-8:00am** (H8.25-11.5) | **sleep 3h** | awake: UI against fixtures/real API; merges own-folder PRs if CI is green | |
 | 8:00am Sat (H11.5) | up | up | both awake for the **H12 "can we demo now?" checkpoint** |
-| Sat ~2:00-2:30pm | **26-min nap** | awake | post-lunch dip; after round 1 user tests |
-| Sat ~2:30-3:00pm | awake | **26-min nap** | |
+| Sat ~3:00-3:30pm | **26-min nap** | awake | post-lunch dip; after round 1 user tests (lunch is 1:30-2:30) |
+| Sat ~3:30-4:00pm | awake | **26-min nap** | |
 | Caffeine | last big dose ~6:30pm | last big dose ~9:30pm | Drake: ≥6h before your sleep block |
 | Sat 8:30pm-12:30am (H24-28) | awake | awake | **feature freeze at H28 + video**: both must be awake |
 | **12:45-3:45am Sun** (H28.25-31.25) | **sleep 3h** | awake: Devpost write-up, screenshots; **no code merges** except a fix for a break | |
@@ -194,3 +194,62 @@ Totals: ~6h sleep + 26-min nap each. At judging, L has been up ~2.5h and I ~5h, 
 ### Plan tweaks implied
 - B1 shrinks to ~2.5h (see Q6), so B2 starts ~12:30am and the first sleep block can start at 1:30am without losing core depth.
 - B2's "Sleep in shifts: 3-4h each" becomes the table above. The current plan has **no Saturday-night sleep**, and that's the riskiest gap: Sunday 6-10am is the sleep-deprived circadian worst window ([Wesensten 2002](https://www.gwern.net/doc/modafinil/2002-wesensten.pdf)), and it's exactly submit + judging time.
+
+---
+
+## User testing for Mental Models (queue #5)
+
+Uses the general method in Q5 above (script, consent, fix scoring) and applies it to our app. 2 rounds of 5 on Saturday with the **same card**, so round 1 vs round 2 is a fair before/after.
+
+### Why 5 + 5, and why think-aloud
+- One user finds ~31% of usability problems, 5 find ~85%. NN/g says to spend the budget on several rounds of 5 with fixes in between, not one big round ([Nielsen, NN/g](https://www.nngroup.com/articles/why-you-only-need-to-test-with-5-users/)) **[primary]**.
+- Think-aloud: the tester talks through what they're thinking while they use it. Nielsen calls it the #1 usability tool and says a handful of users is enough. The risk is the facilitator steering them, so I don't prompt beyond "keep talking" ([Nielsen, NN/g](https://www.nngroup.com/articles/thinking-aloud-the-1-usability-tool/)) **[primary]**.
+- It's a hallway test, not a study (see Q5 consent notes). No names, 18+ only, IDs P1-P10.
+
+### When and where (from /home/bot/hack/event/hacker-guide.md, Sat Oct 17)
+Note: Q5 above now uses the official meal times too (fixed Oct 16).
+| Slot | Where | Who | Use |
+|---|---|---|---|
+| 10:30am-12:30pm Company Connect | REI 3315 & 3320 | hackers waiting for sponsor tables | backup pool, or a dry run with 1-2 people |
+| **1:30-2:30pm Lunch (round 1)** | WERT Lab Lobby (not Reitz, bring a charged laptop + phone hotspot) | hackers in line or eating | 5 testers, ~45 min |
+| 12pm-end UF vs Texas watch party | Rion Ballroom / REI ground floor projector | hackers on a break | ask at halftime only, never mid-play |
+| 4:00-5:30pm Gator Game Room | REI Game Room | people in break mode | fill-in if round 1 came up short |
+| **8:00-9:00pm Dinner (round 2)** | WERT Lab Lobby | hackers | 5 new testers, ~45 min |
+| any time | Mentors REI 2345/2350, Help Desk/volunteers REI 3310 | mentors, volunteers (UF students) | max 1-2 per round, tagged "mentor"/"vol" since they're not typical users |
+- Ask ~10 to get 5. Line from Q5: "Got 5 minutes to try a thing we built and tell us where it's confusing?"
+- Round 1 at 1:30pm overlaps the Sat nap slots in Q18 (2:00-3:00pm). Shift both naps ~30 min later.
+- Each person can only test once. Anyone who has seen the coin streak demo or knows the answer gets tagged "knows it", and I report them separately.
+
+### The task card (print or show on a phone; read it out word for word)
+> **Mental Models: quick test (about 5 minutes)**
+> We're testing the app, not you. There are no wrong answers. Please think out loud the whole time. I can't help once you start, but I'll answer everything at the end.
+> **Task 1.** Answer the question on the screen, then find out if you were right.
+> **Task 2.** Type a topic you've always found confusing, and play the round it gives you.
+> **Task 3.** Find out which wrong idea the app thinks you have. Then do whatever you'd naturally do next.
+
+Timing: start the stopwatch on "go". Task 1 ~90 s, task 2 ~2 min (it covers the 10-20 s generation wait; if it fails, the fallback chips count as part of the test), task 3 ~60 s, post-test ~90 s. If anyone hits 7 min, I stop them there. Start each person from the home screen on a fresh session (`?demo=1`, cleared progress).
+
+### What I measure (one row per tester)
+- **Time to first prediction:** seconds from "go" to locking in the coin-streak answer. Over 30 s = a stumble.
+- **Coin guess:** their longest-streak number for 100 flips + their confidence if the slider exists. This is our only source for "people guess X". demo.md's "3-4" is still **unverified** (showcase-facts.md §6), so the pitch line becomes "the N people we asked guessed X on average" with the count.
+- **Reveal understood unprompted:** after the coin reveal, before I say anything, do they say out loud how their guess compares to the truth? Y / partial / N.
+- **Misconception named:** in task 3, can they say what the card called their wrong idea? Y / N.
+- **Plays another unprompted:** at the end of task 3, do they tap "next" without being asked? Y / N. (What they do, which counts more than what they tell me in post-test Q4.)
+- **Live topic:** the topic they typed, whether it hit the cache / generated / fell back, and the wait in seconds. This doubles as the "5 random topics from strangers" check in demo.md.
+- **Stumbles + 1 verbatim quote**, scored count × severity as in Q5.
+
+### Post-test (5 questions, ~90 s, ask in this order)
+1. "How easy was that, from 1 (very hard) to 7 (very easy)?" (Single Ease Question, see Q5)
+2. "In your own words, what did the coin screen show you?" (checks the reveal)
+3. "The app said you had a wrong idea. What was it, and was that fair?"
+4. "Would you play another round right now? Why or why not?"
+5. "What was the most confusing moment?"
+
+### Logging template (paste into NOTES.md under "User testing", one line per tester)
+```
+| Rnd | ID | Tag (hacker/mentor/vol/knows it) | 1st pred (s) | Coin guess | Conf % | Reveal unprompted (Y/P/N) | Named it (Y/N) | Plays another (Y/N) | Topic -> cache/gen/fallback, wait s | SEQ 1-7 | Top stumble | Quote |
+|---|---|---|---|---|---|---|---|---|---|---|---|---|
+| 1 | P1 | hacker | | | | | | | | | | |
+```
+Round summary line (also in NOTES.md): `R1 (n=5): median 1st pred __ s, reveal unprompted __/5, named it __/5, plays another __/5, mean coin guess __ (range __-__), mean SEQ __. Fixes: UT1-1 __, UT1-2 __, UT1-3 __.`
+After round 1: pick the top 3 fixes (Q5 scoring), open them as `UT1: ...` issues, and fix them before dinner. After round 2, the before/after line goes into docs/pitch.md and the Devpost "testing with real people" section, with n stated.
