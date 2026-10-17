@@ -1,0 +1,140 @@
+{
+  "schema_version": 1,
+  "slug": "dice-sums",
+  "topic": "Sums of dice",
+  "concept": "Each die is fair, but their total isn't: a sum that can be made in more ways comes up more often. Count ordered outcomes, not combinations: 7 has 6 of the 36, 12 has just 1.",
+  "reviewed": true,
+  "misconceptions": [
+    {
+      "id": "equiprobability-bias",
+      "label": "Random means every outcome is equally likely",
+      "why_tempting": "Fair dice feel like they should make every total equally fair too.",
+      "refutation": "Two fair dice give 36 equally likely pairs, but totals collect different numbers of them: 7 gets 6 pairs, 2 and 12 get one each.",
+      "source_url": "https://www.ncbi.nlm.nih.gov/pmc/articles/PMC4310748/",
+      "source_note": "Gauvrit & Morsanyi 2014, 'The equiprobability bias...': people tend to judge 11 and 12 with two dice as equally likely"
+    },
+    {
+      "id": "counts-combinations-not-orders",
+      "label": "Count combinations, not orders",
+      "why_tempting": "5+6 and 6+5 look like the same roll, so 11 seems to have one way, like 12.",
+      "refutation": "Paint one die red: red 5 + blue 6 and red 6 + blue 5 are different outcomes. 11 has 2 ways, 12 has 1, so 11 is twice as likely.",
+      "source_url": "https://mathwithbaddrawings.com/2021/05/20/he-invented-calculus-but-you-could-smoke-him-at-monopoly/",
+      "source_note": "Leibniz wrote that 11 and 12 are equally probable since each 'can be made only one way'"
+    }
+  ],
+  "items": [
+    {
+      "id": "most-common-total",
+      "prompt": "Roll two fair dice and add them. Which total comes up most often?",
+      "input_type": "choice",
+      "options": [
+        {
+          "id": "seven",
+          "text": "7",
+          "misconception_id": null
+        },
+        {
+          "id": "all-equal",
+          "text": "Every total from 2 to 12 is equally likely",
+          "misconception_id": "equiprobability-bias"
+        },
+        {
+          "id": "no-favorite",
+          "text": "No total is favored; it's all luck",
+          "misconception_id": "equiprobability-bias"
+        }
+      ],
+      "truth": {
+        "widget": "distribution",
+        "sampler": "dice_sum",
+        "params": {
+          "dice": 2,
+          "trials": 10000
+        },
+        "x_label": "total of two dice"
+      },
+      "explore": {
+        "param": "dice",
+        "label": "number of dice",
+        "min": 1,
+        "max": 5,
+        "step": 1
+      },
+      "targets": [
+        "equiprobability-bias"
+      ]
+    },
+    {
+      "id": "eleven-vs-twelve",
+      "prompt": "Roll two fair dice and add them. Which is more likely: a total of 11 or a total of 12?",
+      "input_type": "choice",
+      "options": [
+        {
+          "id": "same",
+          "text": "Equally likely: 11 is 5+6 and 12 is 6+6, one pair each",
+          "misconception_id": "counts-combinations-not-orders"
+        },
+        {
+          "id": "eleven",
+          "text": "11, about twice as likely",
+          "misconception_id": null
+        }
+      ],
+      "truth": {
+        "widget": "distribution",
+        "sampler": "dice_sum",
+        "params": {
+          "dice": 2,
+          "trials": 10000
+        },
+        "x_label": "total of two dice"
+      },
+      "answer_expr": "(2/36)/(1/36)",
+      "answer_claimed": 2,
+      "targets": [
+        "counts-combinations-not-orders"
+      ]
+    },
+    {
+      "id": "galileo-nine-ten",
+      "prompt": "Three fair dice. Ignoring order, a total of 9 can be made from six different sets of numbers (like 3+3+3 or 1+2+6), and so can 10 (like 3+3+4 or 1+3+6). Which total comes up more often?",
+      "input_type": "choice",
+      "options": [
+        {
+          "id": "same",
+          "text": "Same: six sets of numbers each",
+          "misconception_id": "counts-combinations-not-orders"
+        },
+        {
+          "id": "ten",
+          "text": "10, slightly more often",
+          "misconception_id": null
+        }
+      ],
+      "truth": {
+        "widget": "distribution",
+        "sampler": "dice_sum",
+        "params": {
+          "dice": 3,
+          "trials": 20000
+        },
+        "x_label": "total of three dice"
+      },
+      "answer_expr": "27/25",
+      "answer_claimed": 1.08,
+      "targets": [
+        "counts-combinations-not-orders"
+      ]
+    }
+  ],
+  "aliases": [
+    "dice sums",
+    "dice",
+    "rolling dice",
+    "two dice",
+    "dice probability",
+    "sum of two dice",
+    "sums of two dice",
+    "probability of dice"
+  ]
+}
