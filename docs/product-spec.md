@@ -43,18 +43,33 @@ Any topic you type turns into a short game: **predict → lock in → watch real
     - how well your confidence matched reality
     - a share card ("my guess vs reality")
 
-## 4. What makes it Quizlet-like and coming-back-able (without gaming learning)
-From engagement.md and learning-science.md:
+## 4. What brings you back: learning-first, not points
+**Decision (my call, Oct 16 ~10:45 PM): no XP, points, badges, levels or leaderboards.**
+- **The reward is the feedback itself:**
+  - the reveal moment
+  - seeing your own wrong idea named
+  - busting it
+  - **visible mastery**
+- **The game feel comes from** the reveal, the verdict stamp, the springy lock-in, sound/motion, and the collection, not from counters.
 
-**The hook mechanics:**
-- **A collection of misconceptions ("the cast").** Every wrong idea you've had becomes a card with a name, an icon and a one-line origin story. You **bust** it by beating 2-3 transfer items, and busted cards flip. This is the Quizlet "set" idea, aimed at understanding.
-- **A streak of honest predictions**, not of showing up, with a repair path. Broken streaks make people quit ([Silverman & Barasch 2023](https://www.colorado.edu/business/faculty-research/2023/04/19/or-track-how-broken-streaks-affect-consumer-decisions)).
-- **A review queue.** Unbusted wrong ideas come back as *new* prediction items on growing gaps (about 1, 3, 7 days). Spacing plus retrieval have the strongest evidence (learning-science.md).
-- **A surprise meter and "sure and wrong" moments** get the biggest reveal (hypercorrection).
-- **"The room":** after your own reveal, see what % of SwampHacks players picked the same thing.
+**Why** (sources checked; full evidence in my research notes, module E):
+- **Hanus & Fox 2015** ([doi](https://doi.org/10.1016/j.compedu.2014.08.019); details via [critical review table](https://educationaltechnologyjournal.springeropen.com/articles/10.1186/s41239-017-0042-5/tables/13)): a 16-week course with badges + a leaderboard vs the same course without. The gamified section ended with **lower intrinsic motivation, lower satisfaction and lower final-exam scores**, with the exam drop running through the motivation drop. *(Full text not read; numbers from secondary summaries.)*
+- **Deci, Koestner & Ryan 1999** ([PDF](https://leeds-faculty.colorado.edu/dahe7472/deci%201999.pdf)): a meta-analysis of **128 experiments**.
+  - **Expected tangible rewards undermined intrinsic motivation** (engagement-contingent d = −0.40, completion-contingent −0.36, performance-contingent −0.28).
+  - **Positive, informational feedback enhanced it.** That's exactly the line we're drawing.
+- **Sailer & Homner 2020** ([Springer](https://link.springer.com/article/10.1007/s10648-020-09517-1)): gamification's effects are small.
+  - In the rigorous studies, the **motivational and behavioral effects fell apart**.
+  - The small *learning* effect (g = 0.49) held, and narrative/"game fiction" was what helped. **So we keep story and game feel, and drop the scorekeeping.**
+- **Deslauriers et al. 2019** ([PNAS](https://www.pnas.org/doi/10.1073/pnas.1821936116)): active learning *felt* worse but tested better. A short "here's why this feels harder" note closed the gap, so we tell players once, up front.
 
-**We deliberately leave out:**
-- speed timers, hearts or lives, and XP leaderboards. They punish wrong predictions, and wrong predictions are the product (engagement.md).
+**What we build instead:**
+- **The mastery map ("your collection").** Every wrong idea you've had, caught → busted. Busting takes 2-3 transfer wins. This is the main come-back screen.
+- **The review queue.** Unbusted ideas come back as *new* prediction items on growing gaps (~1, 3, 7 days). Spacing + retrieval have the strongest evidence (learning-science.md).
+- **A light rhythm line, informational only** (my call): "You've played 4 of the last 7 days." No flame, no number to lose, no penalty, nothing gated on it. The research's "middle path" for streaks (Duolingo's own data shows the return lift, [blog](https://blog.duolingo.com/how-duolingo-streak-builds-habit)). *Why keep it at all:* the Entertainment track rewards a reason to come back, and a forgiving, week-level habit line gets most of that without streak anxiety. If it reads as a counter in user tests, it goes.
+- **"The room"** (after your own reveal): what % of players picked the same thing. It's information about the *idea*, never a ranking of people.
+- **"Sure and wrong" gets the biggest reveal** (hypercorrection).
+
+**We leave out:** XP, points, badges, levels, leaderboards, speed timers, hearts/lives, and loss-framed notifications.
 
 **Claims we will NOT make** (learning-science.md):
 - "proven to make you learn faster"
@@ -64,7 +79,7 @@ From engagement.md and learning-science.md:
 ## 5. Screens
 | # | Screen | What's on it | Notes |
 |---|---|---|---|
-| 1 | **Home** | Topic box ("What confuses you?"); 3 showcase chips; "N wrong ideas due for review"; streak | Guest by default |
+| 1 | **Home** | Topic box ("What confuses you?"); 3 showcase chips; "N wrong ideas due for review"; rhythm line ("4 of the last 7 days") | Guest by default |
 | 2 | **Building** | "Building your round…" chip; offers a showcase round while it builds | Hides generation time (demo.md). Real build time measured on our key in docs/research/gemini.md |
 | 3 | **Predict** | One question; the input (slider / draw / choose / order); confidence tap; **Lock it in** | One idea per screen |
 | 4 | **Reveal** | Your pencil guess, the ink truth drawing over it, the shaded gap, the verdict stamp | Shared reveal sequence for all widgets |
@@ -72,7 +87,7 @@ From engagement.md and learning-science.md:
 | 6 | **Play** | One slider on the key parameter | PhET-style: no paragraphs |
 | 7 | **Round summary** | Caught / busted, confidence calibration, share card | |
 | 8 | **Collection** | Your cast of wrong ideas: busted / still active / due | The come-back screen |
-| 9 | **Sign in** | "Keep your streak and collection" (Auth0, Google) | Optional; cut line 2 |
+| 9 | **Sign in** | "Keep your collection across devices" (Auth0, Google) | Optional; cut line 2 |
 | 10 | **How it works** (drawer) | The generated JSON + the computed truth side by side | For judges; answers "how do you know it's right?" |
 
 ## 6. How "any topic" works
@@ -184,12 +199,12 @@ From demo.md; the numbers were rechecked by me.
 - **Core:** Gemini (the engine), Easy On The Eyes, the GoDaddy domain plus a QR code on the table.
 - **Vultr:** hosting, if its code needs no card; otherwise Render.
 - **Tiger Data:** every answer is an event, which feeds "the room" percentages and the streak/review queue (continuous aggregates). If signup needs a card, it's a stretch.
-- **Auth0:** sign in to keep your streak (cut line 2).
+- **Auth0:** sign in to keep your collection across devices (cut line 2).
 - **Out:** DeepSpace, Roblox, Solana, Nessie, Least Vibe Coded.
 - **After the event:** the DEV post.
 
 ## 11. Look (visual.md; needs my sign-off)
-- **"Notebook Arcade":** paper + ink = truth, pencil = your guess, marker = the gap, green = called it. A chunky display face, a verdict stamp, a springy lock-in.
+- **"Notebook Arcade":** paper + ink = truth, pencil = your guess, marker = the gap, green = called it. A chunky display face, a verdict stamp, a springy lock-in. **The "arcade" is feel and motion, not scorekeeping:** no XP/score counters.
 - **Fonts:** Atkinson Hyperlegible Next for the body, Shantell Sans for hand labels.
 - **Contrast:** the ghost gets a solid `#85827a` (3.6:1).
 - **Sound:** optional, with a visual twin for every sound; the hall is loud.

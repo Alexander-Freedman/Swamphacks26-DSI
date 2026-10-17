@@ -167,3 +167,31 @@ All replay data is pre-pulled and served locally.
 - A fast local classifier, so the language model isn't on the critical path.
 - A harder card for judges who answer right.
 - A recorded run.
+
+
+---
+
+## Headline talking point: the feedback is the reward
+**Use in the pitch (one line, ~0:50 or in Q&A):**
+> "Everyone gamifies learning with points. The research says points backfire: in a semester-long class, badges and a leaderboard *lowered* motivation and final-exam scores. So we made the feedback the reward: you see your own wrong idea get named, and then you bust it."
+
+**Why this exact wording** (honest version of the claim):
+- The fair claim is **"points can backfire"**, not "points always make people learn worse."
+  - Sailer & Homner 2020 found a small *positive* average learning effect for gamification overall ([Springer](https://link.springer.com/article/10.1007/s10648-020-09517-1)). What collapsed in rigorous studies was the *motivation* effect.
+  - So we cite the specific semester study (Hanus & Fox) and the reward meta-analysis (Deci et al.), and avoid a blanket claim a judge could poke.
+
+**Sources** (checked Oct 16):
+- [Hanus & Fox 2015](https://doi.org/10.1016/j.compedu.2014.08.019): 16 weeks, badges + leaderboard → lower intrinsic motivation, satisfaction and final-exam scores. *(Secondary summaries; full text not read.)*
+- [Deci, Koestner & Ryan 1999](https://leeds-faculty.colorado.edu/dahe7472/deci%201999.pdf): 128 experiments. Expected tangible rewards undermine intrinsic motivation; positive feedback enhances it.
+- [Deslauriers et al. 2019](https://www.pnas.org/doi/10.1073/pnas.1821936116): effortful learning feels worse but works better, and explaining that up front closes the gap.
+
+### Judge Q&A: "Why no streaks or points? Isn't that how Duolingo keeps people?"
+> "Duolingo keeps people coming *back*. Its own numbers are about daily users, not understanding. We want both, so we kept the parts that are about you:
+> - a collection of the wrong ideas you've caught and busted
+> - a review queue that brings them back
+> - a quiet '4 of the last 7 days' line with nothing to lose
+>
+> We dropped XP, badges and leaderboards. A 16-week study found badges and a leaderboard lowered motivation *and* exam scores, and a meta-analysis of 128 experiments found expected rewards undermine the motivation you started with. The reward here is the moment reality proves your hunch wrong and tells you exactly why."
+
+**Follow-up: "Then why is it Entertainment?"**
+> "The fun is the reveal: you bet, it plays out over your guess, and a stamp lands. That's the game. No scoreboard needed."
