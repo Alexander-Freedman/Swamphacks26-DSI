@@ -31,6 +31,7 @@ TRUTHS = {
     "kinetic-energy": 0.5 * 2 * 20**2,
     "law-of-large-numbers": _binom_at_least(100, 60),
     "logistic-growth": 1000 / (1 + 99 * math.exp(-0.3 * 20)),
+    "herd-immunity": 100 * (1 - 1 / 4),
     "margin-of-error": 0.25 * (1.96 * 100 / 1.55) ** 2,
     "newtons-law-of-cooling": 20 + 80 * math.exp(-0.05 * 30),
     "pendulum-period": 2 * math.pi * math.sqrt(4 / 9.81),
