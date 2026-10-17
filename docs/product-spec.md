@@ -36,8 +36,8 @@ Any topic you type turns into a short game: **predict → lock in → watch real
    - why it's tempting
    - the right model, in two sentences, and a source
    - It only says "this looks like…" until 2+ signals agree (misconceptions.md).
-8. **Play with it.** One slider on the key parameter, so you can see *why*.
-9. **Next item.** It targets the suspected wrong idea in a new setting (transfer). 3-5 items per round.
+8. **Play with it: "run it at the extremes".** One slider on the key parameter. We nudge you to drag it to the extremes (p → 0 or 1, n → 1000), because smart learners over-trust their first model, and pushing it to the edges is how it breaks (my Mental Models research notes).
+9. **Next item: a contrasting case.** It *looks* different but runs on the same structure, and targets the suspected wrong idea in a new setting (transfer). Comparing two such cases is how a shared structure gets noticed ([Gentner, Loewenstein & Thompson 2003](https://doi.org/10.1037/0022-0663.95.2.393)). 3-5 items per round.
 10. **Round summary.**
     - which wrong ideas were caught and which were busted
     - how well your confidence matched reality
@@ -211,6 +211,21 @@ From demo.md; the numbers were rechecked by me.
 
 ## 12. Name (open, issue #29)
 "Mental Models" is the working name. Recommendation in docs/story.md: **Hunch & Ink** (pencil hunch, ink truth), with "your Wrongdex" for the collection and the tagline "Guess in pencil. Truth in ink." **The name is @luanamaldaner's call**; the code uses the neutral working name `mm` until then.
+
+## 12b. From my Mental Models research (a resource, not a rulebook)
+**Kept:**
+- learner produces a guess before being told (sketch input)
+- run-at-the-extremes play
+- contrasting cases as the transfer item
+- no points/leaderboards (§4)
+- tell people it'll feel harder (Deslauriers)
+
+**Left out, on purpose, for a 36h Entertainment build:**
+- the slow multi-step pipeline (anchor → contrasting cases → concreteness fading → drill)
+- study design and measurement
+- an LLM critiquing a free-form model the learner writes
+
+**Where the research and the hackathon disagree:** the research says an *unchecked* wrong model is worse than nothing, and full model critique is the make-or-break test. For 36h I recommend keeping misconception diagnosis to **closed lists + shape rules**, which are checkable and demoable, and *not* doing open-ended model critique, which is slow and risky live. It's a stretch only if everything else is solid.
 
 ## 13. Open questions for me
 1. The visual direction: Notebook Arcade, OK?
