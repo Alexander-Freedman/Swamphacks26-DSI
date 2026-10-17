@@ -1,43 +1,47 @@
-# Scorecard: candidates vs the XII rubric
+# Scorecard: the current demo vs the XII rubric
 
-**Official update (Oct 16, 7 PM):** the criteria below match the official 7 on Devpost. The AI/ML track is run by UF DSI and says "depth over polish… we will be reading GitHubs and code", which raises the value of a measured eval and clean code for any AI/ML entry. The CpE lab lends ESP32/Pico/Arduino boards, with sensors on request, which makes A+ more plausible. Re-ranked directions are in docs/strategy.md ("Re-ranked directions vs the official tracks").
+**Mode: BUILD.** This grades the demo **as a judge would see it right now**, not the plan. The script it's graded against is docs/demo-script.md. Re-grade after every gate and after every merge that changes what a judge sees (build-plan "Hourly").
 
-Nothing is picked. This scores the strongest candidates from docs/strategy.md and docs/ideas.md against the 7 XII Devpost criteria, plus prize odds and build risk.
+Scores are 1-5 gut calls against the 7 official Devpost criteria. They're not data.
 
-Scores are 1-5 gut calls based on the research docs. They are not data.
+**Last graded:** Fri Oct 16, ~11:20 PM (B1).
 
-**What the criteria ask**
-- **Tech Und.:** could we explain how and why we built it?
-- **Innov.:** innovation and creativity.
-- **Func.:** does it work as demonstrated? This mostly comes down to demo reliability.
-- **Design:** design and usability.
-- **Purpose:** purpose and audience.
-- **Track fit:** how well it fits the one track we'd enter.
-- **Sponsor:** which sponsor challenge it could also win, if any.
+## What exists right now (honest)
+- **Backend (local only):** round schema + 3 hand-checked showcase rounds (`data/rounds/`, merged #54). Gemini generator + `POST /api/rounds` with a per-IP limit (PR #58, open). Generation checks: computed truth, band/claim agreement, lint, blind check, estimate widget (PR #63, open). Answer events in local SQLite, room % + collection (PR #61, open).
+- **Frontend:** predict → confidence → lock + the Distribution widget for the coin streak is **in review in PR #62** (@luanamaldaner). Not on main.
+- **Not built:** the reveal sequence (beat, ink over pencil, shaded gap, verdict stamp), the misconception card, the Curve widget (birthday), the positive-test dot array, the Estimate widget UI, the live-topic flow in the browser, the "How it works" drawer, the collection screen, the reset shortcut, the Notebook Arcade visual pass.
+- **Hosted:** only the static GitHub Pages shell. No backend is reachable from the public site. No domain yet.
+- **Not measured yet:** live generation time on our key (gemini.md §4 is still an estimate) and the generation pass rate.
 
-| Candidate | Tech Und. | Innov. | Func. | Design | Purpose | Track fit | Sponsor | Prize slots in reach | Build risk (2 people, ~28h) |
-|---|---|---|---|---|---|---|---|---|---|
-| **A. Hazard radar** (Sperry brief, ML hazard index, replay) | 4 (we own the model and the rules) | 3 (FL judges have seen hazard maps; the edge is the crew decision + backtest) | 4 (replay mode means no live-weather luck) | 3 (a map is easy to make look good) | 5 (named user: crews, plus FL lightning/heat facts) | AI/ML 4 | **Sperry 5** (built to the brief) | Overall, AI/ML, Sperry ×3, Tiger Data, Auth0, Vultr, domain | Medium: lots of data plumbing, but every source is checked and free (docs/data-check.md) |
-| **A+. Hazard radar + Heat Badge** | 4 | 4 (measured vs forecast is new) | 3 (hardware can flake; keep a recorded run) | 4 (something to touch) | 5 | Hardware 5 *instead of* AI/ML | Sperry 5 | Same, with Hardware instead of AI/ML | High: **the standard MLH hardware lab has no humidity sensor, ESP32 or temperature probe** (temp+pressure only), so it only works if one of us already owns the parts |
-| **B. Mental Models Tool** (predict → sim → misconception) | 4 (hand-written sims + eval) | 3 (predict-first is known, the diagnosis isn't) | 4 | 4 | 4 (intro physics students, with a UF faculty hook) | AI/ML 3 (needs a real eval) | none | Overall, AI/ML, Gemini, domain, Auth0 | Low-medium: the sims are small |
-| **B+. Sketch-to-Sim** (B with a paper-drawing input) | 4 | **5** (no app does this) | 2-3 (camera under expo lighting is the risk) | 5 | 4 | AI/ML 4 or Entertainment 4 | DeepSpace (live classroom), maybe | Overall, AI/ML or Entertainment, Gemini, domain | High: computer-vision reliability |
-| **C. Bridge Oracle** (photo → truss solve → snap it) | 5 (a real solver) | 4 | 3 (glue joints make the load guess noisy) | 3 | 3 (education) | Hardware 4 | none | Overall, Hardware, Tiger Data, domain | Medium-high: needs craft supplies and a load cell |
-| **E. Beat the Fingerprint** (judge tries to evade an audio matcher) | 5 (real hashing algorithm + robustness eval) | 4 | 4 (offline, no network) | 3 | 3 (rights holders; thinner human benefit) | Entertainment 4 | none (Vobile flavor for Overall) | Overall, Entertainment, domain | Low-medium |
-| **D. Hold the Wire** (scam call → Nessie hold) | 3 | 2 (crowded) | 4 | 3 | 4 (elders) | AI/ML 3 | Capital One 4 | Overall, AI/ML, Capital One ×1, Auth0, domain | Low-medium |
+## Grades
 
-## Hour estimates (docs/feasibility.md)
-We have ~48 usable person-hours. A is ~42h (cut: storm-cell clustering). A+ adds ~8.5h. B core + eval is ~28h. B with Sketch-to-Sim + DeepSpace is ~42-46h (cut: sketch capture). The paper-card input alone is ~10-13h once done properly (docs/sketch-input.md), so build the on-screen canvas first.
+| Criterion | Now | Why | What gets it to 5 |
+|---|---|---|---|
+| **Technical Understanding** | **3** | The pipeline is real and I can explain every step (spec → computed truth → checks → blind second model). But there's no measured number yet (pass rate, latency) and a judge can't see any of it. | The drawer showing JSON + computed truth + check results; one pass-rate number and one latency number from our own runs; both of us pass the drill in pitch.md. |
+| **Innovation & Creativity** | **3** | The idea is the strongest part (bet first, truth computed, the wrong idea named and tracked). On screen today it's a slider and a histogram, which looks like any quiz. | The reveal over the pencil guess + the misconception card landing on the judge's own answer, then their own topic built live. |
+| **Functionality** | **2** | Nothing plays end to end in a browser on main. The backend works locally; the coin-streak flow is in an open PR. | All 3 showcases + a typed topic playing on the public URL, with the fallback ladder and the no-network build rehearsed. |
+| **Design & Usability** | **1** | Main is a shell. No look applied yet. | Notebook Arcade applied everywhere (pencil/ink/marker, stamp, springy lock-in), one idea per screen, reduced motion, contrast checked, 5 user tests with fixes. |
+| **Purpose & Audience** | **3** | The story is clear and sourced (product-spec §1-2, pitch.md), but there's no user evidence and no screen shows who it's for. | User-test lines from B4/B6 (a line like "N of 5 guessed 4 or less", filled in from real tests), the home screen speaking to a student ("What confuses you?"). |
+| **Track & Challenge Relevance** (Entertainment & Creative Tech) | **2** | The track is judged on feel (track-entertainment.md): reveal, juice, collection, story. None of that is on screen yet. | The reveal moment with motion and a verdict stamp, the misconception "cast" in a collection, one cohesive art style. |
+| **Sponsor Challenge Criteria** | **2** | **Gemini:** real use in the backend (3.5 Flash-Lite generates, Gemma blind-checks) but invisible to a judge, so 3. **Easy On The Eyes:** 1 (no design yet). **Domain:** 1 (not registered, nothing hosted to point it at). | Gemini visible in the drawer and the live beat; the visual pass; the domain + QR on the table pointing at a hosted backend. |
+| **Track fit (prize odds)** | **2** | Right track for the product, but today we'd lose to anything with a game feel. Juice + purpose beat juice alone at XI (SignHero vs FortBox). | Same as Track Relevance; plus the "the entertainment is the learning" line (Crouch et al. 2004) in the pitch. |
 
-## Reading it
-- **Best expected prize count:** A or A+. Sperry has 3 slots plus interviews and an estimated 5-12 entries, and those stack with AI/ML or Hardware plus the near-empty MLH prizes.
-- **Best shot at a memorable Overall:** B+ or A+. Both put something physical in front of the judge (paper drawing, or the sensor).
-- **Lowest risk:** B, then D.
-- **What the new rubric rewards:** Technical Understanding favors whichever one we can explain end to end. That argues for a small stack and one model we train and evaluate ourselves, whichever idea it is.
+**Total now: 16 / 35** (7 criteria). Target at freeze (Sat midnight): 30+.
 
-## Open questions only the event can answer (ask Friday night)
-1. Hardware desk: is there a temp/humidity sensor and an ESP32/Pi? A load cell? (Decides A+ and C. The standard MLH lab list has none of these, so also check whether either of us owns parts.)
-2. Sperry reps:
-   - Is GOES satellite lightning OK?
-   - Is 50 plants a hard minimum?
-   - Which label do they prefer for the hazard index?
-3. Our own team: is at least half of us at a first hackathon? (Decides First Timers.)
+## Biggest 5 gaps, ranked by points gained per hour
+Points = my estimate of rubric points gained across all criteria. Hours = estimate for whoever owns it.
+
+| # | Gap | Owner | Est. hours | Est. points | Points/h |
+|---|---|---|---|---|---|
+| 1 | **Coin streak plays on the public URL with the misconception card.** Review + merge #62, add the card (data is already in the round JSON), redeploy Pages. | @luanamaldaner (card), me (review, merge, deploy) | 1.5 | +3 (Func, Innov, Track) | **2.0** |
+| 2 | **"How it works" drawer.** Round JSON beside the computed truth and the check results from #63; plus one measured pass rate and latency logged in gemini.md. | me | 1.5 | +2.5 (Tech, Gemini, Innov) | **1.7** |
+| 3 | **Live topic in the browser, hosted.** Merge #58/#63/#61, host the backend (Vultr when the code arrives, Render otherwise) with HTTPS + CORS + per-IP limit + daily cap, frontend calls `POST /api/rounds` with the building chip and the 20 s fallback chips. | me (backend, host), @luanamaldaner (chip UI) | 3.5 | +3.5 (Func, Tech, Innov, Gemini) | **1.0** |
+| 4 | **The reveal sequence.** ~400 ms beat, ink truth over the frozen pencil guess, shaded gap, verdict stamp. Shared by every widget. | @luanamaldaner | 2.5 | +2 (Track, Design) | **0.8** |
+| 5 | **Notebook Arcade visual pass.** Tokens, fonts, stamp, springy lock-in, reduced motion. | @luanamaldaner (I can take the tokens/fonts if her queue is full) | 3 | +2 (Design, Easy On The Eyes) | **0.7** |
+
+Just below the line: the positive-test dot array + Curve widget for the birthday problem (~3h, +1.5, 0.5/h). The 90-second demo doesn't need them; the 3:00 one does, so they come right after #5. Also small and cheap whenever someone has 20 minutes: the reset shortcut (`Shift+R` / `?reset=1`).
+
+**Next loop:** review and merge #62, merge my open PRs (#58, #61, #63) once CI is green, redeploy Pages, then build the drawer (gap 2) while @luanamaldaner adds the misconception card (gap 1). Re-grade here after that.
+
+## History
+Before the direction was picked (Fri ~9:50 PM), this file compared the candidates from docs/strategy.md against the same 7 criteria: hazard radar (A, plus a hardware variant A+), the Mental Models tool (B, plus a Sketch-to-Sim variant B+), Bridge Oracle (C), Beat the Fingerprint (E) and a scam-call interceptor (D). The hazard radar had the best expected prize count (Sperry slots), B+/A+ the most memorable Overall shot, and B the lowest build risk. I picked Mental Models, general version, on the Entertainment & Creative Technology track; the full table is in git history for this file.
