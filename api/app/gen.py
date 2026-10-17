@@ -1,10 +1,11 @@
 """Engine v4: a typed topic becomes a runnable model spec (Gemini API, free tier).
 
 - One structured-output call per fresh topic returns a compact model spec:
-  which of our widgets runs the idea (curve, sampler, dial, or an honest
-  stepper), its numbers, the prediction, the extremes to try and the named
-  misconception. app/spec.py validates it, computes every truth in code and
-  compiles it into a Round. The model's own number is only cross-checked.
+  which of our visual widgets runs the idea (a curve with a knob, including
+  slope / area / limit views for calculus, or a sampler), its numbers, the
+  prediction, the extremes to try and the named misconception. app/spec.py
+  validates it, computes every truth in code and compiles it into a Round.
+  The model's own number is only cross-checked.
 - Topics that aren't real concepts, or that no widget fits, get an honest
   no-fit (NoFit) instead of a made-up quiz.
 - The result (spec + round + check report) is cached on disk by normalized
@@ -22,6 +23,7 @@ from __future__ import annotations
 import hashlib
 import json
 import logging
+import math
 import os
 import re
 import tempfile
@@ -53,28 +55,37 @@ TIMEOUT_S = 30
 CACHE_DIR = Path(__file__).resolve().parents[2] / "data" / "cache"
 PACIFIC = ZoneInfo("America/Los_Angeles")
 
-SYSTEM_PROMPT = """You turn a topic into a small RUNNABLE MODEL, as JSON.
+SYSTEM_PROMPT = """You turn a topic into a small RUNNABLE, VISUAL MODEL, as JSON.
 
 A curious college student types a topic. They predict a number BEFORE seeing
-anything, then our code RUNS the model (a curve they can drag, or thousands of
-simulated trials) and shows where their guess was wrong, then we name the
-specific wrong idea. You never write the answer: you fill a spec and our code
-computes the truth from it.
+anything, then our code RUNS the model (a curve they drag with a knob, or
+thousands of simulated trials) and shows where their guess was wrong, then we
+name the specific wrong idea. Every result is an interactive picture; labels
+are short. You never write the answer: you fill a spec and our code computes
+the truth from it.
 
 First: recognized = true only if the topic is a real concept, fact or
 phenomenon you can define. If it is gibberish, made up, or not a topic, set
 recognized = false, no_fit_reason, and leave the rest minimal. definition:
 one plain sentence saying what the topic is (use the topic's own words).
 
-Then pick ONE widget for cases[0] (in this order of preference):
-1. "curve": the idea is a real formula y = f(x) (growth, decay, motion,
-   cost, probability vs group size). expr uses only x, the knob name, your
-   variable names, numbers, + - * / ^, sin cos tan exp log log2 log10 sqrt
-   abs min max. Set exactly one of ask_x (question asks y at that x) or
-   ask_y (question asks which x first reaches that y). x_min/x_max contain the
-   asked point with room on both sides; y in the SAME units as the slider.
-   knob_*: the one parameter a learner wants to drag; knob_default = the value
-   in the question.
+Then pick ONE widget for cases[0]:
+1. "curve": y = f(x) with a knob the learner drags. expr uses x, the knob
+   name, your variable names, numbers, + - * / ^, sin cos tan exp log log2
+   log10 sqrt abs min max. mode:
+   - "value": the question asks y at ask_x, or (ask_y) which x first reaches
+     that y. Growth, decay, motion, cost, probability vs group size...
+   - "slope": the derivative of the curve at ask_x (derivatives, rates of
+     change, instantaneous speed). The picture draws the tangent at ask_x.
+   - "area": the integral from area_from to area_to (integrals, distance from
+     speed, accumulated total). The knob is the number of rectangles
+     (knob_param "n", knob_min 1, knob_max 50, knob_step 1, knob_default 4)
+     and is NOT in expr.
+   - "limit": the limit of the curve at ask_x (limits, e.g. sin(x)/x at 0).
+   x_min/x_max contain the asked point with room on both sides. y in the
+   SAME units as the slider. knob_*: the one parameter a learner wants to
+   drag (rate, half-life, R0, an exponent); knob_default = the value in the
+   question.
 2. "sampler": the idea is chance and fits one of these exactly:
    coin_longest_run (n fair flips; stat mean_longest_run, or p_run_at_least
    with k), base_rate_test (base_rate, sensitivity, false_positive_rate as
@@ -82,48 +93,49 @@ Then pick ONE widget for cases[0] (in this order of preference):
    p_match), binomial_count (n, p; stat mean | mode | p_at_least k |
    p_equals k), dice_sum (dice = number of six-sided dice; same stats).
    Probabilities (p_*) are answered in PERCENT 0-100.
-3. "dial": one number computed from a few real quantities: variables
-   (name, meaning in plain words, unit, value) and answer_expr in those names.
-4. "stepper": nothing can be computed honestly; 2-6 worked steps and
-   answer_text. Use only when 1-3 really don't fit.
-If no widget fits at all, recognized = true but widget "none" and say why
-in no_fit_reason. Never invent survey numbers ("what % of people...").
+approximate: false when the curve is an established formula or the sampler
+is exact; true when it is only a simplified picture of the main relationship
+(then keep it honest and simple, e.g. a saturating or linear trend with a knob).
+If even an approximate picture would mislead (e.g. reaction mechanisms, history,
+events, pure definitions), set widget "none" and say why in no_fit_reason.
+Never invent survey numbers ("what % of people...").
 
 prediction: prompt (never reveals the answer), input "slider" (slider_min,
 slider_max, slider_step, slider_unit, and bands covering the whole slider
 with exactly one correct band, misconception_id null) or "choice" (2-4
 options; each numeric option has its value; exactly one correct option,
 misconception_id null). Every wrong band/option names a misconception id.
+No betting words anywhere (bet, wager, lock in, called it, confidence).
 misconceptions: 1-3 documented wrong ideas real learners hold, the main one
 first: label, why_tempting, refutation (1-2 sentences). source_url only if
 you are sure it exists, else null.
 extremes: 2-3 settings worth trying after the reveal (param = the knob, a
-sampler param, or a variable name; value; watch = one line on what to look
-for). answer_claimed: your own number for the answer.
+sampler param, or a variable name; value; watch = one short line on what to
+look for). answer_claimed: your own number for the answer.
 compare: if a second case LOOKS different but WORKS the same, give
 compare_topic, compare_principle (the shared idea in one sentence) and put
 it as cases[1] with the SAME widget and its own prediction and bands.
 slug: lowercase words joined by hyphens. Plain, friendly words, no markdown.
 
 Hard rules (our code rejects the spec otherwise):
-- Every name in expr / answer_expr is x, the knob, or a declared variable.
-  Declare every constant as a variable (name, meaning, unit, value) or write
-  the number. No pi (write 3.14159), no tanh, no other functions.
+- Every name in expr is x, the knob, or a declared variable. Declare every
+  constant as a variable (name, meaning, unit, value) or write the number.
+  No pi (write 3.14159), no tanh, no other functions. expr must use x.
 - The knob is NOT also a variable. Curves always have numeric x_min, x_max.
-- The prompt asks for EXACTLY the number the spec computes: the curve's y at
-  ask_x (or the x reaching ask_y), the sampler stat in its units, or the dial
-  value. answer_claimed is that number.
+- The prompt asks for EXACTLY the number the spec computes (the curve's
+  value / slope / area / limit, or the sampler stat in its units).
+  answer_claimed is that number.
 - Exactly ONE band (or option) has misconception_id null and contains the
   answer; bands are sorted, touch each other (next min = previous max +
   slider_step) and cover slider_min..slider_max. Every other misconception_id
   is one of the ids in misconceptions, spelled exactly.
 - Sampler fractions (p, base_rate, sensitivity, false_positive_rate) are 0-1.
-- A stepper has 2-6 steps.
 
 Examples (fields abridged):
 {"recognized": true, "definition": "Compound interest is interest earned on
  both the money you put in and the interest it already earned.",
- "cases": [{"widget": "curve", "expr": "P*(1+r/100)^x", "variables": [{"name":
+ "cases": [{"widget": "curve", "mode": "value", "approximate": false,
+ "expr": "P*(1+r/100)^x", "variables": [{"name":
  "P", "meaning": "money put in", "unit": "$", "value": 1000}], "x_min": 0,
  "x_max": 40, "x_label": "years", "y_label": "value ($)", "ask_x": 30,
  "knob_param": "r", "knob_label": "interest rate (%)", "knob_min": 1,
@@ -143,7 +155,11 @@ Examples (fields abridged):
  "slider_unit": "%", ..., "extremes": [{"param": "group_size", "value": 60,
  "watch": "Almost certain by 60."}], "answer_claimed": 50.7}],
  "compare_topic": "Two files with the same short hash", "compare_principle":
- "Matches grow with the number of PAIRS, not the number of items."}"""
+ "Matches grow with the number of PAIRS, not the number of items."}
+{"cases": [{"widget": "curve", "mode": "slope", "approximate": false, "expr":
+ "x^k", "x_min": 0, "x_max": 4, "ask_x": 3, "knob_param": "k", "knob_label":
+ "power", "knob_min": 1, "knob_max": 4, "knob_step": 1, "knob_default": 2,
+ "prompt": "How steep is y = x^2 at x = 3?", ..., "answer_claimed": 6}]}"""
 
 
 class GenerationError(Exception):
@@ -270,7 +286,11 @@ _NN = {"type": "number", "nullable": True}
 _CASE: dict = {
     "type": "object",
     "properties": {
-        "widget": {"type": "string", "enum": ["curve", "sampler", "dial", "stepper", "none"]},
+        "widget": {"type": "string", "enum": ["curve", "sampler", "none"]},
+        "approximate": {"type": "boolean"},
+        "mode": {"type": "string", "enum": ["value", "slope", "area", "limit"]},
+        "area_from": _NN,
+        "area_to": _NN,
         "variables": {
             "type": "array",
             "items": {
@@ -325,10 +345,6 @@ _CASE: dict = {
             ],
         },
         "k": _NN,
-        "answer_expr": _NS,
-        "unit": _NS,
-        "steps": {"type": "array", "items": _S},
-        "answer_text": _NS,
         "prompt": _S,
         "input": {"type": "string", "enum": ["slider", "choice"]},
         "slider_min": _NN,
@@ -470,6 +486,7 @@ def _case_from_gen(c: dict) -> dict:
     widget = c.get("widget")
     out: dict = {
         "widget": widget,
+        "approximate": bool(c.get("approximate")),
         "variables": [
             {
                 "name": v.get("name"),
@@ -527,6 +544,9 @@ def _case_from_gen(c: dict) -> dict:
             )
         out["curve"] = {
             "expr": c.get("expr"),
+            "mode": c.get("mode") or "value",
+            "area_from": c.get("area_from"),
+            "area_to": c.get("area_to"),
             "x_min": c.get("x_min"),
             "x_max": c.get("x_max"),
             "x_label": _clip(c.get("x_label") or "", 60),
@@ -549,20 +569,16 @@ def _case_from_gen(c: dict) -> dict:
             if isinstance(v, (int, float)):
                 params[f] = int(v) if f in _INT_FIELDS else v
         if c.get("sampler") == "base_rate_test":
-            params["population"] = 1000
+            # Enough people that the icon array shows at least a few sick ones.
+            rate = params.get("base_rate")
+            ok = isinstance(rate, (int, float)) and rate > 0
+            params["population"] = min(100000, max(1000, math.ceil(20 / rate))) if ok else 1000
         out["sampler"] = {
             "sampler": c.get("sampler"),
             "params": params,
             "stat": c.get("stat"),
             "k": c.get("k"),
             "x_label": _clip(c.get("x_label") or "", 60),
-        }
-    elif widget == "dial":
-        out["dial"] = {"answer_expr": c.get("answer_expr"), "unit": _clip(c.get("unit") or "", 30)}
-    elif widget == "stepper":
-        out["stepper"] = {
-            "steps": [_clip(s, 300) for s in (c.get("steps") or [])[:8]],
-            "answer_text": _clip(c.get("answer_text") or "", 200),
         }
     return out
 

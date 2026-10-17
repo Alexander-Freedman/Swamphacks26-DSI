@@ -158,6 +158,48 @@
           "default": null,
           "description": "y the question asks about; the answer is the x reaching it",
           "title": "Ask Y"
+        },
+        "show": {
+          "anyOf": [
+            {
+              "enum": [
+                "tangent",
+                "riemann",
+                "limit"
+              ],
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "tangent: answer = slope at ask_x; riemann: answer = area from area_from to area_to, explore param = number of rectangles; limit: answer = limit at ask_x",
+          "title": "Show"
+        },
+        "area_from": {
+          "anyOf": [
+            {
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Area From"
+        },
+        "area_to": {
+          "anyOf": [
+            {
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Area To"
         }
       },
       "required": [
@@ -487,8 +529,21 @@
             }
           ],
           "default": null,
-          "description": "True: truth_value computed by code. False: worked example, not checked. None: rounds from before engine v4",
+          "description": "True: truth_value computed by code from the spec. None: older rounds",
           "title": "Computed"
+        },
+        "approximate": {
+          "anyOf": [
+            {
+              "type": "boolean"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "True: a simplified picture of the main relationship; label it 'approximate picture, not a full model'. None: older rounds",
+          "title": "Approximate"
         }
       },
       "required": [

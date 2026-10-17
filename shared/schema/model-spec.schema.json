@@ -368,6 +368,12 @@
         "widget": {
           "$ref": "#/$defs/SpecWidget"
         },
+        "approximate": {
+          "default": false,
+          "description": "True: a simplified picture of the main relationship, not an established formula; shown as 'approximate picture, not a full model'",
+          "title": "Approximate",
+          "type": "boolean"
+        },
         "variables": {
           "items": {
             "$ref": "#/$defs/Variable"
@@ -391,28 +397,6 @@
           "anyOf": [
             {
               "$ref": "#/$defs/SpecSampler"
-            },
-            {
-              "type": "null"
-            }
-          ],
-          "default": null
-        },
-        "dial": {
-          "anyOf": [
-            {
-              "$ref": "#/$defs/SpecDial"
-            },
-            {
-              "type": "null"
-            }
-          ],
-          "default": null
-        },
-        "stepper": {
-          "anyOf": [
-            {
-              "$ref": "#/$defs/SpecStepper"
             },
             {
               "type": "null"
@@ -506,6 +490,18 @@
           "title": "Expr",
           "type": "string"
         },
+        "mode": {
+          "default": "value",
+          "description": "value: y at ask_x (or the x reaching ask_y); slope: derivative at ask_x; area: integral from area_from to area_to (knob = rectangles); limit: limit at ask_x",
+          "enum": [
+            "value",
+            "slope",
+            "area",
+            "limit"
+          ],
+          "title": "Mode",
+          "type": "string"
+        },
         "x_min": {
           "title": "X Min",
           "type": "number"
@@ -550,6 +546,30 @@
           "default": null,
           "title": "Ask Y"
         },
+        "area_from": {
+          "anyOf": [
+            {
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Area From"
+        },
+        "area_to": {
+          "anyOf": [
+            {
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Area To"
+        },
         "knob": {
           "$ref": "#/$defs/Explore"
         }
@@ -561,27 +581,6 @@
         "knob"
       ],
       "title": "SpecCurve",
-      "type": "object"
-    },
-    "SpecDial": {
-      "properties": {
-        "answer_expr": {
-          "description": "In variable names and numbers",
-          "maxLength": 200,
-          "title": "Answer Expr",
-          "type": "string"
-        },
-        "unit": {
-          "default": "",
-          "maxLength": 30,
-          "title": "Unit",
-          "type": "string"
-        }
-      },
-      "required": [
-        "answer_expr"
-      ],
-      "title": "SpecDial",
       "type": "object"
     },
     "SpecExtreme": {
@@ -696,36 +695,10 @@
       "title": "SpecSampler",
       "type": "object"
     },
-    "SpecStepper": {
-      "properties": {
-        "steps": {
-          "items": {
-            "type": "string"
-          },
-          "maxItems": 8,
-          "minItems": 2,
-          "title": "Steps",
-          "type": "array"
-        },
-        "answer_text": {
-          "maxLength": 200,
-          "title": "Answer Text",
-          "type": "string"
-        }
-      },
-      "required": [
-        "steps",
-        "answer_text"
-      ],
-      "title": "SpecStepper",
-      "type": "object"
-    },
     "SpecWidget": {
       "enum": [
         "curve",
-        "sampler",
-        "dial",
-        "stepper"
+        "sampler"
       ],
       "title": "SpecWidget",
       "type": "string"

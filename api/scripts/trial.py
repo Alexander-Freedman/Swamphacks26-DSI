@@ -25,15 +25,16 @@ _real_call = gen._call_model
 _calls = 0
 
 
-def _capped_call(model: str, topic: str) -> str:
+def _capped_call(model: str, topic: str, feedback: str | None = None) -> str:
     global _calls
     if _calls >= _max_calls:
         raise GenerationError("trial call cap reached")
     _calls += 1
-    raw = _real_call(model, topic)
+    raw = _real_call(model, topic, feedback)
     # Keep the raw reply so dropped items can be re-checked offline later.
     with open(gen.CACHE_DIR / "raw.jsonl", "a") as f:
-        f.write(json.dumps({"topic": topic, "model": model, "raw": raw}) + "\n")
+        row = {"topic": topic, "model": model, "retry": bool(feedback), "raw": raw}
+        f.write(json.dumps(row) + "\n")
     return raw
 
 

@@ -129,6 +129,14 @@ class CurveTruth(BaseModel):
     ask_y: float | None = Field(
         default=None, description="y the question asks about; the answer is the x reaching it"
     )
+    # Engine v4 calculus views (optional): what to draw on top of the curve.
+    show: Literal["tangent", "riemann", "limit"] | None = Field(
+        default=None,
+        description="tangent: answer = slope at ask_x; riemann: answer = area from area_from "
+        "to area_to, explore param = number of rectangles; limit: answer = limit at ask_x",
+    )
+    area_from: float | None = None
+    area_to: float | None = None
 
     @model_validator(mode="after")
     def _one_source(self) -> CurveTruth:
@@ -221,8 +229,12 @@ class Item(BaseModel):
     )
     computed: bool | None = Field(
         default=None,
-        description="True: truth_value computed by code. False: worked example, not checked. "
-        "None: rounds from before engine v4",
+        description="True: truth_value computed by code from the spec. None: older rounds",
+    )
+    approximate: bool | None = Field(
+        default=None,
+        description="True: a simplified picture of the main relationship; label it "
+        "'approximate picture, not a full model'. None: older rounds",
     )
 
     @model_validator(mode="after")
@@ -289,8 +301,6 @@ class Round(BaseModel):
 class SpecWidget(StrEnum):
     curve = "curve"
     sampler = "sampler"
-    dial = "dial"
-    stepper = "stepper"
 
 
 class SamplerStat(StrEnum):
@@ -327,20 +337,34 @@ SAMPLER_STATS: dict[Sampler, tuple[SamplerStat, ...]] = {
 
 class SpecCurve(BaseModel):
     expr: str = Field(max_length=200, description="y in x, the knob param and variable names")
+    mode: Literal["value", "slope", "area", "limit"] = Field(
+        default="value",
+        description="value: y at ask_x (or the x reaching ask_y); slope: derivative at ask_x; "
+        "area: integral from area_from to area_to (knob = rectangles); limit: limit at ask_x",
+    )
     x_min: float
     x_max: float
     x_label: str = Field(default="", max_length=60)
     y_label: str = Field(default="", max_length=60)
     ask_x: float | None = None
     ask_y: float | None = None
+    area_from: float | None = None
+    area_to: float | None = None
     knob: Explore
 
     @model_validator(mode="after")
-    def _ask_one(self) -> SpecCurve:
-        if (self.ask_x is None) == (self.ask_y is None):
-            raise ValueError("curve needs exactly one of ask_x or ask_y")
+    def _ask_fits(self) -> SpecCurve:
         if self.x_max <= self.x_min:
             raise ValueError("curve needs x_min < x_max")
+        if self.mode == "value" and (self.ask_x is None) == (self.ask_y is None):
+            raise ValueError("value curve needs exactly one of ask_x or ask_y")
+        if self.mode in ("slope", "limit"):
+            if self.ask_x is None or not self.x_min <= self.ask_x <= self.x_max:
+                raise ValueError(f"{self.mode} curve needs ask_x inside the x range")
+        if self.mode == "area":
+            lo, hi = self.area_from, self.area_to
+            if lo is None or hi is None or not self.x_min <= lo < hi <= self.x_max:
+                raise ValueError("area curve needs x_min <= area_from < area_to <= x_max")
         k = self.knob
         if k.max <= k.min or k.default is None or not k.min <= k.default <= k.max:
             raise ValueError("knob needs min < max and a default inside the range")
@@ -365,16 +389,6 @@ class SpecSampler(BaseModel):
             if self.k is None:
                 raise ValueError(f"stat {self.stat.value} needs k")
         return self
-
-
-class SpecDial(BaseModel):
-    answer_expr: str = Field(max_length=200, description="In variable names and numbers")
-    unit: str = Field(default="", max_length=30)
-
-
-class SpecStepper(BaseModel):
-    steps: list[str] = Field(min_length=2, max_length=8)
-    answer_text: str = Field(max_length=200)
 
 
 class SpecOption(BaseModel):
@@ -414,11 +428,14 @@ class SpecCase(BaseModel):
     """One runnable case: a widget, its numbers, a prediction and how to read it."""
 
     widget: SpecWidget
+    approximate: bool = Field(
+        default=False,
+        description="True: a simplified picture of the main relationship, not an established "
+        "formula; shown as 'approximate picture, not a full model'",
+    )
     variables: list[Variable] = Field(default_factory=list, max_length=8)
     curve: SpecCurve | None = None
     sampler: SpecSampler | None = None
-    dial: SpecDial | None = None
-    stepper: SpecStepper | None = None
     prediction: Prediction
     bands: list[Band] = Field(default_factory=list, max_length=8)
     extremes: list[SpecExtreme] = Field(default_factory=list, max_length=3)
@@ -428,8 +445,7 @@ class SpecCase(BaseModel):
 
     @model_validator(mode="after")
     def _widget_body(self) -> SpecCase:
-        bodies = {"curve": self.curve, "sampler": self.sampler, "dial": self.dial}
-        bodies["stepper"] = self.stepper
+        bodies = {"curve": self.curve, "sampler": self.sampler}
         if bodies[self.widget.value] is None:
             raise ValueError(f"{self.widget.value} case needs its {self.widget.value} block")
         if self.prediction.input == "slider" and not self.bands:

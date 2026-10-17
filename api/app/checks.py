@@ -8,9 +8,8 @@
    their parameters.
 3. Lint: bands cover the slider, no overlap gaps, the prompt doesn't give the answer.
 There is no blind second-model check any more (engine v4 computes every truth
-in code; a stepper is labelled "worked example, not checked"). Items without a
-computed truth are listed as `unchecked`. Items that fail are dropped; a round
-with no items left is rejected.
+in code). Items without a computed truth are listed as `unchecked`. Items that
+fail are dropped; a round with no items left is rejected.
 """
 
 from __future__ import annotations
@@ -94,7 +93,8 @@ def check_item(item: Item) -> str | None:
         value = true_value(item)
     except (ValueError, ZeroDivisionError, OverflowError, TypeError) as err:
         return f"answer_expr: {str(err)[:60]}"
-    if value is not None and isinstance(truth, CurveTruth) and truth.expr:
+    if value is not None and isinstance(truth, CurveTruth) and truth.expr and not truth.show:
+        # (slope / area / limit answers are computed from the curve in app/spec.py)
         reason = _curve_disagrees(item, truth, value)
         if reason:
             return reason
@@ -162,11 +162,14 @@ def _curve_problem(item: Item, truth: CurveTruth) -> str | None:
             truth.x_min + (truth.x_max - truth.x_min) * i / CURVE_POINTS
             for i in range(CURVE_POINTS + 1)
         ]
+        if truth.show == "limit" and truth.ask_x is not None:
+            # The point a limit asks about may be a hole in the curve: don't sample it.
+            xs = [x for x in xs if abs(x - truth.ask_x) > 1e-9]
         try:
             ys = [_curve_at(item, truth, x, **over) for x in xs]
             if not all(math.isfinite(y) and abs(y) < CURVE_MAX_ABS for y in ys):
                 return "curve not finite"
-            for i in range(CURVE_POINTS):
+            for i in range(len(xs) - 1):
                 if ys[i] * ys[i + 1] < 0 and _pole_between(item, truth, xs[i], xs[i + 1], over):
                     return "curve jumps across a pole"
         except _EXPR_ERRORS as err:

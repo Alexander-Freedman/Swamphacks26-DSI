@@ -252,43 +252,118 @@ def test_choice_correct_option_is_checked_against_the_truth() -> None:
         compile_spec(spec_of(gen_data(cases=[dice_choice(marked="two")])))
 
 
-def test_dial_and_stepper() -> None:
-    dial = curve_case(
-        widget="dial",
-        variables=[
-            {"name": "d", "meaning": "distance to the Moon", "unit": "km", "value": 384400},
-            {"name": "v", "meaning": "car speed", "unit": "km/h", "value": 100},
-        ],
-        answer_expr="d/v/24",
-        unit="days",
-        prompt="Driving to the Moon at highway speed nonstop: how many days?",
+def calc_case(mode: str, expr: str, **over) -> dict:
+    case = curve_case(
+        mode=mode,
+        variables=[],
+        expr=expr,
+        x_min=-4,
+        x_max=4,
+        ask_x=None,
+        knob_param="k",
+        knob_label="power",
+        knob_min=1,
+        knob_max=4,
+        knob_step=1,
+        knob_default=2,
+        prompt="How steep is it there?",
         slider_min=0,
-        slider_max=400,
+        slider_max=20,
         slider_step=1,
-        slider_unit="days",
-        bands=[
-            {"min": 0, "max": 100, "misconception_id": "linear-growth"},
-            {"min": 101, "max": 220, "misconception_id": None},
-            {"min": 221, "max": 400, "misconception_id": "too-high"},
-        ],
-        extremes=[{"param": "v", "value": 1000, "watch": "A jet: about 16 days."}],
-        answer_claimed=160.2,
-    )
-    item = compile_spec(spec_of(gen_data(cases=[dial]))).round.items[0]
-    assert item.truth.widget == "estimate" and item.truth_value == pytest.approx(160.17, abs=0.01)
-    assert item.extremes[0].truth_value == pytest.approx(16.02, abs=0.01)
-
-    stepper = curve_case(
-        widget="stepper",
-        steps=["Start with the claim.", "Check it against the rule."],
-        answer_text="It depends on the rule.",
-        answer_claimed=None,
+        slider_unit="",
         extremes=[],
+        answer_claimed=None,
     )
-    compiled = compile_spec(spec_of(gen_data(cases=[stepper])))
-    item = compiled.round.items[0]
-    assert item.computed is False and item.truth_value is None
-    assert compiled.report.unchecked == [item.id]  # "worked example, not checked"
+    case.update(over)
+    return case
+
+
+def bands_around(lo: float, hi: float, top: float = 20) -> list[dict]:
+    return [
+        {"min": 0, "max": lo - 1, "misconception_id": "linear-growth"},
+        {"min": lo, "max": hi, "misconception_id": None},
+        {"min": hi + 1, "max": top, "misconception_id": "too-high"},
+    ]
+
+
+def test_calculus_slope_area_limit() -> None:
+    slope = calc_case("slope", "x^k", ask_x=3, bands=bands_around(5, 7), answer_claimed=6)
+    item = compile_spec(
+        spec_of(
+            gen_data("derivative", definition="A derivative in calculus.", cases=[slope]),
+            "derivative",
+        )
+    ).round.items[0]
+    assert item.truth.show == "tangent" and item.truth.ask_x == 3
+    assert item.truth_value == pytest.approx(6, abs=1e-4)
+
+    area = calc_case(
+        "area",
+        "x^2",
+        x_min=0,
+        area_from=0,
+        area_to=3,
+        knob_param="n",
+        knob_label="rectangles",
+        knob_min=1,
+        knob_max=50,
+        knob_default=4,
+        bands=bands_around(8, 10),
+        extremes=[{"param": "n", "value": 3, "watch": "Three rectangles miss a lot."}],
+        answer_claimed=9,
+    )
+    item = compile_spec(
+        spec_of(
+            gen_data("integral", definition="A integral in calculus.", cases=[area]), "integral"
+        )
+    ).round.items[0]
+    assert item.truth.show == "riemann" and (item.truth.area_from, item.truth.area_to) == (0, 3)
+    assert item.truth_value == pytest.approx(9, abs=1e-6)
+    assert item.extremes[0].truth_value == pytest.approx(0 + 1 + 4)  # 3 left rectangles
+
+    limit = calc_case(
+        "limit",
+        "sin(k*x)/x",
+        ask_x=0,
+        slider_max=5,
+        bands=bands_around(2, 2, top=5),
+        answer_claimed=2,
+    )
+    item = compile_spec(
+        spec_of(gen_data("limit", definition="A limit in calculus.", cases=[limit]), "limit")
+    ).round.items[0]
+    assert item.truth.show == "limit" and item.truth_value == pytest.approx(2, abs=1e-4)
+
+    corner = calc_case("slope", "abs(x)*k", ask_x=0, bands=bands_around(1, 2))
+    with pytest.raises(SpecRejected, match="no single slope"):
+        compile_spec(
+            spec_of(gen_data("abs", definition="The abs function.", cases=[corner]), "abs")
+        )
+    jump = calc_case("limit", "k*abs(x)/x", ask_x=0, bands=bands_around(1, 2))
+    with pytest.raises(SpecRejected, match="limits differ"):
+        compile_spec(
+            spec_of(gen_data("jump", definition="A jump in a curve.", cases=[jump]), "jump")
+        )
+
+
+def test_curve_must_move_with_x_and_wording_is_clean() -> None:
+    flat = curve_case(expr="P*(1+r/100)^30", answer_claimed=None)
+    with pytest.raises(SpecRejected, match="must use x"):
+        compile_spec(spec_of(gen_data(cases=[flat])))
+    betting = curve_case(prompt="Place your bet: what is $1,000 worth after 30 years at 7%?")
+    with pytest.raises(SpecRejected, match="wording"):
+        compile_spec(spec_of(gen_data(cases=[betting])))
+
+
+def test_approximate_picture_is_labelled() -> None:
+    item = compile_spec(spec_of(gen_data(cases=[curve_case(approximate=True)]))).round.items[0]
+    assert item.approximate is True and item.computed is True
+
+
+def test_text_only_widgets_are_gone() -> None:
+    for widget in ("stepper", "dial"):
+        with pytest.raises(ValidationError):
+            spec_of(gen_data(cases=[curve_case(widget=widget)]))
 
 
 def test_compare_case_compiles_to_a_second_item() -> None:
@@ -476,9 +551,9 @@ def test_harmless_shape_fixes() -> None:
 def test_daily_cap_stops_live_calls(live_gen) -> None:
     from app import gen
 
-    usage = gen.Usage()
-    for _ in range(gen.DAILY_SOFT_CAP):
-        usage.record("gemini-3.5-flash-lite")
+    day = gen._quota_day()
+    calls = {"gemini-3.5-flash-lite": gen.DAILY_SOFT_CAP}
+    gen.Usage().path.write_text(json.dumps({"day": day, "calls": calls, "exhausted": []}))
     res = client.post("/api/rounds", json={"topic": "Compound interest capped"}).json()
     assert res["ok"] is False and live_gen == []
 
