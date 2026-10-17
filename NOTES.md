@@ -79,6 +79,13 @@ Decisions + how to run things. Keep current.
     - **Step 2:** @luanamaldaner reviews, we agree, then re-plan build-plan.md.
     - **Step 3:** build toward it, with QA checking every deploy against the storyboard.
   - **Nothing already built is "done";** judge everything against this goal.
+  - **Clarified (~11:45 PM): NOT all 10 stages.** The pipeline is the inspiration, not a checklist; a 10-stage course isn't Quizlet-style. **Goal: take someone from not understanding a concept to understanding it through visualizations, in a quick session that feels good to come back to.** Borrow the strongest moves:
+    - guess first
+    - a concrete example you can watch and manipulate
+    - push it to the extremes
+    - your own model drawn next to reality
+    - your exact mistake named
+  - Per topic, pick only what makes it click visually. Keep sessions short.
 - Oct 16 ~11:35 PM: **standing QA reviewer.** After every Pages deploy and at least every 30 min, a QA pass plays every showcase round at desktop + phone sizes (~/qa Playwright), screenshots every state, and files one `qa` issue per real problem (frontend → @luanamaldaner, backend/data → me). It re-checks closed qa issues each pass. QA never blocks the build.
 
 ## How to run
