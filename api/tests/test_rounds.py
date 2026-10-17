@@ -88,7 +88,7 @@ def test_bands_cover_slider_and_stay_tight() -> None:
             bands, s = item.bands, item.slider
             assert [b.min for b in bands] == sorted(b.min for b in bands), slug
             assert bands[0].min <= s.min and bands[-1].max >= s.max, slug
-            for a, b in zip(bands, bands[1:]):
+            for a, b in zip(bands, bands[1:], strict=False):
                 assert b.min - a.max <= s.step, (slug, a, b)
             correct = next(b for b in bands if b.misconception_id is None)
             assert correct.min > s.min and correct.max < s.max, slug
