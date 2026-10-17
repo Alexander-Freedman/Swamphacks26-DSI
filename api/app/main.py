@@ -34,6 +34,9 @@ def _rate_limited(ip: str) -> bool:
     q = _hits[ip]
     while q and now - q[0] > 3600:
         q.popleft()
+    if not q:
+        _hits.pop(ip, None)
+        q = _hits[ip]
     if len(q) >= PER_IP_PER_HOUR:
         return True
     q.append(now)

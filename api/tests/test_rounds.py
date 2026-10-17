@@ -131,3 +131,93 @@ def test_to_round_drops_dangling_refs_and_clips() -> None:
     assert r.slug == "dice-sums"
     assert len(r.misconceptions[0].label) <= 80
     assert [b.misconception_id for b in r.items[0].bands] == ["all-equal", None]
+
+
+def test_showcases_pass_checks() -> None:
+    from app.checks import check_round
+
+    for r in showcase_rounds().values():
+        checked, report = check_round(r, blind=False)
+        assert report.dropped == {}, (r.slug, report.dropped)
+
+
+def test_checks_drop_bad_items() -> None:
+    from app.checks import CheckFailed, check_round
+    from app.gen import to_round
+
+    base = {
+        "slug": "t",
+        "topic": "t",
+        "concept": "c",
+        "misconceptions": [{"id": "m", "label": "l", "why_tempting": "w", "refutation": "r"}],
+    }
+    good = {
+        "id": "good",
+        "prompt": "chance of heads?",
+        "input_type": "slider",
+        "slider_min": 0,
+        "slider_max": 100,
+        "bands": [
+            {"min": 0, "max": 40, "misconception_id": "m"},
+            {"min": 41, "max": 60, "misconception_id": None},
+            {"min": 61, "max": 100, "misconception_id": "m"},
+        ],
+        "widget": "curve",
+        "expr": "x",
+        "x_min": 0,
+        "x_max": 1,
+        "answer_expr": "0.5*100",
+        "answer_claimed": 50,
+    }
+    lying = {**good, "id": "lying", "answer_claimed": 90}
+    outside = {**good, "id": "outside", "answer_expr": "90", "answer_claimed": 90}
+    r = to_round({**base, "questions": [good, lying, outside]})
+    checked, report = check_round(r, blind=False)
+    assert [i.id for i in checked.items] == ["good"]
+    assert set(report.dropped) == {"lying", "outside"}
+    with pytest.raises(CheckFailed):
+        check_round(to_round({**base, "questions": [lying]}), blind=False)
+
+
+@pytest.mark.parametrize("bad", ["2x", "x²", "5!", "-" * 3000 + "1", "2**3", "1_000"])
+def test_eval_expr_rejects_outside_subset(bad) -> None:
+    with pytest.raises(ValueError):
+        eval_expr(bad, x=1)
+
+
+def test_normalize_topic_keeps_symbols_and_unicode() -> None:
+    from app.gen import normalize_topic
+
+    assert normalize_topic("C++") != normalize_topic("C")
+    assert normalize_topic("  Café  ") == "café"
+    assert normalize_topic("量子力学") == "量子力学"
+
+
+def test_band_gap_is_caught() -> None:
+    from app.checks import check_item
+    from app.gen import to_round
+
+    r = to_round(
+        {
+            "slug": "g",
+            "topic": "g",
+            "concept": "c",
+            "misconceptions": [{"id": "m", "label": "l", "why_tempting": "w", "refutation": "r"}],
+            "questions": [
+                {
+                    "id": "q",
+                    "prompt": "p",
+                    "input_type": "slider",
+                    "slider_min": 0,
+                    "slider_max": 100,
+                    "bands": [
+                        {"min": 0, "max": 10, "misconception_id": "m"},
+                        {"min": 20, "max": 100, "misconception_id": None},
+                    ],
+                    "widget": "estimate",
+                    "answer_expr": "50",
+                }
+            ],
+        }
+    )
+    assert check_item(r.items[0]) == "bands leave a gap the slider can land in"
