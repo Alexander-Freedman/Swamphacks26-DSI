@@ -41,12 +41,18 @@
 
 | Integration | Key / config | What it's for | Wired in | If it's missing |
 |---|---|---|---|---|
-| **Gemini** (MLH) | `GEMINI_API_KEY` | Generates each topic's full package; Gemma blind-checks it (product-spec §7) | B1 client, B2 pipeline | Mock client serving the cached/hand-made rounds; the demo still works on showcase + cached topics |
-| **OpenAI image generation** | `OPENAI_API_KEY` | Visuals only: brand art, the cast card icons, topic illustrations. Generated **once**, saved as files in the repo (no live calls in the demo) | B5 (visual pass); brand art earlier if the name is set | Hand-drawn SVG/emoji-free icon set and a plain illustration slot. It's a paid API, so the number of images is kept small; spending is my call. These images get disclosed in the AI-tools section |
+| **Gemini** (MLH) | `GEMINI_API_KEY` (free tier, saved on the server 10:30 PM; live after the next restart) | Generates each topic's full package; Gemma blind-checks it (product-spec §7) | B1 client, B2 pipeline | Mock client serving the cached/hand-made rounds; the demo still works on showcase + cached topics |
 | **Tiger Data** (MLH) | `TIGER_DATABASE_URL` (from @luanamaldaner by DM) | Answer events (hypertable) → "the room" %, streak and review queue (continuous aggregates) | B3 | Local SQLite with the same schema; drop the Tiger prize if it never arrives |
 | **Auth0** (MLH) | Domain + Client ID (public, posted in #hack-chat by @luanamaldaner) | "Sign in to keep your streak" (Google login); guest play first | B5 (cut line 2) | Guest only; streak + collection in localStorage |
 | **Domain** (MLH GoDaddy) | Registered by @luanamaldaner via the MLH link | The demo URL + QR on the table | DNS as soon as it's registered; HTTPS on `<ip>.sslip.io` meanwhile | The host's default URL (sslip.io / Render) on the QR |
 | **Hosting** | Vultr (MLH code, if no card) or Render | API + built frontend | B1 first deploy | Render free tier; local laptop + phone hotspot as the last resort |
+
+**Spending stays at $0** unless I say otherwise. **Free Gemini only:** Flash Lite for live calls within the free limits. Showcase topics are written by us during the build and stored. Visuals are designed in code (SVG/CSS), with no AI image generation.
+
+### Optional upgrade (only if I add $5 OpenAI credit; never depend on it)
+- **OpenAI image generation** (`OPENAI_API_KEY`) for brand art and the cast card icons, generated once and saved as files.
+- **Status (10:30 PM):** the account has no billing and a $0 balance, so any call is refused (insufficient quota).
+- **Default:** the SVG/CSS icon set stays the plan either way.
 
 ## Never cut
 - predict → lock → reveal on the coin streak
