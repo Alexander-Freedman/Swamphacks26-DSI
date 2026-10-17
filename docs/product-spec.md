@@ -195,7 +195,7 @@ From demo.md; the numbers were rechecked by me.
 - **Sound:** optional, with a visual twin for every sound; the hall is loud.
 
 ## 12. Name (open, issue #29)
-"Mental Models" is the working name. Recommendation in docs/story.md: **Hunch & Ink** (pencil hunch, ink truth), with "your Wrongdex" for the collection and the tagline "Guess in pencil. Truth in ink." My call.
+"Mental Models" is the working name. Recommendation in docs/story.md: **Hunch & Ink** (pencil hunch, ink truth), with "your Wrongdex" for the collection and the tagline "Guess in pencil. Truth in ink." **The name is @luanamaldaner's call**; the code uses the neutral working name `mm` until then.
 
 ## 13. Open questions for me
 1. The visual direction: Notebook Arcade, OK?

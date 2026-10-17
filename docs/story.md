@@ -1,9 +1,9 @@
 # Story: name, pitch, Devpost, video, DEV post (#29)
 
-Marketing is a full workstream (a product nobody gets in 30 seconds loses). This file grows through the night. **The name is my call.**
+Marketing is a full workstream (a product nobody gets in 30 seconds loses). This file grows through the night. **The name is @luanamaldaner's call** (asked on #1). Until they pick, the code uses the neutral working name `mm`.
 
-## 1. Name: recommendation (pending my decision)
-- **Hunch & Ink** (top pick): your hunch goes down in pencil, the truth lands in ink. That matches the predict-then-reveal moment and the Notebook Arcade look. All of .com/.app/.tech/.space/.study were unregistered on Oct 16 (registry RDAP). No product with that name was found. Trademark: a snippet-level scan only (USPTO blocks scripts), with low risk noted; **not a clearance**.
+## 1. Name: options for @luanamaldaner to choose from
+- **Hunch & Ink** (research's top pick): your hunch goes down in pencil, the truth lands in ink. That matches the predict-then-reveal moment and the Notebook Arcade look. All of .com/.app/.tech/.space/.study were unregistered on Oct 16 (registry RDAP). No product with that name was found. Trademark: a snippet-level scan only (USPTO blocks scripts), with low risk noted; **not a clearance**.
 - **"Your Wrongdex"** names the collection screen.
 - **Verdict stamps:** *Called it / Close / Way off*.
 - **Tagline (table tent):** "Guess in pencil. Truth in ink."
