@@ -157,7 +157,9 @@
 .orgo .og-back { min-height: 36px; padding: 4px 10px; font-size: 14px; margin: 6px 0 2px; }
 
 /* ---------- working out a mechanism: parts, size up, chart ---------- */
-.orgo .og-analyze { display: grid; gap: 14px; }
+.orgo .og-step.og-analyze { grid-template-columns: minmax(0, 820px); gap: 14px; }
+.orgo .og-analyze .og-scene { max-width: 820px; }
+.orgo .og-found { grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); }
 .orgo .og-analyze .og-fig { margin: 0; }
 .orgo .og-hl { background: var(--marker); padding: 0 4px; border-radius: 2px; }
 .orgo .og-chip { display: inline-block; min-width: 34px; text-align: center; font: 700 12px var(--font-mono); background: var(--card); border: 1.5px solid var(--ink); border-radius: 4px; padding: 1px 4px; }
