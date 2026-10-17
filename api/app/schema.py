@@ -133,6 +133,14 @@ class CurveTruth(BaseModel):
         return self
 
 
+class EstimateTruth(BaseModel):
+    """A single computed number shown on a number line against the guess."""
+
+    widget: Literal["estimate"] = "estimate"
+    unit: str = ""
+    source_url: str | None = None
+
+
 class StepperTruth(BaseModel):
     """Honest fallback for topics we can't compute: a sourced worked example."""
 
@@ -141,7 +149,9 @@ class StepperTruth(BaseModel):
     source_url: str | None = None
 
 
-Truth = Annotated[DistributionTruth | CurveTruth | StepperTruth, Field(discriminator="widget")]
+Truth = Annotated[
+    DistributionTruth | CurveTruth | EstimateTruth | StepperTruth, Field(discriminator="widget")
+]
 
 
 class Explore(BaseModel):
@@ -184,6 +194,8 @@ class Item(BaseModel):
                 raise ValueError("choice item needs exactly one correct option")
         if self.input_type is InputType.sketch and not self.sketch_rules:
             raise ValueError("sketch item needs sketch rules")
+        if self.truth.widget == "estimate" and not self.answer_expr:
+            raise ValueError("estimate item needs answer_expr")
         return self
 
 

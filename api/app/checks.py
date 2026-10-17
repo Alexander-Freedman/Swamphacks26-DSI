@@ -17,6 +17,9 @@ import logging
 import math
 import os
 import re
+import time
+from concurrent.futures import ThreadPoolExecutor
+from concurrent.futures import TimeoutError as FutureTimeout
 from dataclasses import dataclass, field
 
 from app.schema import CurveTruth, DistributionTruth, InputType, Item, Round, Sampler
@@ -25,6 +28,7 @@ from app.truth import eval_expr
 log = logging.getLogger("mm.checks")
 
 BLIND_MODEL = "gemma-4-31b-it"
+BLIND_TIMEOUT_S = 8
 REQUIRED_PARAMS = {
     Sampler.coin_longest_run: ("n",),
     Sampler.base_rate_test: ("base_rate", "sensitivity", "false_positive_rate"),
@@ -148,10 +152,22 @@ def check_round(r: Round, blind: bool | None = None) -> tuple[Round, Report]:
         blind = bool(os.environ.get("GEMINI_API_KEY")) and os.environ.get("MM_OFFLINE") != "1"
     report = Report(blind_checked=blind)
     kept: list[Item] = []
+    reasons = {item.id: check_item(item) for item in r.items}
+    if blind:
+        # Run blind checks in parallel and time-box them: a slow check is skipped, not fatal.
+        todo = [i for i in r.items if reasons[i.id] is None]
+        pool = ThreadPoolExecutor(max_workers=3)
+        futures = {i.id: pool.submit(blind_disagrees, i) for i in todo}
+        deadline = time.monotonic() + BLIND_TIMEOUT_S
+        for iid, fut in futures.items():
+            try:
+                reasons[iid] = fut.result(timeout=max(0.0, deadline - time.monotonic()))
+            except FutureTimeout:
+                log.warning("blind check timed out for %s", iid)
+        # Don't wait for stragglers; their answers are simply ignored.
+        pool.shutdown(wait=False, cancel_futures=True)
     for item in r.items:
-        reason = check_item(item)
-        if reason is None and blind:
-            reason = blind_disagrees(item)
+        reason = reasons[item.id]
         if reason:
             report.dropped[item.id] = reason
         else:

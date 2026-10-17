@@ -24,6 +24,7 @@ _FUNCS = {
     "abs": abs,
     "min": min,
     "max": max,
+    "pow": pow,
 }
 
 

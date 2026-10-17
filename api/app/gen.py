@@ -30,7 +30,7 @@ from app.schema import Round
 
 log = logging.getLogger("mm.gen")
 
-PROMPT_VERSION = 1
+PROMPT_VERSION = 2
 MODEL_CHAIN = ["gemini-3.5-flash-lite", "gemini-3.1-flash-lite", "gemma-4-26b-a4b-it"]
 DAILY_SOFT_CAP = 480
 TIMEOUT_S = 30
@@ -49,7 +49,8 @@ Rules:
   sentence refutation. Prefer ones with a source; set source_url only if you
   are sure it exists, otherwise null and say where it's known from in
   source_note.
-- questions: 1-3 prediction questions whose intuitive answer is WRONG for many
+- questions: exactly 3 prediction questions, each testing a DIFFERENT
+  misconception or the same one in a new setting whose intuitive answer is WRONG for many
   people. Every wrong option or numeric band must map to exactly one
   misconception id; the correct one has misconception_id null.
 - choice items need exactly one correct option.
@@ -58,8 +59,12 @@ Rules:
 - the truth is shown by our code, not by you: set widget "distribution" with a
   sampler (and its numbers: n, p, dice, group_size, base_rate, sensitivity,
   false_positive_rate), or "curve" with expr in x using only numbers,
-  + - * / ^ and sin cos tan exp log sqrt abs min max, plus x_min/x_max. If the
-  topic can't be computed, use widget "stepper" with 2-6 worked steps.
+  + - * / ^ and sin cos tan exp log sqrt abs min max, plus x_min/x_max, or
+  "estimate" when the answer is one number you can write as answer_expr
+  (a probability, a percentage, a count, a ratio, a time). Almost every topic
+  has a number worth predicting: prefer slider questions with "estimate",
+  "curve" or "distribution". Use "stepper" (2-6 worked steps) only for a
+  question where nothing can be computed, and at most once per round.
 - Put the true numeric value in answer_expr (same expression rules) when you
   can, and your own number in answer_claimed.
 - slug: lowercase words joined by hyphens. reviewed: false. schema_version: 1.
@@ -167,7 +172,7 @@ GEN_SCHEMA: dict = {
         },
         "questions": {
             "type": "array",
-            "minItems": 1,
+            "minItems": 3,
             "maxItems": 3,
             "items": {
                 "type": "object",
@@ -195,7 +200,10 @@ GEN_SCHEMA: dict = {
                             "required": ["min", "max"],
                         },
                     },
-                    "widget": {"type": "string", "enum": ["distribution", "curve", "stepper"]},
+                    "widget": {
+                        "type": "string",
+                        "enum": ["distribution", "curve", "estimate", "stepper"],
+                    },
                     "sampler": {
                         "type": "string",
                         "nullable": True,
@@ -267,6 +275,8 @@ def to_round(data: dict) -> Round:
                 "x_label": q.get("x_label") or "",
                 "y_label": q.get("y_label") or "",
             }
+        elif widget == "estimate":
+            truth = {"widget": "estimate", "unit": q.get("slider_unit") or ""}
         else:
             truth = {"widget": "stepper", "steps": q.get("steps") or []}
         item = {
@@ -407,7 +417,7 @@ def generate_round(topic: str, usage: Usage | None = None) -> GenResult:
                 log.info("checks for %r: %s", topic, report.as_dict())
             except (ValidationError, ValueError, GenerationError, CheckFailed) as err:
                 last_err = err
-                log.warning("bad round from %s: %s", model, str(err)[:200])
+                log.warning("bad round from %s: %s", model, str(err).replace("\n", " ")[:300])
                 continue
             except Exception as err:  # API errors
                 last_err = err
