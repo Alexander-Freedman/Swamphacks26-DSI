@@ -1,106 +1,79 @@
 # Pitch: the live 3:00, the 1:30, and judge Q&A
 
-**Status:** rewritten Sat Oct 17 ~1 PM for the direction update (NOTES.md, Sat ~12:15 PM, #185). Replaces the old candidate drafts (hazard radar etc., dropped Fri ~9:50 PM) and supersedes the open pitch PR #123 (its Q&A and sourced talking points are carried over here). The screens and clicks come from [docs/demo-script.md](demo-script.md): where they differ, demo-script.md wins for what's on screen and this file wins for the words.
+**Status:** rewritten Sat Oct 17 evening for the team decision of Sat ~6:05 PM: **the demo is the orgo showcase (PR #204) and the calculus level (PR #202, merged)**; typed topic → runnable visual, the three probability sessions and the notebook support it. The screens and clicks come from [docs/demo-script.md](demo-script.md): where they differ, demo-script.md wins for what's on screen and this file wins for the words. Every orgo line is **[if #204 merged]**; until it is, use the "calculus first" order in demo-script.md.
 
-**Headline (say it word for word):**
-> **"ChatGPT tells you the answer. Onionskin builds you a world where you find out you were wrong, and why."**
+**Headline:** **"See your thinking in layers."** Subline: **"Type any topic. Watch it come alive."**
+**Chatbot line (word for word):** **"ChatGPT tells you the answer. Onionskin builds you a world where you find out you were wrong, and why."**
+**The AI story, one breath:** **the AI builds the simulation; code guarantees the truth; you do the thinking.** Honest scope: orgo, calculus and the probability sessions are hand-built; the AI builds the simulation for a topic you type. No betting language.
 
-**The AI story, one breath (use it everywhere):** **the AI builds the simulation; code guarantees the truth; you do the thinking.**
-- Honest scope: the three showcase sessions (birthday, coin streak, positive test) are hand-built. The AI builds the simulation for *a topic you type*, through the any-topic engine. Never say the AI built the birthday session.
-
-**Slot:** 3:00 live demo + 1:00 Q&A at our table, expo style ([Devpost rules](https://swamphacks-xii.devpost.com/rules), docs/strategy.md). Judges rank the handful of tables they saw, so the goal is to be the one they remember ([MLH judging plan](https://guide.mlh.com/general-information/judging-and-submissions/judging-plan)).
+**Slot:** 3:00 live demo + 1:00 Q&A at our table, expo style ([Devpost rules](https://swamphacks-xii.devpost.com/rules)). Judges rank the handful of tables they saw, so the goal is to be the one they remember ([MLH judging plan](https://guide.mlh.com/general-information/judging-and-submissions/judging-plan)).
 
 **Roles:** **narrator** says the words below and keeps time. **Driver** runs the laptop or hands the judge the trackpad/phone, and takes the technical questions.
 
-**What a judge should get in 30 seconds:** this isn't a chatbot. You guess first, you watch a simulation play out over your own guess, and it names the exact wrong idea you had.
+**What a judge should get in 30 seconds:** this isn't a chatbot. You build or draw what you think, the real thing runs on top of it, and it names the exact wrong idea you had.
 
-**Voice:** "I" for things I did, "we" for the team. Plain words. No "AI tutor", "platform" or "dashboard" in the opener ([track-entertainment.md](research/track-entertainment.md) §3).
-
----
-
-## Landing today: confirm before saying
-Two beats in this pitch depend on work that is **not merged yet** (Sat ~1 PM). Until each box is ticked on the deployed site, use the fallback line.
-
-- [ ] **Compare screen, birthday** (#181): after the stamp, a second case (shared 4-digit PINs) with the same pair picture; "What's the same about how these work?"; the shared principle in ink. **Fallback:** say the compare line over the B6 card without a screen: "Same thing with 4-digit PINs: about 119 people before two share one. Pairs grow faster than people."
-- [ ] **Compare screens, coin + positive** (#182, #183). Only needed for the "every session has one" claim. **Fallback:** "the birthday session has one; the others are landing."
-- [ ] **Engine v4: a typed topic becomes a runnable model** (#179 API, #184 round player): widget + parameters + extremes + named misconception, truth computed in code, honest "no runnable model" when nothing fits. **Fallback:** the any-topic beat plays a **reviewed** chip and the narrator says "for a typed topic the AI builds this as a spec; here's one we've hand-checked."
-- [ ] **Pre-built engine-v4 set** (#180, 20-30 hand-checked topics served cached). **Fallback:** the 10 reviewed extras already live (`data/rounds/extra/`, PR #108).
-- [ ] **v4 latency on Vultr re-measured** (#179 trial). Until then, say no number for v4 speed. The only measured live number is the old engine's 5.5 s smoke test (below).
-
-Already live on main / the deployed site (checked Sat ~1 PM): the three sessions (`web/src/sessions/birthday|coin|positive`), the notebook, the "Try any topic" box with hand-checked chips (`web/src/components/AnyTopic.tsx`), the "How it works" drawer + backend dot (#156), and the API on Vultr (`/api/health` → ok). The help chat is **API only** (no panel in `web/src` yet): don't demo it.
+**Voice:** "I" for things I did, "we" for the team. Plain words.
 
 ---
 
 ## Numbers we say out loud (only these)
-Same table as docs/demo-script.md. Anything not here doesn't get said.
+Same table as docs/demo-script.md (sources there). Anything not here doesn't get said.
 
 | Claim | Value | Source |
 |---|---|---|
-| People for a 50% chance two share a birthday | **23 → 50.7%** | computed: 1 − ∏(365−i)/365, i = 0..22 = 0.5073 |
-| Pairs among 23 people | **253** | computed: C(23,2) |
-| 57 people | **99.0%** | computed: same formula, n = 57 → 0.9901 |
-| Someone in a room of 23 shares *my* birthday | **5.9%** | computed: 1 − (364/365)^22 = 0.0586 |
-| Compare case: 4-digit PINs, people for a 50% chance two share one | **119** (50.6%) | computed: 1 − ∏(10000−i)/10000, i = 0..118 = 0.5058 (matches #181's plan). **Say it only if #181's screen shows this number.** |
-| What people tend to guess | "about half of 365" | [Live Science](https://www.livescience.com/what-is-birthday-paradox); a teaching observation, **not a survey** |
-| 100 fair coin flips | longest run averages **6.98**; a run of 5+ in **97%** | exact DP, [showcase-facts.md](research/showcase-facts.md) |
-| Positive test (1% have it, 90% caught, 9% false alarms) | **9.2%** | computed: 0.009 / (0.009 + 0.99 × 0.09) = 0.0917 |
-| Doctors on a similar case | about 95 of 100 guessed ~75%; answer 7.7% | [APS Observer on Eddy 1982](https://www.psychologicalscience.org/observer/helping-physicians-understand-screening-tests-will-improve-health-care); secondary source, primary **unverified** |
-| Watching a demo vs predicting first | watchers understood it no better than people who never saw it; predictors did significantly better | [Crouch et al. 2004](https://doi.org/10.1119/1.1707018), [learning-science.md](research/learning-science.md) §7 |
-| Comparing two cases | comparing two cases gave "a marked advantage" in transfer over studying the same two cases separately (novice negotiators, 3 studies) | [Gentner, Loewenstein & Thompson 2003](https://doi.org/10.1037/0022-0663.95.2.393), abstract ([Kellogg summary](https://www.kellogg.northwestern.edu/academics-research/research/detail/2003/learning-and-transfer-a-general-role-for-analogical-encoding)). The 2003 abstract gives **no multiplier** |
-| "Nearly three times" | students who compared two cases were "nearly three times more likely" to use the strategy in a later negotiation than students who got the cases separately | [Loewenstein, Thompson & Gentner 1999](https://kellogg.northwestern.edu/faculty/research/detail/1999/analogical-encoding-facilitates-knowledge-transfer-in-negotiation?p=1), *Psychonomic Bulletin & Review* (abstract). **Only say "three times" with this 1999 citation, never as the 2003 paper.** One study, business students, negotiation: say it as that |
-| Live generation on the Vultr API (old engine) | **5.5 s** for one topic (2 curve items, 1 dropped by checks) | our own smoke test, NOTES.md Sat ~12:10 PM. **One run.** Not a v4 number |
-| Typed-topic generation (old engine, before Vultr) | 24 of 25 topics delivered, median 27 s, p90 51 s | our own 25-topic trial, NOTES.md Sat ~12:10 AM. **Small sample.** Use only to explain why the demo uses the pre-built set |
-| Reviewed extra topics | **10** hand-checked rounds, served with no model call | `data/rounds/extra/`, PR #108 |
-| First blind-check trial | of 60 calls, 29 were server errors and about 4 usable, while every report said "checked" | our own trial, PR #96 |
-| Free-tier budget | Flash-Lite: 500 requests/day, 15/min | [gemini.md](research/gemini.md) TL;DR |
-| Points can backfire (one study) | 16-week course, badges + leaderboard → lower motivation and final-exam scores | [Hanus & Fox 2015](https://doi.org/10.1016/j.compedu.2014.08.019) (full text not read; secondary summaries) |
-| Session length | 2-3 min | **design target** (docs/experience.md), **unverified** until user tests time it |
+| Ethanol | **C₂H₆O**; dimethyl ether has the same formula | standard; isomer check in `chem.ts` (#204) |
+| Oxygen with 3 bonds | **FC = 6 − 2 − 3 = +1** | formal charge = valence − nonbonding electrons − bonds ([Formal charge](https://en.wikipedia.org/wiki/Formal_charge)) |
+| Cyanide | − charge on carbon: 4 − 2 − 3 = −1 | computed; [Kolbe nitrile synthesis](https://en.wikipedia.org/wiki/Kolbe_nitrile_synthesis) |
+| SN2 | one step, backside attack, inversion | [SN2 reaction](https://en.wikipedia.org/wiki/SN2_reaction), [Walden inversion](https://en.wikipedia.org/wiki/Walden_inversion) |
+| Calculus, one rectangle | **7.5** | computed: f(1) × 2.5 = 3 × 2.5 (`web/src/sessions/calculus/math.ts`) |
+| Calculus, exact area 1 → 3.5 | **4.57** | computed: F(3.5) − F(1) = 585/128 = 4.5703 |
+| Rectangles 10 / 50 / 200 | 4.78 / 4.61 / 4.58 | computed, left-edge Riemann sums |
+| Derivative of x² at x = 3 | **6** | computed (2x); use the number on screen |
+| "derivative of x squared" build | ~4 s on Vultr, one run (Sat ~4:10 PM); engine v4 local trial median 6.0 s, 10/15 built | video-script.md notes; PR #187. **Never "built live in seconds"** |
+| Birthday (only as "more") | 23 → **50.7%** | computed: 1 − ∏(365−i)/365, i = 0..22 |
+| Watching a demo vs predicting first | watchers understood it no better than people who never saw it; predictors did significantly better | [Crouch et al. 2004](https://doi.org/10.1119/1.1707018) |
+| Points can backfire (one study) | 16-week course, badges + leaderboard → lower motivation and final-exam scores | [Hanus & Fox 2015](https://doi.org/10.1016/j.compedu.2014.08.019) (full text not read) |
+| Free-tier budget | Flash-Lite: 500 requests/day, 15/min | [gemini.md](research/gemini.md) |
 
-Never say: "proven to make you learn faster", "permanently fixes misconceptions", "the more you play the more you learn", "3x better learning" (no source for that), or that a typed topic is "built live in seconds" until v4 latency is measured ([learning-science.md](research/learning-science.md) "Three claims we must NOT make").
+Never say: "proven to make you learn faster", "permanently fixes misconceptions", "3x better learning", or that every typed topic builds live.
 
 ---
 
 ## 1. The live 3:00
 
-About 400 spoken words with room for the judge's hands. Times are targets; rehearse with a stopwatch (demo-script.md, rehearsal checklist).
-
 | Time | On screen (driver) | Narrator says |
 |---|---|---|
-| **0:00-0:15**<br>**Hook** | Birthday session open on **B1 Guess** (`?session=birthday`). Driver hands over the trackpad/phone. **Judge drags and locks.** | "Quick one before I explain anything. How many people do you need in a room before it's a coin flip that two of them share a birthday? Drag it, pick how sure you are, lock it in. No changing it." |
-| **0:15-0:35**<br>**Headline, while the room fills** | **B2 Fill the room.** Driver holds **Add a person** (seeded run). Pair lines web up; counter **people · pairs**. At 23: **23 · 253**. A match circles; the room shakes. | "ChatGPT tells you the answer. Onionskin builds you a world where you find out you were wrong, and why. So watch the lines, not the people. Every line is a pair that could match. 23 people already make 253 pairs." |
-| **0:35-0:50**<br>**Your model** | **B4 Draw your curve.** **Judge draws** in pencil. | "Now draw how you think the chance grows as the room fills. There's no wrong drawing. It's your model." |
-| **0:50-1:05**<br>**Ink over pencil** | **B5 Reveal.** The ink S-curve draws in over the judge's pencil; highlighter shades the gap. Driver drags 2 → 23 → 57. | "Pencil is you. Ink is reality. The yellow is where your model broke. 23 people, 50.7%. 57, 99%." |
-| **1:05-1:15**<br>**Mistake named** | **B6 Stamp + card**, quoting the judge's number: *you* get matched 5.9%, *any two* 50.7%. | "And it names the wrong idea. Most people picture someone matching *them*. That's 5.9%. Any two people: 50.7%." |
-| **1:15-1:40**<br>**Pull out the structure** *(landing today, #181)* | **Compare screen:** shared 4-digit PINs next to the birthday room, same pair picture. "What's the same about how these work?" **Judge says or picks it.** The shared principle inks in. | "Now a case that looks nothing like it: 4-digit PINs. How many people before two share one? About 119, out of ten thousand PINs. What's the same? … Pairs grow way faster than people. Putting two cases side by side is how you pull out the structure: in a negotiation study, people who compared two cases transferred the idea markedly better than people who studied the same cases one at a time." *(Fallback if the screen isn't live: say the PIN line over the B6 card.)* |
-| **1:40-2:15**<br>**Any topic → a runnable model** *(engine v4 landing today, #179/#184)* | Home → **Try any topic** → **judge types a topic**, or taps a chip from the pre-built set. A runnable model opens: a widget with a knob, a guess prompt, extremes to try, a named misconception. | "That was hand-built. Now type anything. The AI picks one of our simulations and fills it in: the knobs, the extremes to try, the mistake people make. It never writes the answer: our code computes it from the model. If nothing fits, it says so instead of faking a chart." *(Before v4 is live: tap a **reviewed** chip and say "the AI builds these as a spec; this one we've hand-checked.")* |
-| **2:15-2:40**<br>**How it works, one breath** | Open the **How it works** drawer; point at the backend dot. | "So: the AI builds the simulation, code guarantees the truth, you do the thinking. Every number you saw was computed by formula or exact count, never by a model. The backend runs on one Vultr server; Gemini on the free tier, rate-limited, with a daily cap." |
-| **2:40-3:00**<br>**Close** | Session end: **"Saved to your notebook. Come back tomorrow for a remix."** Notebook shows the judge's mistake as *caught*. | "No points, no streak to lose: one semester-long study found badges and a leaderboard lowered motivation and exam scores. The reward is the moment your guess meets reality. Tomorrow it comes back with new numbers until you've busted it. ChatGPT tells you the answer. Onionskin shows you why you were wrong. Questions?" **Stop talking.** |
+| **0:00-0:15**<br>**Hook** | Home, then the orgo card **Push the electrons**, step 1 "Build ethanol", target **C₂H₆O**. Trackpad/phone to the judge. | "ChatGPT tells you the answer. Onionskin builds you a world where you find out you were wrong, and why. Here's organic chemistry. Build me ethanol: two carbons, six hydrogens, one oxygen." |
+| **0:15-0:40**<br>**Mistake named live** *[if #204 merged]* | Judge drags atoms and bonds. A 5th bond on a carbon: the ring turns red, **"A carbon with 5 bonds"** shows. | "Every atom has slots. Give a carbon one bond too many … and it names the mistake while I make it. Carbon has four slots; a fifth bond has no electrons to use." |
+| **0:40-0:55**<br>**Check it** | **Check it**: ethanol ✓, or "Same formula, different molecule" (ether), or "Oxygen with 3 bonds, no charge" (FC = 6 − 2 − 3 = +1). | Clean: "And if you'd joined the same atoms differently, it would show you dimethyl ether next to ethanol." |
+| **0:55-1:35**<br>**Push the electrons** | HO⁻ + CH₃Br. Judge draws two arrows; **Show me** inks the real ones over theirs; scrubber 0 → 50 → 100. Optional step 3: cyanide + CH₃I, **Run both**. | "This is the part everyone memorizes and nobody sees. Draw where the electrons go. … Pencil is you, ink is reality. The hydroxide comes in from the back, opposite the bromine. Halfway, one bond forming, one breaking. Bromide leaves with the bond's two electrons, and the carbon flips inside out like an umbrella." |
+| **1:35-2:30**<br>**Calculus** | `?session=calculus`. Judge pencils the slope; drags the tangent while the true slope inks over the sketch; guesses the area; slider 1 → 200 rectangles; mistake card ("Slope = height of the curve") if named. | "Same idea in calculus. Draw how steep this curve is. Now drag the tangent: the real slope draws itself over your pencil. The top of the hill is high, but the slope there is zero. Now the area: one rectangle says 7.5. Thinner and thinner … it lands on exactly 4.57. Every number here is computed, never guessed by a model." |
+| **2:30-2:45**<br>**Any topic** | Home → **Try any topic** → "derivative of x squared" → a draggable tangent. | "Type any topic. Watch it come alive. The AI builds the simulation; code guarantees the truth; you do the thinking. When nothing fits, it says so instead of faking a chart." *(Backend down: say it over Home.)* |
+| **2:45-3:00**<br>**Close** | Notebook with the judge's caught mistakes. | "Every wrong idea you had lands in your notebook and comes back with new numbers. No points: the reward is the moment your guess meets reality. Onionskin. See your thinking in layers. Questions?" **Stop.** |
 
 **Branches:**
-- **Judge nails the birthday guess:** "You're one of the few. Draw the curve anyway, that's where people miss."
-- **Judge is fast (at 1:40 early):** coin streak C1-C2 before any-topic: "Fake 20 coin flips. … Yours switches back and forth. Real coins clump: in 100 real flips you get a run of five or more 97% of the time."
-- **Judge is slow:** skip the judge typing; tap a pre-built chip. Never cut the compare beat or the headline.
-- **Live generation slow (>10 s) or errors:** tap a pre-built chip (#180 set, else the 10 reviewed extras) and say "this one's from our checked set." Never wait on a spinner at the table.
+- **#204 not merged:** calculus first (1:30), then any topic, then the birthday session as "more" (23 people → 50.7%), then the close.
+- **Judge is fast:** add the birthday session as "more".
+- **Judge is slow:** skip cyanide and the calculus compare. Never cut the named orgo mistake, the scrubber or the tangent.
+- **Backend down or slow:** skip typing; one line over Home.
 
 ---
 
 ## 2. The 1:30 version
-For a judge queue or a rushed judge. Birthday, one compare line, one any-topic line.
 
 | Time | On screen | Narrator says |
 |---|---|---|
-| **0:00** | B1 Guess; hand over the trackpad. Judge locks. | "Before I explain anything: how many people for a coin-flip chance two share a birthday? Lock it in." |
-| **0:10** | B2: hold **Add a person** to 23. | "ChatGPT tells you the answer. Onionskin builds you a world where you find out you were wrong, and why. 23 people, 253 pairs." |
-| **0:25** | B4 → B5: judge draws; ink over pencil, gap shaded; slider 23 → 57. | "Pencil is you, ink is reality, yellow is where your model broke. 23 people, 50.7%. 57, 99%." |
-| **0:45** | B6: stamp + "It's about MY birthday" card. | "It names the wrong idea: matching *you* is 5.9%, any two is 50.7%." |
-| **0:55** | Compare screen *(if live; else say it over the card)*. | "Same structure, different world: 4-digit PINs, about 119 people. Pairs grow faster than people." |
-| **1:05** | Home: "Try any topic". | "Type any topic and the AI builds the simulation, code computes the truth, and you do the thinking. No points: it comes back tomorrow with new numbers." |
+| **0:00** | Orgo step 1; judge drags atoms; a 5th bond on a carbon. | "ChatGPT tells you the answer. Onionskin builds you a world where you find out you were wrong. Build ethanol … a carbon with five bonds, named while you make it." |
+| **0:25** | Step 2: two arrows, **Show me**, scrub. | "Draw the electrons. Ink over pencil: backside attack, the bromide leaves, the carbon inverts." |
+| **0:50** | Calculus: tangent over the sketch; rectangles 1 → 200. | "Drag the tangent; the real slope inks over your guess. Rectangles: 7.5 down to exactly 4.57." |
+| **1:15** | Home: "Try any topic". | "Type any topic: the AI builds the simulation, code guarantees the truth, you do the thinking." |
 | **1:30** | | Stop. |
 
 ---
 
-## 3. Judge Q&A prep (16)
-Each answer is ≤ 3 sentences. Driver takes the technical ones (2, 4, 6, 7, 9, 12), narrator the rest. If a question isn't here: one sentence, say what we don't know, stop.
+## 3. Judge Q&A prep (18)
+
+Each answer is ≤ 3 sentences. Driver takes the technical ones (2, 4, 6, 7, 9, 12, 17, 18), narrator the rest. If a question isn't here: one sentence, say what we don't know, stop.
 
 1. **"How is this different from a chatbot? Why not just ask ChatGPT?"**
    "A chatbot explains, and explaining is the part that doesn't stick: in a physics classroom study, students who only watched a demo understood it no better than students who never saw it, and students who predicted first did significantly better ([Crouch et al. 2004](https://doi.org/10.1119/1.1707018)). Here you commit a guess, a simulation runs on top of it, and your wrong idea gets named. The AI builds the simulation, code guarantees the truth, and you do the thinking."
@@ -118,7 +91,7 @@ Each answer is ≤ 3 sentences. Driver takes the technical ones (2, 4, 6, 7, 9, 
    "After the reveal you get a second case that looks different but works the same, like birthdays and 4-digit PINs, and you name what they share. Comparing two cases side by side helps people pull out the principle: novice negotiators who compared two cases transferred it markedly better than those who studied the same cases separately ([Gentner, Loewenstein & Thompson 2003](https://doi.org/10.1037/0022-0663.95.2.393)). In an earlier study by the same group, comparers were nearly three times more likely to use the strategy ([Loewenstein, Thompson & Gentner 1999](https://kellogg.northwestern.edu/faculty/research/detail/1999/analogical-encoding-facilitates-knowledge-transfer-in-negotiation?p=1))."
 
 6. **"How fast is any topic?"**
-   "A topic we've already checked comes back instantly with no model call. A fresh one on our Vultr server took 5.5 seconds in one smoke test Saturday, on the previous engine (NOTES.md); I haven't measured the new engine yet, so for the table I use the pre-built set." **[Replace with the #179 trial numbers once they're in docs/research/gemini.md.]**
+   "A topic we've already checked loads instantly with no model call. 'Derivative of x squared' built in about 4 seconds on our Vultr server in one run Saturday; across a 15-topic local trial of the engine, the median was 6 seconds and about two thirds built (PR #187). So at the table, if it's slow, I tap a pre-built topic."
 
 7. **"What if a topic can't be simulated, like history?"**
    "Then it doesn't pretend: if no widget fits or the spec fails validation, it tells you there's no runnable model for that and offers the nearest checked topic. An honest 'no' beats a fake chart." **[Engine v4 behavior: confirm live. Before v4, typed topics fall back to a plain labelled round.]**
@@ -133,7 +106,7 @@ Each answer is ≤ 3 sentences. Driver takes the technical ones (2, 4, 6, 7, 9, 
     "Points bring people back, but one 16-week study found badges and a leaderboard lowered motivation and final-exam scores ([Hanus & Fox 2015](https://doi.org/10.1016/j.compedu.2014.08.019)), and a meta-analysis of 128 experiments found expected rewards undermine the motivation you started with ([Deci, Koestner & Ryan 1999](https://leeds-faculty.colorado.edu/dahe7472/deci%201999.pdf)). So the reward is the feedback: the reveal, your wrong idea named, then busted. You still get a reason to come back: a notebook of caught and busted ideas and a remix tomorrow, with nothing to lose."
 
 11. **"What's creative or entertaining about a probability lesson?"**
-    "It's a toy before it's a lesson: you bet, you fill a room and watch the pair lines web up, you draw your own curve, the truth inks in over it and a stamp lands. The paper we built on is literally titled 'Classroom demonstrations: learning tools or entertainment?' ([Crouch 2004](https://doi.org/10.1119/1.1707018)), and the answer was entertainment, unless you predict first. So we made the prediction the game."
+    "It's a toy before it's a lesson: you snap atoms together, drag a tangent, fill a room and watch the pair lines web up, you draw your own curve, the truth inks in over it and a stamp lands. The paper we built on is literally titled 'Classroom demonstrations: learning tools or entertainment?' ([Crouch 2004](https://doi.org/10.1119/1.1707018)), and the answer was entertainment, unless you predict first. So we made the prediction the game."
 
 12. **"What did you build this weekend vs before?"**
     "The idea and the learning-science reading are from before, which the rules allow; every line of code was written after hacking opened Friday 8:30 PM ([rules](https://swamphacks-xii.devpost.com/rules)). This weekend: the three sessions end to end, the notebook, the any-topic engine and its checks, the reviewed topics, the help API, the answer store and the Vultr deploy. The commit history shows it."
@@ -149,6 +122,12 @@ Each answer is ≤ 3 sentences. Driver takes the technical ones (2, 4, 6, 7, 9, 
 
 16. **"What's next? Is there a business?"**
     "More widgets so more typed topics become runnable models, and a remix schedule that brings each unbusted mistake back on growing gaps, since spaced retrieval is about the best-established finding in learning science ([learning-science.md](research/learning-science.md)). We haven't validated a business, so I won't pretend; the obvious paths are a free app for students and a classroom mode where a room guesses together."
+
+17. **"Is the chemistry right?"** *[if #204 merged]*
+    "The rules are code, not a model. Formal charge is valence minus nonbonding electrons minus bonds, so an oxygen with three bonds and one lone pair is 6 − 2 − 3 = +1, and cyanide's minus sits on carbon (4 − 2 − 3 = −1), which is why carbon attacks ([Formal charge](https://en.wikipedia.org/wiki/Formal_charge), [Kolbe nitrile synthesis](https://en.wikipedia.org/wiki/Kolbe_nitrile_synthesis)). SN2 is one step with the nucleophile coming in opposite the leaving group, so the carbon inverts like an umbrella, and that's what the scrubber shows ([SN2](https://en.wikipedia.org/wiki/SN2_reaction), [Walden inversion](https://en.wikipedia.org/wiki/Walden_inversion)). Honest limit: it's a 2-D picture of one mechanism, not a quantum simulation."
+
+18. **"How is the derivative checked?"**
+    "The level's curve is f(x) = (x³ − 6x² + 9x)/2 + 1 with its derivative and antiderivative written in closed form, so the ink slope and the 4.57 area come from formulas; unit tests check them against a numeric derivative and Riemann sums (`web/src/sessions/calculus/math.test.ts`). For a typed topic like 'derivative of x squared', the model only picks the curve and the point; our code computes the slope and rejects a spec whose claimed number is off by more than 2% (PR #187)."
 
 **If asked something we can't answer:** "I don't know yet. Here's how I'd find out: …" One sentence, then stop.
 
