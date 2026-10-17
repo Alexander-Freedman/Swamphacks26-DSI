@@ -196,3 +196,5 @@
 .orgo .og-cell small { display: block; font: 12px var(--font-hand); color: var(--ink-soft); }
 .orgo .og-cell.target { border: 3px solid var(--ink); background: var(--marker); font-size: 22px; }
 .orgo .og-cell.solved { animation: og-pop 0.35s ease-out; }
+
+.orgo .og-endwrap { outline: none; scroll-margin: 24px; }
