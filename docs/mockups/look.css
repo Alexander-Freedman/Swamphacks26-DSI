@@ -1,0 +1,55 @@
+/* Mockup look: Notebook Arcade. Same tokens as web/src/index.css, plus the primitives the new screens need. */
+@import url('https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible+Next:wght@400;700&family=Bricolage+Grotesque:opsz,wght@12..96,700;12..96,800&family=Shantell+Sans:wght@400;600&family=JetBrains+Mono:wght@500&display=swap');
+
+:root {
+  --paper: #fbf8f1;
+  --desk: #f4efe4;
+  --grid: #e6e0d2;
+  --ink: #1b2340;        /* truth */
+  --ink-soft: #4a5170;
+  --pencil: #85827a;     /* your guess / your model (dashed 3px) */
+  --marker: #ffd84d;     /* the gap, your mistake */
+  --marker-soft: rgba(255, 216, 77, 0.45);
+  --called: #1f8a4c;
+  --close: #c77d00;
+  --off: #c2362f;
+  --card: #ffffff;
+  --shadow: 0 2px 0 var(--ink);
+  --font-body: 'Atkinson Hyperlegible Next', system-ui, sans-serif;
+  --font-display: 'Bricolage Grotesque', system-ui, sans-serif;
+  --font-hand: 'Shantell Sans', 'Comic Neue', cursive;
+  --font-mono: 'JetBrains Mono', ui-monospace, monospace;
+  --radius: 14px;
+}
+
+* { box-sizing: border-box; }
+body {
+  margin: 0; min-height: 100vh; font-family: var(--font-body); color: var(--ink);
+  background-color: var(--paper);
+  background-image: linear-gradient(var(--grid) 1px, transparent 1px), linear-gradient(90deg, var(--grid) 1px, transparent 1px);
+  background-size: 24px 24px;
+}
+.screen { max-width: 720px; margin: 0 auto; padding: 24px 16px 48px; }
+.screen + .screen { border-top: 2px dashed var(--grid); }
+.tag { font: 600 12px var(--font-mono); text-transform: uppercase; letter-spacing: .08em; color: var(--ink-soft); }
+h1, h2 { font-family: var(--font-display); font-weight: 800; line-height: 1.05; margin: 6px 0 12px; }
+h1 { font-size: clamp(28px, 6vw, 40px); } h2 { font-size: clamp(22px, 5vw, 30px); }
+.hand { font-family: var(--font-hand); }
+.num { font-family: var(--font-mono); font-variant-numeric: tabular-nums; }
+.card { background: var(--card); border: 2px solid var(--ink); border-radius: var(--radius); box-shadow: var(--shadow); padding: 16px; }
+.btn { font: 700 16px var(--font-body); background: var(--ink); color: var(--paper); border: 2px solid var(--ink); border-radius: 999px; padding: 10px 20px; box-shadow: 0 3px 0 #000; }
+.btn:active { transform: translateY(2px); box-shadow: 0 1px 0 #000; }
+.btn.ghost { background: var(--card); color: var(--ink); }
+.stamp { display: inline-block; font: 800 22px var(--font-display); text-transform: uppercase; border: 3px solid currentColor; border-radius: 8px; padding: 2px 10px; transform: rotate(-6deg); }
+.stamp.called { color: var(--called); } .stamp.close { color: var(--close); } .stamp.off { color: var(--off); }
+.you { stroke: var(--pencil); stroke-width: 3; stroke-dasharray: 6 5; fill: none; }
+.truth { stroke: var(--ink); stroke-width: 3; fill: none; }
+.gap { fill: var(--marker-soft); }
+.hl { background: linear-gradient(transparent 55%, var(--marker) 55%); }
+.legend { display: flex; gap: 16px; font-size: 14px; color: var(--ink-soft); flex-wrap: wrap; }
+.legend i { display: inline-block; width: 22px; height: 0; vertical-align: middle; margin-right: 6px; }
+.legend .l-you { border-top: 3px dashed var(--pencil); } .legend .l-truth { border-top: 3px solid var(--ink); } .legend .l-gap { height: 10px; background: var(--marker); }
+input[type=range] { width: 100%; accent-color: var(--ink); }
+.note { font-family: var(--font-hand); color: var(--ink-soft); font-size: 15px; }
+.stage { font: 600 12px var(--font-mono); background: var(--marker); padding: 2px 6px; border-radius: 4px; }
+@media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation-duration: .01ms !important; transition-duration: .01ms !important; } }
