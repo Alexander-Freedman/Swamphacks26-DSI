@@ -2,7 +2,7 @@
 
 > **Direction (decided Oct 16 ~9:50 PM):** Mental Models, general version. One engine for ANY topic: predict first → see the truth interactively → your exact misconception named → keep coming back (Quizlet-style, addictive, for deep understanding not memorizing).
 > - **Track:** Entertainment & Creative Technology.
-> - **Mode:** RESEARCH; no project code until I say "start building".
+> - **Mode:** BUILD (approved; plan in docs/build-plan.md, from 10:48 PM Fri).
 > - **Next:** research issues are done (#17-#26, #31). docs/product-spec.md + docs/build-plan.md posted for my approval at 10:18 PM; they auto-approve at 10:48 PM if I don't answer. Then the build issues get opened from docs/build-plan.md.
 >
 > | Issue | Research | Owner |

@@ -1,6 +1,6 @@
 # Build plan: from approval to the 7:30 AM Sun submit
 
-**Status:** draft for my approval (auto-approved 30 min after posting, per NOTES.md). The product is in docs/product-spec.md.
+**Status:** **approved** (plan in force from 10:48 PM Fri). The product is in docs/product-spec.md.
 
 **Split:** **me = engine/backend/data** (Gemini generation, validation, cache, API, the event DB, deploy) · **@luanamaldaner = frontend/demo** (screens, truth widgets, the reveal, the visual design).
 
@@ -14,7 +14,7 @@
 - Expo **Sun 10 AM-12 PM**; closing **2:30 PM** (one of us at both).
 
 **Time budget (evidence):**
-- Approval (~1 AM Sat) → 7:30 AM Sun is ~30.5h × 2 people. After sleep (~6-7h each), meals and user tests, that's **~40-44 build person-hours**.
+- Approval (10:48 PM Fri) → 7:30 AM Sun is ~32.7h × 2 people. After sleep (~6-7h each), meals and user tests, that's **~40-44 build person-hours**.
 - **Core estimates:**
   - engine ~20-24h (any-topic-engine.md)
   - reveal + 2 widgets ~8-10h (reveal-patterns.md)
@@ -25,8 +25,8 @@
 ## Blocks
 | Block | Clock | Goal | Me (engine/backend) | @luanamaldaner (frontend) | Done when (gate) |
 |---|---|---|---|---|---|
-| **B1 Contract + first round** | Sat 1:00-3:30 AM | One round plays end to end from a fixture | • Merge skeleton + CI (docs/ci.md)<br>• **JSON schema** for a round (misconceptions, items, widget spec) committed with 2 hand-checked showcase rounds (coin streak, positive test) as fixtures<br>• Gemini client: **Flash Lite** structured output + Gemma fallback + **disk cache by topic** + a request counter (1-2h). **Until the key is in the env, run on the mock/cached responses**<br>• first deploy to Vultr or Render (0.5-1.5h) | • Merge #10 (shell, mock/live API, source chip)<br>• **Predict → confidence → lock** screen + **Distribution widget** against the coin-streak fixture (2-3h) | **3:30 AM:** coin streak plays predict → lock → reveal locally |
-| **B2 Engine + reveal** | Sat 3:30-9:00 AM | A typed topic becomes a playable, checked round | • Generation pipeline: schema-validate → compute truth → linter → **Gemma blind check** → fallback (6-9h). Stay under **500 Flash Lite calls/day** (product-spec §7)<br>• Time real latency on our key and write it into gemini.md<br>• Sleep 5:30-8:30 | • Sleep 3:30-6:30<br>• **Reveal sequence** (beat, ink over pencil, shaded gap, verdict stamp) + **misconception card** + **Curve widget** (4-6h) | **9:00 AM:** a typed topic → a round on the deployed URL. If not, freeze stretch work and fix only this |
+| **B1 Contract + first round** | Fri 10:48 PM-1:30 AM | One round plays end to end from a fixture | • Merge skeleton + CI (docs/ci.md)<br>• **JSON schema** for a round (misconceptions, items, widget spec) committed with 2 hand-checked showcase rounds (coin streak, positive test) as fixtures<br>• Gemini client: **Flash Lite** structured output + Gemma fallback + **disk cache by topic** + a request counter (1-2h). **Until the key is in the env, run on the mock/cached responses**<br>• first deploy to Vultr or Render (0.5-1.5h) | • Merge #10 (shell, mock/live API, source chip)<br>• **Predict → confidence → lock** screen + **Distribution widget** against the coin-streak fixture (2-3h) | **1:30 AM:** coin streak plays predict → lock → reveal locally |
+| **B2 Engine + reveal (+~2h engine buffer)** | Sat 1:30-9:00 AM | A typed topic becomes a playable, checked round | • Generation pipeline: schema-validate → compute truth → linter → **Gemma blind check** → fallback (6-9h, **+~2h buffer from the early approval: engine only, no new features**). Stay under **500 Flash Lite calls/day** (product-spec §7)<br>• Time real latency on our key and write it into gemini.md<br>• Sleep 5:30-8:30 | • Sleep 3:30-6:30<br>• **Reveal sequence** (beat, ink over pencil, shaded gap, verdict stamp) + **misconception card** + **Curve widget** (4-6h) | **9:00 AM:** a typed topic → a round on the deployed URL. If not, freeze stretch work and fix only this |
 | **B3 Come-back loop** | Sat 9:00 AM-1:30 PM | It feels like a game you return to | • **Answer events** in Tiger Data (or Postgres if no card), "the room" %, collection + review queue API (3-4h)<br>• **Pre-generate + spot-check 30 cached topics** (1-2h; 30 Flash Lite calls) | • **Home**, **Building**, **Round summary**, **Collection** screens (4-5h) | Collection shows caught/busted from real plays |
 | *Company Connect* | 10:30 AM-12:30 PM | Feedback | One of us shows the coin-streak round to Vobile/Roblox reps (30 min) | | Notes in docs/user-testing.md |
 | **B4 Users, round 1** | Sat 1:30-2:30 PM (lunch) | Real evidence | Run 5 users with the 5-min script (plan-extras.md) | Same, in parallel | Findings + the top 3 fixes in docs/user-testing.md |

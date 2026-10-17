@@ -1,4 +1,4 @@
-Mode: RESEARCH (direction picked; no project code until I say "start building")
+Mode: BUILD (approved by Alex; plan in force from 10:48 PM Fri)
 
 # Notes
 
@@ -55,6 +55,8 @@ Decisions + how to run things. Keep current.
   3. **Birthday problem** (Curve + a 23-dot calendar lighting up): P(shared birthday) with 23 people = 50.7% (computed). People tend to guess about half of 365 ([Live Science](https://www.livescience.com/what-is-birthday-paradox); a teaching observation, not a survey). Misconception: "it's about MY birthday" ([Conversable Economist on Hand](https://conversableeconomist.com/2014/02/22/intuition-behind-the-birthday-bets/)).
   - **Dropped as showcases** (generated topics can still cover them): Off the Edge (no solid adult error-rate source; needs the Trajectory widget) and Wason 2-4-6 (great, but a rule-discovery game, not a reveal over your guess).
   - **The live "judge names any topic" moment** goes on top of these.
+
+- Oct 16 ~11:05 PM, **approved:** build-plan.md is good. Name later, keep the working name `mm`. B1 starts at approval (10:48 PM). The ~2 extra hours go to engine buffer in B2, **not** to new features.
 
 ## How to run
 Nothing to run yet. Build box tooling (my side): Python 3.12, uv 0.13, Node 22.23 / npm 10.9 in `~/.local/bin` (DeepSpace would also need `npm i -g npm@11`). No Docker on the build box; deploys go to Vultr/Render. The box is 1 CPU, so heavy model training should be kept small or run on Vultr.
