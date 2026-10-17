@@ -1,0 +1,42 @@
+{
+  "schema_version": 1,
+  "slug": "birthday",
+  "topic": "Shared birthdays",
+  "concept": "Matches come from every pair in the room, and pairs grow much faster than people: 23 people make 253 pairs.",
+  "reviewed": true,
+  "misconceptions": [
+    {
+      "id": "its-about-my-birthday",
+      "label": "It's about MY birthday",
+      "why_tempting": "We picture someone matching us, which really does need hundreds of people.",
+      "refutation": "Any two people can match. 23 people make 253 pairs, so a shared birthday is already a coin flip.",
+      "source_url": "https://conversableeconomist.com/2014/02/22/intuition-behind-the-birthday-bets/",
+      "source_note": "The classic fallacy is counting matches with yourself, not all pairs"
+    },
+    {
+      "id": "half-of-365",
+      "label": "You need about half of 365",
+      "why_tempting": "50% sounds like it should take half the days.",
+      "refutation": "The chance grows with the number of pairs, not people, so it passes 50% at 23 and 99% at 57.",
+      "source_url": "https://www.livescience.com/what-is-birthday-paradox",
+      "source_note": "Many people intuitively guess ~183 (teaching observation, not a survey)"
+    }
+  ],
+  "items": [
+    {
+      "id": "people-for-half",
+      "prompt": "How many people need to be in a room for a 50% chance that two share a birthday?",
+      "input_type": "slider",
+      "slider": {"min": 2, "max": 366, "step": 1, "unit": "people"},
+      "bands": [
+        {"min": 2, "max": 30, "misconception_id": null},
+        {"min": 31, "max": 150, "misconception_id": "its-about-my-birthday"},
+        {"min": 151, "max": 366, "misconception_id": "half-of-365"}
+      ],
+      "truth": {"widget": "curve", "preset": "birthday_match_probability", "x_min": 2, "x_max": 80, "x_label": "people in the room", "y_label": "chance two share a birthday"},
+      "answer_claimed": 23,
+      "explore": {"param": "group_size", "label": "people in the room", "min": 2, "max": 80, "step": 1},
+      "targets": ["its-about-my-birthday", "half-of-365"]
+    }
+  ]
+}

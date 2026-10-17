@@ -1,0 +1,53 @@
+{
+  "schema_version": 1,
+  "slug": "coin-streak",
+  "topic": "Streaks in coin flips",
+  "concept": "Real randomness is streakier than it feels: in 100 fair flips, a run of 5+ of the same side happens about 97% of the time.",
+  "reviewed": true,
+  "misconceptions": [
+    {
+      "id": "random-means-evenly-mixed",
+      "label": "Random means evenly mixed",
+      "why_tempting": "Long runs look like a pattern, so a 'random' sequence feels like it should keep switching sides.",
+      "refutation": "Each flip ignores the last one, so switching only half the time is normal. Over 100 flips that makes long runs almost certain.",
+      "source_url": "https://chance.dartmouth.edu/teaching_aids/Profiles/streaks/section3_3.html",
+      "source_note": "People inventing random sequences switch too often (Falk & Konold 1997, via docs/research/showcase-facts.md)"
+    },
+    {
+      "id": "streak-means-not-random",
+      "label": "A long streak means something's off",
+      "why_tempting": "Seven heads in a row feels too unlikely to be luck.",
+      "refutation": "Any single run of 7 is unlikely, but with 100 flips there are dozens of places one can start, so some long run is expected.",
+      "source_url": null,
+      "source_note": "Same computation as the reveal (exact DP in docs/research/showcase-facts.md)"
+    }
+  ],
+  "items": [
+    {
+      "id": "longest-run-100",
+      "prompt": "Flip a fair coin 100 times. What's the longest run of the same side in a row?",
+      "input_type": "slider",
+      "slider": {"min": 1, "max": 20, "step": 1, "unit": "in a row"},
+      "bands": [
+        {"min": 1, "max": 4, "misconception_id": "random-means-evenly-mixed"},
+        {"min": 5, "max": 9, "misconception_id": null},
+        {"min": 10, "max": 20, "misconception_id": "streak-means-not-random"}
+      ],
+      "truth": {"widget": "distribution", "sampler": "coin_longest_run", "params": {"n": 100, "p": 0.5, "trials": 10000}, "x_label": "longest run in 100 flips"},
+      "answer_claimed": 6.98,
+      "explore": {"param": "n", "label": "number of flips", "min": 10, "max": 1000, "step": 10},
+      "targets": ["random-means-evenly-mixed"]
+    },
+    {
+      "id": "which-is-real",
+      "prompt": "One of these was flipped, one was made up by a person. Which is the real coin? A: HTHHTHTTHTHHTHTTHTHT  B: HTTTTHHTHHHHTTHTHHHT",
+      "input_type": "choice",
+      "options": [
+        {"id": "a", "text": "A (switches a lot)", "misconception_id": "random-means-evenly-mixed"},
+        {"id": "b", "text": "B (has runs of 4)", "misconception_id": null}
+      ],
+      "truth": {"widget": "distribution", "sampler": "coin_longest_run", "params": {"n": 20, "p": 0.5, "trials": 10000}, "x_label": "longest run in 20 flips"},
+      "targets": ["random-means-evenly-mixed"]
+    }
+  ]
+}

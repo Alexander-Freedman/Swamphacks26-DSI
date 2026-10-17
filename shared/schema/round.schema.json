@@ -1,0 +1,711 @@
+{
+  "$defs": {
+    "Band": {
+      "description": "A numeric range of answers that maps to one misconception (or to correct).",
+      "properties": {
+        "min": {
+          "title": "Min",
+          "type": "number"
+        },
+        "max": {
+          "title": "Max",
+          "type": "number"
+        },
+        "misconception_id": {
+          "anyOf": [
+            {
+              "maxLength": 60,
+              "pattern": "^[a-z0-9]+(-[a-z0-9]+)*$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Misconception Id"
+        }
+      },
+      "required": [
+        "min",
+        "max"
+      ],
+      "title": "Band",
+      "type": "object"
+    },
+    "CurvePreset": {
+      "enum": [
+        "birthday_match_probability"
+      ],
+      "title": "CurvePreset",
+      "type": "string"
+    },
+    "CurveTruth": {
+      "properties": {
+        "widget": {
+          "const": "curve",
+          "default": "curve",
+          "title": "Widget",
+          "type": "string"
+        },
+        "expr": {
+          "anyOf": [
+            {
+              "maxLength": 200,
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "mathjs subset in x (and the explore param)",
+          "title": "Expr"
+        },
+        "preset": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/CurvePreset"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "x_min": {
+          "title": "X Min",
+          "type": "number"
+        },
+        "x_max": {
+          "title": "X Max",
+          "type": "number"
+        },
+        "x_label": {
+          "default": "",
+          "title": "X Label",
+          "type": "string"
+        },
+        "y_label": {
+          "default": "",
+          "title": "Y Label",
+          "type": "string"
+        }
+      },
+      "required": [
+        "x_min",
+        "x_max"
+      ],
+      "title": "CurveTruth",
+      "type": "object"
+    },
+    "DistributionTruth": {
+      "properties": {
+        "widget": {
+          "const": "distribution",
+          "default": "distribution",
+          "title": "Widget",
+          "type": "string"
+        },
+        "sampler": {
+          "$ref": "#/$defs/Sampler"
+        },
+        "params": {
+          "$ref": "#/$defs/SamplerParams"
+        },
+        "x_label": {
+          "default": "",
+          "title": "X Label",
+          "type": "string"
+        }
+      },
+      "required": [
+        "sampler",
+        "params"
+      ],
+      "title": "DistributionTruth",
+      "type": "object"
+    },
+    "Explore": {
+      "properties": {
+        "param": {
+          "maxLength": 40,
+          "title": "Param",
+          "type": "string"
+        },
+        "label": {
+          "maxLength": 60,
+          "title": "Label",
+          "type": "string"
+        },
+        "min": {
+          "title": "Min",
+          "type": "number"
+        },
+        "max": {
+          "title": "Max",
+          "type": "number"
+        },
+        "step": {
+          "default": 1,
+          "title": "Step",
+          "type": "number"
+        }
+      },
+      "required": [
+        "param",
+        "label",
+        "min",
+        "max"
+      ],
+      "title": "Explore",
+      "type": "object"
+    },
+    "InputType": {
+      "enum": [
+        "slider",
+        "choice",
+        "sketch",
+        "order"
+      ],
+      "title": "InputType",
+      "type": "string"
+    },
+    "Item": {
+      "properties": {
+        "id": {
+          "maxLength": 60,
+          "pattern": "^[a-z0-9]+(-[a-z0-9]+)*$",
+          "title": "Id",
+          "type": "string"
+        },
+        "prompt": {
+          "maxLength": 300,
+          "title": "Prompt",
+          "type": "string"
+        },
+        "input_type": {
+          "$ref": "#/$defs/InputType"
+        },
+        "slider": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/SliderSpec"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "options": {
+          "items": {
+            "$ref": "#/$defs/Option"
+          },
+          "maxItems": 6,
+          "title": "Options",
+          "type": "array"
+        },
+        "bands": {
+          "items": {
+            "$ref": "#/$defs/Band"
+          },
+          "maxItems": 8,
+          "title": "Bands",
+          "type": "array"
+        },
+        "sketch_rules": {
+          "items": {
+            "$ref": "#/$defs/SketchRule"
+          },
+          "maxItems": 6,
+          "title": "Sketch Rules",
+          "type": "array"
+        },
+        "truth": {
+          "discriminator": {
+            "mapping": {
+              "curve": "#/$defs/CurveTruth",
+              "distribution": "#/$defs/DistributionTruth",
+              "stepper": "#/$defs/StepperTruth"
+            },
+            "propertyName": "widget"
+          },
+          "oneOf": [
+            {
+              "$ref": "#/$defs/DistributionTruth"
+            },
+            {
+              "$ref": "#/$defs/CurveTruth"
+            },
+            {
+              "$ref": "#/$defs/StepperTruth"
+            }
+          ],
+          "title": "Truth"
+        },
+        "answer_expr": {
+          "anyOf": [
+            {
+              "maxLength": 200,
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "mathjs-subset expression for the true value",
+          "title": "Answer Expr"
+        },
+        "answer_claimed": {
+          "anyOf": [
+            {
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Generator's own number; only cross-checked",
+          "title": "Answer Claimed"
+        },
+        "explore": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/Explore"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "targets": {
+          "description": "Misconception ids this item is built to test",
+          "items": {
+            "maxLength": 60,
+            "pattern": "^[a-z0-9]+(-[a-z0-9]+)*$",
+            "type": "string"
+          },
+          "title": "Targets",
+          "type": "array"
+        }
+      },
+      "required": [
+        "id",
+        "prompt",
+        "input_type",
+        "truth"
+      ],
+      "title": "Item",
+      "type": "object"
+    },
+    "Misconception": {
+      "properties": {
+        "id": {
+          "maxLength": 60,
+          "pattern": "^[a-z0-9]+(-[a-z0-9]+)*$",
+          "title": "Id",
+          "type": "string"
+        },
+        "label": {
+          "description": "Short name, e.g. 'Random means evenly mixed'",
+          "maxLength": 80,
+          "title": "Label",
+          "type": "string"
+        },
+        "why_tempting": {
+          "maxLength": 280,
+          "title": "Why Tempting",
+          "type": "string"
+        },
+        "refutation": {
+          "description": "Right model in <=2 sentences",
+          "maxLength": 400,
+          "title": "Refutation",
+          "type": "string"
+        },
+        "source_url": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Source Url"
+        },
+        "source_note": {
+          "anyOf": [
+            {
+              "maxLength": 200,
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Source Note"
+        }
+      },
+      "required": [
+        "id",
+        "label",
+        "why_tempting",
+        "refutation"
+      ],
+      "title": "Misconception",
+      "type": "object"
+    },
+    "Option": {
+      "properties": {
+        "id": {
+          "maxLength": 60,
+          "pattern": "^[a-z0-9]+(-[a-z0-9]+)*$",
+          "title": "Id",
+          "type": "string"
+        },
+        "text": {
+          "maxLength": 200,
+          "title": "Text",
+          "type": "string"
+        },
+        "misconception_id": {
+          "anyOf": [
+            {
+              "maxLength": 60,
+              "pattern": "^[a-z0-9]+(-[a-z0-9]+)*$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "None means this is the correct option",
+          "title": "Misconception Id"
+        }
+      },
+      "required": [
+        "id",
+        "text"
+      ],
+      "title": "Option",
+      "type": "object"
+    },
+    "Sampler": {
+      "enum": [
+        "coin_longest_run",
+        "base_rate_test",
+        "birthday_match",
+        "binomial_count",
+        "dice_sum"
+      ],
+      "title": "Sampler",
+      "type": "string"
+    },
+    "SamplerParams": {
+      "properties": {
+        "n": {
+          "anyOf": [
+            {
+              "maximum": 10000,
+              "minimum": 1,
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "N"
+        },
+        "p": {
+          "anyOf": [
+            {
+              "maximum": 1,
+              "minimum": 0,
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "P"
+        },
+        "population": {
+          "anyOf": [
+            {
+              "maximum": 100000,
+              "minimum": 1,
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Population"
+        },
+        "base_rate": {
+          "anyOf": [
+            {
+              "maximum": 1,
+              "minimum": 0,
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Base Rate"
+        },
+        "sensitivity": {
+          "anyOf": [
+            {
+              "maximum": 1,
+              "minimum": 0,
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Sensitivity"
+        },
+        "false_positive_rate": {
+          "anyOf": [
+            {
+              "maximum": 1,
+              "minimum": 0,
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "False Positive Rate"
+        },
+        "group_size": {
+          "anyOf": [
+            {
+              "maximum": 366,
+              "minimum": 1,
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Group Size"
+        },
+        "dice": {
+          "anyOf": [
+            {
+              "maximum": 10,
+              "minimum": 1,
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Dice"
+        },
+        "trials": {
+          "default": 10000,
+          "maximum": 100000,
+          "minimum": 100,
+          "title": "Trials",
+          "type": "integer"
+        }
+      },
+      "title": "SamplerParams",
+      "type": "object"
+    },
+    "SketchRule": {
+      "description": "Deterministic shape check from a fixed vocabulary; the generator only chooses rules.",
+      "properties": {
+        "kind": {
+          "$ref": "#/$defs/SketchRuleKind"
+        },
+        "threshold": {
+          "title": "Threshold",
+          "type": "number"
+        },
+        "x": {
+          "anyOf": [
+            {
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "0-1 position for *_at rules",
+          "title": "X"
+        },
+        "misconception_id": {
+          "maxLength": 60,
+          "pattern": "^[a-z0-9]+(-[a-z0-9]+)*$",
+          "title": "Misconception Id",
+          "type": "string"
+        }
+      },
+      "required": [
+        "kind",
+        "threshold",
+        "misconception_id"
+      ],
+      "title": "SketchRule",
+      "type": "object"
+    },
+    "SketchRuleKind": {
+      "enum": [
+        "alternation_rate_gt",
+        "alternation_rate_lt",
+        "max_run_lt",
+        "max_run_gt",
+        "value_at_gt",
+        "value_at_lt",
+        "slope_sign_at"
+      ],
+      "title": "SketchRuleKind",
+      "type": "string"
+    },
+    "SliderSpec": {
+      "properties": {
+        "min": {
+          "title": "Min",
+          "type": "number"
+        },
+        "max": {
+          "title": "Max",
+          "type": "number"
+        },
+        "step": {
+          "default": 1,
+          "title": "Step",
+          "type": "number"
+        },
+        "unit": {
+          "default": "",
+          "title": "Unit",
+          "type": "string"
+        }
+      },
+      "required": [
+        "min",
+        "max"
+      ],
+      "title": "SliderSpec",
+      "type": "object"
+    },
+    "StepperTruth": {
+      "description": "Honest fallback for topics we can't compute: a sourced worked example.",
+      "properties": {
+        "widget": {
+          "const": "stepper",
+          "default": "stepper",
+          "title": "Widget",
+          "type": "string"
+        },
+        "steps": {
+          "items": {
+            "type": "string"
+          },
+          "maxItems": 8,
+          "minItems": 2,
+          "title": "Steps",
+          "type": "array"
+        },
+        "source_url": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Source Url"
+        }
+      },
+      "required": [
+        "steps"
+      ],
+      "title": "StepperTruth",
+      "type": "object"
+    }
+  },
+  "properties": {
+    "schema_version": {
+      "const": 1,
+      "default": 1,
+      "title": "Schema Version",
+      "type": "integer"
+    },
+    "slug": {
+      "maxLength": 60,
+      "pattern": "^[a-z0-9]+(-[a-z0-9]+)*$",
+      "title": "Slug",
+      "type": "string"
+    },
+    "topic": {
+      "maxLength": 120,
+      "title": "Topic",
+      "type": "string"
+    },
+    "concept": {
+      "maxLength": 300,
+      "title": "Concept",
+      "type": "string"
+    },
+    "reviewed": {
+      "default": false,
+      "description": "True only for hand-checked showcase rounds",
+      "title": "Reviewed",
+      "type": "boolean"
+    },
+    "misconceptions": {
+      "items": {
+        "$ref": "#/$defs/Misconception"
+      },
+      "maxItems": 8,
+      "minItems": 1,
+      "title": "Misconceptions",
+      "type": "array"
+    },
+    "items": {
+      "items": {
+        "$ref": "#/$defs/Item"
+      },
+      "maxItems": 5,
+      "minItems": 1,
+      "title": "Items",
+      "type": "array"
+    }
+  },
+  "required": [
+    "slug",
+    "topic",
+    "concept",
+    "misconceptions",
+    "items"
+  ],
+  "title": "Round",
+  "type": "object"
+}
