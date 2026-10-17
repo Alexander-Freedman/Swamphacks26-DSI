@@ -11,7 +11,7 @@
       "why_tempting": "Long runs look like a pattern, so a 'random' sequence feels like it should keep switching sides.",
       "refutation": "Each flip ignores the last one, so switching only half the time is normal. Over 100 flips that makes long runs almost certain.",
       "source_url": "https://chance.dartmouth.edu/teaching_aids/Profiles/streaks/section3_3.html",
-      "source_note": "People inventing random sequences switch too often (Falk & Konold 1997, via docs/research/showcase-facts.md)"
+      "source_note": "People inventing random sequences switch too often (Falk & Konold 1997)"
     },
     {
       "id": "streak-means-not-random",
@@ -19,7 +19,7 @@
       "why_tempting": "Seven heads in a row feels too unlikely to be luck.",
       "refutation": "Any single run of 7 is unlikely, but with 100 flips there are dozens of places one can start, so some long run is expected.",
       "source_url": null,
-      "source_note": "Same computation as the reveal (exact DP in docs/research/showcase-facts.md)"
+      "source_note": "Exact computation over all 100-flip sequences"
     }
   ],
   "items": [
