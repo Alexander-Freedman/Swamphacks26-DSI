@@ -31,5 +31,7 @@ Decisions + how to run things. Keep current.
 
 - Oct 16 7:20 PM: building with AI ≠ the AI/ML track. One specialized track or none; choose per stack by expected value, and don't default to AI/ML. Gemini/MLH prizes are challenges and stack with any track.
 
+- Oct 16 8:40 PM: paused at the usage reset on my word; resume only when I say so. Skeleton (FastAPI /api/health + test, Vite React) is pushed on branch `alexander-freedman/skeleton`, no PR yet, no idea-specific code. Direction still not picked.
+
 ## How to run
 Nothing to run yet. Build box tooling (my side): Python 3.12, uv 0.13, Node 22.23 / npm 10.9 in `~/.local/bin` (DeepSpace would also need `npm i -g npm@11`). No Docker on the build box; deploys go to Vultr/Render. The box is 1 CPU, so heavy model training should be kept small or run on Vultr.
