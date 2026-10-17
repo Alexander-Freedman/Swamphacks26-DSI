@@ -9,11 +9,13 @@ import {
 import { reducedMotion, useWidth } from './plot'
 import { SlopeChart } from './SlopeChart'
 import { FINE, fineXs, pencilAt } from './slopeGeo'
+import { GradientStep } from './Gradient'
 import { SurfaceStep } from './Surface'
 import { COURSES, type CalcStep, type CalcTopic } from './topics'
+import { VolumeStep } from './Volume'
 import './calculus.css'
 
-const LABEL: Record<CalcStep, string> = { draw: 'Draw the slope', tangent: 'Drag the tangent', area: 'Fill the area', card: 'Your mistake', compare: 'Same idea twice', surface: 'Slices' }
+const LABEL: Record<CalcStep, string> = { draw: 'Draw the slope', tangent: 'Drag the tangent', area: 'Fill the area', card: 'Your mistake', compare: 'Same idea twice', surface: 'Slices', gradient: 'The gradient', volume: 'Volume' }
 
 // One plain-language guidance line per screen.
 const TITLES: Record<CalcStep, [string, string]> = {
@@ -23,6 +25,8 @@ const TITLES: Record<CalcStep, [string, string]> = {
   card: ['What your pencil says.', 'The idea your sketch and your guess point to, and the one-line fix.'],
   compare: ['Same idea, twice.', 'Drag time on either graph. Watch which numbers match, then pick what the two have in common.'],
   surface: ['Slices of a surface.', 'With two inputs, x and y, the graph is a surface: a height above every point of the floor. Drag it to turn it around. Slicing it straight along x or y gives an ordinary curve, and that curve’s slope is a partial derivative.'],
+  gradient: ['The gradient.', 'On a hill, one direction climbs fastest. The gradient is the arrow on the floor that points that way, and its length is how steep the climb is. Turn the hill around, then pick the arrow you think is steepest.'],
+  volume: ['Volume under a surface.', 'Stand columns on the floor under a curved roof and add up their volumes, like rectangles under a curve but in 3D. Guess the real volume first, then make the columns thinner and watch the total close in.'],
 }
 const REMIX: Record<string, string> = {
   slope: 'Next: the area under the same curve.',
@@ -158,6 +162,8 @@ function CalcRun({ topic, onTopics, onDone }: { topic: CalcTopic; onTopics: () =
       )}
       {cur === 'compare' && <CompareStep slope={slope} area={area} onDone={onDone} onPick={savePick} />}
       {cur === 'surface' && <SurfaceStep onDone={onDone} topic={topic.id} />}
+      {cur === 'gradient' && <GradientStep onDone={onDone} topic={topic.id} />}
+      {cur === 'volume' && <VolumeStep onDone={onDone} topic={topic.id} />}
     </Frame>
   )
 }
