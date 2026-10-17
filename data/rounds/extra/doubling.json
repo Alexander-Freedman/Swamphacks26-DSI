@@ -1,0 +1,134 @@
+{
+  "schema_version": 1,
+  "slug": "doubling",
+  "topic": "Exponential doubling",
+  "concept": "Doubling starts tiny and ends enormous: each step adds as much as all the steps before it combined. A 0.1 mm sheet folded in half about 42 times would be thicker than the distance to the Moon.",
+  "reviewed": true,
+  "misconceptions": [
+    {
+      "id": "exponential-growth-bias",
+      "label": "Doubling grows steadily",
+      "why_tempting": "We extrapolate from the first few steps, which look small and slow.",
+      "refutation": "Each doubling adds more than everything before it. 10 doublings is about 1,000 times, 20 is about a million, 40 is about a trillion.",
+      "source_url": "https://en.wikipedia.org/wiki/Exponential_growth#Exponential_growth_bias",
+      "source_note": "'Exponential growth bias is the tendency to underestimate compound growth processes' (also covers rice on a chessboard and water lily)"
+    },
+    {
+      "id": "halve-the-time",
+      "label": "Half the size means half the time",
+      "why_tempting": "48 days for the whole lake, so 24 for half: proportional thinking is fast and usually works.",
+      "refutation": "If it doubles every day, it was half the size the day before it was full: day 47.",
+      "source_url": "https://en.wikipedia.org/wiki/Cognitive_reflection_test",
+      "source_note": "Frederick 2005 CRT lily-pad item: intuitive answer 24 days, correct 47"
+    }
+  ],
+  "items": [
+    {
+      "id": "fold-to-moon",
+      "prompt": "A sheet of paper is 0.1 mm thick. Pretend you could fold it in half as many times as you like; each fold doubles the thickness. How many folds until the stack is thicker than the distance to the Moon (384,400 km)?",
+      "input_type": "choice",
+      "truth": {
+        "widget": "estimate",
+        "unit": "folds"
+      },
+      "answer_expr": "log(384400000/0.0001)/log(2)",
+      "answer_claimed": 41.81,
+      "targets": [
+        "exponential-growth-bias"
+      ],
+      "options": [
+        {
+          "id": "about-42",
+          "text": "About 42 folds",
+          "misconception_id": null
+        },
+        {
+          "id": "about-4000",
+          "text": "About 4,000 folds",
+          "misconception_id": "exponential-growth-bias"
+        },
+        {
+          "id": "about-4-million",
+          "text": "About 4 million folds",
+          "misconception_id": "exponential-growth-bias"
+        }
+      ]
+    },
+    {
+      "id": "chessboard-last-square",
+      "prompt": "Put 1 grain of rice on the first square of a chessboard, 2 on the second, 4 on the third, doubling each time. How many grains go on the 64th square?",
+      "input_type": "choice",
+      "options": [
+        {
+          "id": "thousands",
+          "text": "A few thousand",
+          "misconception_id": "exponential-growth-bias"
+        },
+        {
+          "id": "billion",
+          "text": "About a billion",
+          "misconception_id": "exponential-growth-bias"
+        },
+        {
+          "id": "quintillions",
+          "text": "About 9 quintillion (9 followed by 18 digits)",
+          "misconception_id": null
+        }
+      ],
+      "truth": {
+        "widget": "estimate",
+        "unit": "grains"
+      },
+      "answer_expr": "2^63",
+      "answer_claimed": 9.223372036854776e+18,
+      "targets": [
+        "exponential-growth-bias"
+      ]
+    },
+    {
+      "id": "lily-pads",
+      "prompt": "A patch of lily pads doubles in size every day. It covers the whole lake on day 48. On what day did it cover half the lake?",
+      "input_type": "choice",
+      "options": [
+        {
+          "id": "day-24",
+          "text": "Day 24",
+          "misconception_id": "halve-the-time"
+        },
+        {
+          "id": "day-40",
+          "text": "Day 40",
+          "misconception_id": "exponential-growth-bias"
+        },
+        {
+          "id": "day-47",
+          "text": "Day 47",
+          "misconception_id": null
+        }
+      ],
+      "truth": {
+        "widget": "curve",
+        "expr": "100*2^(x-48)",
+        "x_min": 30,
+        "x_max": 48,
+        "x_label": "day",
+        "y_label": "% of lake covered"
+      },
+      "answer_expr": "48-1",
+      "answer_claimed": 47,
+      "targets": [
+        "halve-the-time"
+      ]
+    }
+  ],
+  "aliases": [
+    "exponential growth",
+    "doubling",
+    "exponential doubling",
+    "folding paper to the moon",
+    "rice on a chessboard",
+    "wheat and chessboard problem",
+    "lily pad problem",
+    "powers of two"
+  ]
+}

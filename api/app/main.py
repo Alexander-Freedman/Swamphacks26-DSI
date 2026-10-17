@@ -16,7 +16,7 @@ from app.gen import (
     normalize_topic,
     offline,
 )
-from app.rounds import showcase_rounds
+from app.rounds import extra_for_topic, extra_rounds, showcase_rounds
 from app.schema import Round
 from app.truth import band_for
 
@@ -73,7 +73,7 @@ def list_rounds() -> list[dict[str, str | bool]]:
 
 @app.get("/api/rounds/{slug}")
 def get_round(slug: str) -> Round:
-    r = showcase_rounds().get(slug)
+    r = showcase_rounds().get(slug) or extra_rounds().get(slug)
     if r is None:
         raise HTTPException(status_code=404, detail="no such round")
     return r
@@ -96,6 +96,16 @@ def create_round(body: TopicIn, request: Request) -> dict:
                 "round": r,
                 "checks": None,
             }
+    extra = extra_for_topic(body.topic)
+    if extra is not None:
+        # Hand-reviewed extra topic: served as-is, no model call.
+        return {
+            "status": "ok",
+            "source": "reviewed",
+            "seconds": 0.0,
+            "round": extra,
+            "checks": None,
+        }
     try:
         res = generate_round(body.topic)
     except GenerationError:
@@ -138,7 +148,11 @@ def post_answer(body: AnswerIn, request: Request) -> dict:
     ip = request.client.host if request.client else "unknown"
     if _rate_limited("answers:" + ip, ANSWERS_PER_IP_PER_HOUR):
         raise HTTPException(status_code=429, detail="slow down")
-    r = showcase_rounds().get(body.round_slug) or generated_round(body.round_slug)
+    r = (
+        showcase_rounds().get(body.round_slug)
+        or extra_rounds().get(body.round_slug)
+        or generated_round(body.round_slug)
+    )
     item = next((i for i in r.items if i.id == body.item_id), None) if r else None
     if item is None:
         raise HTTPException(status_code=404, detail="unknown round or item")
