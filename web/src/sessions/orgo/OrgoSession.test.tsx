@@ -151,6 +151,41 @@ describe('orgo session', () => {
     expect(document.body.textContent).not.toMatch(/lock it in|called it|\bbet\b|how sure|points/i)
   }, 60000)
 
+  it('Undo steps back one change at a time (button and Ctrl+Z), and a right build shows a big check', () => {
+    render(<session.Component onDone={() => {}} />)
+    const undo = screen.getByRole('button', { name: /Undo/ }) as HTMLButtonElement
+    expect(undo.disabled).toBe(true)
+    add('carbon')
+    add('carbon') // bonded to the first
+    const formula = () => document.querySelector('.og-formula')!.textContent
+    expect(formula()).toBe('C₂')
+    // tap the bond: single → double; Undo brings the single back
+    const bond = () => screen.getByRole('button', { name: /bond\. Press to change\.$/ })
+    fireEvent.click(bond())
+    expect(bond().getAttribute('aria-label')).toMatch(/double bond/)
+    fireEvent.click(undo)
+    expect(bond().getAttribute('aria-label')).toMatch(/single bond/)
+    // Ctrl+Z takes the second carbon (and its bond) back off
+    fireEvent.keyDown(window, { key: 'z', ctrlKey: true })
+    expect(formula()).toBe('C')
+    expect(screen.queryByRole('button', { name: /bond\. Press to change\.$/ })).toBeNull()
+    // Clear is undoable too
+    fireEvent.click(screen.getByText('Clear'))
+    expect(formula()).toBe('—')
+    fireEvent.click(undo)
+    expect(formula()).toBe('C')
+    fireEvent.click(undo)
+    expect(undo.disabled).toBe(true)
+
+    buildEthanol()
+    expect(document.querySelector('.og-correct')).toBeNull()
+    fireEvent.click(screen.getByText('Check it'))
+    expect(document.querySelector('.og-correct')!.textContent).toBe('Correct!')
+    // changing the molecule again takes the check away until the next Check it
+    fireEvent.click(undo)
+    expect(document.querySelector('.og-correct')).toBeNull()
+  })
+
   it('the notebook shows the same names as the session', () => {
     for (const [id, m] of Object.entries(MISTAKES)) expect(labelFor('orgo', id)).toBe(m.label)
   }, 60000)
