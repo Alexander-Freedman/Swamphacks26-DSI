@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react'
+import { AnyTopic } from './components/AnyTopic'
 import { Distribution } from './components/Distribution'
 import { NotebookLink, NotebookScreen } from './components/Notebook'
 import { useReset } from './reset'
@@ -7,6 +8,7 @@ import { showcaseRound, showcaseSlugs } from './rounds'
 import { sessionFor, sessions } from './sessions/registry'
 import { simulate, shareAtLeast, type Histogram } from './truth'
 import type { Item, Round } from './types'
+import { useExtraRound } from './extras'
 import { misconceptionFor, verdictFor, verdictText } from './verdict'
 import { HOME, onScreenChange, pushScreen, readScreen, replaceScreen, type Screen } from './url'
 import './App.css'
@@ -35,6 +37,7 @@ function Home({ onPick, onSession, onNotebook }: { onPick: (slug: string) => voi
           </button>
         ))}
       </div>
+      <AnyTopic onOpen={onPick} />
       <NotebookLink onOpen={onNotebook} />
     </div>
   )
@@ -120,9 +123,13 @@ export default function App() {
   // An old ?round= link whose slug now has a session opens the session instead.
   const redirected = urlScreen.kind === 'round' && !!sessionFor(urlScreen.slug)
   const screen: Screen = redirected ? { kind: 'session', slug: urlScreen.slug } : urlScreen
-  const round = screen.kind === 'round' ? showcaseRound(screen.slug) : undefined
+  const showcase = screen.kind === 'round' ? showcaseRound(screen.slug) : undefined
+  // Not bundled: a reviewed extra or a just-built round, fetched (static file, then the API).
+  const extra = useExtraRound(screen.kind === 'round' && !showcase && !redirected ? screen.slug : null)
+  const round = showcase ?? extra.round
   const session = screen.kind === 'session' ? sessionFor(screen.slug) : undefined
-  const unknown = (screen.kind === 'session' || screen.kind === 'round') && !round && !session
+  const loading = screen.kind === 'round' && !round && !redirected && !extra.missing
+  const unknown = (screen.kind === 'session' || screen.kind === 'round') && !round && !session && !loading
 
   useEffect(() => onScreenChange(setScreen), [])
   // A slug that doesn't exist shows Home, so the URL should say Home too.
@@ -163,6 +170,8 @@ export default function App() {
         <NotebookScreen onHome={home} />
       ) : round ? (
         <Player key={round.slug} round={round} onDone={home} />
+      ) : loading ? (
+        <p className="sheet progress" role="status">Opening the round…</p>
       ) : (
         <Home
           onPick={(slug) => go({ kind: 'round', slug })}
