@@ -20,6 +20,15 @@ export type Entry = {
   confidence?: string
   misconception: string | null
   rematch: 'right' | 'wrong' | null
+  /** The mistake a missed rematch points to, if it maps to one (#162). */
+  rematchMisconception?: string | null
+  /** Rounds (#172): the mistake's label and the round's topic, saved with the entry since extra rounds aren't bundled. */
+  label?: string
+  topic?: string
+  /** Rounds (#172): one id per play, so a round that caught two mistakes still counts as one play. */
+  play?: string
+  /** 'round' for the round player (its card links to ?round=); sessions leave it out. */
+  kind?: 'round'
 }
 
 export type Card = {
@@ -32,7 +41,14 @@ export type Card = {
   caught: number
   /** right answers since the last catch */
   wins: number
+  /**
+   * The latest try at this mistake, so the card can show it (#176): the catching session's own rematch
+   * ('rematch-right' doesn't count toward busting, 'rematch-missed'), or a later session ('right' counts, 'missed').
+   */
+  last: 'rematch-right' | 'rematch-missed' | 'right' | 'missed' | null
   lastSeen: string
+  /** Where "try it again" goes: the session, or the round (#172). */
+  href: string
 }
 
 // Session-only misconceptions that aren't in a round JSON.
@@ -88,6 +104,34 @@ export function record(entry: Entry & Record<string, unknown>): void {
   }
 }
 
+/**
+ * Saves an entry, replacing the one with the same session + `at` if it's there (#159):
+ * sessions save at the card, then the rematch updates that same entry instead of adding a second one.
+ */
+export function upsert(entry: Entry & Record<string, unknown>): void {
+  try {
+    const s = store()
+    if (!s) return
+    const all = entries()
+    const i = all.findLastIndex((e) => e.session === entry.session && e.at === entry.at)
+    if (i >= 0) all[i] = entry
+    else all.push(entry)
+    s.setItem(KEY, JSON.stringify(all.slice(-MAX)))
+  } catch {
+    // blocked or full storage: the session still ends fine
+  }
+}
+
+/**
+ * The mistake an entry caught (#162): the first guess's, or else the one a missed rematch points to.
+ * A called-it first guess with a missed rematch that maps to a mistake lands in the notebook too,
+ * so the end bar's "it's in your notebook" is true.
+ */
+export function caughtId(e: Entry): string | null {
+  if (e.misconception) return e.misconception
+  return e.rematch === 'wrong' ? (e.rematchMisconception ?? null) : null
+}
+
 /** Clears the notebook and any other answers this app keeps (every `mm.` key). */
 export function reset(): void {
   try {
@@ -104,9 +148,16 @@ export function reset(): void {
   }
 }
 
-export function labelFor(session: string, id: string): string {
+/** How many plays the notebook has seen: entries sharing a `play` id are one play (#172). */
+export function plays(list: Entry[] = entries()): number {
+  return new Set(list.map((e) => e.play ?? `${e.session}\u0000${e.at}`)).size
+}
+
+/** `saved`: the label stored with a round entry, for rounds that aren't bundled (#172). */
+export function labelFor(session: string, id: string, saved?: string): string {
   const own = showcaseRound(session)?.misconceptions.find((m) => m.id === id)
   if (own) return own.label
+  if (saved) return saved
   if (EXTRA_LABELS[id]) return EXTRA_LABELS[id]
   const words = id.replace(/[-_]+/g, ' ').trim()
   return words.charAt(0).toUpperCase() + words.slice(1)
@@ -127,29 +178,35 @@ export function notebook(list: Entry[] = entries()): Card[] {
   const cards = new Map<string, Card>()
   const sorted = [...list].sort((a, b) => a.at.localeCompare(b.at))
   for (const e of sorted) {
-    const right = !e.misconception || e.rematch === 'right'
+    const id = caughtId(e)
+    const right = !id || e.rematch === 'right'
     for (const c of cards.values()) {
-      if (c.session !== e.session || c.id === e.misconception || !right) continue
-      c.wins += 1
+      if (c.session !== e.session || c.id === id) continue
+      c.last = right ? 'right' : 'missed'
       c.lastSeen = e.at
+      if (right) c.wins += 1
     }
-    if (!e.misconception) continue
-    const key = `${e.session}\u0000${e.misconception}`
+    const own = e.rematch === 'right' ? 'rematch-right' : e.rematch === 'wrong' ? 'rematch-missed' : null
+    if (!id) continue
+    const key = `${e.session}\u0000${id}`
     const c = cards.get(key)
     if (c) {
       c.caught += 1
       c.wins = 0
+      c.last = own
       c.lastSeen = e.at
     } else {
       cards.set(key, {
         session: e.session,
-        id: e.misconception,
-        label: labelFor(e.session, e.misconception),
-        topic: topicFor(e.session),
+        id,
+        label: labelFor(e.session, id, e.label),
+        topic: e.topic ?? topicFor(e.session),
         status: 'caught',
         caught: 1,
         wins: 0,
+        last: own,
         lastSeen: e.at,
+        href: `${import.meta.env.BASE_URL}?${e.kind === 'round' ? 'round' : 'session'}=${encodeURIComponent(e.session)}`,
       })
     }
   }

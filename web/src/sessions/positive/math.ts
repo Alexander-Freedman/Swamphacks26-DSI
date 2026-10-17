@@ -1,3 +1,4 @@
+import { percent } from '../../components/session/percent'
 // Exact math for the positive test session. Everything here is closed form (no simulation).
 // P(sick | positive) = b*s / (b*s + (1-b)*f)
 
@@ -38,13 +39,13 @@ export function secondTest(t: Test): number {
 export function pct(p: number): string {
   const v = p * 100
   if (!Number.isFinite(v)) return '-'
-  return v < 10 ? `${v.toFixed(1).replace(/\.0$/, '')}%` : `${Math.round(v)}%`
+  // capped like exact() (#161): 99.6% reads ">99%", never "100%"
+  return v < 10 ? percent(p, 1).replace(/\.0%$/, '%') : percent(p, 0)
 }
 
 /** Exact readouts keep one decimal: 0.909 → "90.9%", 0.0917 → "9.2%". */
 export function exact(p: number): string {
-  const v = p * 100
-  return Number.isFinite(v) ? `${v.toFixed(1)}%` : '-'
+  return percent(p, 1)
 }
 
 /** P6 rematch: same story, new numbers (docs/experience.md): 2% sick, 95% caught, 5% false alarms → 27.9%. */
@@ -72,3 +73,12 @@ export function seededOrder(n = POP, seed = 7): number[] {
   }
   return order
 }
+
+/**
+ * Compare step (#183): an airport bag scanner, same structure as the test. Illustrative numbers,
+ * not real airport data: 1 in 1,000 bags has something, the scanner flags 99% of those, and
+ * 2% of clean bags set it off too. Over a day of 100,000 bags every count is a whole bag:
+ * 100 with something, 99 flagged, 1,998 false alarms, so 99 / 2,097 alarms are real (4.72%).
+ */
+export const BAGS: Test = { baseRate: 0.001, sensitivity: 0.99, falseAlarm: 0.02 }
+export const BAG_DAY = 100_000

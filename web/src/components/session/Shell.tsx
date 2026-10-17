@@ -1,6 +1,7 @@
 import type { ReactNode, Ref } from 'react'
 import { NOTEBOOK_HREF } from '../../notebook'
 import { CONFS, endLine, STAMP, type Confidence, type RematchResult } from './copy'
+import { useReportSpot, type HelpSpot } from './helpSpot'
 import type { Verdict } from '../../verdict'
 import './shell.css'
 
@@ -21,9 +22,12 @@ export function SessionHead(p: {
   labels?: readonly string[]
   canGo?: (i: number) => boolean
   onGo?: (i: number) => void
+  /** Optional: the storyboard screen, lock state and guess, for the Ask panel (#186). */
+  help?: Pick<HelpSpot, 'screen' | 'locked' | 'guess'>
   children?: ReactNode
 }) {
   const { chip, step, total, labels, canGo, onGo, children } = p
+  useReportSpot({ ...p.help, step, total, label: labels?.[step - 1] })
   return (
     <div className="ss-head">
       <span className="ss-chip">{chip}</span>
@@ -96,13 +100,14 @@ export function StampRow({ v, children, className = '' }: { v: Verdict; children
 
 /**
  * The yellow end bar: saved, what happened, the remix, Open notebook, Done.
+ * `rematchCaught`: the mistake a missed rematch points to, when the first guess called it (#162).
  * `line` replaces the caught/rematch sentence for sessions without a rematch.
  */
-export function EndBar(p: { caught: string | null; rematch: RematchResult; remix: string; onDone: () => void; line?: ReactNode }) {
+export function EndBar(p: { caught: string | null; rematch: RematchResult; rematchCaught?: string | null; remix: string; onDone: () => void; line?: ReactNode }) {
   return (
     <div className="ss-end" role="status">
       <p>
-        <b>Saved to your notebook.</b> {p.line ?? endLine(p.caught, p.rematch)} {p.remix}
+        <b>Saved to your notebook.</b> {p.line ?? endLine(p.caught, p.rematch, p.rematchCaught ?? null)} {p.remix}
       </p>
       <div className="ss-endact">
         <a className="ss-nblink" href={NOTEBOOK_HREF}>Open notebook</a>

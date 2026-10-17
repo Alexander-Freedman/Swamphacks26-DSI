@@ -33,6 +33,48 @@
       "title": "Band",
       "type": "object"
     },
+    "Compare": {
+      "description": "Compare screen: a second case that looks different but works the same.",
+      "properties": {
+        "topic": {
+          "maxLength": 120,
+          "title": "Topic",
+          "type": "string"
+        },
+        "item_id": {
+          "anyOf": [
+            {
+              "maxLength": 60,
+              "pattern": "^[a-z0-9]+(-[a-z0-9]+)*$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "The second case's item in round.items, if it has one",
+          "title": "Item Id"
+        },
+        "prompt": {
+          "default": "What's the same about how these work?",
+          "maxLength": 200,
+          "title": "Prompt",
+          "type": "string"
+        },
+        "shared_principle": {
+          "maxLength": 300,
+          "title": "Shared Principle",
+          "type": "string"
+        }
+      },
+      "required": [
+        "topic",
+        "shared_principle"
+      ],
+      "title": "Compare",
+      "type": "object"
+    },
     "CurvePreset": {
       "enum": [
         "birthday_match_probability"
@@ -116,6 +158,48 @@
           "default": null,
           "description": "y the question asks about; the answer is the x reaching it",
           "title": "Ask Y"
+        },
+        "show": {
+          "anyOf": [
+            {
+              "enum": [
+                "tangent",
+                "riemann",
+                "limit"
+              ],
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "tangent: answer = slope at ask_x; riemann: answer = area from area_from to area_to, explore param = number of rectangles; limit: answer = limit at ask_x",
+          "title": "Show"
+        },
+        "area_from": {
+          "anyOf": [
+            {
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Area From"
+        },
+        "area_to": {
+          "anyOf": [
+            {
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Area To"
         }
       },
       "required": [
@@ -228,6 +312,47 @@
         "max"
       ],
       "title": "Explore",
+      "type": "object"
+    },
+    "Extreme": {
+      "description": "A setting worth trying after the reveal (engine v4).",
+      "properties": {
+        "param": {
+          "description": "The knob, sampler param or variable to set",
+          "pattern": "^[A-Za-z][A-Za-z0-9_]{0,23}$",
+          "title": "Param",
+          "type": "string"
+        },
+        "value": {
+          "title": "Value",
+          "type": "number"
+        },
+        "watch": {
+          "description": "One line: what to watch at this setting",
+          "maxLength": 160,
+          "title": "Watch",
+          "type": "string"
+        },
+        "truth_value": {
+          "anyOf": [
+            {
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "The item's answer at this setting, computed by code",
+          "title": "Truth Value"
+        }
+      },
+      "required": [
+        "param",
+        "value",
+        "watch"
+      ],
+      "title": "Extreme",
       "type": "object"
     },
     "InputType": {
@@ -364,6 +489,61 @@
           },
           "title": "Targets",
           "type": "array"
+        },
+        "variables": {
+          "items": {
+            "$ref": "#/$defs/Variable"
+          },
+          "maxItems": 8,
+          "title": "Variables",
+          "type": "array"
+        },
+        "extremes": {
+          "items": {
+            "$ref": "#/$defs/Extreme"
+          },
+          "maxItems": 3,
+          "title": "Extremes",
+          "type": "array"
+        },
+        "truth_value": {
+          "anyOf": [
+            {
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "The true answer, computed by code from the spec",
+          "title": "Truth Value"
+        },
+        "computed": {
+          "anyOf": [
+            {
+              "type": "boolean"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "True: truth_value computed by code from the spec. None: older rounds",
+          "title": "Computed"
+        },
+        "approximate": {
+          "anyOf": [
+            {
+              "type": "boolean"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "True: a simplified picture of the main relationship; label it 'approximate picture, not a full model'. None: older rounds",
+          "title": "Approximate"
         }
       },
       "required": [
@@ -722,6 +902,38 @@
       ],
       "title": "StepperTruth",
       "type": "object"
+    },
+    "Variable": {
+      "description": "A named number in a model spec, shown with its plain meaning and unit.",
+      "properties": {
+        "name": {
+          "pattern": "^[A-Za-z][A-Za-z0-9_]{0,23}$",
+          "title": "Name",
+          "type": "string"
+        },
+        "meaning": {
+          "maxLength": 120,
+          "title": "Meaning",
+          "type": "string"
+        },
+        "unit": {
+          "default": "",
+          "maxLength": 30,
+          "title": "Unit",
+          "type": "string"
+        },
+        "value": {
+          "title": "Value",
+          "type": "number"
+        }
+      },
+      "required": [
+        "name",
+        "meaning",
+        "value"
+      ],
+      "title": "Variable",
+      "type": "object"
     }
   },
   "properties": {
@@ -770,6 +982,30 @@
       "minItems": 1,
       "title": "Items",
       "type": "array"
+    },
+    "spec_version": {
+      "anyOf": [
+        {
+          "type": "integer"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "description": "4 for engine v4 rounds",
+      "title": "Spec Version"
+    },
+    "compare": {
+      "anyOf": [
+        {
+          "$ref": "#/$defs/Compare"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null
     }
   },
   "required": [

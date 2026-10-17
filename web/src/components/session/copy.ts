@@ -21,9 +21,21 @@ export const STAMP: Record<Verdict, string> = { called: 'Called it', close: 'Clo
 
 export type RematchResult = 'right' | 'close' | 'wrong'
 
-/** First guess + rematch, in one line (#135, #148). */
-export function endLine(caught: string | null, rematch: RematchResult): string {
+/**
+ * First guess + rematch, in one line (#135, #148). Only promises the notebook when something is in it (#162):
+ * a caught first guess, or a missed rematch that names a mistake (`rematchCaught`, saved as `rematchMisconception`).
+ */
+export function endLine(caught: string | null, rematch: RematchResult, rematchCaught: string | null = null): string {
   const first = caught ? `Caught: “${caught}”.` : 'Your first guess called it.'
-  const second = rematch === 'right' ? 'Rematch: right.' : rematch === 'close' ? 'Rematch: close.' : 'Rematch missed; it stays in your notebook to try again.'
+  const second =
+    rematch === 'right'
+      ? 'Rematch: right.'
+      : rematch === 'close'
+        ? 'Rematch: close.'
+        : caught
+          ? 'Rematch missed; it stays in your notebook to try again.'
+          : rematchCaught
+            ? `Rematch missed: “${rematchCaught}” is in your notebook to try again.`
+            : 'Rematch missed; try it again tomorrow.'
   return `${first} ${second}`
 }
