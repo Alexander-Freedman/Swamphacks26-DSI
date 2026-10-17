@@ -1,4 +1,4 @@
-Mode: RESEARCH
+Mode: RESEARCH (direction picked; no project code until I say "start building")
 
 # Notes
 
@@ -32,6 +32,12 @@ Decisions + how to run things. Keep current.
 - Oct 16 7:20 PM: building with AI ≠ the AI/ML track. One specialized track or none; choose per stack by expected value, and don't default to AI/ML. Gemini/MLH prizes are challenges and stack with any track.
 
 - Oct 16 9:30 PM: not my first hackathon, so First Timers is out. Track choice is AI/ML, Entertainment, Hardware or none.
+
+- **Oct 16 ~9:50 PM, DIRECTION DECIDED:** we're building **Mental Models, general version**: one engine that works on ANY topic someone types in (coin flips, physics, calculus, anything), not physics-only. Goal: nuanced understanding of complex subjects in a Quizlet-style loop that's addictive to use. **Predict first → see the truth interactively → get your exact misconception named → keep coming back.**
+  - **Track:** Entertainment & Creative Technology (not AI/ML).
+  - **Dropped:** the hazard radar and fraud stacks.
+  - **Paused:** Luana's #11-#16 and PR #10.
+  - **Research mode** until I say "start building"; the product spec (docs/product-spec.md) gets my review before anything is built.
 
 ## How to run
 Nothing to run yet. Build box tooling (my side): Python 3.12, uv 0.13, Node 22.23 / npm 10.9 in `~/.local/bin` (DeepSpace would also need `npm i -g npm@11`). No Docker on the build box; deploys go to Vultr/Render. The box is 1 CPU, so heavy model training should be kept small or run on Vultr.
