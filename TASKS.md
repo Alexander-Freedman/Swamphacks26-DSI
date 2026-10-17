@@ -1,28 +1,35 @@
 # Tasks
 
-> **Direction (decided Oct 16 ~9:50 PM):** Mental Models, general version. One engine for ANY topic: predict first → see the truth interactively → your exact misconception named → keep coming back (Quizlet-style, addictive, for deep understanding not memorizing).
-> - **Track:** Entertainment & Creative Technology.
-> - **Mode:** BUILD (approved; plan in docs/build-plan.md, from 10:48 PM Fri).
-> - **Next:** research issues are done (#17-#26, #31). docs/product-spec.md + docs/build-plan.md posted for my approval at 10:18 PM; they auto-approve at 10:48 PM if I don't answer. Then the build issues get opened from docs/build-plan.md.
->
-> | Issue | Research | Owner |
-> |---|---|---|
-> | #17 | Entertainment track judges + past creative winners | @Alexander-Freedman |
-> | #18 | Learning science for prediction-first | @Alexander-Freedman |
-> | #19 | Misconceptions + detecting the exact one | @Alexander-Freedman |
-> | #20 | Any-topic engine + accuracy | @Alexander-Freedman |
-> | #21 | Add-on prizes that fit | @Alexander-Freedman |
-> | #22 | What makes study apps addictive | @luanamaldaner |
-> | #23 | Competitors / not a chatbot | @luanamaldaner |
-> | #24 | Truth-reveal UI patterns | @luanamaldaner |
-> | #25 | 3-minute demo | @luanamaldaner |
-> | #26 | Visual/brand direction | @luanamaldaner |
->
-> My #22-#26 are done in PR #30 (docs/research/). The visual direction needs my sign-off before building.
+> **Direction:** Mental Models, general version (any topic: predict → lock → truth over your guess → misconception named → come back). **Track:** Entertainment & Creative.
+> **Mode:** BUILD since 10:48 PM Fri (docs/build-plan.md). Name TBD (my call); working name `mm`.
+> **Gate 1:30 AM:** coin streak plays predict → lock → reveal locally. **9 AM:** a typed topic → a round on the deployed URL.
 
-Shared board. Every task is a GitHub issue; assign yourself + comment "on it" before starting. Plan: #1.
+Shared board. Every task is a GitHub issue; assign yourself + comment "on it" before starting. Plan: #1. Folders: `web/` = @luanamaldaner, `api/` `shared/schema/` `data/` = @Alexander-Freedman.
 
-## Phase 1: research (no building yet)
+## Build (B1-B3)
+
+| Issue | Task | Owner | Status |
+|---|---|---|---|
+| #44 | Round schema + 3 showcase fixtures | @Alexander-Freedman | merged (#54) |
+| #45 | Skeleton + CI | @Alexander-Freedman | merged (#60) |
+| #46 | Gemini client + POST /api/rounds | @Alexander-Freedman | PR #58 |
+| #47 | Generation pipeline (validate, truth, lint, blind check, fallback) | @Alexander-Freedman | |
+| #48 | First deploy (Pages now; Vultr/Render Sat) | @Alexander-Freedman | Pages live |
+| — | Answer events, "the room" %, collection API | @Alexander-Freedman | PR #61 |
+| #49 | Predict → confidence → lock + Distribution | @luanamaldaner | merged (#62) |
+| #51 | Reveal sequence + misconception card + Curve + icon array | @luanamaldaner | PR #64 |
+| #66 | Home (topic box) + Building screen | @luanamaldaner | in progress |
+| #67 | Round summary + Collection | @luanamaldaner | in progress |
+| #68 | Play with it: extremes slider | @luanamaldaner | in progress |
+| #11 | Sketch input + shape rules | @luanamaldaner | in progress |
+| #29 | Name, one-liner, pitch, Devpost, video script | @Alexander-Freedman | |
+
+## Next (my side)
+- B5 visual pass (Notebook Arcade), share card, motion polish, reduced motion
+- "How it works" drawer (generated JSON + computed truth side by side)
+- B6 backup demo video (≤2 min)
+
+## Phase 1: research (done)
 
 | Issue | Task | Owner | Status |
 |---|---|---|---|
