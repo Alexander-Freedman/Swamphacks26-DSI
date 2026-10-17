@@ -58,5 +58,8 @@ Decisions + how to run things. Keep current.
 
 - Oct 16 ~11:05 PM, **approved:** build-plan.md is good. Name later, keep the working name `mm`. B1 starts at approval (10:48 PM). The ~2 extra hours go to engine buffer in B2, **not** to new features.
 
+- Oct 16 ~11:15 PM, **Azure image generation available (my paid account):** build-time only (a script generates, files are committed, served as static assets; the public site never calls Azure). **Hard cap 40 images** unless I say more; ≤1024x1024. Key stays in `~/.hack-app.env` / `.env` only. Use it where it helps the demo + Easy On The Eyes (brand art, showcase illustrations, share card); SVG/CSS stays the base.
+  - **Image count: 0 / 40**
+
 ## How to run
 Nothing to run yet. Build box tooling (my side): Python 3.12, uv 0.13, Node 22.23 / npm 10.9 in `~/.local/bin` (DeepSpace would also need `npm i -g npm@11`). No Docker on the build box; deploys go to Vultr/Render. The box is 1 CPU, so heavy model training should be kept small or run on Vultr.

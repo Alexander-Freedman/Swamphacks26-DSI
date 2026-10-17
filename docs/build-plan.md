@@ -49,6 +49,17 @@
 
 **Spending stays at $0** unless I say otherwise. **Free Gemini only:** Flash Lite for live calls within the free limits. Showcase topics are written by us during the build and stored. Visuals are designed in code (SVG/CSS), with no AI image generation.
 
+### Azure image generation (my paid Azure account; added 11:15 PM)
+- **gpt-image-2** via an Azure AI Foundry endpoint (OpenAI client). **Build-time only:** a script generates images, they're committed as files, and served static. The public site never calls Azure.
+- **Hard cap: 40 images** for the whole hackathon (count in NOTES.md), ≤1024x1024.
+- **Planned use (~15):**
+  - brand mark/hero (2-3)
+  - 3 showcase illustrations
+  - misconception "cast" portraits for the showcase ideas (~6)
+  - a share-card background (1-2)
+  - the rest held back
+- **Owner:** me (script + generation), with @luanamaldaner choosing what's needed for the UI. SVG/CSS stays the base design system.
+
 ### Optional upgrade (only if I add $5 OpenAI credit; never depend on it)
 - **OpenAI image generation** (`OPENAI_API_KEY`) for brand art and the cast card icons, generated once and saved as files.
 - **Status (10:30 PM):** the account has no billing and a $0 balance, so any call is refused (insufficient quota).
