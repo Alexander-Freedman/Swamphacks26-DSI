@@ -111,6 +111,15 @@ Decisions + how to run things. Keep current.
   3. **Pitch headline:** "ChatGPT tells you the answer. Onionskin builds you a world where you find out you were wrong, and why." AI story everywhere: **the AI builds the simulation; code guarantees the truth; you do the thinking.**
   - **Never cut:** compare screens, the pitch. **Live generation falls back to the pre-built set.** Devpost due Sun 8:30 AM (we submit by 7:30).
 
+- **Sat Oct 17 ~1:05 PM, AGREED DIRECTION (Luana + Alex; supersedes the 12:15 PM pitch line and anything below that conflicts):** Onionskin = **type any topic (incl. orgo and calculus) and learn it visually.** Problem now: it's barely visual (most questions are text + a number box). Fix:
+  1. **Every step is a visual you interact with:** drag, draw, slide, build, watch it move. Text only as short labels/captions next to the picture. No round is just a question + a number box.
+  2. **Typed topics come back as an interactive visual** (graph, diagram, animation, molecule, simulation), never a text quiz. If the engine can't build a visual for that topic, show a visual it *can* make (a chart/diagram), never plain text.
+  3. **Showcase levels to build:** calculus = drag the tangent line, fill the area under a curve with rectangles, sketch the derivative over the function; orgo = build a molecule by dragging atoms/bonds, animate a reaction mechanism with curved arrows.
+  4. **No betting language** (bet, "lock it in", "called it", confidence picker) and **no XP/points.** At most a subtle "mastered" check per topic. Keep the notebook of mistakes.
+  5. **Headline:** "See your thinking in layers." **Subline:** "Type any topic. Watch it come alive."
+  - Still: truth computed in code, never by a model; no pill shapes (4px corners, #190). Split + issues on #1.
+- **Sat ~12:50 PM, UI rule:** no pill-shaped buttons, chips, tags, toggles, pickers or toasts: 4px corners so they read as cards/stamps. Circles stay for dots, coins and slider thumbs (#190).
+
 ## How to run
 - **Live site (GitHub Pages):** https://alexander-freedman.github.io/Swamphacks26-DSI/ is served from the `gh-pages` branch. After **every merge to main that touches `web/` or `data/rounds/`**, run `scripts/deploy-pages.sh` on a clean, up-to-date `main`. It builds web/ with base `/Swamphacks26-DSI/`, copies the showcase rounds to `/rounds/*.json` (+ `rounds/index.json`), adds `.nojekyll` and a 404 fallback, refuses to publish anything key-shaped, and pushes gh-pages. The site works with no backend: the frontend falls back to `${import.meta.env.BASE_URL}rounds/<slug>.json`. No API key ever goes in the frontend.
 - **Hosting tonight (decided Fri ~11:25 PM):** frontend on GitHub Pages; backend local on the server for dev/tests only; local SQLite until the Tiger URL arrives. **Sat:** Vultr (MLH code) with HTTPS + CORS, then point the frontend at it. Render free tier if no Vultr code by Sat 2 PM.
