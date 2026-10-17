@@ -458,3 +458,193 @@ class _MemUsage:
 
     def exhaust(self, model: str) -> None:
         pass
+
+
+def _curve_round(**q):
+    from app.gen import to_round
+
+    question = {
+        "id": "q",
+        "prompt": "worth after 30 years?",
+        "input_type": "slider",
+        "slider_min": 1000,
+        "slider_max": 15000,
+        "slider_step": 100,
+        "bands": [
+            {"min": 1000, "max": 5999, "misconception_id": "m"},
+            {"min": 6000, "max": 9000, "misconception_id": None},
+            {"min": 9001, "max": 15000, "misconception_id": "m"},
+        ],
+        "widget": "curve",
+        "expr": "1000*(1+r/100)^x",
+        "x_min": 0,
+        "x_max": 40,
+        "ask_x": 30,
+        "explore_param": "r",
+        "explore_label": "rate (%)",
+        "explore_min": 1,
+        "explore_max": 12,
+        "explore_step": 0.5,
+        "explore_default": 7,
+        "answer_expr": "1000*1.07^30",
+        **q,
+    }
+    return to_round(
+        {
+            "slug": "c",
+            "topic": "c",
+            "concept": "c",
+            "misconceptions": [{"id": "m", "label": "l", "why_tempting": "w", "refutation": "r"}],
+            "questions": [question],
+        }
+    )
+
+
+def test_curve_with_knob_passes_and_maps() -> None:
+    from app.checks import check_item
+
+    item = _curve_round().items[0]
+    assert item.explore is not None and item.explore.default == 7
+    assert item.truth.ask_x == 30
+    assert check_item(item) is None
+
+
+@pytest.mark.parametrize(
+    ("change", "reason"),
+    [
+        ({"ask_x": 20}, "curve at x=20"),
+        ({"ask_x": 50}, "asked x is off"),
+        ({"expr": "tan(x)", "ask_x": None, "explore_param": None}, "pole"),
+        ({"expr": "10^x", "ask_x": None, "explore_param": None}, "not finite"),
+        ({"explore_default": None}, "explore knob"),
+        ({"explore_default": 30}, "explore knob"),
+        ({"explore_param": None}, "curve expr"),  # expr uses r but no knob defines it
+    ],
+)
+def test_bad_curves_are_dropped(change, reason) -> None:
+    from app.checks import check_item
+
+    got = check_item(_curve_round(**change).items[0])
+    assert got is not None and reason in got
+
+
+def test_ask_y_checks_the_x_that_reaches_it() -> None:
+    from app.checks import check_item
+
+    half_life = {
+        "expr": "400*0.5^(x/h)",
+        "x_min": 0,
+        "x_max": 36,
+        "ask_x": None,
+        "ask_y": 50,
+        "explore_param": "h",
+        "explore_min": 1,
+        "explore_max": 24,
+        "explore_default": 6,
+        "slider_min": 0,
+        "slider_max": 60,
+        "slider_step": 1,
+        "bands": [
+            {"min": 0, "max": 15, "misconception_id": "m"},
+            {"min": 16, "max": 20, "misconception_id": None},
+            {"min": 21, "max": 60, "misconception_id": "m"},
+        ],
+    }
+    assert check_item(_curve_round(**half_life, answer_expr="6*3").items[0]) is None
+    got = check_item(_curve_round(**half_life, answer_expr="6*3.2").items[0])
+    assert got is not None and "not 50" in got
+
+
+def test_bad_knob_name_is_ignored() -> None:
+    item = _curve_round(explore_param="x", expr="1000*1.07^x").items[0]
+    assert item.explore is None
+
+
+def test_flat_curve_is_allowed() -> None:
+    from app.checks import check_item
+
+    item = _curve_round(expr="7612", ask_x=None, explore_param=None).items[0]
+    assert check_item(item) is None
+
+
+def test_ask_y_accepts_the_whole_step_after_the_crossing() -> None:
+    from app.checks import check_item
+
+    # Doubling daily from 1 case: 50,000 is crossed at x = 15.6, so "day 16" is right.
+    pandemic = {
+        "expr": "2^x",
+        "x_min": 0,
+        "x_max": 25,
+        "ask_x": None,
+        "ask_y": 50000,
+        "explore_param": None,
+        "slider_min": 0,
+        "slider_max": 30,
+        "slider_step": 1,
+        "bands": [
+            {"min": 0, "max": 14, "misconception_id": "m"},
+            {"min": 15, "max": 17, "misconception_id": None},
+            {"min": 18, "max": 30, "misconception_id": "m"},
+        ],
+    }
+    assert check_item(_curve_round(**pandemic, answer_expr="16").items[0]) is None
+    got = check_item(_curve_round(**pandemic, answer_expr="15").items[0])
+    assert got is None  # 15.6 is within one step either way
+    got = check_item(_curve_round(**pandemic, answer_expr="12").items[0])
+    assert got is not None and "not 50000" in got
+
+
+def test_one_invalid_question_no_longer_sinks_the_round() -> None:
+    from pydantic import ValidationError
+
+    from app.gen import to_round
+
+    choice = {
+        "prompt": "p",
+        "input_type": "choice",
+        "options": [{"id": "a", "text": "a", "misconception_id": "m"}, {"id": "b", "text": "b"}],
+        "widget": "estimate",
+    }
+    data = {
+        "slug": "c",
+        "topic": "c",
+        "concept": "c",
+        "misconceptions": [{"id": "m", "label": "l", "why_tempting": "w", "refutation": "r"}],
+        "questions": [{**choice, "id": "bad"}, {**choice, "id": "good", "answer_expr": "1"}],
+    }
+    dropped: dict[str, str] = {}
+    r = to_round(data, dropped)
+    assert [i.id for i in r.items] == ["good"]
+    assert "answer_expr" in dropped["bad"]
+    with pytest.raises(ValidationError):
+        to_round(data)
+
+
+def test_correct_band_between_slider_stops_is_dropped() -> None:
+    from app.checks import check_item
+
+    narrow = {
+        "expr": "g",
+        "ask_x": 50,
+        "x_min": 1,
+        "x_max": 100,
+        "explore_param": "g",
+        "explore_min": 5,
+        "explore_max": 15,
+        "explore_default": 9.81,
+        "slider_min": 1,
+        "slider_max": 30,
+        "slider_step": 0.5,
+        "bands": [
+            {"min": 1, "max": 9.7, "misconception_id": "m"},
+            {"min": 9.8, "max": 9.82, "misconception_id": None},
+            {"min": 9.83, "max": 30, "misconception_id": "m"},
+        ],
+        "answer_expr": "9.81",
+    }
+    assert check_item(_curve_round(**narrow).items[0]) == "no slider stop lands in the correct band"
+
+
+def test_unused_knob_is_dropped() -> None:
+    item = _curve_round(expr="1000*1.07^x").items[0]
+    assert item.explore is None
