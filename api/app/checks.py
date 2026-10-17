@@ -48,6 +48,16 @@ class Report:
     def as_dict(self) -> dict:
         return {"kept": self.kept, "dropped": self.dropped, "blind_checked": self.blind_checked}
 
+    def public(self, model: str, seconds: float) -> dict:
+        """The shape POST /api/rounds returns as `checks` (and the cache keeps)."""
+        return {
+            "kept": len(self.kept),
+            "dropped": [{"item_id": k, "reason": v} for k, v in self.dropped.items()],
+            "blind_checked": self.blind_checked,
+            "model": model,
+            "seconds": round(seconds, 1),
+        }
+
 
 class CheckFailed(Exception):
     pass

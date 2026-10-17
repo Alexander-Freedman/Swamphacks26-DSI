@@ -221,3 +221,110 @@ def test_band_gap_is_caught() -> None:
         }
     )
     assert check_item(r.items[0]) == "bands leave a gap the slider can land in"
+
+
+def _fake_generation(topic: str) -> dict:
+    base_item = {
+        "input_type": "slider",
+        "slider_min": 0,
+        "slider_max": 100,
+        "bands": [
+            {"min": 0, "max": 40, "misconception_id": "m"},
+            {"min": 41, "max": 60, "misconception_id": None},
+            {"min": 61, "max": 100, "misconception_id": "m"},
+        ],
+        "widget": "estimate",
+    }
+    return {
+        "slug": "fake-topic",
+        "topic": topic,
+        "concept": "c",
+        "misconceptions": [{"id": "m", "label": "l", "why_tempting": "w", "refutation": "r"}],
+        "questions": [
+            {**base_item, "id": "computed", "prompt": "half of 100?", "answer_expr": "100/2"},
+            {
+                **base_item,
+                "id": "lying",
+                "prompt": "also half?",
+                "answer_expr": "100/2",
+                "answer_claimed": 90,
+            },
+            {
+                **base_item,
+                "id": "blind",
+                "prompt": "no formula for this one",
+                "widget": "curve",
+                "expr": "x",
+                "x_min": 0,
+                "x_max": 1,
+            },
+        ],
+    }
+
+
+@pytest.fixture
+def live_gen(monkeypatch, tmp_path):
+    """Generation with a fake key and the model calls stubbed out (no network)."""
+    from app import checks, gen, main
+
+    monkeypatch.setenv("GEMINI_API_KEY", "test-not-a-key")
+    monkeypatch.delenv("MM_OFFLINE", raising=False)
+    monkeypatch.setattr(gen, "CACHE_DIR", tmp_path)
+    calls = []
+
+    def fake_call(model, topic):
+        calls.append(model)
+        return json.dumps(_fake_generation(topic))
+
+    monkeypatch.setattr(gen, "_call_model", fake_call)
+    monkeypatch.setattr(checks, "_blind_answer", lambda item: 50)
+    main._hits.clear()
+    yield calls
+    main._hits.clear()
+
+
+def test_generated_round_returns_checks_and_cache_keeps_them(live_gen) -> None:
+    first = client.post("/api/rounds", json={"topic": "Some fresh topic"}).json()
+    assert first["status"] == "ok" and first["source"] == "gemini-3.5-flash-lite"
+    checks = first["checks"]
+    assert checks["kept"] == 2
+    assert checks["dropped"] == [{"item_id": "lying", "reason": "claimed 90.0 but computed 50"}]
+    assert checks["blind_checked"] is True
+    assert checks["model"] == "gemini-3.5-flash-lite"
+    assert isinstance(checks["seconds"], float)
+    assert [i["id"] for i in first["round"]["items"]] == ["computed", "blind"]
+
+    again = client.post("/api/rounds", json={"topic": "  some FRESH topic "}).json()
+    assert again["source"] == "cache"
+    assert again["checks"] == checks
+    assert again["round"] == first["round"]
+    assert live_gen == ["gemini-3.5-flash-lite"]  # one model call in total
+
+
+def test_blind_disagreement_is_reported(live_gen, monkeypatch) -> None:
+    from app import checks
+
+    monkeypatch.setattr(checks, "_blind_answer", lambda item: 90)
+    res = client.post("/api/rounds", json={"topic": "another topic"}).json()
+    dropped = {d["item_id"]: d["reason"] for d in res["checks"]["dropped"]}
+    assert set(dropped) == {"lying", "blind"}
+    assert "blind check" in dropped["blind"]
+    assert res["checks"]["kept"] == 1
+
+
+def test_cached_round_without_report_returns_null_checks(live_gen) -> None:
+    from app import gen
+
+    client.post("/api/rounds", json={"topic": "old cached topic"})
+    gen._checks_path(gen._cache_path("old cached topic")).unlink()
+    res = client.post("/api/rounds", json={"topic": "old cached topic"}).json()
+    assert res["source"] == "cache" and res["checks"] is None
+
+
+def test_showcase_topic_returns_null_checks(live_gen) -> None:
+    for topic in ("Streaks in coin flips", "coin-streak"):
+        res = client.post("/api/rounds", json={"topic": topic}).json()
+        assert res["status"] == "ok" and res["source"] == "showcase"
+        assert res["round"]["slug"] == "coin-streak" and res["round"]["reviewed"] is True
+        assert res["checks"] is None
+    assert live_gen == []  # no model call for a showcase

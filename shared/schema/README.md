@@ -3,7 +3,10 @@
 `round.schema.json` is generated from `api/app/schema.py` (`cd api && uv run python scripts/export_schema.py`). Don't edit it by hand.
 
 - `GET /api/rounds` → `[{slug, topic, reviewed}]`
-- `POST /api/rounds {topic}` → `{status: "ok", source, seconds, round}` or `{status: "fallback", suggestions: [slug…]}` (any failure, offline, quota, rate limit 12/h per IP → 429)
+- `POST /api/rounds {topic}` → `{status: "ok", source, seconds, round, checks}` or `{status: "fallback", suggestions: [slug…]}` (any failure, offline, quota, rate limit 12/h per IP → 429)
+  - `source`: the model id that wrote it, `"cache"`, or `"showcase"` (topic matches a showcase's topic or slug; no model call).
+  - `checks`: the generation check report, for the "How it works" drawer: `{kept: int, dropped: [{item_id, reason}], blind_checked: bool, model: str, seconds: float}`. `model` is the model that wrote the round, `seconds` is how long generation + checks took that first time. The cache keeps it, so a cached topic returns the same report. `blind_checked` is true when at least one item had no computed answer and the second model answered it blind; items with a computed truth are never blind-checked (code wins). `dropped` items are already removed from `round.items`.
+  - `checks: null` for showcase/reviewed rounds (hand-checked, nothing generated) and for rounds cached before reports were stored.
 - `GET /api/rounds/{slug}` → a `Round`
 - Showcase rounds live in `data/rounds/*.json` (`reviewed: true`).
 
