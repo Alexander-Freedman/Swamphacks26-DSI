@@ -38,7 +38,7 @@ Builds on docs/research/any-topic-engine.md, docs/sponsor-tech.md and docs/feasi
 - **Flash (20/day) goes only to offline showcase pre-generation**, never to live calls.
 - **Request budget: stay under 500/day on 3.5 Flash-Lite**, with `gemini-3.1-flash-lite` as overflow (see section 6). Quota resets at **midnight Pacific = 3:00 AM Eastern**.
 - **Structured output:** `response_mime_type="application/json"` + `response_json_schema`. Keys stream in schema order. Always check `finish_reason == STOP` and validate with Pydantic. Gemma's JSON-schema support isn't documented officially, so test it in the first hour.
-- **Billing:** we don't assume it. Paid prices are listed in section 2 in case I decides otherwise: 500 sessions on Flash-Lite would be about $5.
+- **Billing:** we don't assume it. Paid prices are listed in section 2 in case I decide otherwise: 500 sessions on Flash-Lite would be about $5.
 
 ## 1. Models available via the API (Oct 2026)
 
@@ -90,9 +90,9 @@ Official ([rate limits](https://ai.google.dev/gemini-api/docs/rate-limits)):
 - 429 = `RESOURCE_EXHAUSTED`. The [API errors page](https://ai.google.dev/gemini-api/docs/api-errors) splits it into `rate_limit_exceeded` (per minute: back off and retry), `quota_exceeded` (**daily: wait for the reset, retrying won't help**) and `too_many_requests`. Retry 429/503 with backoff + jitter, and never retry 400/402/403 ([troubleshooting](https://ai.google.dev/gemini-api/docs/troubleshooting)).
 - **Free-tier prompts and outputs are used to improve Google products** ([pricing](https://ai.google.dev/gemini-api/docs/pricing)), so keep personal data out of prompts.
 - Free tier has no Batch/Flex. Google Search grounding isn't free for these models.
-- Don't spread keys across extra projects to dodge limits. Luana having her own key for her own dev work is fine.
+- Don't spread keys across extra projects to dodge limits. @luanamaldaner having their own key for their own dev work is fine.
 
-### Paid prices per 1M tokens, Standard tier (only if I links billing)
+### Paid prices per 1M tokens, Standard tier (only if I link billing)
 
 Source: [ai.google.dev/gemini-api/docs/pricing](https://ai.google.dev/gemini-api/docs/pricing). Output prices include thinking tokens.
 
