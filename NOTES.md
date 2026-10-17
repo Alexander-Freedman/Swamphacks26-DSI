@@ -49,5 +49,12 @@ Decisions + how to run things. Keep current.
 
 - Oct 16 ~10:55 PM, **my decision: the look is Notebook Arcade.** Pencil = your guess, ink = truth, marker = the gap, a stamped verdict, a chunky display face. (The name is still @luanamaldaner's call.)
 
+- Oct 16 ~11:00 PM, **showcase topics (my call, delegated by Alex):** picked for being easy to demo reliably, fun to watch, and fully computed in the browser (offline, never generated). Only 2 widgets needed.
+  1. **Coin streak** (Distribution): longest run in 100 flips. Exact: mean 6.98, ≥5 in 97.2%.
+  2. **Positive test / base rates** (Distribution, 1,000 dots): 1% base rate, 90% sensitivity, 9% false positives → 9.2%.
+  3. **Birthday problem** (Curve + a 23-dot calendar lighting up): P(shared birthday) with 23 people = 50.7% (computed). People tend to guess about half of 365 ([Live Science](https://www.livescience.com/what-is-birthday-paradox); a teaching observation, not a survey). Misconception: "it's about MY birthday" ([Conversable Economist on Hand](https://conversableeconomist.com/2014/02/22/intuition-behind-the-birthday-bets/)).
+  - **Dropped as showcases** (generated topics can still cover them): Off the Edge (no solid adult error-rate source; needs the Trajectory widget) and Wason 2-4-6 (great, but a rule-discovery game, not a reveal over your guess).
+  - **The live "judge names any topic" moment** goes on top of these.
+
 ## How to run
 Nothing to run yet. Build box tooling (my side): Python 3.12, uv 0.13, Node 22.23 / npm 10.9 in `~/.local/bin` (DeepSpace would also need `npm i -g npm@11`). No Docker on the build box; deploys go to Vultr/Render. The box is 1 CPU, so heavy model training should be kept small or run on Vultr.

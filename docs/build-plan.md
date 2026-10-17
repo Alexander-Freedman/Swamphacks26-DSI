@@ -30,7 +30,7 @@
 | **B3 Come-back loop** | Sat 9:00 AM-1:30 PM | It feels like a game you return to | • **Answer events** in Tiger Data (or Postgres if no card), "the room" %, collection + review queue API (3-4h)<br>• **Pre-generate + spot-check 30 cached topics** (1-2h; 30 Flash Lite calls) | • **Home**, **Building**, **Round summary**, **Collection** screens (4-5h) | Collection shows caught/busted from real plays |
 | *Company Connect* | 10:30 AM-12:30 PM | Feedback | One of us shows the coin-streak round to Vobile/Roblox reps (30 min) | | Notes in docs/user-testing.md |
 | **B4 Users, round 1** | Sat 1:30-2:30 PM (lunch) | Real evidence | Run 5 users with the 5-min script (plan-extras.md) | Same, in parallel | Findings + the top 3 fixes in docs/user-testing.md |
-| **B5 Fix + polish + 3rd showcase** | Sat 2:30-8:00 PM | Top marks on Design + Functionality | • Fix the top 3 (≤45 min each)<br>• **Showcase #3** (Trajectory or Curve)<br>• "How it works" drawer data<br>• Auth0 (1.5-2h, **cut line 2**; keeps the collection across devices) | • **Visual pass: Notebook Arcade** (2.5-3.5h; design-depth.md, visual.md)<br>• Share card<br>• Motion polish<br>• `prefers-reduced-motion` | Scorecard re-graded; the biggest gap closed |
+| **B5 Fix + polish + 3rd showcase** | Sat 2:30-8:00 PM | Top marks on Design + Functionality | • Fix the top 3 (≤45 min each)<br>• **Showcase #3: the birthday problem** (Curve; already built)<br>• "How it works" drawer data<br>• Auth0 (1.5-2h, **cut line 2**; keeps the collection across devices) | • **Visual pass: Notebook Arcade** (2.5-3.5h; design-depth.md, visual.md)<br>• Share card<br>• Motion polish<br>• `prefers-reduced-motion` | Scorecard re-graded; the biggest gap closed |
 | **B6 Users, round 2 + freeze** | Sat 8:00 PM-12:00 AM | Lock it, protect the demo | 5 users at dinner (8-9 PM), same card. **Feature freeze at midnight.** Tag a release | **Record the backup demo video** (≤2 min, 1.5-2.5h; expo-video.md) | A before/after line for the pitch; video uploaded unlisted and its URL in the Devpost draft |
 | **B7 Write + harden** | Sun 12:00-4:30 AM | Submission-ready | Bug fixes only; README (approach, generation pass-rate numbers, run in 3 commands, tools disclosure); sleep 12:30-3:30 | Devpost write-up (450-1,100 words, screenshots); sleep 3:30-6:30 | Draft complete; every sponsor tool named; **AI disclosure wording decided by me** |
 | **B8 Submit** | Sun 4:30-7:30 AM | Ship with a buffer | **Submit by 7:30 AM.** Check repo/video/challenge boxes in a private window | (back at 6:30) | "Submitted" tag on Devpost |
@@ -63,7 +63,7 @@
 - the backup video
 
 ## Cut lines, in this order, if a gate slips
-1. Showcase #3 and the Trajectory widget
+1. Showcase #3 polish (the 23-dot calendar) and the Trajectory widget
 2. Auth0 (guest only; the collection is stored locally)
 3. Tiger Data → plain Postgres or SQLite (drop that prize)
 4. Typed "why" classification (choices/bands only)
