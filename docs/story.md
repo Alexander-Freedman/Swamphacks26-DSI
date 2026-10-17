@@ -79,3 +79,36 @@ Alt: "Bet your hunch. Bust your myths."
 - MythBusters trademark dispute: https://www.techdirt.com/tag/mythbusters/ , https://blogs.luc.edu/ipbytes/?p=4778
 - Pokédex takedown: https://nolanlawson.com/2011/05/26/on-pokedroids-removal/
 - Belief Busting (self-help use): https://courageandspice.buzzsprout.com/1673158/7708237
+
+---
+
+## 3. README outline (what the repo README should give judges)
+
+Judges on the AI-heavy tracks read GitHubs, and every judge clicks the README first. Goal: a judge understands the product in 30 seconds and can run it in 3 commands. `[NAME]` until the name is picked. Draft the real README from this once the demo build is stable.
+
+1. **Title + result line.** `[NAME]`: one line from the one-liners above ("Every AI tutor explains. [NAME] makes you bet first, ..."). Under it, one sentence on what a round is: predict, lock in, the truth is computed and drawn over your guess, your misconception gets named.
+2. **Demo link.** The live site (https://alexander-freedman.github.io/Swamphacks26-DSI/ or the custom domain), the 2-minute video, and the Devpost page. One hero GIF of the coin-streak reveal.
+3. **How it works (text diagram):**
+   ```
+   topic ──> cache? ──hit──────────────────────────────────────────┐
+               │ miss                                               v
+               └─> Gemini 3.5 Flash-Lite (structured JSON: misconceptions, questions, truth SPEC)
+                     └─> our code: compute truth ─> claim agrees? ─> lint ─> Gemma blind check
+                           (items that fail are dropped; 0 items left = rejected)        │
+                                                                                         v
+   browser: predict + confidence ─> lock ─> truth drawn over the pencil guess ─> misconception named ─> collection
+   ```
+   Plus one line: the model never writes the answer; code computes it. Showcase rounds are hand-checked JSON in `data/rounds/` and run with no backend.
+4. **Run it in 3 commands** (verify against the real repo before publishing):
+   ```
+   cd api && uv sync && uv run uvicorn app.main:app      # backend on :8000 (GEMINI_API_KEY from the env; no key or MM_OFFLINE=1 = mock mode)
+   cd web && npm install && npm run dev                  # frontend, proxies /api to :8000
+   ```
+   Note that the showcase rounds work with the frontend alone.
+5. **The checks pipeline** (from `api/app/checks.py`): structural validation, computed truth vs the model's claimed answer, band/slider lint, no answer in the prompt, the time-boxed blind check by a second model, drop-on-fail. Link to the tests (`api/tests`) and, if we have it, the eval table (how many generated items each check dropped on our test topics).
+6. **Model chain + quotas:** Flash-Lite → 3.1 Flash-Lite → Gemma fallback, daily counter, cache by topic, per-IP rate limit and daily cap on the public endpoint, keys only in the server's `.env`.
+7. **Why no points:** the "Everyone gamifies learning with points" paragraph (section 2), with its two sources.
+8. **Limits (honest):** works best on topics with a checkable answer (chance, math, physics); fuzzy topics get fewer questions or none; the blind check catches a lot but not everything; generated rounds are "auto-checked", only showcase rounds are "reviewed"; build time per new topic is an estimate until measured (docs/research/gemini.md); free-tier quotas cap live generation.
+9. **Sources:** the research behind the loop (predict-first, hypercorrection, the points studies), linked, from docs/research/learning-science.md.
+10. **AI tools disclosure: PLACEHOLDER, wording decided by me at submission.** Same text as the Devpost "How we used AI tools" section (SwampHacks XII requires disclosing AI/LLM tool use). Keep it separate from the runtime models the app calls.
+11. **Team + track:** both of us, SwampHacks XII, Entertainment & Creative Technology; challenges entered.
