@@ -43,12 +43,22 @@ describe('How it works drawer', () => {
     fireEvent.click(screen.getByRole('button', { name: /How it works/ }))
     const d = dialog()!
     expect(d).toBeTruthy()
+    // no spoiler before the guess is locked (#171): no value, formula, claim, raw JSON or source titles
+    expect(within(d).getByText(/Make your guess first/)).toBeTruthy()
+    expect(within(d).queryByTestId('hiw-value')).toBeNull()
+    expect(within(d).queryByText('2 ÷ 3 × 100')).toBeNull()
+    expect(within(d).queryByText('Round claims')).toBeNull()
+    expect(within(d).queryByText(/Raw JSON/)).toBeNull()
+    expect(within(d).getByTestId('hiw-held-spec')).toBeTruthy()
+    expect(within(d).getByTestId('hiw-held-sources')).toBeTruthy()
+    for (const m of (monty as unknown as Round).misconceptions) expect(d.textContent).not.toContain(m.label)
+    expect(within(d).queryAllByRole('link')).toEqual([])
+    fireEvent.click(within(d).getByRole('button', { name: /Show it anyway/ }))
     // spec side: the formula in readable form, not just raw JSON
     expect(within(d).getByText('2 ÷ 3 × 100')).toBeTruthy()
-    // no spoiler before the guess is locked
-    expect(within(d).getByText(/Lock in your guess first/)).toBeTruthy()
-    expect(within(d).queryByTestId('hiw-value')).toBeNull()
-    fireEvent.click(within(d).getByRole('button', { name: /Show it anyway/ }))
+    expect(within(d).getByText('Round claims')).toBeTruthy()
+    expect(within(d).getByText(/Raw JSON/)).toBeTruthy()
+    expect(within(d).queryByTestId('hiw-held-spec')).toBeNull()
     const item = (monty as unknown as Round).items[0]
     expect(within(d).getByTestId('hiw-value').textContent).toBe(withUnit(answerValue(item)!, '%'))
     expect(within(d).getByText(/computed answer lands here/).closest('tr')!.className).toContain('correct')
@@ -186,10 +196,11 @@ describe('How it works drawer', () => {
 })
 
 describe('backend status dot', () => {
-  it('is grey "offline mode" with no backend, and asks nothing', async () => {
+  it('is hidden with no backend (no "offline mode" on the public site), and asks nothing (#173)', async () => {
     render(<App />)
-    expect(screen.getByTestId('backend-dot').textContent).toBe('offline mode')
     await screen.findByRole('button', { name: 'Sums of dice' })
+    expect(screen.queryByTestId('backend-dot')).toBeNull()
+    expect(screen.queryByText(/offline/)).toBeNull()
     expect(apiCalls()).toEqual([])
   })
 

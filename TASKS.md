@@ -31,20 +31,16 @@ Updated Sat Oct 17 morning. Supersedes #70.
 | #29 | Story: pitch, Devpost, video script | open | AI-disclosure draft to #questions |
 | #45, #47, #48 | Skeleton/CI, pipeline, first deploy | mostly done | close #45/#47; #48 waits on the host account |
 
-### @luanamaldaner (Home, coin, positive, notebook, topic box, round player, look)
+### @luanamaldaner (orgo, Home, notebook, look)
+Updated Sat ~7:30 PM. Orgo build/push #204, Undo #209 and the topic menu #211 are merged.
 | Issue / PR | What | Status | Next step |
 |---|---|---|---|
-| #136 / #66 | Home: try any topic box with reviewed chips | changes requested | show the truth + label after the guess on reviewed items, then merge |
-| #144 | Home: session card art (art merged in #124) | open | wire the art into the three Home cards |
-| #143 / #133 | Notebook: bust after two later right answers | PR up | review |
-| #147 | Notebook never counts a positive rematch | open | fix the saved shape |
-| #148 | Coin + positive end bar "Called it." after a missed rematch | open | same fix as my #135 |
-| #151 | Positive: guess 0% stamps CLOSE but card catches a mistake | open | fix |
-| #64 / #51 | Round player reveal + misconception card + Curve | changes requested | rebase on main, address review |
-| #113 | Submission drafts: Devpost + 2-min video script | PR up | review against docs/devpost-draft.md |
-| #71 | How it works drawer, status dot | open | after #136 |
-| #68 | Extremes slider for generated topics | open | after #136; cut if short on time |
-| #11 | Pen input | parked | not in the demo script |
+| #213 / #215 | Orgo: SN1, E2, E1 (draw the arrows per step, watch it run, mistakes named) | PR up | review, merge |
+| #216 / #218 | Orgo: SN2 vs E2 side by side (same HO⁻, predict each path, one slider) | PR up, stacked on #215 | merge after #215 |
+| #194 / #205 | No betting language, confidence picker gone, new headline | PR up | review, merge (blocks "no bets" in the Devpost) |
+| #214 | Home leads with subjects: orgo, calculus | PR up | review, merge |
+| #68 | Extremes slider for generated topics | open | cut if short on time |
+| #11 | Pen input | parked | not in the demo |
 
 ## Next (gate order)
 1. **Sat 1:30 PM: user tests round 1** (both). 3-5 people, one session each, kit in docs/user-testing.md (#120). Log guess, confidence, verdict, one quote. Top 3 fixes go in as issues.

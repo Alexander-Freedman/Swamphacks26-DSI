@@ -164,8 +164,8 @@ export function Reveal({ item, round, answer, truth, signals }: Props) {
       {(truth.kind === 'icons' || truth.kind === 'estimate') && guess != null && truth.value != null && item.slider && (
         <GuessBar guess={guess} truth={truth.value} min={item.slider.min} max={item.slider.max} unit={item.slider.unit} />
       )}
-      {v === 'off' && answer.confidence === 'certain' && (
-        <p className="sure-wrong">A confident miss is the one you're most likely to fix. Keep this one.</p>
+      {v === 'off' && (
+        <p className="sure-wrong">A big miss is the one you're most likely to fix. Keep this one.</p>
       )}
       {t.widget === 'stepper' && t.steps.length > 0 && (
         <div className="steps">
