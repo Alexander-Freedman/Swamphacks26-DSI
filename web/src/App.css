@@ -1,8 +1,10 @@
 .app { max-width: 760px; margin: 0 auto; padding: 24px 16px 64px; }
 .topbar { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 20px; }
+/* on a session screen the header lines up with the session frame (1040px), not the page column */
+.app:has(.ss-frame, .bday) .topbar { width: min(1040px, calc(100vw - 32px)); margin-left: calc(50% - min(520px, 50vw - 16px)); }
 .logo { font-weight: 800; font-size: 1.25rem; letter-spacing: -0.02em; }
 .chip { display: inline-flex; align-items: center; gap: 6px; padding: 3px 10px; border: 1.5px solid var(--ink); border-radius: 999px; font-size: 0.8rem; background: var(--card); }
-.chip.reviewed { border-color: var(--called); color: var(--called); }
+.checked-tag { font-size: 0.8rem; color: var(--ink-soft); cursor: help; border-bottom: 1px dotted var(--ink-soft); }
 .progress { font-size: 0.85rem; color: var(--ink-soft); }
 
 .sheet { background: var(--card); border: 2px solid var(--ink); border-radius: var(--radius); box-shadow: 4px 4px 0 var(--ink); padding: 24px; }
@@ -43,6 +45,7 @@ input[type='range'] { width: 100%; accent-color: var(--pencil); height: 28px; }
 .showcases { display: grid; gap: 12px; margin-top: 20px; }
 .showcase { text-align: left; padding: 16px; border: 2px solid var(--ink); border-radius: var(--radius); background: var(--card); box-shadow: 3px 3px 0 var(--ink); font-weight: 600; }
 .showcase .blurb { display: block; font-weight: 400; color: var(--ink-soft); margin-top: 4px; }
+.prompt:focus { outline: none; }
 
 /* Session cards with art: 3 columns, big art on top; phone: rows with a 120px thumb. */
 .showcases.sessions { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 14px; }

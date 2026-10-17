@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import type { Confidence, Item } from '../types'
 
 export type Answer = { value: number | null; optionId: string | null; confidence: Confidence }
@@ -12,12 +12,16 @@ export function Predict({ item, onLock }: { item: Item; onLock: (a: Answer) => v
   const [optionId, setOptionId] = useState<string | null>(null)
   const [confidence, setConfidence] = useState<Confidence | null>(null)
 
+  const promptRef = useRef<HTMLHeadingElement>(null)
+  // A new item takes focus (and scroll) back to its question.
+  useEffect(() => promptRef.current?.focus(), [])
+
   const answered = item.input_type === 'slider' ? touched : optionId !== null
   const ready = answered && confidence !== null
 
   return (
     <div>
-      <h2 className="prompt">{item.prompt}</h2>
+      <h2 className="prompt" ref={promptRef} tabIndex={-1}>{item.prompt}</h2>
 
       {item.input_type === 'slider' && s && (
         <div className="slider-row">
