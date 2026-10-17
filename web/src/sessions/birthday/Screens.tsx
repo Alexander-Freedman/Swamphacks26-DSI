@@ -216,7 +216,7 @@ export function Card({ guess, conf, curve, skipped, onAgain, onNext }: { guess: 
         </p>
       </div>
       <div className="bday-card bday-mistake">
-        <div className="bday-tag bday-red">{m ? 'the mistake' : 'the right model'}</div>
+        <div className={'bday-tag' + (m ? ' bday-red' : '')}>{m ? 'the mistake' : 'the right model'}</div>
         <h3 className="bday-named">
           {m ? <>“<span className="bday-hl">{m.label}</span>”</> : <>You counted <span className="bday-hl">pairs</span>, not people.</>}
         </h3>
