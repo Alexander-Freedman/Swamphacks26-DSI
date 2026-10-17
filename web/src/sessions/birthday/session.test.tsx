@@ -20,8 +20,18 @@ describe('birthday session', () => {
     expect(screen.getByText('Fill a room')).toBeTruthy()
     for (let k = 0; k < 5; k++) fireEvent.click(screen.getByText('+5'))
     expect(screen.getByText('The match')).toBeTruthy()
-    expect(screen.getByText('first match at')).toBeTruthy()
+    expect(screen.getByText('first match at 23 people')).toBeTruthy()
     expect(screen.getByText('253')).toBeTruthy()
+    // the room keeps going after the match, counter and all
+    fireEvent.click(screen.getByLabelText('add 5 people'))
+    expect(screen.getByText('28')).toBeTruthy()
+    expect(screen.getByText('378')).toBeTruthy()
+    expect(screen.getByText('first match at 23 people')).toBeTruthy()
+    // keyboard / screen reader activation is a click with no pointer
+    fireEvent.click(screen.getByText('+ Add a person'), { detail: 0 })
+    expect(screen.getByText('29')).toBeTruthy()
+    fireEvent.click(screen.getByText('Empty the room, try again'))
+    expect(screen.getByText('An empty room. Add people one by one.')).toBeTruthy()
     vi.useRealTimers()
   }, 30000)
 
@@ -31,5 +41,10 @@ describe('birthday session', () => {
     expect(verdictOf(100).m?.id).toBe('its-about-my-birthday')
     expect(verdictOf(180).m?.id).toBe('half-of-365')
     expect(verdictOf(180).v).toBe('off')
+    // tiny rooms are well under a coin flip: not "called it"
+    expect(verdictOf(2).v).toBe('close')
+    expect(verdictOf(2).m?.refutation).toContain('1 pair: a 0.3% chance')
+    expect(verdictOf(14).m?.id).toBe('too-few')
+    expect(verdictOf(15).v).toBe('called')
   })
 })

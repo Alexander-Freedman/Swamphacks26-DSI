@@ -8,7 +8,7 @@ import './birthday.css'
 const TITLES: [string, string][] = [
   ['How many people?', "Guess first: how many people until it's a coin flip that two share a birthday? Your guess stays on screen so you can check it later."],
   ['Fill a room', 'Add people one by one and watch the lines: each line is a pair that could share a birthday. Notice how fast pairs pile up.'],
-  ['The match', 'A match! Empty the room and try again a few times: see how many people it usually takes.'],
+  ['The match', 'A match! Keep adding to watch matches pile up, or empty the room and try again: how many people does it usually take?'],
   ['Draw your curve', "Draw how you think the chance grows as the room fills, from 2 to 80 people. There's no wrong drawing; it's your model."],
   ['Your curve vs the real one', "Here's the real curve over yours. Drag the group size to see where your model and reality part."],
   ['What happened in your head', 'This is the mistake your guess points to, and the one idea that fixes it.'],
@@ -28,7 +28,7 @@ function save(entry: object) {
 function Birthday({ onDone }: SessionProps) {
   const [step, setStep] = useState(1)
   const [guess, setGuess] = useState(100)
-  const [, setConf] = useState<Confidence>('pretty sure')
+  const [conf, setConf] = useState<Confidence>('pretty sure')
   const [matched, setMatched] = useState(false)
   const [curve, setCurve] = useState<number[] | null>(null)
   const [skipped, setSkipped] = useState(false)
@@ -77,7 +77,7 @@ function Birthday({ onDone }: SessionProps) {
         />
       )}
       {step === 5 && curve && <Reveal guess={guess} curve={curve} skipped={skipped} onNext={() => go(6)} />}
-      {step === 6 && curve && <Card guess={guess} curve={curve} skipped={skipped} onAgain={() => go(5)} onNext={() => go(7)} />}
+      {step === 6 && curve && <Card guess={guess} conf={conf} curve={curve} skipped={skipped} onAgain={() => go(5)} onNext={() => go(7)} />}
       {step === 7 && curve && (
         <>
           <Rematch
@@ -85,7 +85,7 @@ function Birthday({ onDone }: SessionProps) {
             picked={picked}
             onPick={(more) => {
               setPicked(more)
-              save({ session: 'birthday', at: new Date().toISOString(), guess, misconception: verdictOf(guess).m?.id ?? null, rematch: more ? 'right' : 'wrong' })
+              save({ session: 'birthday', at: new Date().toISOString(), guess, confidence: conf, misconception: verdictOf(guess).m?.id ?? null, rematch: more ? 'right' : 'wrong' })
             }}
           />
           {picked != null && (

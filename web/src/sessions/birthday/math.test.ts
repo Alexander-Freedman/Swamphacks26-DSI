@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 import {
-  coverage, dayLabel, FIRST_ROOM_SEED, lineFromGuess, monthDay, needForMe, pairs, pct, pMatch, pMine,
+  addPeople, coverage, dayLabel, firstMatchAt, ROOM_MAX, sharedDays, FIRST_ROOM_SEED, lineFromGuess, monthDay, needForMe, pairs, pct, pMatch, pMine,
   resample, rng, roomUntilMatch, sizeForChance,
 } from './math'
 
@@ -18,6 +18,8 @@ describe('exact birthday math', () => {
     expect(pairs(23)).toBe(253)
     expect(pairs(30)).toBe(435)
     expect(pairs(2)).toBe(1)
+    expect(Object.is(pairs(0), 0)).toBe(true) // not -0, which prints as "-0"
+    expect(pairs(1)).toBe(0)
   })
   it('separates MY birthday from any two', () => {
     expect(pMine(23)).toBeCloseTo(0.0585713253, 9)
@@ -74,5 +76,30 @@ describe('drawing -> curve', () => {
     expect(l[42]).toBeCloseTo(0.5)
     expect(lineFromGuess(180)[80]).toBeLessThan(0.25)
     expect(lineFromGuess(10)[80]).toBe(1)
+  })
+})
+
+describe('room that keeps filling', () => {
+  it('stops at the first match, then keeps adding past it', () => {
+    const r = rng(FIRST_ROOM_SEED)
+    let days: number[] = []
+    while (firstMatchAt(days) == null) days = addPeople(days, 5, r, true)
+    expect(days.length).toBe(23)
+    expect(days).toEqual(roomUntilMatch(rng(FIRST_ROOM_SEED)))
+    const more = addPeople(days, 5, r, false)
+    expect(more.length).toBe(28)
+    expect(more.slice(0, 23)).toEqual(days)
+    expect(firstMatchAt(more)).toBe(23)
+  })
+  it('never goes past the cap', () => {
+    const r = rng(1)
+    const full = addPeople([], ROOM_MAX + 50, r, false)
+    expect(full.length).toBe(ROOM_MAX)
+    expect(addPeople(full, 5, r, false)).toEqual(full)
+  })
+  it('finds shared days', () => {
+    expect(firstMatchAt([1, 2, 3])).toBeNull()
+    expect(firstMatchAt([1, 2, 1, 2])).toBe(3)
+    expect(sharedDays([1, 2, 1, 2, 2, 5]).sort()).toEqual([1, 2])
   })
 })

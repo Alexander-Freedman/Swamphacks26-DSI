@@ -15,7 +15,7 @@ export function pMatch(n: number): number {
 }
 
 /** Number of pairs among n people. */
-export const pairs = (n: number) => (n * (n - 1)) / 2
+export const pairs = (n: number) => (n < 2 ? 0 : (n * (n - 1)) / 2)
 
 /** Chance that at least one of the other n-1 people shares YOUR birthday. */
 export const pMine = (n: number) => 1 - Math.pow((DAYS - 1) / DAYS, n - 1)
@@ -56,6 +56,46 @@ export function roomUntilMatch(rand: () => number): number[] {
     if (seen.has(d)) return days
     seen.add(d)
   }
+}
+
+/** Most people the room holds (4,950 pairs); enough to watch matches pile up. */
+export const ROOM_MAX = 100
+
+/**
+ * Add up to k people (days drawn from rand). With stopAtMatch, stop right after the first person who
+ * matches someone, so +5 or holding never skips past the moment. Never goes past ROOM_MAX.
+ */
+export function addPeople(days: number[], k: number, rand: () => number, stopAtMatch: boolean): number[] {
+  const out = [...days]
+  const seen = new Set(out)
+  let matched = seen.size < out.length
+  for (let i = 0; i < k && out.length < ROOM_MAX; i++) {
+    const d = Math.floor(rand() * DAYS)
+    out.push(d)
+    if (seen.has(d) && !matched) {
+      matched = true
+      if (stopAtMatch) break
+    }
+    seen.add(d)
+  }
+  return out
+}
+
+/** People in the room when the first match happened (1-based), or null if nobody matches yet. */
+export function firstMatchAt(days: number[]): number | null {
+  const seen = new Set<number>()
+  for (let i = 0; i < days.length; i++) {
+    if (seen.has(days[i])) return i + 1
+    seen.add(days[i])
+  }
+  return null
+}
+
+/** Days with two or more people on them. */
+export function sharedDays(days: number[]): number[] {
+  const c = new Map<number, number>()
+  for (const d of days) c.set(d, (c.get(d) ?? 0) + 1)
+  return [...c].filter(([, v]) => v > 1).map(([d]) => d)
 }
 
 /** Seed for the first room: its first match lands at 23 people (checked in the tests). */

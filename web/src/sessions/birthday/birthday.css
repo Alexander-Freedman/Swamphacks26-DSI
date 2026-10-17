@@ -183,3 +183,28 @@
 .bday-chart, .bday-cal, .bday-plot { user-select: none; -webkit-user-select: none; }
 .bday-rematch { margin-top: 22px; }
 .bday-handnote { font: 600 14px var(--font-hand); }
+
+/* room: counts + add buttons in one dock; on a phone it rides the bottom of the screen so the
+   calendar, the counter and the button are all in view while you add people */
+.bday-dock { display: flex; flex-direction: column; gap: 10px; }
+.bday-dock .bday-countrow { margin-top: 0; }
+.bday-dock .bday-hint { margin: 0; text-align: center; }
+.bday-again { width: 100%; }
+.bday-details .bday-bars { margin-top: 0; }
+@media (max-width: 899px) {
+  .bday-dock { position: sticky; bottom: 8px; z-index: 2; padding: 10px 12px; gap: 8px; box-shadow: 0 3px 0 var(--ink), 0 -6px 18px rgb(0 0 0 / 0.12); }
+  .bday-dock .bday-countrow b { font-size: 32px; }
+  .bday-dock .bday-tag { font-size: 11px; }
+  .bday-dock .bday-holdhint { display: none; }
+  .bday-stampwrap { min-height: 0; }
+}
+
+/* dot plot key */
+.bday-plotkey { display: flex; gap: 14px; flex-wrap: wrap; font-size: 13px; color: var(--ink-soft); margin: 4px 2px 0; }
+.bday-plotkey i { display: inline-block; vertical-align: middle; margin-right: 6px; }
+.bday-k-dot { width: 10px; height: 10px; border-radius: 50%; background: var(--ink); }
+.bday-k-mine { width: 10px; height: 10px; border-radius: 50%; background: var(--off); box-shadow: 0 0 0 3px var(--marker); }
+.bday-k-band { width: 18px; height: 10px; background: var(--marker-soft); border: 1px solid var(--marker); }
+.bday-plot-narrow .bday-tick { font-size: 13px; }
+.bday-plot-narrow .bday-axlabel { font-size: 14px; }
+.bday-plot-narrow .bday-h { font-size: 15px; }
