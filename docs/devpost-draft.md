@@ -24,7 +24,7 @@ Example: "Flip a fair coin 100 times. What's the longest run of the same side?" 
 
 ## How we built it
 - **The model writes the question, our code computes the truth.** Gemini 3.5 Flash-Lite turns a topic into a compact round with structured JSON output: the misconceptions first, then the questions, with every wrong option or slider range mapped to one misconception. The truth comes back as a *spec* (an expression or a named simulation plus parameters), never as a number we trust blindly.
-- **Checks before anyone sees a round.** Our backend computes every truth, drops items where the model's claimed answer disagrees, lints the rest (sliders fully covered, no answer in the prompt), and has a second model, Gemma, answer them blind without the key. Disagreements are dropped.
+- **Checks before anyone sees a round.** Our backend computes every truth, drops items where the model's claimed answer disagrees, lints the rest (sliders fully covered, no answer in the prompt). When code can't compute the answer, a second model, Gemma, answers it blind without the key, and anything they disagree on gets dropped; everything else is computed by code.
 - **Showcase rounds are hand-checked** (coin streaks, a positive medical test, the birthday problem) and work offline.
 - **Free tier, on purpose.** Flash-Lite falls back to Gemini 3.1 Flash-Lite and then Gemma if we hit a quota; every generated round is cached by topic; the public endpoint has a per-IP rate limit and a daily cap.
 - **Stack:** FastAPI + Pydantic backend, React + TypeScript + Vite frontend, deployed as a static site on GitHub Pages.
