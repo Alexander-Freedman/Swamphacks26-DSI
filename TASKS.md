@@ -2,7 +2,7 @@
 
 > **Direction (decided Oct 16 ~9:50 PM):** Mental Models, general version. One engine for ANY topic: predict first → see the truth interactively → your exact misconception named → keep coming back (Quizlet-style, addictive, for deep understanding not memorizing).
 > - **Track:** Entertainment & Creative Technology.
-> - **Mode:** BUILD (approved; plan in docs/build-plan.md, from 10:48 PM Fri).
+> - **Mode:** BUILD, but **re-planning first** (11:40 PM): the product must take someone from zero to a runnable mental model, visually, on the 10-stage pipeline. Step 1: docs/experience.md storyboard + mockups; Step 2: @luanamaldaner reviews, re-plan build-plan.md; Step 3: build. See NOTES.md.
 > - **Next:** research issues are done (#17-#26, #31). docs/product-spec.md + docs/build-plan.md posted for my approval at 10:18 PM; they auto-approve at 10:48 PM if I don't answer. Then the build issues get opened from docs/build-plan.md.
 >
 > | Issue | Research | Owner |
