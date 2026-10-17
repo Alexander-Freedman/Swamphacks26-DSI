@@ -1,0 +1,2 @@
+.demo-controls { display: flex; align-items: center; gap: 10px; margin-left: auto; }
+.hiw-open { padding: 3px 10px; border: 1.5px solid var(--ink); border-radius: 999px; background: var(--card); font-size: 0.8rem; }

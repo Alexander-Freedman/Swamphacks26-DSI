@@ -1,0 +1,35 @@
+.hiw-backdrop { position: fixed; inset: 0; background: rgba(27, 35, 64, 0.28); z-index: 50; animation: fade 200ms ease-out; }
+.hiw { position: absolute; top: 0; right: 0; bottom: 0; width: min(920px, 100vw); display: flex; flex-direction: column; background: var(--paper); border-left: 2px solid var(--ink); box-shadow: -6px 0 0 var(--ink); padding: 20px 16px 16px 20px; animation: hiw-in 280ms cubic-bezier(.2, 1, .4, 1); }
+@keyframes hiw-in { from { transform: translateX(100%); } }
+@media (prefers-reduced-motion: reduce) { .hiw, .hiw-backdrop { animation: none; } }
+
+.hiw-head { display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; margin-bottom: 12px; }
+.hiw-head h2 { margin: 0; font-size: 1.4rem; }
+.hiw-caption { margin: 4px 0 0; color: var(--ink-soft); }
+.hiw-close { border: 2px solid var(--ink); border-radius: 999px; background: var(--card); width: 36px; height: 36px; flex: none; }
+.hiw-empty { color: var(--ink-soft); }
+
+.hiw-cols { flex: 1; min-height: 0; display: grid; grid-template-columns: minmax(0, 1.2fr) minmax(0, 1fr); gap: 16px; }
+.hiw h3 { font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.06em; color: var(--ink-soft); margin: 0 0 6px; }
+.hiw pre { margin: 0; font-size: 0.78rem; line-height: 1.45; white-space: pre-wrap; word-break: break-word; }
+.hiw-json { display: flex; flex-direction: column; min-height: 0; }
+.hiw-json pre { flex: 1; overflow: auto; background: var(--card); border: 2px solid var(--ink); border-radius: 10px; padding: 12px; }
+.hiw-json mark { background: var(--marker-soft); outline: 2px solid var(--marker); border-radius: 3px; color: inherit; }
+.hiw-side { overflow: auto; }
+.hiw-side h3 { margin-top: 14px; }
+.hiw-side h3:first-child { margin-top: 0; }
+.hiw-spec { background: var(--marker-soft); border: 2px solid var(--ink); border-radius: 10px; padding: 10px; }
+.hiw-value { margin: 0; font-size: 1.1rem; font-weight: 800; }
+.hiw-checks { list-style: none; margin: 0; padding: 0; display: grid; gap: 6px; }
+.hiw-checks li { display: flex; gap: 10px; align-items: baseline; }
+.hiw-checks small { color: var(--ink-soft); }
+.hiw-icon { display: inline-block; min-width: 2.2em; text-align: center; font-weight: 800; border-radius: 6px; padding: 0 4px; }
+.hiw-checks .pass .hiw-icon { color: var(--called); }
+.hiw-checks .fail .hiw-icon { color: var(--off); }
+.hiw-checks .na .hiw-icon { color: var(--pencil); font-size: 0.8rem; }
+.hiw-meta { margin: 14px 0 0; font-size: 0.85rem; color: var(--ink-soft); }
+
+@media (max-width: 640px) {
+  .hiw-cols { grid-template-columns: 1fr; overflow: auto; }
+  .hiw-json pre { max-height: 40vh; }
+}

@@ -1,0 +1,2 @@
+.status-dot { display: inline-block; width: 12px; height: 12px; border-radius: 50%; border: 2px solid var(--ink); background: var(--pencil); flex: none; }
+.status-dot.up { background: var(--called); }
