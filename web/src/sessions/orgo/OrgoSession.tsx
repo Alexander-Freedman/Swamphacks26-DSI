@@ -6,6 +6,7 @@ import { MISTAKES } from './chem'
 import { CompareStep } from './CompareStep'
 import { CASES, SN2_CASE } from './analysis'
 import { DecideStep, PartsStep, SizeStep } from './MechSteps'
+import { ContrastStep } from './ContrastStep'
 import { MechStep } from './MechStep'
 import { MECHS } from './mechs'
 import { PushStep } from './PushStep'
@@ -14,7 +15,7 @@ import { reducedMotion } from './geom'
 import './orgo.css'
 
 export const SLUG = 'orgo'
-const LABEL: Record<OrgoStep, string> = { build: 'Build', parts: 'Parts', size: 'Size up', decide: 'Mechanism', push: 'Arrows', compare: 'Compare' }
+const LABEL: Record<OrgoStep, string> = { build: 'Build', parts: 'Parts', size: 'Size up', decide: 'Mechanism', push: 'Arrows', compare: 'Compare', contrast: 'Contrast' }
 // Short captions only: the pictures do the explaining.
 const TITLES: Record<OrgoStep, [string, string]> = {
   build: ['Build ethanol', 'Ethanol (C₂H₆O) is the alcohol in drinks. Drag atoms onto the paper and connect them until each one has its full set of bonds: carbon 4, oxygen 2, hydrogen 1.'],
@@ -23,6 +24,7 @@ const TITLES: Record<OrgoStep, [string, string]> = {
   decide: ['Pick the mechanism', 'Your answers point to one spot on the chart. Pick the mechanism that belongs there.'],
   push: ['Show how the electrons move', 'Hydroxide (HO⁻) kicks the bromine off CH₃Br and takes its place in one step (SN2). Chemists draw this with curved arrows: each one starts on a pair of electrons and ends where that pair goes. Draw the arrows, then watch the reaction play out.'],
   compare: ['Find the same pattern', 'A new reaction sits next to the one you just did. In both, tap the atom that attacks, the carbon it hits, and the atom that leaves.'],
+  contrast: ['SN2 or E2?', 'The same HO⁻ meets two different carbons. For each one, predict whether HO⁻ swaps in (SN2) or pulls off an H (E2), then run both side by side.'],
 }
 const REMIX: Record<string, string> = {
   'build-ethanol': 'Next: push the electrons in a real mechanism.',
@@ -31,6 +33,7 @@ const REMIX: Record<string, string> = {
   sn1: 'Next: E1. Same carbocation, a different ending.',
   e1: 'Next: E2. A strong base skips the carbocation.',
   e2: 'Next: SN1. Weak nucleophile, same crowded carbon.',
+  'sn2-vs-e2': 'Next: draw the E2 arrows yourself.',
 }
 type M = keyof typeof MISTAKES
 const SIZE_SUB = (nu: string) => `Three questions decide the mechanism: how strong is the ${nu}, what kind of carbon holds the leaving group, and does the leaving group leave easily?`
@@ -150,6 +153,11 @@ function OrgoTopicRun({ topic, onTopics, onDone }: { topic: OrgoTopic; onTopics:
       {at('compare') > 0 && reached >= at('compare') && (
         <div hidden={step !== at('compare')}>
           <CompareStep onMistake={(m) => caught([m])} onDone={finish} />
+        </div>
+      )}
+      {at('contrast') > 0 && reached >= at('contrast') && (
+        <div hidden={step !== at('contrast')}>
+          <ContrastStep onMistake={(m) => caught([m])} onDone={finish} />
         </div>
       )}
       {finished && last && (

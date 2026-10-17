@@ -198,3 +198,8 @@
 .orgo .og-cell.solved { animation: og-pop 0.35s ease-out; }
 
 .orgo .og-endwrap { outline: none; scroll-margin: 24px; }
+
+/* SN2 vs E2: one path button per picture; the picked one is marker yellow (4px corners, no pills). */
+.orgo .og-paths .og-path { flex: 1 1 140px; font-size: 15px; min-height: 42px; }
+.orgo .og-path.og-picked { background: var(--marker); }
+.orgo .og-fig .og-verdict { margin-top: 8px; }

@@ -1,5 +1,5 @@
 // @vitest-environment jsdom
-import { act, cleanup, fireEvent, render, screen } from '@testing-library/react'
+import { act, cleanup, fireEvent, render, screen, within } from '@testing-library/react'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { entries, labelFor } from '../../notebook'
 import { MISTAKES } from './chem'
@@ -212,7 +212,7 @@ describe('orgo session', () => {
     render(<session.Component onDone={() => {}} />)
     expect(screen.getByText('What do you want to practice?')).toBeTruthy()
     for (const sec of ['Molecules', 'Mechanisms', 'Guided path']) expect(screen.getByRole('heading', { name: sec })).toBeTruthy()
-    for (const t of [/^SN2/, /^SN1/, /^E2/, /^E1/]) expect((screen.getByRole('button', { name: t }) as HTMLButtonElement).disabled).toBe(false)
+    for (const t of [/^SN2 One/, /^SN1/, /^E2 One/, /^E1/, /^SN2 vs E2/]) expect((screen.getByRole('button', { name: t }) as HTMLButtonElement).disabled).toBe(false)
     expect(screen.queryByText('coming next')).toBeNull()
   })
 
@@ -272,6 +272,24 @@ describe('orgo session', () => {
     watch()
     expect(screen.getByText('your arrows match')).toBeTruthy()
     expect(screen.getByText('H₂O + (CH₃)₂C=CH₂ + Br⁻')).toBeTruthy()
+  })
+
+  it('Mechanisms > SN2 vs E2: predict each path, both run, the wrong pick is named', () => {
+    vi.useFakeTimers()
+    render(<session.Component onDone={() => {}} />)
+    pickTopic(/^SN2 vs E2/)
+    const run = screen.getByText('Run both') as HTMLButtonElement
+    expect(run.disabled).toBe(true)
+    const paths = screen.getAllByRole('group', { name: /pick a path/ })
+    fireEvent.click(within(paths[0]).getByText('swaps in (SN2)'))
+    fireEvent.click(within(paths[1]).getByText('swaps in (SN2)'))
+    fireEvent.click(run)
+    act(() => void vi.advanceTimersByTime(3400))
+    expect(screen.getByText(MISTAKES['crowding-ignored'].label)).toBeTruthy()
+    expect(screen.queryByText(MISTAKES['no-neighbor-h'].label)).toBeNull()
+    expect(screen.getByText('CH₃OH + Br⁻')).toBeTruthy()
+    expect(screen.getByText('H₂O + (CH₃)₂C=CH₂ + Br⁻')).toBeTruthy()
+    expect(entries()[0]).toMatchObject({ session: 'orgo', orgoTopic: 'sn2-vs-e2', misconception: 'crowding-ignored' })
   })
 
   it('Mechanisms > E1: two steps, the H comes off the carbon next to C⁺', () => {
@@ -345,7 +363,7 @@ describe('orgo session', () => {
 
   it('Mechanisms > SN2 works it out before the arrows, and the topics link goes back to the menu', () => {
     render(<session.Component onDone={() => {}} />)
-    pickTopic(/^SN2/)
+    pickTopic(/^SN2 One/)
     expect(screen.getByText('Find the parts')).toBeTruthy()
     expect(screen.getByText('1 of 4')).toBeTruthy()
     expect(screen.queryByText('Build ethanol')).toBeNull()
@@ -356,7 +374,7 @@ describe('orgo session', () => {
   it('SN2 step by step: parts, size up (wrong answers named), the chart, then arrows and Finish', () => {
     vi.useFakeTimers()
     render(<session.Component onDone={() => {}} />)
-    pickTopic(/^SN2/)
+    pickTopic(/^SN2 One/)
     // parts: a wrong tap gets a hint, not a pass
     expect(screen.getByText(/Tap the nucleophile/)).toBeTruthy()
     fireEvent.click(screen.getByRole('button', { name: 'H of hydroxide' }))
