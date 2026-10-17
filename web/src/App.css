@@ -42,3 +42,4 @@ input[type='range'] { width: 100%; accent-color: var(--pencil); height: 28px; }
 .home h1 { font-size: 2rem; margin: 0 0 8px; }
 .showcases { display: grid; gap: 12px; margin-top: 20px; }
 .showcase { text-align: left; padding: 16px; border: 2px solid var(--ink); border-radius: var(--radius); background: var(--card); box-shadow: 3px 3px 0 var(--ink); font-weight: 600; }
+.showcase .blurb { display: block; font-weight: 400; color: var(--ink-soft); margin-top: 4px; }
