@@ -7,7 +7,7 @@ Builds on docs/prize-strategy.md (prize rules, crowding, stacks) and docs/feasib
 | Tech | Setup to first working call | Worth it? | New from live checks |
 |---|---|---|---|
 | Nessie | 15 min (key via GitHub login) | only if the core is money | bad key on GET returns `200 []`, not an error; `/enterprise/*` shows every team's data; ATM/branch endpoints 502 right now |
-| Vultr | 20-30 min (signup + gift code + VM) | yes, it's our host anyway | a $0 512 MB plan exists (Miami only); $5/mo 1 GB in atl/mia; card question still open |
+| Vultr | 20-30 min (signup + gift code + VM) | yes, it's our host anyway | a $0 512 MB plan exists (sea, fra, mia); $5/mo 1 GB in ~30 regions incl. atl and mia; card question still open |
 | Gemini | 5 min (AI Studio key) | yes if it does a real job; cheap | free-tier limits are per project and only shown in AI Studio; third-party numbers conflict (250 vs 1,500 RPD) |
 | Tiger Data | 15-20 min (signup + service) | yes if we have time-series (hazard radar) | pricing page only shows the 30-day no-card trial; free plan (2 x 750 MiB) is in the changelog only |
 | Auth0 | 30-60 min incl. roles Action | yes if 2 real roles | MLH page confirms: no card, 7,000 MAU |
@@ -38,8 +38,8 @@ What that means for the build:
 Claim steps (MLH partner page): register at mlh.link/vultr-discover (Company = school, Job title = Student) → verify email → sign up at mlh.link/vultr-signup → Billing → Gift Code → $100. An older MLH page also says "no credit card required"; Vultr's own docs say new accounts add a payment method to verify. **If the Billing page asks for a card, stop** (no-spend rule) and use Render's free tier (docs/deploy-provenance.md).
 
 Plans (public API `GET /v2/plans`, no key):
-- `vc2-1c-0.5gb-free`: $0, 512 MB, **Miami only**. Fine for FastAPI + static frontend, too small for any model training or Postgres + app together.
-- `vc2-1c-1gb`: $5/mo, atl + mia. $100 covers it for the whole event many times over. **Pick this one.**
+- `vc2-1c-0.5gb-free`: $0, 512 MB, **sea, fra, mia only** (rechecked Oct 16 10 PM via `GET /v2/plans`). Fine for FastAPI + static frontend, too small for any model training or Postgres + app together.
+- `vc2-1c-1gb`: $5/mo, ~30 regions incl. atl + mia. $100 covers it for the whole event many times over. **Pick this one.**
 - GPU (`vcg-l40s-*`): from $1,123/mo (~$1.54/h). $100 is ~60 h on paper, but don't: training stays small on CPU (hazard-ml.md), and a GPU VM left running is the only way we'd burn real money.
 - Delete VMs after the event (credits expire, ~30 days per Vultr docs).
 
