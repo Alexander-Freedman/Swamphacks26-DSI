@@ -41,6 +41,15 @@ export function pct(p: number): string {
   return v < 10 ? `${v.toFixed(1).replace(/\.0$/, '')}%` : `${Math.round(v)}%`
 }
 
+/** Exact readouts keep one decimal: 0.909 → "90.9%", 0.0917 → "9.2%". */
+export function exact(p: number): string {
+  const v = p * 100
+  return Number.isFinite(v) ? `${v.toFixed(1)}%` : '-'
+}
+
+/** P6 rematch: same story, new numbers (docs/experience.md): 2% sick, 95% caught, 5% false alarms → 27.9%. */
+export const REMATCH: Test = { baseRate: 0.02, sensitivity: 0.95, falseAlarm: 0.05 }
+
 // Log slider for the base rate: 0..1000 maps to 0.1%..50%.
 export const BASE_MIN = 0.001
 export const BASE_MAX = 0.5

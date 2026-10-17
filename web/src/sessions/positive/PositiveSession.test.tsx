@@ -4,6 +4,9 @@ import { afterEach, beforeAll, describe, expect, it, vi } from 'vitest'
 import App from '../../App'
 import { session } from './index'
 
+// 1,000-person screens are slow-ish under jsdom on a busy machine
+vi.setConfig({ testTimeout: 30000 })
+
 // jsdom has no canvas; the crowd is described by its aria-label instead.
 beforeAll(() => {
   HTMLCanvasElement.prototype.getContext = (() => null) as unknown as typeof HTMLCanvasElement.prototype.getContext
@@ -52,11 +55,15 @@ describe('positive test session', () => {
 
     fireEvent.click(screen.getByText('Compare with my guess →'))
     expect(screen.getByText('real 9.2%')).toBeTruthy()
+    // the guidance line from docs/experience.md, and tapping into the real pile
+    expect(screen.getByText('These are all the positives. Tap a few: how many are actually sick?')).toBeTruthy()
+    fireEvent.click(screen.getByText('pick one for me'))
+    expect(container.textContent).toMatch(/sick, caught|healthy, false alarm/)
     expect(screen.getByText('these 89 were never sick')).toBeTruthy()
 
     fireEvent.click(screen.getByText('Now change the crowd →'))
     fireEvent.click(screen.getByText('common (50%)'))
-    expect(screen.getByText('91%')).toBeTruthy()
+    expect(screen.getByText('90.9%')).toBeTruthy()
     expect(screen.getByText('positive = probably sick')).toBeTruthy()
     expect(container.innerHTML).not.toContain('NaN')
 
@@ -65,16 +72,25 @@ describe('positive test session', () => {
     expect(screen.getByText('Close')).toBeTruthy()
     expect(container.textContent).toContain('You said 21% (certain).')
     expect(screen.getByText('False alarms are too rare to matter')).toBeTruthy()
+    expect(screen.getByText('9.2%', { selector: '.pt-reality' })).toBeTruthy()
+
+    // P6: new numbers, nothing given away before you move the slider
+    fireEvent.click(screen.getByText('One more, new numbers →'))
+    expect(screen.getByText('Same test, new numbers: does the idea stick?')).toBeTruthy()
     expect((screen.getByText('Move the slider first') as HTMLButtonElement).disabled).toBe(true)
-    fireEvent.change(screen.getByLabelText(/Your guess/), { target: { value: '60' } })
+    expect(container.textContent).not.toContain('27.9%')
+    fireEvent.change(screen.getByLabelText("Chance you're actually sick?"), { target: { value: '60' } })
     fireEvent.click(screen.getByText('Lock in 60% and show me'))
-    expect(screen.getByText('50%', { selector: 'b' })).toBeTruthy()
+    expect(screen.getByText('27.9%', { selector: '.pt-reality' })).toBeTruthy()
+    expect(screen.getByText('real 27.9%')).toBeTruthy()
+    expect(screen.getByText('Way off')).toBeTruthy()
+    expect(container.textContent).toContain('68 test positive: 19 sick, 49 false alarms')
     expect(screen.getByText('Saved.')).toBeTruthy()
     const saved = JSON.parse(localStorage.getItem('mm.sessions') ?? '[]')
-    expect(saved.at(-1)).toMatchObject({ session: 'positive-test', guess: 21, confidence: 'certain', misconception: 'ignores-false-alarms' })
+    expect(saved.at(-1)).toMatchObject({ session: 'positive-test', guess: 21, confidence: 'certain', misconception: 'ignores-false-alarms', rematch: { guess: 60, truth: 27.9 } })
     fireEvent.click(screen.getByText('Done'))
     expect(screen.getByText('You tested positive. Are you sick?')).toBeTruthy()
-  }, 30000)
+  })
 
   it('reduced motion jumps straight to the piles', () => {
     window.matchMedia = ((q: string) => ({ matches: q.includes('reduce') })) as unknown as typeof window.matchMedia
@@ -95,8 +111,10 @@ describe('positive test session', () => {
     expect(screen.getByText(`you ${g}%`)).toBeTruthy()
     fireEvent.click(screen.getByText('Now change the crowd →'))
     fireEvent.click(screen.getByText('What did I get wrong? →'))
-    expect(screen.getByText(g === 0 ? 'Called it' : 'Way off')).toBeTruthy()
-    if (g === 0) expect(container.textContent).toContain('Not zero, though: 9 of the 98 positives really are sick')
+    // 0% is 9.2 points off: "close", band → positive-barely-matters; 100% is way off
+    expect(screen.getByText(g === 0 ? 'Close' : 'Way off')).toBeTruthy()
+    expect(container.textContent).toContain(`You said ${g}%:`)
+    if (g === 0) expect(container.textContent).toContain('a positive takes you from 1% to 9.2%, about 9 times more likely')
     expect(container.innerHTML).not.toContain('NaN')
   })
 
@@ -121,17 +139,17 @@ describe('positive test session', () => {
     // 500 sick → 450 hits; 30% of 500 healthy → 150 false alarms
     fireEvent.change(base, { target: { value: '1000' } })
     expect(read()).toContain('450 / 600')
-    expect(read()).toContain('75%')
+    expect(read()).toContain('75.0%')
     fireEvent.change(fa, { target: { value: '1' } })
     expect(read()).toContain('450 / 455')
-    expect(read()).toContain('99%')
+    expect(read()).toContain('98.9%')
     expect(container.innerHTML).not.toContain('NaN')
     // the coin-flip label sits above the plot, inside the chart, at both false alarm extremes
     for (const v of ['1', '30']) {
       fireEvent.change(fa, { target: { value: v } })
       const x = Number(container.querySelector('.pt-coin-label')!.getAttribute('x'))
-      expect(x).toBeGreaterThanOrEqual(120)
-      expect(x).toBeLessThanOrEqual(330)
+      expect(x).toBeGreaterThanOrEqual(100)
+      expect(x).toBeLessThanOrEqual(300)
     }
   })
 })

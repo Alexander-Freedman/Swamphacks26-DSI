@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { baseToSlider, breakEven, CARD, pct, piles, ppv, secondTest, seededOrder, sliderToBase } from './math'
+import { baseToSlider, breakEven, CARD, exact, pct, piles, ppv, REMATCH, secondTest, seededOrder, sliderToBase } from './math'
 
 describe('positive test math', () => {
   it('1% / 90% / 9% gives 9.17%, shown as 9.2%', () => {
@@ -45,5 +45,17 @@ describe('positive test math', () => {
     const a = seededOrder()
     expect(new Set(a).size).toBe(1000)
     expect(seededOrder()).toEqual(a)
+  })
+
+  it('exact readouts keep one decimal: 90.9%, 9.2%, 0.3%', () => {
+    expect(exact(ppv({ ...CARD, baseRate: 0.5 }))).toBe('90.9%')
+    expect(exact(ppv(CARD))).toBe('9.2%')
+    expect(exact(0.003)).toBe('0.3%')
+    expect(exact(NaN)).toBe('-')
+  })
+
+  it('rematch: 2% sick, 95% caught, 5% false alarms → 27.9%, 19 of 68 per 1,000', () => {
+    expect(exact(ppv(REMATCH))).toBe('27.9%')
+    expect(piles(REMATCH)).toEqual({ sick: 20, healthy: 980, truePos: 19, falsePos: 49, positives: 68 })
   })
 })

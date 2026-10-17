@@ -1,9 +1,9 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { showcaseRound } from '../../rounds'
 import { misconceptionFor, verdictFor, verdictText } from '../../verdict'
-import { CrowdCurve, GuessBar, PileCompare } from './Charts'
+import { CrowdCurve, GuessBar, MiniPile, PileCompare } from './Charts'
 import { DotCanvas, PaintGrid, type Kind } from './Crowd'
-import { baseToSlider, breakEven, CARD, pct, piles, POP, ppv, secondTest, seededOrder, sliderToBase, type Test } from './math'
+import { baseToSlider, breakEven, CARD, exact, pct, piles, POP, ppv, REMATCH, seededOrder, sliderToBase, type Test } from './math'
 import './positive.css'
 
 const ORDER = seededOrder()
@@ -56,12 +56,14 @@ export function PositiveSession({ onDone }: { onDone: () => void }) {
     title.current?.focus({ preventScroll: true })
   }, [step])
 
+  // Guidance lines: exact wording from the P1-P6 table in docs/experience.md.
   const TITLES: [string, string][] = [
-    ['You tested positive.', `${pct(test.baseRate)} of people have it. The test catches ${pct(test.sensitivity)} of real cases and wrongly says yes to ${pct(test.falseAlarm)} of healthy people. Guess first: your guess stays on screen so you can check it later.`],
-    ['Test all 1,000.', 'Run the same test on 1,000 people and watch where the positives come from.'],
-    ['Your pile vs the real pile.', 'Your guess in pencil, reality in ink, the gap in marker.'],
-    ['Same test. Change the crowd.', 'Drag how common it is. The test stays the same; watch the piles and the chance move.'],
-    ['What happened in your head', 'The mistake your guess points to, and the one idea that fixes it.'],
+    ['You tested positive.', "Guess first: you tested positive. What's the chance you actually have it? Your guess stays on screen."],
+    ['Test all 1,000.', 'Here are 1,000 people; 10 are sick. Test everyone and watch who comes up positive.'],
+    ['Your pile vs the real pile.', 'These are all the positives. Tap a few: how many are actually sick?'],
+    ['Same test. Change the crowd.', 'Drag how common the condition is. Watch what a positive result really means change.'],
+    ['What happened in your head', 'This is the mistake your guess points to, and the one idea that fixes it.'],
+    ['Rematch', 'Same test, new numbers: does the idea stick?'],
   ]
   const [h, sub] = TITLES[step - 1]
 
@@ -69,12 +71,12 @@ export function PositiveSession({ onDone }: { onDone: () => void }) {
     <div className="pt">
       <div className="pt-head">
         <span className="pt-chip">Positive test</span>
-        <span className="pt-dots-steps" aria-label={`step ${step} of 5`}>
+        <span className="pt-dots-steps" aria-label={`step ${step} of 6`}>
           {TITLES.map((_, i) => (
             <i key={i} className={i < step ? 'on' : ''} />
           ))}
         </span>
-        <span className="pt-count">{step} of 5</span>
+        <span className="pt-count">{step} of 6</span>
         {step > 1 && (
           <span className="pt-pencil-chip">
             your guess: <b>{guess}%</b>
@@ -87,6 +89,7 @@ export function PositiveSession({ onDone }: { onDone: () => void }) {
 
       {step === 1 && (
         <GuessStep
+          test={test}
           guess={guess}
           touched={touched}
           setGuess={(v) => (setGuess(v), setTouched(true))}
@@ -101,7 +104,14 @@ export function PositiveSession({ onDone }: { onDone: () => void }) {
       {step === 2 && <RunStep test={test} guess={guess} onNext={() => setStep(3)} />}
       {step === 3 && <CompareStep guess={guess} truth={truth} painted={painted} test={test} onNext={() => setStep(4)} />}
       {step === 4 && <CrowdStep card={test} guess={guess} onNext={() => setStep(5)} />}
-      {step === 5 && <CardStep guess={guess} conf={conf} truth={truth} test={test} round={round} item={item} onDone={onDone} />}
+      {step === 5 && <CardStep guess={guess} conf={conf} truth={truth} test={test} round={round} item={item} onNext={() => setStep(6)} />}
+      {step === 6 && (
+        <RematchStep
+          onReveal={(g2) => save({ session: 'positive-test', at: new Date().toISOString(), guess, confidence: conf, misconception: misconceptionId(item, guess, conf), rematch: { guess: g2, truth: Math.round(ppv(REMATCH) * 1000) / 10 } })}
+          caught={round.misconceptions.find((x) => x.id === misconceptionId(item, guess, conf))?.label ?? null}
+          onDone={onDone}
+        />
+      )}
 
       {step > 2 && (
         <button className="pt-back" onClick={() => setStep(step - 1)}>
@@ -113,6 +123,7 @@ export function PositiveSession({ onDone }: { onDone: () => void }) {
 }
 
 function GuessStep(props: {
+  test: Test
   guess: number
   touched: boolean
   setGuess: (v: number) => void
@@ -123,7 +134,7 @@ function GuessStep(props: {
   painted: { sick: number; healthy: number }
   onLock: () => void
 }) {
-  const { guess, touched, setGuess, conf, setConf, sketch, setSketch, painted, onLock } = props
+  const { test, guess, touched, setGuess, conf, setConf, sketch, setSketch, painted, onLock } = props
   const [brush, setBrush] = useState<Brush>(1)
   const paint = (i: number) => setSketch((s) => (s[i] === brush ? s : s.map((v, k) => (k === i ? brush : v))))
   const add = (kind: 1 | 2, n: number) =>
@@ -149,6 +160,9 @@ function GuessStep(props: {
   return (
     <section className="pt-guessgrid">
       <div className="pt-card pt-guess">
+        <p className="pt-lede">
+          {pct(test.baseRate)} of people have it. The test catches <b>{pct(test.sensitivity)}</b> of real cases and wrongly says yes to <b>{pct(test.falseAlarm)}</b> of healthy people.
+        </p>
         <label className="pt-lab" htmlFor="pt-guess">Chance you're actually sick?</label>
         <div className="pt-row">
           <span className="pt-guessval" aria-live="polite">{touched ? `${guess}%` : '?'}</span>
@@ -248,7 +262,7 @@ function RunStep({ test, guess, onNext }: { test: Test; guess: number; onNext: (
   const running = phase > 0 && phase < 5
 
   return (
-    <section className="pt-split">
+    <section className="pt-split pt-run">
       <div className="pt-side">
         {phase !== 5 && (
           <button className="pt-btn pt-go pt-test" onClick={run} disabled={running}>
@@ -260,7 +274,7 @@ function RunStep({ test, guess, onNext }: { test: Test; guess: number; onNext: (
             <>
               <span className="pt-big">{c.truePos} / {c.positives}</span>
               <span className="pt-sub">
-                positives are actually sick. That's <b className="pt-truthnum">{pct(ppv(test))}</b> <span className="pt-tag">exact</span>
+                positives are actually sick. That's <b className="pt-truthnum">{exact(ppv(test))}</b> <span className="pt-tag">exact</span>
                 <br />
                 <span className="pt-pencil-text">you guessed {guess}%</span>
               </span>
@@ -272,18 +286,6 @@ function RunStep({ test, guess, onNext }: { test: Test; guess: number; onNext: (
             </>
           )}
         </div>
-        <div className="pt-legend">
-          <span><i className="pt-sw tp" />sick, positive</span>
-          <span><i className="pt-sw miss" />sick, missed</span>
-          <span><i className="pt-sw fp" />healthy, but positive</span>
-          <span><i className="pt-sw plain" />healthy, negative</span>
-        </div>
-        {phase === 5 && (
-          <div className="pt-row pt-start">
-            <button className="pt-btn pt-go" onClick={onNext}>Compare with my guess →</button>
-            <button className="pt-btn pt-ghost pt-sm" onClick={run}>replay</button>
-          </div>
-        )}
       </div>
       <div className="pt-card pt-tight pt-gridcard">
         <DotCanvas kinds={kinds} moves={moves} height={300 + fpRows * 12 + 10} label="1,000 people tested; the positives move into two piles">
@@ -297,6 +299,20 @@ function RunStep({ test, guess, onNext }: { test: Test; guess: number; onNext: (
             </>
           )}
         </DotCanvas>
+      </div>
+      <div className="pt-after">
+        <div className="pt-legend">
+          <span><i className="pt-sw tp" />sick, positive</span>
+          <span><i className="pt-sw miss" />sick, missed</span>
+          <span><i className="pt-sw fp" />healthy, but positive</span>
+          <span><i className="pt-sw plain" />healthy, negative</span>
+        </div>
+        {phase === 5 && (
+          <div className="pt-row pt-start">
+            <button className="pt-btn pt-go" onClick={onNext}>Compare with my guess →</button>
+            <button className="pt-btn pt-ghost pt-sm" onClick={run}>replay</button>
+          </div>
+        )}
       </div>
     </section>
   )
@@ -378,7 +394,7 @@ function CrowdStep({ card, guess, onNext }: { card: Test; guess: number; onNext:
           <div className="pt-readout" aria-live="polite">
             <span className="pt-big">{c.truePos} / {c.positives}</span>
             <span className="pt-sub">
-              positives are sick · <b className="pt-truthnum">{pct(p)}</b> <span className="pt-tag">exact</span>
+              positives are sick · <b className="pt-truthnum">{exact(p)}</b> <span className="pt-tag">exact</span>
               <br />
               <span className={`pt-pill ${p >= 0.5 ? 'ok' : ''}`}>{p >= 0.5 ? 'positive = probably sick' : "don't trust it yet"}</span>
             </span>
@@ -402,58 +418,59 @@ function CrowdStep({ card, guess, onNext }: { card: Test; guess: number; onNext:
   )
 }
 
+type ItemT = NonNullable<ReturnType<typeof showcaseRound>>['items'][number]
+const toAnswer = (guess: number, conf: Confidence | null) => ({ value: guess, optionId: null, confidence: conf === 'unsure' || !conf ? ('guessing' as const) : conf })
+const misconceptionId = (item: ItemT, guess: number, conf: Confidence | null) => misconceptionFor(item, toAnswer(guess, conf))
+
 type CardProps = {
   guess: number
   conf: Confidence | null
   truth: number
   test: Test
   round: NonNullable<ReturnType<typeof showcaseRound>>
-  item: NonNullable<ReturnType<typeof showcaseRound>>['items'][number]
-  onDone: () => void
+  item: ItemT
+  onNext: () => void
 }
 
-function CardStep({ guess, conf, truth, test, round, item, onDone }: CardProps) {
-  const answer = { value: guess, optionId: null, confidence: conf === 'unsure' || !conf ? ('guessing' as const) : conf }
+function CardStep({ guess, conf, truth, test, round, item, onNext }: CardProps) {
+  const answer = toAnswer(guess, conf)
   const v = verdictFor(item, answer, truth * 100) // truth in the slider's units (%)
   const mid = misconceptionFor(item, answer)
   const m = round.misconceptions.find((x) => x.id === mid)
   const c = piles(test)
   const ratio = Math.round(c.falsePos / Math.max(1, c.truePos))
-  const [g2, setG2] = useState(50)
-  const [moved2, setMoved2] = useState(false)
-  const [shown, setShown] = useState(false)
-  const second = secondTest(test)
-  const reveal = () => {
-    if (shown) return
-    setShown(true)
-    save({ session: 'positive-test', at: new Date().toISOString(), guess, confidence: conf, misconception: m?.id ?? null, second: { guess: g2, truth: Math.round(second * 1000) / 10 } })
-  }
   return (
     <section>
       <div className="pt-stamprow">
         <span className={`pt-stamp ${v}`}>{verdictText[v]}</span>
         <p className="pt-said">
-          You said <b className="pt-pencil-c pt-num">{guess}%</b>{conf && <> ({conf})</>}. It's <span className="pt-hl pt-num"><b>{pct(truth)}</b></span>.
+          You said <b className="pt-pencil-c pt-num">{guess}%</b>{conf && <> ({conf})</>}. It's
         </p>
+        <span className="pt-reality pt-num">{exact(truth)}</span>
       </div>
       <div className="pt-card pt-verdict">
         <div className={`pt-k ${m ? 'pt-red' : ''}`}>{m ? 'the mistake' : 'the right model'}</div>
         <h3 className="pt-named">{m ? <>“<span className="pt-hl">{m.label}</span>”</> : <>You counted the <span className="pt-hl">whole crowd</span>.</>}</h3>
         {!m && (
           <p>
-            You weighed the <b>{c.falsePos}</b> false alarms against the <b>{c.truePos}</b> real hits.
-            {guess < 5 && <> Not zero, though: {c.truePos} of the {c.positives} positives really are sick, so a positive still means a {pct(truth)} chance.</>}
+            You said {guess}%: you weighed the <b>{c.falsePos}</b> false alarms against the <b>{c.truePos}</b> real hits.
+          </p>
+        )}
+        {m?.id === 'positive-barely-matters' && (
+          <p>
+            You said {guess}%: you read the positive as almost meaningless. But <b>{c.truePos}</b> of the <b>{c.positives}</b> positives really are sick:
+            a positive takes you from {pct(test.baseRate)} to {exact(truth)}, about {Math.round(truth / test.baseRate)} times more likely.
           </p>
         )}
         {m?.id === 'accuracy-is-my-chance' && (
           <p>
-            You read the test's accuracy as your chance and skipped the <b>{c.healthy}</b> healthy people.{' '}
+            You said {guess}%: you read the test's accuracy as your chance and skipped the <b>{c.healthy}</b> healthy people.{' '}
             {pct(test.falseAlarm)} of them is <b>{c.falsePos}</b> false alarms, next to only <b>{c.truePos}</b> real cases.
           </p>
         )}
         {m?.id === 'ignores-false-alarms' && (
           <p>
-            You saw the false alarms but shrank them. {pct(test.falseAlarm)} of {c.healthy} is <b>{c.falsePos}</b> people,
+            You said {guess}%: you saw the false alarms but shrank them. {pct(test.falseAlarm)} of {c.healthy} is <b>{c.falsePos}</b> people,
             about {ratio} times the {c.truePos} real cases.
           </p>
         )}
@@ -467,30 +484,74 @@ function CardStep({ guess, conf, truth, test, round, item, onDone }: CardProps) 
           </>
         )}
       </div>
+      <button className="pt-btn pt-go" onClick={onNext}>One more, new numbers →</button>
+    </section>
+  )
+}
 
-      <div className="pt-next">
-        <div className="pt-k">next challenge</div>
-        <p><b>You test positive again, on a second, independent test.</b> Now what's the chance? Guess first.</p>
-        <label className="pt-lab" htmlFor="pt-g2">Your guess: <span className="pt-num pt-pencil-c">{moved2 ? `${g2}%` : '?'}</span></label>
-        <input id="pt-g2" type="range" min={0} max={100} step={1} value={g2} disabled={shown} onChange={(e) => (setG2(+e.target.value), setMoved2(true))} />
-        {shown ? (
-          <p>
-            Reality: <b className="pt-hl">{pct(second)}</b> <span className="pt-tag">exact</span>. You said <span className="pt-pencil-c">{g2}%</span>. After one positive you're in a crowd where {pct(truth)} are
-            sick, so the second test starts from that crowd, not from {pct(test.baseRate)}.
-          </p>
-        ) : (
-          <button className="pt-btn" disabled={!moved2} onClick={reveal}>{moved2 ? `Lock in ${g2}% and show me` : 'Move the slider first'}</button>
+/** Stamp for the rematch: same 15-point "close" window as the round's verdict, "called it" within 5. */
+function rematchVerdict(guess: number, truth: number): 'called' | 'close' | 'off' {
+  const d = Math.abs(guess - truth * 100)
+  return d <= 5 ? 'called' : d <= 15 ? 'close' : 'off'
+}
+
+function RematchStep({ onReveal, caught, onDone }: { onReveal: (g: number) => void; caught: string | null; onDone: () => void }) {
+  const t = REMATCH
+  const truth = ppv(t)
+  const c = piles(t)
+  const [g, setG] = useState(50)
+  const [moved, setMoved] = useState(false)
+  const [shown, setShown] = useState(false)
+  const v = rematchVerdict(g, truth)
+  return (
+    <section>
+      <div className="pt-card pt-guess">
+        <p className="pt-lede">
+          New numbers. <b>{pct(t.baseRate)}</b> of people have it. The test catches <b>{pct(t.sensitivity)}</b> of real cases and wrongly says yes to <b>{pct(t.falseAlarm)}</b> of healthy people. You test positive.
+        </p>
+        <label className="pt-lab" htmlFor="pt-g2">Chance you're actually sick?</label>
+        <div className="pt-row">
+          <span className="pt-guessval" aria-live="polite">{moved ? `${g}%` : '?'}</span>
+          <span className="pt-note">in pencil</span>
+        </div>
+        <input id="pt-g2" type="range" min={0} max={100} step={1} value={g} disabled={shown} onChange={(e) => (setG(+e.target.value), setMoved(true))} />
+        <div className="pt-ends"><span>0%</span><span>50%</span><span>100%</span></div>
+        {!shown && (
+          <button
+            className="pt-btn pt-lock"
+            disabled={!moved}
+            onClick={() => {
+              setShown(true)
+              onReveal(g)
+            }}
+          >
+            {moved ? `Lock in ${g}% and show me` : 'Move the slider first'}
+          </button>
         )}
       </div>
-      {shown ? (
-        <div className="pt-saved">
-          <p>
-            <b>Saved.</b> {m ? <>Caught: “{m.label}”.</> : 'Called it.'} Come back tomorrow for a remix: same test, a different crowd.
-          </p>
-          <button className="pt-btn pt-done" onClick={onDone}>Done</button>
-        </div>
-      ) : (
-        <button className="pt-back" onClick={onDone}>skip, I'm done</button>
+      {shown && (
+        <>
+          <div className="pt-stamprow pt-mt">
+            <span className={`pt-stamp ${v}`}>{verdictText[v]}</span>
+            <p className="pt-said">You said <b className="pt-pencil-c pt-num">{g}%</b>. It's</p>
+            <span className="pt-reality pt-num">{exact(truth)}</span>
+          </div>
+          <div className="pt-two">
+            <div className="pt-card">
+              <GuessBar guess={g} truth={truth} />
+            </div>
+            <div className="pt-card">
+              <p className="pt-small pt-top0">Of 1,000 people, {c.positives} test positive: {c.truePos} sick, {c.falsePos} false alarms.</p>
+              <MiniPile truePos={c.truePos} positives={c.positives} />
+            </div>
+          </div>
+          <div className="pt-saved">
+            <p>
+              <b>Saved.</b> {caught ? <>Caught: “{caught}”.</> : 'Called it.'} Come back tomorrow for a remix: same idea, a different crowd.
+            </p>
+            <button className="pt-btn pt-done" onClick={onDone}>Done</button>
+          </div>
+        </>
       )}
     </section>
   )

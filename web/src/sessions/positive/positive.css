@@ -33,7 +33,7 @@
 .pt-hand { font-family: var(--font-hand); font-size: 18px; margin: 6px 0 0; }
 .pt-num { font-family: var(--pt-mono); font-variant-numeric: tabular-nums; }
 .pt-hl { background: linear-gradient(transparent 55%, var(--marker) 55%); }
-.pt-tag { font: 600 11px var(--pt-mono); text-transform: uppercase; letter-spacing: .06em; border: 1.5px solid var(--ink); border-radius: 4px; padding: 0 4px; vertical-align: 2px; }
+.pt-tag { font: 600 12px var(--pt-mono); text-transform: uppercase; letter-spacing: .06em; border: 1.5px solid var(--ink); border-radius: 4px; padding: 0 4px; vertical-align: 2px; }
 .pt-k { font: 600 12px var(--pt-mono); text-transform: uppercase; letter-spacing: .06em; color: var(--ink-soft); }
 
 .pt input[type='range'] { width: 100%; height: 32px; accent-color: var(--ink); }
@@ -70,7 +70,7 @@
 .pt-dot.fp { fill: var(--marker); stroke: var(--ink-soft); stroke-width: 1; }
 .pt-divider { stroke: var(--grid); stroke-width: 2; stroke-dasharray: 4 4; }
 .pt-pile-label { font: 800 17px var(--font-body); fill: var(--ink); }
-.pt-hand-svg { font: 16px var(--font-hand); fill: var(--ink-soft); }
+.pt-hand-svg { font: 17px var(--font-hand); fill: var(--ink-soft); }
 
 .pt-legend { display: flex; flex-wrap: wrap; gap: 6px 16px; font-size: 14px; color: var(--ink-soft); margin-top: 12px; }
 .pt-sw { display: inline-block; width: 12px; height: 12px; border-radius: 50%; vertical-align: -1px; margin-right: 6px; }
@@ -86,7 +86,7 @@
 .pt-l.gap { height: 12px; background: var(--marker); }
 
 .pt-readout { display: flex; align-items: center; gap: 8px 16px; flex-wrap: wrap; margin: 14px 0 4px; }
-.pt-big { font: 800 clamp(48px, 13vw, 76px)/1 var(--pt-display); font-variant-numeric: tabular-nums; }
+.pt-big { font: 800 clamp(44px, 11vw, 76px)/1 var(--pt-display); font-variant-numeric: tabular-nums; }
 .pt-big.pt-dim { color: var(--grid); }
 .pt-sub { color: var(--ink-soft); font-size: 1.05rem; line-height: 1.6; }
 .pt-pill { font: 600 13px var(--pt-mono); padding: 3px 8px; border-radius: 999px; border: 2px solid var(--ink); background: var(--card); color: var(--ink); }
@@ -94,18 +94,18 @@
 
 /* charts: font sizes are viewBox units; the charts are ~320px wide on a phone, so 15 → 12px */
 .pt-axis { stroke: var(--ink-soft); stroke-width: 1; }
-.pt-tick { font: 14px var(--pt-mono); fill: var(--ink-soft); }
+.pt-tick { font: 17px var(--pt-mono); fill: var(--ink-soft); }
 .pt-truth { stroke: var(--ink); stroke-width: 3; fill: none; }
-.pt-truth-label { font: 800 16px var(--font-body); fill: var(--ink); }
+.pt-truth-label { font: 800 18px var(--font-body); fill: var(--ink); }
 .pt-you { stroke: var(--pencil); stroke-width: 3; stroke-dasharray: 6 5; }
-.pt-you-label { font: 600 16px var(--font-hand); fill: var(--ink-soft); }
+.pt-you-label { font: 600 18px var(--font-hand); fill: var(--ink-soft); }
 .pt-you-dot { fill: var(--card); stroke: var(--pencil); stroke-width: 3; stroke-dasharray: 4 3; }
 .pt-gap { fill: var(--marker); opacity: .75; }
 .pt-gap-solid { fill: var(--marker); }
 .pt-p-sick { fill: var(--pencil); }
 .pt-p-healthy { fill: none; stroke: var(--pencil); stroke-width: 1.6; stroke-dasharray: 2.4 1.8; }
 .pt-coin { stroke: var(--called); stroke-width: 1.5; stroke-dasharray: 3 3; }
-.pt-coin-label { font: 600 14px var(--font-body); fill: var(--called); }
+.pt-coin-label { font: 600 17px var(--font-body); fill: var(--called); }
 .pt-now { fill: var(--ink); stroke: var(--card); stroke-width: 2; }
 
 .pt-logticks { position: relative; height: 20px; font: 14px var(--font-hand); color: var(--ink-soft); }
@@ -141,6 +141,10 @@
   .pt-split > .pt-gridcard { order: -1; margin-top: 0; }
   .pt-split > .pt-gridcard .pt-dots { max-width: 600px; margin: 0 auto; }
   .pt-crowd .pt-controls { margin-top: 0; }
+  .pt-run { grid-template-areas: 'grid side' 'grid after'; grid-template-rows: auto 1fr; }
+  .pt-run > .pt-side { grid-area: side; }
+  .pt-run > .pt-after { grid-area: after; }
+  .pt-run > .pt-gridcard { grid-area: grid; }
   .pt-two { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; align-items: start; }
   .pt-two > .pt-card { margin-top: 10px; }
   .pt-guessgrid { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); }
@@ -169,7 +173,7 @@
 .pt-btn:disabled.pt-test { opacity: .6; }
 .pt-ghost { background: var(--card); color: var(--ink); }
 .pt-sm { font-size: 14px; padding: 8px 14px; min-height: 40px; }
-.pt-truthnum { font: 800 1.35em var(--pt-mono); color: var(--ink); background: linear-gradient(transparent 55%, var(--marker) 55%); }
+.pt-truthnum { font: 800 1.35em var(--pt-display); font-variant-numeric: tabular-nums; color: var(--ink); background: linear-gradient(transparent 55%, var(--marker) 55%); }
 
 /* card: stamp row like the birthday session */
 .pt-stamprow { display: flex; align-items: center; gap: 18px; flex-wrap: wrap; margin: 4px 0 14px; }
@@ -185,4 +189,16 @@
 
 @media (prefers-reduced-motion: reduce) {
   .pt section, .pt-stamp { animation: none; }
+}
+
+/* P3: tap a positive */
+.pt-tappable { cursor: pointer; touch-action: manipulation; }
+.pt-picked { stroke: var(--ink); stroke-width: 2.4; }
+.pt-pickline { display: flex; align-items: center; gap: 6px 10px; flex-wrap: wrap; margin: 8px 0 0; min-height: 38px; }
+.pt-gap-area { opacity: .35; }
+/* P5/P6: reality, in ink, is the biggest thing on the screen */
+.pt-reality { font: 800 clamp(52px, 14vw, 80px)/1 var(--pt-display); font-variant-numeric: tabular-nums; color: var(--ink); background: linear-gradient(transparent 60%, var(--marker) 60%); padding: 0 4px; }
+.pt-lede { margin: 0 0 12px; font-size: 1.05rem; line-height: 1.45; }
+@media (max-width: 400px) {
+  .pt-logticks { font-size: 12.5px; }
 }
