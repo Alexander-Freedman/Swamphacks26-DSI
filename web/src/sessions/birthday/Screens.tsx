@@ -192,14 +192,14 @@ function Web({ full }: { full: boolean }) {
       lines.push(<line key={i + '-' + j} x1={a[0]} y1={a[1]} x2={b[0]} y2={b[1]} stroke="var(--ink)" strokeOpacity={full ? 0.22 : 0.7} strokeWidth={full ? 0.8 : 1.4} />)
     }
   return (
-    <svg className="bday-web" viewBox="0 0 200 200" aria-hidden>
+    <svg className="bday-web" viewBox="0 -12 200 212" aria-hidden>
       {lines}
       {Array.from({ length: n }, (_, i) => {
         const [x, y] = pt(i)
         const me = !full && i === 0
         return <circle key={i} cx={x} cy={y} r={me ? 8 : 4.5} fill={me ? 'var(--marker)' : 'var(--ink)'} stroke="var(--ink)" strokeWidth={1.5} />
       })}
-      {!full && <text x={84} y={14} textAnchor="end" className="bday-webyou">you</text>}
+      {!full && <text x={86} y={12} textAnchor="end" className="bday-webyou">you</text>}
     </svg>
   )
 }
@@ -216,7 +216,7 @@ export function Card({ guess, conf, curve, skipped, onAgain, onNext }: { guess: 
         </p>
       </div>
       <div className="bday-card bday-mistake">
-        <div className="bday-tag bday-red">{m ? 'the mistake' : 'the right model'}</div>
+        <div className={'bday-tag' + (m ? ' bday-red' : '')}>{m ? 'the mistake' : 'the right model'}</div>
         <h3 className="bday-named">
           {m ? <>“<span className="bday-hl">{m.label}</span>”</> : <>You counted <span className="bday-hl">pairs</span>, not people.</>}
         </h3>

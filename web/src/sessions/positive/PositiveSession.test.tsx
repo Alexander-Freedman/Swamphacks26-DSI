@@ -2,7 +2,11 @@
 import { act, cleanup, fireEvent, render, screen } from '@testing-library/react'
 import { afterEach, beforeAll, describe, expect, it, vi } from 'vitest'
 import App from '../../App'
+import { shellVerdict } from '../../components/session/verdict'
+import { showcaseRound } from '../../rounds'
+import { misconceptionFor } from '../../verdict'
 import { session } from './index'
+import { CARD, ppv } from './math'
 
 // 1,000-person screens are slow-ish under jsdom on a busy machine
 vi.setConfig({ testTimeout: 30000 })
@@ -20,7 +24,8 @@ afterEach(() => {
 const Session = session.Component
 const guessAndLock = (v: number) => {
   fireEvent.change(screen.getByLabelText("Chance you're actually sick?"), { target: { value: String(v) } })
-  fireEvent.click(screen.getByText(`Lock in ${v}%`))
+  fireEvent.click(screen.getByText('pretty sure'))
+  fireEvent.click(screen.getByText('Lock it in'))
 }
 const testEveryone = async () => {
   fireEvent.click(screen.getByText('Test everyone'))
@@ -34,14 +39,21 @@ describe('positive test session', () => {
     const { container } = render(<App />)
     fireEvent.click(screen.getByText('You tested positive. Are you sick?'))
 
-    const lock = screen.getByText('Move the slider to guess') as HTMLButtonElement
+    // same lock as the other sessions: slider, then how sure, then lock (#149)
+    const lock = screen.getByText('Move the slider first') as HTMLButtonElement
     expect(lock.disabled).toBe(true)
+    expect(lock.className).toContain('ss-lock')
+    expect(container.textContent).not.toContain('optional')
     fireEvent.change(screen.getByLabelText("Chance you're actually sick?"), { target: { value: '21' } })
+    expect(lock.textContent).toBe('Pick how sure you are')
+    expect(lock.disabled).toBe(true)
     fireEvent.click(screen.getByText('certain'))
+    expect(lock.textContent).toBe('Lock it in')
+    expect(lock.disabled).toBe(false)
     fireEvent.click(screen.getByLabelText('ten more healthy positives'))
     fireEvent.click(screen.getByLabelText('one more sick positive'))
     expect(container.textContent).toContain('9.1% of positives are sick (1 of 11)')
-    fireEvent.click(screen.getByText('Lock in 21%'))
+    fireEvent.click(screen.getByText('Lock it in'))
 
     expect(screen.getByText('Test all 1,000.')).toBeTruthy()
     // the step title takes focus so keyboard and screen reader users land on the new step
@@ -68,8 +80,9 @@ describe('positive test session', () => {
     expect(container.innerHTML).not.toContain('NaN')
 
     fireEvent.click(screen.getByText('What did I get wrong? →'))
-    // 21% is 11.8 points from 9.2%: inside the 15-point "close" window, band → ignores-false-alarms.
-    expect(screen.getByText('Close')).toBeTruthy()
+    // 21% is 11.8 points from 9.2% but more than twice it: way off (#151), band → ignores-false-alarms.
+    expect(screen.getByText('Way off')).toBeTruthy()
+    expect(screen.getByText(/^This is the mistake your guess points to/)).toBeTruthy()
     expect(container.textContent).toContain('You said 21% (certain).')
     expect(screen.getByText('False alarms are too rare to matter')).toBeTruthy()
     expect(screen.getByText('9.2%', { selector: '.pt-reality' })).toBeTruthy()
@@ -80,12 +93,15 @@ describe('positive test session', () => {
     expect((screen.getByText('Move the slider first') as HTMLButtonElement).disabled).toBe(true)
     expect(container.textContent).not.toContain('27.9%')
     fireEvent.change(screen.getByLabelText("Chance you're actually sick?"), { target: { value: '60' } })
-    fireEvent.click(screen.getByText('Lock in 60% and show me'))
+    fireEvent.click(screen.getByText('Lock it in'))
     expect(screen.getByText('27.9%', { selector: '.pt-reality' })).toBeTruthy()
     expect(screen.getByText('real 27.9%')).toBeTruthy()
     expect(screen.getByText('Way off')).toBeTruthy()
     expect(container.textContent).toContain('68 test positive: 19 sick, 49 false alarms')
-    expect(screen.getByText('Saved.')).toBeTruthy()
+    // end bar like birthday's: saved, first guess + rematch, open notebook, done (#148)
+    expect(screen.getByText('Saved to your notebook.')).toBeTruthy()
+    expect(container.querySelector('.ss-end')!.textContent).toContain('Caught: “False alarms are too rare to matter”. Rematch missed; it stays in your notebook to try again.')
+    expect(screen.getByText('Open notebook').getAttribute('href')).toContain('?notebook=1')
     const saved = JSON.parse(localStorage.getItem('mm.sessions') ?? '[]')
     expect(saved.at(-1)).toMatchObject({ session: 'positive-test', guess: 21, confidence: 'certain', misconception: 'ignores-false-alarms', rematch: 'wrong', rematchGuess: 60, rematchTruth: 27.9 })
     fireEvent.click(screen.getByText('Done'))
@@ -111,8 +127,9 @@ describe('positive test session', () => {
     expect(screen.getByText(`you ${g}%`)).toBeTruthy()
     fireEvent.click(screen.getByText('Now change the crowd →'))
     fireEvent.click(screen.getByText('What did I get wrong? →'))
-    // 0% is 9.2 points off: "close", band → positive-barely-matters; 100% is way off
-    expect(screen.getByText(g === 0 ? 'Close' : 'Way off')).toBeTruthy()
+    // 0% is 9.2 points off but nowhere near 9.2% in proportion: way off, next to the caught mistake (#151)
+    expect(screen.getByText('Way off')).toBeTruthy()
+    expect(container.textContent).toContain('the mistake')
     expect(container.textContent).toContain(`You said ${g}%:`)
     if (g === 0) expect(container.textContent).toContain('a positive takes you from 1% to 9.2%, about 9 times more likely')
     expect(container.innerHTML).not.toContain('NaN')
@@ -151,5 +168,76 @@ describe('positive test session', () => {
       expect(x).toBeGreaterThanOrEqual(100)
       expect(x).toBeLessThanOrEqual(300)
     }
+  })
+})
+
+const toCard = async (g: number) => {
+  guessAndLock(g)
+  await testEveryone()
+  fireEvent.click(screen.getByText('Compare with my guess →'))
+  fireEvent.click(screen.getByText('Now change the crowd →'))
+  fireEvent.click(screen.getByText('What did I get wrong? →'))
+}
+
+describe('positive card and end bar (same shell as birthday)', () => {
+  it('confidence is required, no "optional"', () => {
+    render(<Session onDone={() => {}} />)
+    fireEvent.change(screen.getByLabelText("Chance you're actually sick?"), { target: { value: '40' } })
+    const lock = screen.getByText('Pick how sure you are') as HTMLButtonElement
+    expect(lock.disabled).toBe(true)
+    fireEvent.click(screen.getByText('unsure'))
+    expect(lock.disabled).toBe(false)
+    expect(lock.textContent).toBe('Lock it in')
+  })
+
+  it('called-it guess, missed rematch: called-it line on the card, both parts on the bar (#150, #148)', async () => {
+    vi.useFakeTimers()
+    const { container } = render(<Session onDone={() => {}} />)
+    await toCard(9)
+    expect(screen.getByText('Called it')).toBeTruthy()
+    expect(screen.getByText("You called it. Here's the idea that makes it work, so you can do it again.")).toBeTruthy()
+    fireEvent.click(screen.getByText('One more, new numbers →'))
+    fireEvent.change(screen.getByLabelText("Chance you're actually sick?"), { target: { value: '100' } })
+    fireEvent.click(screen.getByText('Lock it in'))
+    expect(screen.getByText('Way off')).toBeTruthy()
+    expect(container.querySelector('.ss-end')!.textContent).toContain('Saved to your notebook. Your first guess called it. Rematch missed; it stays in your notebook to try again.')
+  })
+
+  it('stamp and caught mistake agree for every guess; close only within 15 points and 2x (#151)', () => {
+    const item = showcaseRound('positive-test')!.items[0]
+    const truth = ppv(CARD) * 100
+    for (let g = 0; g <= 100; g++) {
+      const m = misconceptionFor(item, { value: g, optionId: null, confidence: 'pretty sure' })
+      const v = shellVerdict(m, g, truth, 15)
+      expect(v === 'called').toBe(m === null)
+      if (v === 'close') expect(g >= truth / 2 && g <= truth * 2 && Math.abs(g - truth) <= 15).toBe(true)
+      if (g <= 4) expect(v).toBe('off') // the low end never reads "close" next to a caught mistake
+    }
+  })
+
+  it('step dots go back to any reached step, never to the locked guess (no "back" link)', async () => {
+    vi.useFakeTimers()
+    render(<Session onDone={() => {}} />)
+    await toCard(30)
+    expect(screen.queryByText('← back')).toBeNull()
+    expect((screen.getByRole('button', { name: '1 Your guess' }) as HTMLButtonElement).disabled).toBe(true)
+    expect((screen.getByRole('button', { name: '6 Rematch' }) as HTMLButtonElement).disabled).toBe(true)
+    expect(screen.getByRole('button', { name: '5 Your mistake' }).getAttribute('aria-current')).toBe('step')
+    fireEvent.click(screen.getByRole('button', { name: '3 Your pile vs real' }))
+    expect(screen.getByText('Your pile vs the real pile.')).toBeTruthy()
+    // forward again to where you were
+    fireEvent.click(screen.getByRole('button', { name: '5 Your mistake' }))
+    expect(screen.getByText('What happened in your head')).toBeTruthy()
+  })
+
+  it('rematch at the low end is way off, not close', async () => {
+    vi.useFakeTimers()
+    render(<Session onDone={() => {}} />)
+    await toCard(9)
+    fireEvent.click(screen.getByText('One more, new numbers →'))
+    fireEvent.change(screen.getByLabelText("Chance you're actually sick?"), { target: { value: '13' } })
+    fireEvent.click(screen.getByText('Lock it in'))
+    // 13% is 14.9 points from 27.9%, inside the old window, but under half of it
+    expect(screen.getByText('Way off')).toBeTruthy()
   })
 })
