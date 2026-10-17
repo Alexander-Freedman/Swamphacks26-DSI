@@ -147,7 +147,7 @@ export function MiniRects() {
     )
   }
   return (
-    <svg className="calc-mini" width={w} height={120} viewBox={`0 0 ${w} 120`} role="img" aria-label="one rectangle overshoots at 7.5; twelve rectangles hug the curve at about 4.8">
+    <svg className="calc-mini" width={w} height={120} viewBox={`0 0 ${w} 120`} role="img" aria-label="one rectangle overshoots at 7.5; twelve rectangles hug the curve at 4.74">
       {pane(1, 6)}
       {pane(12, 128)}
     </svg>
