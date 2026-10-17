@@ -74,6 +74,7 @@ function ProgRun({ topic, onTopics, onDone }: { topic: ProgTopic; onTopics: () =
 const START = 4
 const CODE = ['function fact(n) {', '  if (n <= 1) return 1', '  return n * fact(n - 1)', '}']
 const OVERFLOW = 5 // extra frames drawn past fact(1) when the base case is gone
+const reducedMotion = () => typeof matchMedia === 'function' && matchMedia('(prefers-reduced-motion: reduce)').matches
 
 type Phase = 'depth' | 'run' | 'which' | 'run2' | 'overflow' | 'crash' | 'done'
 type Q = { ask: string; choices: { id: string; text: string }[]; answer: string; traps: Partial<Record<string, StackMistake>>; why: string }
@@ -134,7 +135,11 @@ function CallStackStep({ topic, onDone }: { topic: string; onDone: () => void })
       setRight(q.why)
       setNote(null)
       setWrong([])
-      setPhase(phase === 'depth' ? 'run' : phase === 'which' ? 'run2' : 'crash')
+      if (phase === 'overflow' && reducedMotion()) {
+        // no animation: show the overflowing stack all at once
+        setExtra(OVERFLOW)
+        setPhase('done')
+      } else setPhase(phase === 'depth' ? 'run' : phase === 'which' ? 'run2' : 'crash')
       return
     }
     setWrong((w) => [...w, id])
@@ -156,12 +161,6 @@ function CallStackStep({ topic, onDone }: { topic: string; onDone: () => void })
   // the crash: frames keep piling on past fact(1), one at a time
   useEffect(() => {
     if (phase !== 'crash') return
-    const reduce = typeof matchMedia === 'function' && matchMedia('(prefers-reduced-motion: reduce)').matches
-    if (reduce) {
-      setExtra(OVERFLOW)
-      setPhase('done')
-      return
-    }
     const id = setInterval(() => {
       setExtra((e) => {
         if (e + 1 >= OVERFLOW) {
