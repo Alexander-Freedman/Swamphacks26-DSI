@@ -1,5 +1,7 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { AnyTopic, BuildReady } from './components/AnyTopic'
+import { AskHelp } from './components/AskHelp'
+import { ITEM_SCREENS } from './components/helpHints'
 import { BackendDot } from './components/BackendDot'
 import { CheckedTag } from './components/CheckedTag'
 import { HowItWorks } from './components/HowItWorks'
@@ -108,9 +110,23 @@ function Player({ round, onDone }: { round: Round; onDone: () => void }) {
     <div className="sheet">
       <div className="player-bar">
         <p className="progress">{round.topic} · {idx + 1} of {round.items.length}</p>
-        <button className="hiw-btn" onClick={() => setDrawer(true)} aria-haspopup="dialog">
-          How it works <kbd aria-hidden="true">D</kbd>
-        </button>
+        <div className="topbar-actions">
+          <AskHelp
+            slug={round.slug}
+            kind="round"
+            spot={{
+              screen: ITEM_SCREENS[item.id],
+              locked: phase.kind !== 'predict',
+              guess: phase.kind === 'predict' ? null : (phase.answer.value ?? phase.answer.optionId),
+              step: idx + 1,
+              total: round.items.length,
+              label: round.topic,
+            }}
+          />
+          <button className="hiw-btn" onClick={() => setDrawer(true)} aria-haspopup="dialog">
+            How it works <kbd aria-hidden="true">D</kbd>
+          </button>
+        </div>
       </div>
       {drawer && <HowItWorks round={round} item={item} locked={phase.kind !== 'predict'} onClose={closeDrawer} />}
       {phase.kind === 'predict' && <Predict key={item.id} item={item} onLock={lock} />}
@@ -183,7 +199,10 @@ export default function App() {
       <main className="app">
         <header className="topbar">
           <button className="logo" style={{ border: 0, background: 'none', padding: 0 }} onClick={home}>Onionskin</button>
-          {sessionHowItWorks[session.slug] && <SessionDrawer key={session.slug} slug={session.slug} />}
+          <div className="topbar-actions">
+            <AskHelp key={session.slug} slug={session.slug} kind="session" />
+            {sessionHowItWorks[session.slug] && <SessionDrawer key={session.slug} slug={session.slug} />}
+          </div>
         </header>
         <session.Component key={session.slug} onDone={home} />
         <BuildReady onOpen={(slug) => go({ kind: 'round', slug })} />
