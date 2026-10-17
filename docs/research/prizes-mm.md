@@ -26,10 +26,10 @@ For issue #21. Analysis only. Inputs: event/hacker-guide.md (challenges), event/
 | **Auth0 (MLH)** | Yes, modestly | Accounts so streaks and your misconception history follow you across devices ("come back" needs an identity). Google login, guest first, sign in to keep your streak | 1.5-2 | **Core-lite** (cut line 2) | medium, ~1 project used it at XI |
 | **Tiger Data (MLH)** | Yes now (wasn't for the physics-only version) | Every answer is an event: (user, topic, concept, misconception code, correct, confidence, time). Hypertable + continuous aggregates drive streaks, "misconceptions you've fixed this week", and "the room": what % of everyone at SwampHacks predicted the same wrong thing | 2-3 (we need a DB anyway; Tiger as the only DB) | **Core** if signup is no-card; else stretch | medium, 0 used it at XI |
 | **DeepSpace** | Only if multiplayer is the headline | Live "class / party" rooms: room code, everyone locks a prediction, reveal shows the room's spread; realtime leaderboard | 9-12 (deepspace.md, live classroom) | **Stretch at most; default skip** | low per hour |
-| **DEV writing (MLH)** | Yes | Post-event write-up | 1-2 after the event; needs I's DEV account | **After** | small |
+| **DEV writing (MLH)** | Yes | Post-event write-up | 1-2 after the event; needs my DEV account | **After** | small |
 | **Roblox** | No | Any-topic generation + web loop doesn't live in Luau; would mean a different product | whole project | **Skip** | — |
 
-**Recommended stack:** Entertainment track + Gemini + Easy On The Eyes + GoDaddy + Vultr + Tiger Data + Auth0 (cut line) + DEV after. ~5-6.5 extra hours total. DeepSpace stays out unless I makes multiplayer rooms the core idea (see "DeepSpace decision" below).
+**Recommended stack:** Entertainment track + Gemini + Easy On The Eyes + GoDaddy + Vultr + Tiger Data + Auth0 (cut line) + DEV after. ~5-6.5 extra hours total. DeepSpace stays out unless I make multiplayer rooms the core idea (see "DeepSpace decision" below).
 
 ## Per prize
 
@@ -87,7 +87,7 @@ For issue #21. Analysis only. Inputs: event/hacker-guide.md (challenges), event/
 - **Cheaper alternative for the same "room" feeling:** the Tiger "the room" panel (everyone at the event, asynchronously). It gets ~70% of the wow for ~10% of the hours.
 
 ### DEV writing (MLH): after the event
-- 1-2h on Sun/Mon; needs a DEV account that I makes. Monthly editorial pick, ~5-10%. The eval-ish numbers (how often Gemini's sessions were right, how many misconceptions the room had) make a better post than a feature list.
+- 1-2h on Sun/Mon; needs a DEV account that I make. Monthly editorial pick, ~5-10%. The eval-ish numbers (how often Gemini's sessions were right, how many misconceptions the room had) make a better post than a feature list.
 
 ### Roblox: skip
 - Built in Roblox Studio with Luau only. Our product is a web loop over any topic; Roblox would mean a separate, fixed-content game. 2 Roblox judges are present and crowding is low, but it excludes every web sponsor and doubles the build. No.
@@ -103,13 +103,13 @@ For issue #21. Analysis only. Inputs: event/hacker-guide.md (challenges), event/
 | Prizes in play | Gemini, UI/UX, GoDaddy, Vultr, Auth0, Tiger, DEV | Gemini, UI/UX, GoDaddy, Vultr, DeepSpace, (Tiger), DEV |
 | Risk | low; one backend, one DB | alpha SDK, two runtimes, WS on venue Wi-Fi, Node upgrade |
 
-A wins on EV per hour. B only makes sense if I wants "play with friends" to be the main Entertainment pitch. If B, decide **before the first commit** (DeepSpace is either the base from the start or not used), and only if DeepSpace confirms in-person judging at the 8:30 PM desk.
+A wins on EV per hour. B only makes sense if I want "play with friends" to be the main Entertainment pitch. If B, decide **before the first commit** (DeepSpace is either the base from the start or not used), and only if DeepSpace confirms in-person judging at the 8:30 PM desk.
 
 ## Core vs stretch and cut order
 - **Core:** Gemini engine, design pass (UI/UX), domain, Vultr host, Tiger answer log + "the room" + streak cagg.
 - **Cut line 2:** Auth0 (if not working by ~H22, ship guest-only streaks keyed to a device id; still feeds Tiger).
 - **Stretch:** Tiger "misconceptions you fixed this week" chart with seeded history; free-text prediction labeling.
-- **Out:** DeepSpace (unless I picks B), Roblox, Solana, Nessie, Sperry, Least Vibe Coded.
+- **Out:** DeepSpace (unless I pick B), Roblox, Solana, Nessie, Sperry, Least Vibe Coded.
 - **Cut order if behind:** DeepSpace (n/a) → Auth0 → Tiger history chart (keep "the room") → Vultr (fall back to Render) → never cut Gemini generation, the reveal, or the domain/QR.
 
 ## One-line demo moments (table script order)
