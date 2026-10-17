@@ -41,10 +41,18 @@ describe('birthday session', () => {
     expect(verdictOf(100).m?.id).toBe('its-about-my-birthday')
     expect(verdictOf(180).m?.id).toBe('half-of-365')
     expect(verdictOf(180).v).toBe('off')
-    // tiny rooms are well under a coin flip: not "called it"
-    expect(verdictOf(2).v).toBe('close')
-    expect(verdictOf(2).m?.refutation).toContain('1 pair: a 0.3% chance')
-    expect(verdictOf(14).m?.id).toBe('too-few')
+    // 250+ is mixing up a coin flip with a sure thing, not halving 365 (#111)
+    expect(verdictOf(249).m?.id).toBe('half-of-365')
+    expect(verdictOf(250).m?.id).toBe('fifty-is-not-certain')
+    expect(verdictOf(366).m?.id).toBe('fifty-is-not-certain')
+    expect(verdictOf(366).v).toBe('off')
+    // tiny rooms are well under a coin flip: 2 people (0.3%) is way off, 10-17 is close
+    expect(verdictOf(2).v).toBe('off')
+    expect(verdictOf(9).v).toBe('off')
+    expect(verdictOf(10).v).toBe('close')
+    expect(verdictOf(14).m?.id).toBe('a-handful-is-enough')
+    expect(verdictOf(57).v).toBe('off')
+    expect(verdictOf(56).v).toBe('close')
     // 15 people is a 25% chance: below the tightened 18-30 band (#98), so not "called it"
     expect(verdictOf(15).v).not.toBe('called')
     expect(verdictOf(23).v).toBe('called')

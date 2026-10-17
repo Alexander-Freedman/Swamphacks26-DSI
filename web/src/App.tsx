@@ -121,7 +121,7 @@ export default function App() {
     return (
       <main className="app">
         <header className="topbar">
-          <button className="logo" style={{ border: 0, background: 'none', padding: 0 }} onClick={home}>mm</button>
+          <button className="logo" style={{ border: 0, background: 'none', padding: 0 }} onClick={home}>Onionskin</button>
         </header>
         <session.Component key={session.slug} onDone={home} />
       </main>
@@ -130,7 +130,7 @@ export default function App() {
   return (
     <main className="app">
       <header className="topbar">
-        <button className="logo" style={{ border: 0, background: 'none', padding: 0 }} onClick={home}>mm</button>
+        <button className="logo" style={{ border: 0, background: 'none', padding: 0 }} onClick={home}>Onionskin</button>
         {round && <CheckedTag reviewed={round.reviewed} />}
       </header>
       {cleared && <p className="nb-toast" role="status">Notebook cleared</p>}

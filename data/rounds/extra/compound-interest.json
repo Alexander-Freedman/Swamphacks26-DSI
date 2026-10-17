@@ -17,7 +17,7 @@
       "id": "simple-interest",
       "label": "Growth adds the same amount each year",
       "why_tempting": "Adding the same interest every year ($2 a year, or 8% of the start each year) feels exact: $110 after 5 years, 12.5 years to double.",
-      "refutation": "Each year's 8% is taken on a bigger balance than the year before, so doubling comes sooner (about 9 years) and long horizons end far higher than adding would give.",
+      "refutation": "Interest is figured on the current balance, which grows every year, so each year adds more than the last: $100 at 2% for 5 years is $110.41 (not $110), money at 8% doubles in about 9 years (not 12.5), and $10,000 at 7% for 30 years ends near $76,000 (not $31,000).",
       "source_url": "https://research.cgu.edu/dpe-events-and-conferences/wp-content/uploads/sites/37/2016/12/EGB.pdf",
       "source_note": "Levy & Tasoff: exponential-growth bias is 'the tendency... to partially neglect compounding'"
     },
@@ -25,7 +25,7 @@
       "id": "exponential-growth-bias",
       "label": "Compounding is a small bonus",
       "why_tempting": "People know interest compounds but picture it as a little extra on top of steady growth.",
-      "refutation": "Over 30 years at 7%, compounding doesn't add a bit: it makes the final amount about 2.5 times what simple adding gives.",
+      "refutation": "Compounding's effect grows with time instead of staying small: at 8% money doubles in about 9 years, and $10,000 at 7% for 30 years ends near $76,000, about 2.5 times the $31,000 simple adding gives.",
       "source_url": "https://en.wikipedia.org/wiki/Exponential_growth#Exponential_growth_bias",
       "source_note": "'Exponential growth bias is the tendency to underestimate compound growth processes'"
     }
