@@ -104,6 +104,20 @@ describe('notebook store', () => {
     expect(notebook()).toMatchObject([{ id: 'half-of-365', wins: 1 }, { id: 'too-few', caught: 2, wins: 0 }])
   })
 
+  it('the card keeps the latest try: rematch right vs missed, then later sessions (#176)', () => {
+    record(e('10', 'half-of-365', 'right'))
+    expect(notebook()[0]).toMatchObject({ last: 'rematch-right', wins: 0 })
+    localStorage.clear()
+    record(e('10', 'half-of-365', 'wrong'))
+    expect(notebook()[0]).toMatchObject({ last: 'rematch-missed', wins: 0 })
+    record(e('11', 'too-few', 'wrong')) // a later miss: marked, no win, no reset
+    expect(notebook()[0]).toMatchObject({ last: 'missed', wins: 0, lastSeen: '2026-10-11T12:00:00.000Z' })
+    record(e('12', null, null))
+    expect(notebook()[0]).toMatchObject({ last: 'right', wins: 1 })
+    record(e('13', 'half-of-365', null)) // caught again with no rematch
+    expect(notebook()[0]).toMatchObject({ last: null, wins: 0, caught: 2 })
+  })
+
   it('getting caught again puts a busted mistake back in pencil', () => {
     record(e('10', 'too-few', 'right'))
     record(e('11', null, 'right'))

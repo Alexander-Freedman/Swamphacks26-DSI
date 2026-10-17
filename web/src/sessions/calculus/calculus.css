@@ -1,0 +1,144 @@
+/* Calculus level. Notebook Arcade: ink = truth, pencil (dashed) = you, marker = the gap. Square-ish corners (4px), no pills. */
+.calc {
+  --calc-mono: 'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, monospace;
+  --calc-rect: rgba(27, 35, 64, 0.12);
+}
+.calc .ss-chip { border-radius: 4px; }
+.calc section { animation: calc-in 220ms ease-out; }
+@keyframes calc-in { from { opacity: 0; transform: translateY(6px); } }
+
+.calc-card { background: var(--card); border: 2px solid var(--ink); border-radius: 4px; box-shadow: var(--shadow); padding: 16px; margin-top: 14px; min-width: 0; }
+.calc-card.calc-tight { padding: 10px; }
+.calc-pad { padding: 2px 4px 6px; }
+.calc-row { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
+.calc-row.calc-start { margin-top: 10px; }
+.calc-hand { font: 17px/1.45 var(--font-hand); margin: 12px 0 0; }
+.calc-small { font-size: 15px; margin: 8px 0 0; color: var(--ink-soft); }
+.calc-num { font-family: var(--calc-mono); font-variant-numeric: tabular-nums; }
+.calc-hl { background: linear-gradient(transparent 50%, var(--marker) 50%); }
+.calc-box { border: 2px solid var(--ink); border-radius: 4px; padding: 0 4px; }
+.calc-tag { font: 600 12px var(--calc-mono); text-transform: uppercase; letter-spacing: .06em; color: var(--ink-soft); }
+.calc-k { font: 600 12px var(--calc-mono); text-transform: uppercase; letter-spacing: .06em; color: var(--ink-soft); }
+.calc-k.calc-red { color: var(--off); }
+.calc-chip { font: 600 12px var(--calc-mono); text-transform: uppercase; letter-spacing: .06em; border: 1.5px solid var(--ink); border-radius: 4px; padding: 0 4px; vertical-align: 2px; }
+.calc-pencil-c { font-family: var(--font-hand); color: var(--ink-soft); border-bottom: 2px dashed var(--pencil); }
+.calc-truthnum { font-family: var(--calc-mono); color: var(--ink); }
+
+.calc-btn { font: 700 16px var(--font-body); background: var(--ink); color: var(--paper); border: 2px solid var(--ink); border-radius: 4px; padding: 10px 18px; box-shadow: 0 3px 0 #000; margin-top: 14px; min-height: 46px; touch-action: manipulation; }
+.calc-btn:active:not(:disabled) { transform: translateY(2px); box-shadow: 0 1px 0 #000; }
+.calc-btn:disabled { opacity: .45; cursor: not-allowed; }
+.calc-btn.calc-go { background: var(--marker); color: var(--ink); }
+.calc-btn.calc-ghost { background: var(--card); color: var(--ink); box-shadow: 0 2px 0 var(--ink); }
+.calc-btn.calc-sm { font-size: 14px; min-height: 40px; padding: 6px 12px; margin-top: 0; }
+
+.calc-seg { display: inline-flex; border: 2px solid var(--ink); border-radius: 4px; overflow: hidden; }
+.calc-seg button { font: 700 14px var(--font-body); background: var(--card); border: 0; padding: 8px 12px; min-height: 40px; }
+.calc-seg button + button { border-left: 2px solid var(--ink); }
+.calc-seg button[aria-pressed='true'] { background: var(--ink); color: var(--paper); }
+
+.calc input[type='range'] { width: 100%; height: 32px; accent-color: var(--ink); }
+.calc-lab { font-weight: 700; display: block; margin-bottom: 2px; }
+.calc-ends { display: flex; justify-content: space-between; font-size: 14px; color: var(--ink-soft); }
+
+/* layout: chart + a side readout; on a phone the readout sits above the chart so it stays in view while dragging */
+.calc-split { display: grid; grid-template-columns: minmax(0, 1fr) 270px; gap: 0 16px; align-items: start; }
+.calc-split .calc-main { grid-column: 1; grid-row: 1 / span 2; }
+.calc-split .calc-side { grid-column: 2; grid-row: 1; }
+.calc-split .calc-after { grid-column: 1 / -1; }
+.calc-two { display: grid; grid-template-columns: 1fr 1fr; gap: 0 16px; }
+@media (max-width: 760px) {
+  .calc-split, .calc-two { grid-template-columns: minmax(0, 1fr); }
+  .calc-split .calc-main, .calc-split .calc-side, .calc-split .calc-after { grid-column: 1; grid-row: auto; }
+}
+
+.calc-readout { display: flex; flex-direction: column; gap: 2px; }
+.calc-big { font: 800 clamp(40px, 10vw, 64px)/1 var(--font-display); font-variant-numeric: tabular-nums; }
+.calc-big.calc-dim { color: var(--ink-soft); }
+.calc-word { font: 20px var(--font-hand); }
+.calc-sub { color: var(--ink-soft); font-size: 15px; line-height: 1.5; }
+.calc-meter { height: 10px; border: 2px solid var(--ink); border-radius: 4px; margin-top: 12px; background: var(--card); overflow: hidden; }
+.calc-meter i { display: block; height: 100%; background: var(--ink); }
+@media (max-width: 760px) {
+  .calc-readout { flex-direction: row; flex-wrap: wrap; align-items: baseline; gap: 4px 12px; }
+  .calc-readout .calc-tag { flex: 1 1 100%; }
+  .calc-big { font-size: 40px; }
+  /* the readout above the drawing pad never changes height mid-stroke */
+  .calc-steady { height: 98px; overflow: hidden; }
+}
+
+/* charts */
+.calc-svg { display: block; max-width: 100%; height: auto; overflow: visible; }
+.calc-touch { user-select: none; -webkit-user-select: none; }
+.calc-draw { touch-action: none; cursor: crosshair; }
+.calc-drag { touch-action: pan-y; cursor: ew-resize; }
+.calc-svg:focus { outline: none; }
+.calc-svg:focus-visible { outline: 3px solid var(--marker); outline-offset: 2px; }
+.calc-grid line { stroke: var(--grid); stroke-width: 1; }
+.calc-grid-strong line { stroke: #d6cfbd; }
+.calc-frame { fill: none; stroke: var(--ink-soft); stroke-width: 1; opacity: .5; }
+.calc-ink { fill: none; stroke: var(--ink); stroke-width: 3; stroke-linecap: round; stroke-linejoin: round; }
+.calc-ink.thin { stroke-width: 2; }
+.calc-pencil { fill: none; stroke: var(--pencil); stroke-width: 3; stroke-dasharray: 7 5; stroke-linecap: round; stroke-linejoin: round; }
+.calc-gap { fill: var(--marker-soft); stroke: none; }
+.calc-zero { stroke: var(--ink-soft); stroke-width: 1.5; }
+.calc-tangent { stroke: var(--ink); stroke-width: 2.5; stroke-linecap: round; }
+.calc-link { stroke: var(--ink-soft); stroke-width: 1.5; stroke-dasharray: 3 4; }
+.calc-handle { fill: var(--marker); stroke: var(--ink); stroke-width: 3; }
+.calc-dot { fill: var(--ink); stroke: var(--paper); stroke-width: 2; }
+.calc-flat { stroke: var(--ink); stroke-width: 2.5; stroke-dasharray: 2 4; stroke-linecap: round; }
+.calc-mk { fill: var(--marker); stroke: var(--ink); stroke-width: 2; }
+.calc-axis { font: 12px var(--calc-mono); fill: var(--ink-soft); }
+.calc-ptitle { font: 700 13px var(--font-body); fill: var(--ink); }
+.calc-sidelab { font: 13px var(--font-hand); fill: var(--ink-soft); }
+.calc-note { font: 13px var(--font-hand); fill: var(--ink); paint-order: stroke; stroke: var(--paper); stroke-width: 4px; stroke-linejoin: round; }
+.calc-hint { font: 17px var(--font-hand); fill: var(--ink-soft); pointer-events: none; }
+
+.calc-under { fill: none; stroke: var(--ink); stroke-width: 1; stroke-dasharray: 2 3; }
+.calc-rect { fill: var(--calc-rect); stroke: var(--ink); stroke-width: 1.5; }
+.calc-rect.thin { stroke: none; fill: rgba(27, 35, 64, 0.16); }
+.calc-gapfill { fill: var(--marker); opacity: .75; }
+.calc-edge { stroke: var(--ink-soft); stroke-width: 1.5; stroke-dasharray: 4 3; }
+.calc-areafill { fill: var(--calc-rect); stroke: none; }
+.calc-heightbar { stroke: var(--marker); stroke-width: 6; }
+
+.calc-bar .calc-track { fill: var(--paper); stroke: var(--ink); stroke-width: 2; }
+.calc-tick { stroke: var(--ink-soft); }
+.calc-onerect { stroke: var(--ink-soft); stroke-width: 2; stroke-dasharray: 2 3; }
+.calc-exactline { stroke: var(--ink); stroke-width: 4; }
+.calc-exactlab { font: 700 13px var(--calc-mono); fill: var(--ink); paint-order: stroke; stroke: var(--card); stroke-width: 4px; }
+.calc-sumtick { fill: var(--ink-soft); }
+.calc-phandle { fill: var(--card); stroke: var(--pencil); stroke-width: 3; stroke-dasharray: 4 3; }
+.calc-you { font: 14px var(--font-hand); fill: var(--ink-soft); }
+.calc-mini { display: block; max-width: 100%; height: auto; margin: 8px auto 0; }
+
+.calc-legend { display: flex; flex-wrap: wrap; gap: 6px 16px; font-size: 14px; color: var(--ink-soft); margin: 6px 4px 2px; }
+.calc-l { display: inline-block; width: 22px; height: 0; vertical-align: middle; margin-right: 6px; }
+.calc-l.you { border-top: 3px dashed var(--pencil); }
+.calc-l.ink { border-top: 3px solid var(--ink); }
+.calc-l.gap { height: 12px; background: var(--marker); }
+.calc-l.rect { height: 12px; background: var(--calc-rect); border: 1.5px solid var(--ink); }
+
+/* the mistake card */
+.calc-verdict p { margin: 8px 0 0; line-height: 1.5; }
+.calc-named { font: 800 24px/1.2 var(--font-display); margin: 6px 0 0; }
+.calc-fix { font-size: 15px; }
+
+/* compare */
+.calc-pair { font-size: 15px; margin: 6px 4px 2px; color: var(--ink-soft); }
+.calc-pair b { color: var(--ink); }
+.calc-picks { display: grid; gap: 8px; margin-top: 10px; }
+.calc-pick { font: 600 15px var(--font-body); text-align: left; background: var(--card); color: var(--ink); border: 2px solid var(--ink); border-radius: 4px; padding: 10px 12px; min-height: 46px; touch-action: manipulation; }
+.calc-pick[aria-pressed='true'] { background: var(--ink); color: var(--paper); }
+.calc-principle { margin-top: 12px; }
+.calc-rule { font: 700 19px/1.5 var(--font-body); margin: 6px 0 0; display: grid; gap: 4px; }
+
+/* end */
+.calc-end { margin-top: 18px; background: var(--marker); border: 2px solid var(--ink); border-radius: 4px; box-shadow: 0 3px 0 var(--ink); padding: 14px 16px; display: flex; gap: 14px; align-items: center; justify-content: space-between; flex-wrap: wrap; }
+.calc-end p { margin: 0; font-size: 16px; line-height: 1.4; flex: 1 1 260px; }
+.calc-end .calc-btn { margin-top: 0; }
+.calc-endact { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
+.calc-nblink { color: var(--ink); font-weight: 700; padding: 12px 4px; }
+.calc-mastered { font: 600 14px var(--calc-mono); color: var(--called); white-space: nowrap; }
+@media (max-width: 480px) {
+  .calc-endact { flex: 1 1 100%; justify-content: space-between; }
+}
