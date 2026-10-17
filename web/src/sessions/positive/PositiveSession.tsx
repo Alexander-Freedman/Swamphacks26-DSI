@@ -1,11 +1,12 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
-import { record as save } from '../../notebook'
+import { labelFor } from '../../notebook'
 import { showcaseRound } from '../../rounds'
 import { misconceptionFor } from '../../verdict'
 import { ConfidencePicker, EndBar, Frame, LockButton, SessionHead, StampRow, Title } from '../../components/session/Shell'
 import { Compare, type CompareAnswer, type CompareOption } from '../../components/session/Compare'
 import { cardGuide, lockLabel, type Confidence } from '../../components/session/copy'
 import { rematchVerdict, shellVerdict } from '../../components/session/verdict'
+import { useNotebookEntry } from '../../components/session/entry'
 import { AlarmArray, CrowdCurve, GuessBar, MiniPile, PileCompare } from './Charts'
 import { DotCanvas, PaintGrid, type Kind } from './Crowd'
 import { BAG_DAY, BAGS, baseToSlider, breakEven, CARD, exact, pct, piles, POP, ppv, REMATCH, seededOrder, sliderToBase, type Test } from './math'
@@ -37,6 +38,7 @@ export function PositiveSession({ onDone }: { onDone: () => void }) {
   const test = useMemo(() => cardTest(), [])
   const truth = ppv(test)
 
+  const entry = useNotebookEntry('positive-test')
   const [step, setStep] = useState(1)
   const [reached, setReached] = useState(1)
   const go = (n: number) => {
@@ -46,7 +48,6 @@ export function PositiveSession({ onDone }: { onDone: () => void }) {
   const [guess, setGuess] = useState(50)
   const [touched, setTouched] = useState(false)
   const [conf, setConf] = useState<Confidence | null>(null)
-  const [cmp, setCmp] = useState<CompareAnswer | null>(null)
   const [sketch, setSketch] = useState<Brush[]>(() => Array(POP).fill(0))
   const painted = useMemo(() => ({ sick: sketch.filter((v) => v === 1).length, healthy: sketch.filter((v) => v === 2).length }), [sketch])
 
@@ -66,7 +67,7 @@ export function PositiveSession({ onDone }: { onDone: () => void }) {
     ['Same test. Change the crowd.', 'Drag how common the condition is. Watch what a positive result really means change.'],
     ['What happened in your head', cardGuide(misconceptionId(item, guess) === null)],
     ['One more case: airport bags', "A bag scanner next to your test. Look at both: what's the same about how they work?"],
-    ['Rematch', 'Same test, new numbers: does the idea stick?'],
+    ['Rematch', 'New test, new crowd: does the idea stick?'],
   ]
   const [h, sub] = TITLES[step - 1]
 
@@ -74,8 +75,8 @@ export function PositiveSession({ onDone }: { onDone: () => void }) {
     <Frame className="pt">
       {/* step dots navigate like coin's: any step you've reached, never back to the locked guess */}
       <SessionHead chip="Positive test" step={step} total={TITLES.length} labels={STEPS} canGo={(i) => i > 0 && i < reached} onGo={(i) => go(i + 1)}
-        // Ask panel: P1 is before lock-in; the rematch (P6) has its own guess, so it stays hint-only.
-        help={{ screen: `P${step}`, locked: step > 1 && step < 6, guess: step < 6 && touched ? guess : null }}
+        // Ask panel: P1 is before lock-in; compare reports the card (P5); the rematch (step 7, storyboard P6) has its own guess, so it stays hint-only.
+        help={{ screen: step === 7 ? 'P6' : step === 6 ? 'P5' : `P${step}`, locked: step > 1 && step < 7, guess: step < 7 && touched ? guess : null }}
       >
         {step > 1 && (
           <span className="pt-pencil-chip">
@@ -103,22 +104,29 @@ export function PositiveSession({ onDone }: { onDone: () => void }) {
       {step === 2 && <RunStep test={test} guess={guess} onNext={() => go(3)} />}
       {step === 3 && <CompareStep guess={guess} truth={truth} painted={painted} test={test} onNext={() => go(4)} />}
       {step === 4 && <CrowdStep card={test} guess={guess} onNext={() => go(5)} />}
-      {step === 5 && <CardStep guess={guess} conf={conf ?? 'pretty sure'} truth={truth} test={test} round={round} item={item} onNext={() => go(6)} />}
-      {step === 6 && <BagsCompare test={test} onAnswer={setCmp} onNext={() => go(7)} />}
+      {step === 5 && (
+        <CardStep
+          guess={guess}
+          conf={conf ?? 'pretty sure'}
+          truth={truth}
+          test={test}
+          round={round}
+          item={item}
+          onShown={() => entry.atCard({ guess, confidence: conf ?? undefined, misconception: misconceptionId(item, guess) })}
+          onNext={() => go(6)}
+        />
+      )}
+      {step === 6 && (
+        <BagsCompare
+          test={test}
+          onAnswer={(a) => entry.extend({ comparePick: a.pick, compareRight: a.right, ...(a.text ? { compareText: a.text } : {}) })}
+          onNext={() => go(7)}
+        />
+      )}
       {step === 7 && (
         <RematchStep
           onReveal={(g2) =>
-            save({
-              session: 'positive-test',
-              at: new Date().toISOString(),
-              guess,
-              confidence: conf ?? undefined,
-              misconception: misconceptionId(item, guess),
-              rematch: rematchOf(g2) === 'off' ? 'wrong' : 'right',
-              rematchGuess: g2,
-              rematchTruth: Math.round(ppv(REMATCH) * 1000) / 10,
-              ...(cmp ? { comparePick: cmp.pick, compareRight: cmp.right, ...(cmp.text ? { compareText: cmp.text } : {}) } : {}),
-            })
+            entry.rematch(rematchOf(g2) === 'off' ? 'wrong' : 'right', rematchMisconception(g2), { rematchGuess: g2, rematchTruth: Math.round(ppv(REMATCH) * 1000) / 10 })
           }
           caught={round.misconceptions.find((x) => x.id === misconceptionId(item, guess))?.label ?? null}
           onDone={onDone}
@@ -428,10 +436,14 @@ type CardProps = {
   test: Test
   round: NonNullable<ReturnType<typeof showcaseRound>>
   item: ItemT
+  onShown: () => void
   onNext: () => void
 }
 
-function CardStep({ guess, conf, truth, test, round, item, onNext }: CardProps) {
+function CardStep({ guess, conf, truth, test, round, item, onShown, onNext }: CardProps) {
+  // Saved when the card shows (#159); the rematch updates this same entry. The hook saves once per play.
+  const shown = useRef(onShown)
+  useEffect(() => shown.current(), [])
   const mid = misconceptionId(item, guess)
   const v = shellVerdict(mid, guess, truth * 100, WINDOW) // truth in the slider's units (%)
   const m = round.misconceptions.find((x) => x.id === mid)
@@ -489,6 +501,17 @@ function CardStep({ guess, conf, truth, test, round, item, onNext }: CardProps) 
 /** Stamp for the rematch: "called it" within 5 points, then the same close rule as the first guess (#151). */
 const rematchOf = (g: number) => rematchVerdict(g, ppv(REMATCH) * 100, 5, WINDOW)
 
+/**
+ * The mistake a missed rematch points to (#162), read the way the card's bands read the first guess:
+ * 60%+ is the test's accuracy taken as your chance, above the truth is false alarms shrunk,
+ * below it is the positive read as barely mattering. Only a miss ("way off") names one.
+ */
+function rematchMisconception(g: number): string | null {
+  if (rematchOf(g) !== 'off') return null
+  if (g >= 60) return 'accuracy-is-my-chance'
+  return g > ppv(REMATCH) * 100 ? 'ignores-false-alarms' : 'positive-barely-matters'
+}
+
 function RematchStep({ onReveal, caught, onDone }: { onReveal: (g: number) => void; caught: string | null; onDone: () => void }) {
   const t = REMATCH
   const truth = ppv(t)
@@ -501,7 +524,7 @@ function RematchStep({ onReveal, caught, onDone }: { onReveal: (g: number) => vo
     <section>
       <div className="pt-card pt-guess">
         <p className="pt-lede">
-          New numbers. <b>{pct(t.baseRate)}</b> of people have it. The test catches <b>{pct(t.sensitivity)}</b> of real cases and wrongly says yes to <b>{pct(t.falseAlarm)}</b> of healthy people. You test positive.
+          New test, new crowd. <b>{pct(t.baseRate)}</b> of people have it. The test catches <b>{pct(t.sensitivity)}</b> of real cases and wrongly says yes to <b>{pct(t.falseAlarm)}</b> of healthy people. You test positive.
         </p>
         <label className="pt-lab" htmlFor="pt-g2">Chance you're actually sick?</label>
         <div className="pt-row">
@@ -537,7 +560,14 @@ function RematchStep({ onReveal, caught, onDone }: { onReveal: (g: number) => vo
               <MiniPile truePos={c.truePos} positives={c.positives} />
             </div>
           </div>
-          <EndBar caught={caught} rematch={v === 'called' ? 'right' : v === 'close' ? 'close' : 'wrong'} remix="Come back tomorrow for a remix: same idea, a different crowd." onDone={onDone} />
+          <EndBar
+            caught={caught}
+            rematch={v === 'called' ? 'right' : v === 'close' ? 'close' : 'wrong'}
+            rematchCaught={(() => {
+              const id = rematchMisconception(g)
+              return id ? labelFor('positive-test', id) : null
+            })()}
+            remix="Come back tomorrow for a remix: same idea, a different crowd." onDone={onDone} />
         </>
       )}
     </section>

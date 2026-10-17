@@ -1,14 +1,15 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
-import { amend, record as save } from '../../notebook'
+import { labelFor } from '../../notebook'
 import { showcaseRound } from '../../rounds'
 import { misconceptionFor } from '../../verdict'
 import { ConfidencePicker, EndBar, Frame, LockButton, SessionHead, StampRow, Title } from '../../components/session/Shell'
 import { Compare, type CompareAnswer, type CompareOption } from '../../components/session/Compare'
 import { cardGuide, lockLabel, type Confidence } from '../../components/session/copy'
 import { shellVerdict } from '../../components/session/verdict'
+import { useNotebookEntry } from '../../components/session/entry'
 import { ExtremeChart, KMAX, RunHistogram } from './Charts'
 import { CoinGrid, Track } from './CoinGrid'
-import { fmt, pBeatLabel, pct, reducedMotion, sampleLabel } from './hooks'
+import { fmt, pct, reducedMotion, sampleLabel } from './hooks'
 import { ShotRow } from './Shots'
 import {
   expectedLongest,
@@ -27,7 +28,6 @@ import {
 import './coin.css'
 
 const N = 100
-const now = () => new Date().toISOString()
 const MIN_TAPS = 20
 const E100 = expectedLongest(N)
 const P5 = pLongestAtLeast(N, 5)
@@ -58,9 +58,9 @@ export function CoinSession({ onDone }: { onDone: () => void }) {
   const [newest, setNewest] = useState(0)
   const [running, setRunning] = useState(false)
   const heading = useRef<HTMLHeadingElement>(null)
-  const [rematch, setRematch] = useState<'right' | 'wrong' | null>(null)
-  const [cmp, setCmp] = useState<CompareAnswer | null>(null)
-  const savedAt = useRef<string | null>(null) // one notebook entry per play; the compare answer is added to it
+  const entry = useNotebookEntry('coin-streak')
+  // the rematch pick, kept here so the end bar can show on the compare step
+  const [picked, setPicked] = useState<{ right: boolean; misId: string | null } | null>(null)
   const model = mine // you can only lock (and leave step 1) with 20+ taps of your own
 
   const dealRow = useCallback((n: number) => {
@@ -160,9 +160,8 @@ export function CoinSession({ onDone }: { onDone: () => void }) {
   }
 
   const restart = () => {
-    savedAt.current = null
-    setRematch(null)
-    setCmp(null)
+    entry.reset()
+    setPicked(null)
     setMine([])
     setDeal([])
     setLocked(false)
@@ -187,15 +186,7 @@ export function CoinSession({ onDone }: { onDone: () => void }) {
   const [title, sub] = TITLES[step]
   // Storyboard screens for the Ask panel: step 1 holds C1 (tapping) and C3 (the guess).
   const screen = step === 0 ? (locked ? 'C2' : mine.length < len ? 'C1' : 'C3') : ['', 'C4', 'C2', 'C5', 'C6', 'C6'][step]
-  const record = (r: 'right' | 'wrong' | null, c: CompareAnswer | null = cmp) => {
-    if (savedAt.current) return
-    savedAt.current = now()
-    save({ session: 'coin-streak', at: savedAt.current, guess, confidence: conf ?? 'pretty sure', switchRate: Math.round(sw * 100) / 100, misconception: misId, rematch: r, ...(c ? compareFields(c) : {}) })
-  }
-  const answerCompare = (a: CompareAnswer) => {
-    setCmp(a)
-    if (savedAt.current) amend('coin-streak', savedAt.current, compareFields(a))
-  }
+  const answerCompare = (a: CompareAnswer) => entry.extend(compareFields(a))
   const caught = round.misconceptions.find((x) => x.id === misId)?.label ?? null
   return (
     <Frame className="coin-session">
@@ -228,7 +219,7 @@ export function CoinSession({ onDone }: { onDone: () => void }) {
             <Legend items={[['truth', 'real coin'], ['you', 'your guess'], ['gap', 'the gap']]} />
             <p className="simnote" aria-live="polite">
               {sampleLabel(sim, flipped)}, <b className="num">{pct(hist.reduce((s, c, k) => s + (k > guess ? c : 0), 0) / Math.max(1, total))}</b> beat your guess of {guess}.
-              Exact: a run longer than your {guess} shows up <b className="num">{pBeatLabel(1 - pLongestAtMost(N, guess))}</b> of the time.
+              Exact: a run longer than your {guess} shows up <b className="num">{pct(1 - pLongestAtMost(N, guess), 1)}</b> of the time.
             </p>
             <Next onClick={() => go(2)}>Next: your coin vs the real one</Next>
           </>
@@ -243,10 +234,11 @@ export function CoinSession({ onDone }: { onDone: () => void }) {
             conf={conf ?? 'pretty sure'}
             verdict={shellVerdict(misId, guess, E100, WINDOW)}
             misId={misId}
-            rematch={rematch}
-            onPick={(right) => {
-              setRematch(right ? 'right' : 'wrong')
-              record(right ? 'right' : 'wrong')
+            entry={entry}
+            rematch={picked ? (picked.right ? 'right' : 'wrong') : null}
+            onPick={(right, pickedMis) => {
+              setPicked({ right, misId: pickedMis })
+              entry.rematch(right ? 'right' : 'wrong', pickedMis)
             }}
             onRestart={restart}
             onNext={() => go(5)}
@@ -254,17 +246,17 @@ export function CoinSession({ onDone }: { onDone: () => void }) {
         )}
         {step === 5 && (
           <ShooterCompare real={real} onAnswer={answerCompare}>
-            {rematch != null ? (
-              <EndBar caught={caught} rematch={rematch} remix="Come back tomorrow for a remix with new rows." onDone={onDone} />
+            {picked != null ? (
+              <EndBar
+                caught={caught}
+                rematch={picked.right ? 'right' : 'wrong'}
+                rematchCaught={!picked.right && picked.misId ? labelFor('coin-streak', picked.misId) : null}
+                remix="Come back tomorrow for a remix with new rows."
+                onDone={onDone}
+              />
             ) : (
               <div className="row">
-                <button
-                  className="btn small"
-                  onClick={() => {
-                    record(null)
-                    onDone()
-                  }}
-                >
+                <button className="btn small" onClick={onDone}>
                   Done
                 </button>
               </div>
@@ -482,13 +474,18 @@ function CardStep(p: {
   round: NonNullable<ReturnType<typeof showcaseRound>>
   verdict: 'called' | 'close' | 'off'
   misId: string | null
+  entry: ReturnType<typeof useNotebookEntry>
   rematch: 'right' | 'wrong' | null
-  onPick: (right: boolean) => void
+  onPick: (right: boolean, misId: string | null) => void
   onRestart: () => void
   onNext: () => void
 }) {
-  const { model, guess, conf, round, verdict, misId, rematch, onPick, onRestart, onNext } = p
+  const { model, guess, conf, round, verdict, misId, entry, rematch, onPick, onRestart, onNext } = p
   const m = round.misconceptions.find((x) => x.id === misId)
+  // Saved when the card shows (#159); the rematch and the compare answer update this same entry.
+  useEffect(() => {
+    entry.atCard({ guess, confidence: conf, switchRate: Math.round(switchRate(model) * 100) / 100, misconception: misId })
+  }, [entry, guess, conf, model, misId])
   const sw = switchRate(model)
   const pPast = 1 - pLongestAtMost(N, guess)
   const pReach = pLongestAtLeast(N, guess)
@@ -531,7 +528,7 @@ function CardStep(p: {
   )
 }
 
-function WhichIsReal({ round, onPick }: { round: NonNullable<ReturnType<typeof showcaseRound>>; onPick: (right: boolean) => void }) {
+function WhichIsReal({ round, onPick }: { round: NonNullable<ReturnType<typeof showcaseRound>>; onPick: (right: boolean, misId: string | null) => void }) {
   const item = round.items.find((i) => i.id === 'which-is-real')
   const [pick, setPick] = useState<string | null>(null)
   const seqs = item?.prompt.match(/A:\s*([HT]+)\s+B:\s*([HT]+)/)
@@ -558,7 +555,7 @@ function WhichIsReal({ round, onPick }: { round: NonNullable<ReturnType<typeof s
             disabled={pick != null}
             onClick={() => {
               setPick(id)
-              onPick(id === real)
+              onPick(id === real, item.options!.find((o) => o.id === id)?.misconception_id ?? null)
             }}
           >
             <b>{up(id)}</b>

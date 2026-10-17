@@ -20,6 +20,8 @@ export type Entry = {
   confidence?: string
   misconception: string | null
   rematch: 'right' | 'wrong' | null
+  /** The mistake a missed rematch points to, if it maps to one (#162). */
+  rematchMisconception?: string | null
 }
 
 export type Card = {
@@ -76,30 +78,32 @@ export function record(entry: Entry & Record<string, unknown>): void {
   }
 }
 
-/** Fields an amend never touches: the ones the notebook's catch and bust rules read. */
-const CORE = new Set(['session', 'at', 'guess', 'confidence', 'misconception', 'rematch'])
-
 /**
- * Adds extra fields (e.g. the compare step's answer) to the entry saved earlier with this
- * session + `at`. Core fields are never changed, so catching and busting work exactly as before.
+ * Saves an entry, replacing the one with the same session + `at` if it's there (#159):
+ * sessions save at the card, then the rematch updates that same entry instead of adding a second one.
  */
-export function amend(session: string, at: string, fields: Record<string, unknown>): void {
+export function upsert(entry: Entry & Record<string, unknown>): void {
   try {
     const s = store()
-    const raw = s?.getItem(KEY)
-    const all: unknown = raw ? JSON.parse(raw) : null
-    if (!s || !Array.isArray(all)) return
-    for (let i = all.length - 1; i >= 0; i--) {
-      const e = all[i]
-      if (!valid(e) || e.session !== session || e.at !== at) continue
-      const extra = Object.fromEntries(Object.entries(fields).filter(([k]) => !CORE.has(k)))
-      all[i] = { ...e, ...extra }
-      s.setItem(KEY, JSON.stringify(all))
-      return
-    }
+    if (!s) return
+    const all = entries()
+    const i = all.findLastIndex((e) => e.session === entry.session && e.at === entry.at)
+    if (i >= 0) all[i] = entry
+    else all.push(entry)
+    s.setItem(KEY, JSON.stringify(all.slice(-MAX)))
   } catch {
     // blocked or full storage: the session still ends fine
   }
+}
+
+/**
+ * The mistake an entry caught (#162): the first guess's, or else the one a missed rematch points to.
+ * A called-it first guess with a missed rematch that maps to a mistake lands in the notebook too,
+ * so the end bar's "it's in your notebook" is true.
+ */
+export function caughtId(e: Entry): string | null {
+  if (e.misconception) return e.misconception
+  return e.rematch === 'wrong' ? (e.rematchMisconception ?? null) : null
 }
 
 /** Clears the notebook and any other answers this app keeps (every `mm.` key). */
@@ -141,14 +145,15 @@ export function notebook(list: Entry[] = entries()): Card[] {
   const cards = new Map<string, Card>()
   const sorted = [...list].sort((a, b) => a.at.localeCompare(b.at))
   for (const e of sorted) {
-    const right = !e.misconception || e.rematch === 'right'
+    const id = caughtId(e)
+    const right = !id || e.rematch === 'right'
     for (const c of cards.values()) {
-      if (c.session !== e.session || c.id === e.misconception || !right) continue
+      if (c.session !== e.session || c.id === id || !right) continue
       c.wins += 1
       c.lastSeen = e.at
     }
-    if (!e.misconception) continue
-    const key = `${e.session}\u0000${e.misconception}`
+    if (!id) continue
+    const key = `${e.session}\u0000${id}`
     const c = cards.get(key)
     if (c) {
       c.caught += 1
@@ -157,8 +162,8 @@ export function notebook(list: Entry[] = entries()): Card[] {
     } else {
       cards.set(key, {
         session: e.session,
-        id: e.misconception,
-        label: labelFor(e.session, e.misconception),
+        id,
+        label: labelFor(e.session, id),
         topic: topicFor(e.session),
         status: 'caught',
         caught: 1,

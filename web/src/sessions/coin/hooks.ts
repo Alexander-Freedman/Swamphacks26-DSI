@@ -1,3 +1,4 @@
+import { percent } from '../../components/session/percent'
 import { useEffect, useRef, useState } from 'react'
 
 // Charts draw in real pixels (viewBox = measured width), so 12px labels stay 12px on a phone.
@@ -20,7 +21,8 @@ export function useWidth<T extends HTMLElement>(fallback = 560) {
 export const reducedMotion = () =>
   typeof matchMedia === 'function' && matchMedia('(prefers-reduced-motion: reduce)').matches
 
-export const pct = (x: number, digits = 0) => `${(x * 100).toFixed(digits)}%`
+/** Capped (#161): a 99.97% chance reads ">99.9%", never "100.0%". */
+export const pct = (x: number, digits = 0) => percent(x, digits)
 export const fmt = (x: number) => x.toLocaleString('en-US')
 
 // What the sample label says: strips you flipped one by one and/or a simulated batch, counted apart.
@@ -30,6 +32,3 @@ export function sampleLabel(sim: number, flipped: number): string {
   if (!flipped) return `Simulated: ${runsOf(sim)} of 100 flips`
   return `Simulated: ${runsOf(sim)} + ${fmt(flipped)} you flipped, of 100 flips each`
 }
-
-/** One decimal, but never "100.0%" or "0.0%" for something that isn't certain (#174, #161). */
-export const pBeatLabel = (p: number) => (p >= 1 ? '100%' : p > 0.999 ? '>99.9%' : p <= 0 ? '0%' : p < 0.001 ? '<0.1%' : pct(p, 1))
