@@ -12,15 +12,15 @@ Shared board. Every task is a GitHub issue; assign yourself + comment "on it" be
 |---|---|---|---|
 | #44 | Round schema + 3 showcase fixtures | @Alexander-Freedman | merged (#54) |
 | #45 | Skeleton + CI | @Alexander-Freedman | merged (#60) |
-| #46 | Gemini client + POST /api/rounds | @Alexander-Freedman | PR #58 |
-| #47 | Generation pipeline (validate, truth, lint, blind check, fallback) | @Alexander-Freedman | |
+| #46 | Gemini client + POST /api/rounds | @Alexander-Freedman | PR #58 (approved) |
+| #47 | Generation pipeline (validate, truth, lint, blind check, fallback) | @Alexander-Freedman | PR #63 (approved; asked for the check report on the response) |
 | #48 | First deploy (Pages now; Vultr/Render Sat) | @Alexander-Freedman | Pages live |
-| — | Answer events, "the room" %, collection API | @Alexander-Freedman | PR #61 |
+| — | Answer events, "the room" %, collection API | @Alexander-Freedman | PR #72 (approved, replaces #61) |
 | #49 | Predict → confidence → lock + Distribution | @luanamaldaner | merged (#62) |
-| #51 | Reveal sequence + misconception card + Curve + icon array | @luanamaldaner | PR #64 |
-| #66 | Home (topic box) + Building screen | @luanamaldaner | in progress (branch home-building) |
+| #51 | Reveal sequence + misconception card + Curve + icon array | @luanamaldaner | PR #64 (needs review) |
+| #66 | Home (topic box) + Building chip | @luanamaldaner | in progress (branch home-building, stacks on #64) |
 | #67 | Round summary + Collection | @luanamaldaner | in progress (with #66) |
-| #68 | Play with it: extremes slider | @luanamaldaner | in progress (branch extremes) |
+| #68 | Play with it: extremes slider + Estimate widget (from #63) | @luanamaldaner | in progress (branch extremes) |
 | #71 | How it works drawer (D), reset (Shift+R), status dot | @luanamaldaner | in progress (branch demo-controls) |
 | #11 | Sketch input + shape rules | @luanamaldaner | parked: not in the demo script; after B5 if time |
 | #29 | Name, one-liner, pitch, Devpost, video script | @Alexander-Freedman | |

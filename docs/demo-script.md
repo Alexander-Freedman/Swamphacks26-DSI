@@ -40,7 +40,7 @@ Never say "proven to make you learn faster", "permanently fixes misconceptions" 
 | **1:20** | Birthday card: "How many people need to be in a room for a 50% chance two share a birthday?" Slider 2-366. **Judge answers**, locks. | "Last one before your topic." | Nothing. |
 | **1:28** | The curve of P(shared birthday) vs people draws in ink over the judge's pencil mark; it crosses 50% at **23**. Card: *"It's about MY birthday."* | "23. Not because anyone matches you: 23 people make 253 pairs, and any pair can match." | Grabs the **"run it at the extremes"** slider and drags it to 2, then to 80, so the curve and the dot calendar move live. "Push it to the edges, that's where your model breaks." |
 | **1:45** | The corner chip reads **"Your topic's ready"**. Driver opens it: item 1 of the judge's own topic, labeled **auto-checked**. **Judge predicts and locks**; the reveal plays (whichever widget the round picked). | "Your topic's ready. Same loop, built for you just now." | Taps the chip. If it isn't ready: see the fallback ladder below. |
-| **2:15** | **"How it works" drawer** slides in from the right: the generated round JSON on the left, the computed truth and the check results on the right (schema ✓, truth computed ✓, bands agree with the answer ✓, lint ✓, blind check ✓). | "How do we know it's right? Gemini writes the question, the wrong ideas and which reveal to use. It never writes the answer. The truth comes from code: a simulation, a formula, or a cited number. Then a second model answers the questions blind, and anything they disagree on gets dropped." | Opens the drawer (button or `D`), points at the `truth` spec, then at the computed number next to it. |
+| **2:15** | **"How it works" drawer** slides in from the right: the generated round JSON on the left, the computed truth and the check results on the right (schema ✓, truth computed ✓, bands agree with the answer ✓, lint ✓, blind check ✓). | "How do we know it's right? Gemini writes the question, the wrong ideas and which reveal to use. It never writes the answer. The truth comes from code: a simulation, a formula, or a cited number. When code can't compute an answer, a second model answers that question blind, and if they disagree it gets dropped." | Opens the drawer (button or `D`), points at the `truth` spec, then at the computed number next to it. |
 | **2:40** | Back to home. If the collection screen exists: the judge's wrong ideas from this session, caught. | "Everyone gamifies learning with points, and the research says points can backfire. So there's no score here. The reward is the feedback: you bet, reality plays out over your guess, and your wrong idea gets named. Then it comes back until you've busted it." | Taps home (or the collection). **Stop talking. Hand over for questions.** |
 
 **If the judge gets the coin streak right:** "Nice, you're in the few who don't fall for it. Try this one" and go straight to the positive test.
@@ -54,7 +54,7 @@ Never say "proven to make you learn faster", "permanently fixes misconceptions" 
 | 0:20 | Reveal: tiles, histogram, pencil vs ink, verdict stamp. "Longest run averages about 7; 5+ in 97% of runs." |
 | 0:35 | Misconception card: "Random means evenly mixed." One line: "It names the exact wrong idea you just bet on." |
 | 0:50 | "Your topic's ready": one item, predict, lock, reveal. |
-| 1:15 | One sentence: "Gemini writes the question; code computes the truth; a second model checks it blind." Stop. |
+| 1:15 | One sentence: "Gemini writes the question; code computes the truth; anything code can't compute gets a blind second opinion." Stop. |
 
 Skip the positive test, the birthday problem and the drawer (open the drawer only if they ask "how is it right?").
 
@@ -78,7 +78,7 @@ Built from docs/research/demo.md; the timings are its recommendation.
 
 ## 6 likely judge questions
 1. **"How do you know the answer is right? Doesn't the model hallucinate?"**
-   "The model never writes the answer. It writes a spec: a simulation, a formula or a cited number, and our code computes the truth from it. Then we check: the JSON against the schema, the computed answer against the bands, a linter on the wording, and a second model from a different family answers each question blind. Disagreement drops the item. The three showcase rounds are hand-checked and labeled 'reviewed'; generated ones say 'auto-checked'." (Open the drawer.)
+   "The model never writes the answer. It writes a spec: a simulation, a formula or a cited number, and our code computes the truth from it. Then we check: the JSON against the schema, the computed answer against the bands, a linter on the wording, and for any question where code can't compute the answer, a second model (Gemma) answers it blind; disagreement drops the item. When code computes the truth, code wins (api/app/checks.py). The three showcase rounds are hand-checked and labeled 'reviewed'; generated ones say 'auto-checked'." (Open the drawer.)
 2. **"What if my topic can't be simulated, like history?"**
    "Then it doesn't pretend. If fewer than 3 items survive the checks, it falls back to a worked-example stepper or claim cards with sources, and if a topic can't be checked at all, it says so." (product-spec §6.)
 3. **"How is this different from ChatGPT's study mode or Brilliant?"**
