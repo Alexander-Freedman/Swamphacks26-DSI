@@ -1,5 +1,7 @@
 Mode: BUILD (approved by Alex; plan in force from 10:48 PM Fri)
 
+Team rules: [CONTRIBUTING.md](CONTRIBUTING.md) (plan every task first; goal: help people understand concepts faster, visually).
+
 # Notes
 
 Decisions + how to run things. Keep current.
