@@ -38,13 +38,13 @@ For issue #21. Analysis only. Inputs: event/hacker-guide.md (challenges), event/
 - **Why it's honest:** without Gemini the app only works on topics we hand-write. "Any topic" *is* the Gemini job.
 - **Accuracy (judges will ask):** truths that are numbers get computed by our code, not the model (the widget runs the formula/sim; Gemini only picks the template and params). Optional second Gemini pass to self-check the session; flag "unverified" otherwise. Pre-generate and cache the demo topics so the expo never waits on the API.
 - **Limits:** free-tier RPD only visible in AI Studio; cache by topic hash, reset is 3 AM our time. Fallback: cached sessions.
-- **Judging:** MLH (Gabby Flynn is on the judge list; MLH coach likely). 48% of XI tagged Gemini, so ~5-10% odds; ours is above average because Gemini is the engine, not a chatbot.
+- **Judging:** MLH (MLH coach likely). ~48% of XI projects tagged Gemini (**unverified**: from our earlier gallery count in docs/prizes.md, not re-linked here), so ~5-10% odds; ours is above average because Gemini is the engine, not a chatbot.
 - **Demo moment:** *the judge types their own topic ("why do ice skaters spin faster?") and ~5s later it's a playable predict-and-reveal round.* An "under the hood" toggle shows the structured JSON.
 
 ### Easy On The Eyes (UI/UX): core
 - **Job:** none extra; it's the design pass we need for Entertainment anyway (the reveal, the misconception card, the streak screen).
 - **Judging:** organizer/general pool, not a sponsor. Everyone is implicitly in; XI's equivalent went to a polished 3D viewer and mentioned accessibility.
-- **Odds:** ~8-12%. 4 monitors (x4 per the guide), so it's the highest-value add-on we can hit.
+- **Odds:** ~8-12%. The guide says the monitor prize is x4, but the Devpost page lists one monitor (**sources conflict; unverified**). Ask the help desk.
 - **Demo moment:** the reveal itself: your guess "ghost" vs. the truth, then the misconception card sliding in.
 
 ### GoDaddy domain (MLH): core
