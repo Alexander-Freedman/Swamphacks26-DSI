@@ -53,6 +53,8 @@ input[type='range'] { width: 100%; accent-color: var(--pencil); height: 28px; }
 .card-title { display: block; font-size: 1.05rem; font-weight: 700; }
 @media (max-width: 640px) {
   .showcases.sessions { grid-template-columns: 1fr; }
-  .showcase.has-art { flex-direction: row; align-items: center; }
-  .card-art { width: 120px; flex: none; border-bottom: 0; border-right: 2px solid var(--ink); }
+  .showcase.has-art { flex-direction: row; align-items: stretch; }
+  /* thumb column runs the full card height so the divider does too; art stays square, centred */
+  .card-art { width: 120px; min-height: 120px; aspect-ratio: auto; object-fit: contain; flex: none; border-bottom: 0; border-right: 2px solid var(--ink); }
+  .showcase.has-art .card-text { align-self: center; }
 }

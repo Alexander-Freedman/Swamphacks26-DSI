@@ -44,7 +44,8 @@ describe('Try any topic', () => {
     expect(here()).toBe(`${BASE}?round=dice-sums`)
     expect(await screen.findByText(/Sums of dice · 1 of 3/)).toBeTruthy()
     expect(screen.getByText(/^(reviewed|hand-checked)$/)).toBeTruthy()
-  })
+    // first full App render in this file pays the cold import; ~5.7s on a busy box
+  }, 15000)
 
   it('a refresh on an extra round reopens it', async () => {
     history.replaceState(null, '', `${BASE}?round=monty-hall`)
