@@ -78,7 +78,7 @@ Never show a raw error or a spinner. Never run a fresh generation at the table.
 
 ## Reset shortcut
 - **`Shift+R` on Home, or opening the app with `?reset=1`**: clears this browser's answers and notebook, returns Home. No confirm dialog at the table.
-- **Status: not built yet.** Until it exists: a private window per judge.
+- **Status: built (#67).** A "Notebook cleared" pill shows for a few seconds. Shift+R is ignored while typing in a field.
 
 ## 6 likely judge questions
 1. **"How do you know the answers are right? Doesn't the model hallucinate?"**

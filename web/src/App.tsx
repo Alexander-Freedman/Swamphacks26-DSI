@@ -1,5 +1,7 @@
 import { useEffect, useState } from 'react'
 import { Distribution } from './components/Distribution'
+import { NotebookLink, NotebookScreen } from './components/Notebook'
+import { useReset } from './reset'
 import { Predict, type Answer } from './components/Predict'
 import { showcaseRound, showcaseSlugs } from './rounds'
 import { sessionFor, sessions } from './sessions/registry'
@@ -11,7 +13,7 @@ import './App.css'
 
 const BEAT_MS = 400
 
-function Home({ onPick, onSession }: { onPick: (slug: string) => void; onSession: (slug: string) => void }) {
+function Home({ onPick, onSession, onNotebook }: { onPick: (slug: string) => void; onSession: (slug: string) => void; onNotebook: () => void }) {
   return (
     <div className="home sheet">
       <h1>Bet on your gut. Then watch reality.</h1>
@@ -33,6 +35,7 @@ function Home({ onPick, onSession }: { onPick: (slug: string) => void; onSession
           </button>
         ))}
       </div>
+      <NotebookLink onOpen={onNotebook} />
     </div>
   )
 }
@@ -119,11 +122,11 @@ export default function App() {
   const screen: Screen = redirected ? { kind: 'session', slug: urlScreen.slug } : urlScreen
   const round = screen.kind === 'round' ? showcaseRound(screen.slug) : undefined
   const session = screen.kind === 'session' ? sessionFor(screen.slug) : undefined
-  const unknown = screen.kind !== 'home' && !round && !session
+  const unknown = (screen.kind === 'session' || screen.kind === 'round') && !round && !session
 
   useEffect(() => onScreenChange(setScreen), [])
   // A slug that doesn't exist shows Home, so the URL should say Home too.
-  const slug = screen.kind === 'home' ? '' : screen.slug
+  const slug = screen.kind === 'session' || screen.kind === 'round' ? screen.slug : ''
   useEffect(() => {
     if (unknown) replaceScreen(HOME)
     else if (redirected) replaceScreen({ kind: 'session', slug })
@@ -134,6 +137,11 @@ export default function App() {
     setScreen(s)
   }
   const home = () => go(HOME)
+  // Demo reset (Shift+R / ?reset=1) always lands on a clean Home URL.
+  const cleared = useReset(!session && !round, () => {
+    replaceScreen(HOME)
+    setScreen(HOME)
+  })
   if (session) {
     return (
       <main className="app">
@@ -150,10 +158,17 @@ export default function App() {
         <button className="logo" style={{ border: 0, background: 'none', padding: 0 }} onClick={home}>mm</button>
         {round && <span className={`chip ${round.reviewed ? 'reviewed' : ''}`}>{round.reviewed ? 'reviewed' : 'auto-checked'}</span>}
       </header>
-      {round ? (
+      {cleared && <p className="nb-toast" role="status">Notebook cleared</p>}
+      {screen.kind === 'notebook' ? (
+        <NotebookScreen onHome={home} />
+      ) : round ? (
         <Player key={round.slug} round={round} onDone={home} />
       ) : (
-        <Home onPick={(slug) => go({ kind: 'round', slug })} onSession={(slug) => go({ kind: 'session', slug })} />
+        <Home
+          onPick={(slug) => go({ kind: 'round', slug })}
+          onSession={(slug) => go({ kind: 'session', slug })}
+          onNotebook={() => go({ kind: 'notebook' })}
+        />
       )}
     </main>
   )

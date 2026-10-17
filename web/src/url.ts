@@ -1,6 +1,7 @@
 // Which screen is open lives in the URL, so Back, Forward and refresh work.
-// Sessions are ?session=<slug>, showcase rounds are ?round=<slug>, Home is the bare base URL.
-export type Screen = { kind: 'home' } | { kind: 'session'; slug: string } | { kind: 'round'; slug: string }
+// Sessions are ?session=<slug>, showcase rounds are ?round=<slug>, the notebook is ?notebook=1,
+// Home is the bare base URL.
+export type Screen = { kind: 'home' } | { kind: 'notebook' } | { kind: 'session'; slug: string } | { kind: 'round'; slug: string }
 
 export const HOME: Screen = { kind: 'home' }
 
@@ -10,11 +11,13 @@ export function readScreen(search: string): Screen {
   if (session) return { kind: 'session', slug: session }
   const round = q.get('round')
   if (round) return { kind: 'round', slug: round }
+  if (q.has('notebook')) return { kind: 'notebook' }
   return HOME
 }
 
 export function screenUrl(screen: Screen, base: string = import.meta.env.BASE_URL): string {
   if (screen.kind === 'home') return base
+  if (screen.kind === 'notebook') return `${base}?notebook=1`
   return `${base}?${screen.kind}=${encodeURIComponent(screen.slug)}`
 }
 

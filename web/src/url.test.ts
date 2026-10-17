@@ -11,6 +11,7 @@ describe('readScreen', () => {
     expect(readScreen('?session=boxes')).toEqual({ kind: 'session', slug: 'boxes' })
     expect(readScreen('?round=birthday')).toEqual({ kind: 'round', slug: 'birthday' })
     expect(readScreen('')).toEqual(HOME)
+    expect(readScreen('?notebook=1')).toEqual({ kind: 'notebook' })
     expect(readScreen('?round=')).toEqual(HOME)
     expect(readScreen('?utm=x')).toEqual(HOME)
   })
@@ -19,6 +20,7 @@ describe('readScreen', () => {
 describe('screenUrl', () => {
   it('keeps the base path', () => {
     expect(screenUrl(HOME, BASE)).toBe(BASE)
+    expect(screenUrl({ kind: 'notebook' }, BASE)).toBe('/Swamphacks26-DSI/?notebook=1')
     expect(screenUrl({ kind: 'round', slug: 'birthday' }, BASE)).toBe('/Swamphacks26-DSI/?round=birthday')
     expect(screenUrl({ kind: 'session', slug: 'a b' }, '/')).toBe('/?session=a%20b')
   })
