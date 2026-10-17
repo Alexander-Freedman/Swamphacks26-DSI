@@ -9,6 +9,7 @@ import { MechStep } from './MechStep'
 import { MECHS } from './mechs'
 import { PushStep } from './PushStep'
 import { SECTIONS, type OrgoStep, type OrgoTopic } from './topics'
+import { reducedMotion } from './geom'
 import './orgo.css'
 
 export const SLUG = 'orgo'
@@ -100,6 +101,13 @@ function OrgoTopicRun({ topic, onTopics, onDone }: { topic: OrgoTopic; onTopics:
   }, [step])
 
   const finish = useCallback(() => setFinished(true), [])
+  // the end bar lands below the picture, so bring it into view: otherwise Finish looks like it did nothing
+  const end = useRef<HTMLDivElement>(null)
+  useEffect(() => {
+    if (!finished) return
+    end.current?.scrollIntoView?.({ behavior: reducedMotion() ? 'auto' : 'smooth', block: 'center' })
+    end.current?.focus({ preventScroll: true })
+  }, [finished])
   useEffect(() => {
     if (!finished || saved.current) return
     saved.current = true
@@ -141,6 +149,7 @@ function OrgoTopicRun({ topic, onTopics, onDone }: { topic: OrgoTopic; onTopics:
         </div>
       )}
       {finished && last && (
+        <div ref={end} tabIndex={-1} className="og-endwrap">
         <EndBar
           caught={null}
           rematch="right"
@@ -154,6 +163,7 @@ function OrgoTopicRun({ topic, onTopics, onDone }: { topic: OrgoTopic; onTopics:
           remix={REMIX[topic.id] ?? ''}
           onDone={onDone}
         />
+        </div>
       )}
     </Frame>
   )
