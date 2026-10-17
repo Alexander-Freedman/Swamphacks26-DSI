@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react'
+import { useEffect, useState } from 'react'
 import { Distribution } from './components/Distribution'
 import { Predict, type Answer } from './components/Predict'
 import { showcaseRound, showcaseSlugs } from './rounds'
@@ -6,6 +6,7 @@ import { sessionFor, sessions } from './sessions/registry'
 import { simulate, shareAtLeast, type Histogram } from './truth'
 import type { Item, Round } from './types'
 import { misconceptionFor, verdictFor, verdictText } from './verdict'
+import { HOME, onScreenChange, pushScreen, readScreen, replaceScreen, type Screen } from './url'
 import './App.css'
 
 const BEAT_MS = 400
@@ -26,7 +27,7 @@ function Home({ onPick, onSession }: { onPick: (slug: string) => void; onSession
         </div>
       )}
       <div className="showcases">
-        {showcaseSlugs.map((slug) => (
+        {showcaseSlugs.filter((slug) => !sessionFor(slug)).map((slug) => (
           <button key={slug} className="showcase" onClick={() => onPick(slug)}>
             {showcaseRound(slug)!.topic}
           </button>
@@ -112,21 +113,34 @@ function Player({ round, onDone }: { round: Round; onDone: () => void }) {
 }
 
 export default function App() {
-  const [slug, setSlug] = useState<string | null>(() => new URLSearchParams(location.search).get('round'))
-  const round = useMemo(() => (slug ? showcaseRound(slug) : undefined), [slug])
-  const [sessionSlug, setSessionSlug] = useState<string | null>(() => new URLSearchParams(location.search).get('session'))
-  const session = sessionFor(sessionSlug)
-  const home = () => {
-    setSlug(null)
-    setSessionSlug(null)
+  const [urlScreen, setScreen] = useState<Screen>(() => readScreen(location.search))
+  // An old ?round= link whose slug now has a session opens the session instead.
+  const redirected = urlScreen.kind === 'round' && !!sessionFor(urlScreen.slug)
+  const screen: Screen = redirected ? { kind: 'session', slug: urlScreen.slug } : urlScreen
+  const round = screen.kind === 'round' ? showcaseRound(screen.slug) : undefined
+  const session = screen.kind === 'session' ? sessionFor(screen.slug) : undefined
+  const unknown = screen.kind !== 'home' && !round && !session
+
+  useEffect(() => onScreenChange(setScreen), [])
+  // A slug that doesn't exist shows Home, so the URL should say Home too.
+  const slug = screen.kind === 'home' ? '' : screen.slug
+  useEffect(() => {
+    if (unknown) replaceScreen(HOME)
+    else if (redirected) replaceScreen({ kind: 'session', slug })
+  }, [unknown, redirected, slug])
+
+  const go = (s: Screen) => {
+    pushScreen(s)
+    setScreen(s)
   }
+  const home = () => go(HOME)
   if (session) {
     return (
       <main className="app">
         <header className="topbar">
           <button className="logo" style={{ border: 0, background: 'none', padding: 0 }} onClick={home}>mm</button>
         </header>
-        <session.Component onDone={home} />
+        <session.Component key={session.slug} onDone={home} />
       </main>
     )
   }
@@ -136,7 +150,11 @@ export default function App() {
         <button className="logo" style={{ border: 0, background: 'none', padding: 0 }} onClick={home}>mm</button>
         {round && <span className={`chip ${round.reviewed ? 'reviewed' : ''}`}>{round.reviewed ? 'reviewed' : 'auto-checked'}</span>}
       </header>
-      {round ? <Player key={round.slug} round={round} onDone={() => setSlug(null)} /> : <Home onPick={setSlug} onSession={setSessionSlug} />}
+      {round ? (
+        <Player key={round.slug} round={round} onDone={home} />
+      ) : (
+        <Home onPick={(slug) => go({ kind: 'round', slug })} onSession={(slug) => go({ kind: 'session', slug })} />
+      )}
     </main>
   )
 }
