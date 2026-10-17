@@ -1,5 +1,7 @@
 Mode: BUILD (approved by Alex; plan in force from 10:48 PM Fri)
 
+Team rules: [CONTRIBUTING.md](CONTRIBUTING.md) (plan every task first; goal: help people understand concepts faster, visually).
+
 # Notes
 
 Decisions + how to run things. Keep current.
@@ -60,6 +62,33 @@ Decisions + how to run things. Keep current.
 
 - Oct 16 ~11:15 PM, **Azure image generation available (my paid account):** build-time only (a script generates, files are committed, served as static assets; the public site never calls Azure). **Hard cap 40 images** unless I say more; ≤1024x1024. Key stays in `~/.hack-app.env` / `.env` only. Use it where it helps the demo + Easy On The Eyes (brand art, showcase illustrations, share card); SVG/CSS stays the base.
   - **Image count: 0 / 40**
+
+- **Oct 16 ~11:40 PM, MOST IMPORTANT DIRECTION:** what's live feels like two slides (one guess, one text verdict). That is not the product. **The product takes someone from never having seen a concept to a mental model they can actually run, and it is inherently visual:** you manipulate things, watch them move, draw, and see your own model next to reality.
+  - **Backbone:** the 10-stage concept-to-runnable-model pipeline (from my research):
+    0. surface your guess and sketch
+    1. a concrete anchor you can run
+    2. contrasting cases side by side, then name what's the same
+    3. an explanation tied to YOUR mistake
+    4. run it at the extremes until it breaks
+    5. draw it from memory and get it checked
+    6. fade the help
+    7. tell it apart from its neighbor
+    8. carry it somewhere new
+    9. space and re-quiz
+  - Adapted to a fun creative-track experience and a 3-min demo; some stages take seconds.
+  - **Plan before building:**
+    - **Step 1:** docs/experience.md, a storyboard per showcase topic, screen by screen, plus low-fi mockups (HTML/SVG, screenshotted).
+    - **Step 2:** @luanamaldaner reviews, we agree, then re-plan build-plan.md.
+    - **Step 3:** build toward it, with QA checking every deploy against the storyboard.
+  - **Nothing already built is "done";** judge everything against this goal.
+  - **Clarified (~11:45 PM): NOT all 10 stages.** The pipeline is the inspiration, not a checklist; a 10-stage course isn't Quizlet-style. **Goal: take someone from not understanding a concept to understanding it through visualizations, in a quick session that feels good to come back to.** Borrow the strongest moves:
+    - guess first
+    - a concrete example you can watch and manipulate
+    - push it to the extremes
+    - your own model drawn next to reality
+    - your exact mistake named
+  - Per topic, pick only what makes it click visually. Keep sessions short.
+- Oct 16 ~11:35 PM: **standing QA reviewer.** After every Pages deploy and at least every 30 min, a QA pass plays every showcase round at desktop + phone sizes (~/qa Playwright), screenshots every state, and files one `qa` issue per real problem (frontend → @luanamaldaner, backend/data → me). It re-checks closed qa issues each pass. QA never blocks the build.
 
 ## How to run
 - **Live site (GitHub Pages):** https://alexander-freedman.github.io/Swamphacks26-DSI/ is served from the `gh-pages` branch. After **every merge to main that touches `web/` or `data/rounds/`**, run `scripts/deploy-pages.sh` on a clean, up-to-date `main`. It builds web/ with base `/Swamphacks26-DSI/`, copies the showcase rounds to `/rounds/*.json` (+ `rounds/index.json`), adds `.nojekyll` and a 404 fallback, refuses to publish anything key-shaped, and pushes gh-pages. The site works with no backend: the frontend falls back to `${import.meta.env.BASE_URL}rounds/<slug>.json`. No API key ever goes in the frontend.
