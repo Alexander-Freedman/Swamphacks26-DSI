@@ -26,6 +26,7 @@ EXPECTED = {
     "small-samples",
     "boyles-law",
     "caffeine-half-life",
+    "herd-immunity",
     "earthquake-magnitude",
     "enzyme-saturation",
     "falling-objects",
