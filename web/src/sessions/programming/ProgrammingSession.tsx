@@ -208,6 +208,13 @@ function CallStackStep({ topic, onDone }: { topic: string; onDone: () => void })
           <p className="pg-say" aria-live="polite">
             {phase === 'depth' ? 'Nothing has run yet. The stack is empty.' : crashing ? (phase === 'done' ? 'Stack overflow: the program crashes.' : 'No base case, so the calls never stop…') : m.say}
           </p>
+          {phase === 'done' && (
+            <p className="pg-rule">
+              <span>Each call gets a <span className="pg-hl">frame</span> on the stack.</span>
+              <span>The newest frame finishes first: <span className="pg-hl">last in, first out</span>.</span>
+              <span>The <span className="pg-hl">base case</span> is what makes it stop.</span>
+            </p>
+          )}
           {running && (
             <button className="pg-btn pg-go" onClick={step}>
               Run the next line ▶
@@ -259,11 +266,6 @@ function CallStackStep({ topic, onDone }: { topic: string; onDone: () => void })
       )}
       {phase === 'done' && (
         <>
-          <p className="pg-rule">
-            <span>Each call gets a <span className="pg-hl">frame</span> on the stack.</span>
-            <span>The newest frame finishes first: <span className="pg-hl">last in, first out</span>.</span>
-            <span>The <span className="pg-hl">base case</span> is what makes it stop.</span>
-          </p>
           <div className="pg-end" role="status">
             <p>
               <b>Saved to your notebook.</b>{' '}

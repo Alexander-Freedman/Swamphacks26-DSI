@@ -61,3 +61,9 @@
 .prog .pg-endact .pg-btn { margin-top: 0; }
 .prog .pg-nblink { color: var(--ink); font-weight: 700; }
 .prog .pg-mastered { font-weight: 700; color: var(--called); }
+
+/* the crash fits the window: compact frames, the stack box keeps its height */
+.prog .pg-stack.crash { gap: 3px; max-height: 330px; overflow: hidden; }
+.prog .pg-stack.crash .pg-frame { padding: 3px 10px; }
+.prog .pg-stack.crash .pg-frame b { font-size: 14px; }
+.prog .pg-rule { font-size: 16px; margin-top: 12px; }
