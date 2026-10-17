@@ -59,7 +59,8 @@ Decisions + how to run things. Keep current.
 - Oct 16 ~11:05 PM, **approved:** build-plan.md is good. Name later, keep the working name `mm`. B1 starts at approval (10:48 PM). The ~2 extra hours go to engine buffer in B2, **not** to new features.
 
 - Oct 16 ~11:15 PM, **Azure image generation available (my paid account):** build-time only (a script generates, files are committed, served as static assets; the public site never calls Azure). **Hard cap 40 images** unless I say more; ≤1024x1024. Key stays in `~/.hack-app.env` / `.env` only. Use it where it helps the demo + Easy On The Eyes (brand art, showcase illustrations, share card); SVG/CSS stays the base.
-  - **Image count: 0 / 40**
+  - **Budget raised to 100 images (Sat ~12:00 AM); beyond 100 needs my approval.** Same rules.
+  - **Image count: 5 / 100** (coin streak, positive test, birthday, 2 hero tries; not committed yet, picked per screen during the build)
 
 - **Oct 16 ~11:40 PM, MOST IMPORTANT DIRECTION:** what's live feels like two slides (one guess, one text verdict). That is not the product. **The product takes someone from never having seen a concept to a mental model they can actually run, and it is inherently visual:** you manipulate things, watch them move, draw, and see your own model next to reality.
   - **Backbone:** the 10-stage concept-to-runnable-model pipeline (from my research):
@@ -87,6 +88,10 @@ Decisions + how to run things. Keep current.
     - your exact mistake named
   - Per topic, pick only what makes it click visually. Keep sessions short.
 - Oct 16 ~11:35 PM: **standing QA reviewer.** After every Pages deploy and at least every 30 min, a QA pass plays every showcase round at desktop + phone sizes (~/qa Playwright), screenshots every state, and files one `qa` issue per real problem (frontend → @luanamaldaner, backend/data → me). It re-checks closed qa issues each pass. QA never blocks the build.
+
+- Sat ~12:00 AM, **takeover rule:** while @luanamaldaner's side is offline, I own everything (frontend + backend, storyboard, screens, reveal, design, QA fixes, deploys). Any issue/PR assigned to her with no commit or comment from her side for 30+ min is mine: comment "taking this while your side is offline", reassign, build on her branch or a new one, keep her work. Hand-back signal: **"BACK ONLINE"** on #1 → I reply with the state, hand back the frontend issues I'm not mid-way through, and we return to the normal split. Rule 17 still applies.
+- Sat ~12:10 AM, **design phase closed** (docs/experience.md + docs/experience-look.md). **By morning the live site shows a real working visual session for at least one topic** (rule from me). Build order: birthday (#78) and coin streak sessions first, then positive test.
+- Sat ~12:10 AM, **generation trial (25 topics, prompt v2):** 24/25 delivered, median 27 s (p90 51 s): too slow to generate live on stage. Every generated item came out as a plain estimate (no curve/sampler), several had wrong answers the checks didn't catch, and the blind check mostly timed out or errored while reporting `blind_checked: true`. **Decision:** the demo runs on hand-reviewed rounds; "try any topic" is a labeled extra, and the blind check gets fixed or removed before anyone relies on it.
 
 ## How to run
 - **Live site (GitHub Pages):** https://alexander-freedman.github.io/Swamphacks26-DSI/ is served from the `gh-pages` branch. After **every merge to main that touches `web/` or `data/rounds/`**, run `scripts/deploy-pages.sh` on a clean, up-to-date `main`. It builds web/ with base `/Swamphacks26-DSI/`, copies the showcase rounds to `/rounds/*.json` (+ `rounds/index.json`), adds `.nojekyll` and a 404 fallback, refuses to publish anything key-shaped, and pushes gh-pages. The site works with no backend: the frontend falls back to `${import.meta.env.BASE_URL}rounds/<slug>.json`. No API key ever goes in the frontend.

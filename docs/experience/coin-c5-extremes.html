@@ -1,0 +1,65 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Coin C5 mockup</title>
+<!-- Low-fi mockup (static). Numbers are from a real simulation: 10,000 rounds of 100 fair flips; see docs/experience.md. -->
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible+Next:wght@400;700&family=Shantell+Sans:wght@400;600;800&display=swap" rel="stylesheet"><style>
+:root{--paper:#fbf8f1;--grid:#e6e0d2;--ink:#1b2340;--ink-soft:#4a5170;--pencil:#85827a;--marker:#ffd84d;--marker-soft:rgba(255,216,77,.55);
+--called:#1f8a4c;--close:#c77d00;--off:#c2362f;--card:#fff;--font-body:'Atkinson Hyperlegible Next',system-ui,sans-serif;--font-hand:'Shantell Sans','Comic Neue',cursive;color-scheme:light}
+*{box-sizing:border-box}
+body{margin:0;min-height:100vh;font-family:var(--font-body);color:var(--ink);background-color:var(--paper);
+background-image:linear-gradient(var(--grid) 1px,transparent 1px),linear-gradient(90deg,var(--grid) 1px,transparent 1px);background-size:24px 24px}
+.hand{font-family:var(--font-hand)}
+.screen{max-width:390px;margin:0 auto;padding:18px 16px 28px;display:flex;flex-direction:column;gap:14px;min-height:100vh}
+.top{display:flex;align-items:center;justify-content:space-between;font-size:13px;color:var(--ink-soft)}
+.top b{font-family:var(--font-hand);font-weight:800;color:var(--ink);font-size:15px}
+.dots{display:flex;gap:5px}.dots i{width:8px;height:8px;border-radius:50%;border:1.5px solid var(--ink);display:block}.dots i.on{background:var(--ink)}
+h1{font-family:var(--font-hand);font-weight:800;font-size:26px;line-height:1.15;margin:4px 0 0}
+h1 .mk{background:linear-gradient(transparent 55%,var(--marker) 55%,var(--marker) 92%,transparent 92%);padding:0 3px}
+.sub{margin:0;color:var(--ink-soft);font-size:15px;line-height:1.4}
+.card{background:var(--card);border:2px solid var(--ink);border-radius:14px;box-shadow:0 3px 0 var(--ink);padding:12px 14px}
+.lbl{font-size:12px;letter-spacing:.08em;text-transform:uppercase;font-weight:700;display:flex;justify-content:space-between;align-items:baseline}
+.lbl.pencil{color:var(--pencil)}.lbl.ink{color:var(--ink)}
+.lbl .r{font-family:var(--font-hand);text-transform:none;letter-spacing:0;font-size:14px}
+.num{font-family:var(--font-hand);font-weight:800;line-height:1}
+.tally{display:flex;gap:10px}
+.tally>div{flex:1;border-radius:12px;padding:10px 12px;border:2px solid var(--ink);background:var(--card)}
+.tally .p{border:2px dashed var(--pencil);color:var(--pencil);background:transparent}
+.tally .num{font-size:44px}.tally small{display:block;font-size:12px;text-transform:uppercase;letter-spacing:.06em;font-weight:700}
+.btn{display:block;width:100%;text-align:center;font-family:var(--font-hand);font-weight:800;font-size:18px;padding:13px;border-radius:14px;border:2px solid var(--ink);background:var(--marker);box-shadow:0 3px 0 var(--ink);color:var(--ink)}
+.btn.ghost{background:var(--card)}
+.row2{display:flex;gap:10px}.row2 .btn{flex:1}
+.note{font-size:14px;line-height:1.45;color:var(--ink-soft);margin:0}
+.note b{color:var(--ink)}
+.hl{background:var(--marker-soft);padding:0 3px;border-radius:3px}
+.stamp{display:inline-block;font-family:var(--font-hand);font-weight:800;text-transform:uppercase;letter-spacing:.06em;border:4px double currentColor;border-radius:10px;padding:6px 14px;transform:rotate(-8deg);filter:url(#rough)}
+.stamp.off{color:var(--off)}.stamp.called{color:var(--called)}.stamp.close{color:var(--close)}
+.chip{font-size:13px;border:2px solid var(--ink);border-radius:999px;padding:6px 11px;background:var(--card)}
+.chip.on{background:var(--ink);color:var(--paper)}
+.only-desk{display:none}.deskc2>.col{display:flex;flex-direction:column;gap:14px}.deskc2>.col+.col{margin-top:14px}
+svg text{font-family:var(--font-body)}
+svg .h{font-family:var(--font-hand)}
+@media (min-width:900px){
+ .screen{max-width:1080px;padding:28px 40px}
+ .only-phone{display:none}.only-desk{display:block}
+ h1{font-size:34px}
+ .desk2{display:grid;grid-template-columns:1.5fr 1fr;gap:22px;align-items:start}
+ .desk2 > .col{display:flex;flex-direction:column;gap:14px}
+ .c2x{display:grid!important;grid-template-columns:1fr 1fr 1fr;align-items:start}.c2x .note{grid-column:2}.c2x .card{grid-column:3;grid-row:1}.c2x .row2{grid-column:1/4}
+}</style></head><body><svg width="0" height="0" style="position:absolute"><defs>
+<filter id="rough"><feTurbulence type="fractalNoise" baseFrequency="0.9" numOctaves="2" result="n"/><feDisplacementMap in="SourceGraphic" in2="n" scale="2.2"/></filter>
+<filter id="sketch"><feTurbulence type="fractalNoise" baseFrequency="0.05" numOctaves="2" result="n"/><feDisplacementMap in="SourceGraphic" in2="n" scale="3"/></filter>
+<filter id="sketchL" filterUnits="userSpaceOnUse" x="0" y="0" width="700" height="400"><feTurbulence type="fractalNoise" baseFrequency="0.05" numOctaves="2" result="n"/><feDisplacementMap in="SourceGraphic" in2="n" scale="3"/></filter>
+</defs></svg><div class="screen"><div class="top"><b>Coin streak</b><span>5/7 · extremes</span><div class="dots"><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class=""></i><i class=""></i></div></div>
+<h1>Flip <span class="mk">more</span>. What happens?</h1>
+<p class="sub">You drew your curve first (pencil). Drag the slider: the real curve is ink.</p>
+<div class="desk2"><div class="col">
+<div class="card" style="padding:10px 6px 4px"><div class="only-phone"><svg viewBox="0 0 360 250" width="100%" style="display:block"><polygon points="34.0,170.0 65.3,159.2 106.7,143.9 138.0,133.3 169.3,122.5 210.7,104.7 242.0,94.6 273.3,83.9 314.7,68.4 346.0,57.1 346.0,151.7 314.7,151.7 273.3,152.8 242.0,152.3 210.7,152.8 169.3,153.4 138.0,155.1 106.7,158.5 65.3,165.4 34.0,173.3" fill="var(--marker-soft)"/><line x1="34" y1="212" x2="346" y2="212" stroke="var(--grid)" stroke-width="1"/><text x="28" y="216" text-anchor="end" font-size="11" fill="var(--ink-soft)">0</text><line x1="34" y1="166.5" x2="346" y2="166.5" stroke="var(--grid)" stroke-width="1"/><text x="28" y="170.5" text-anchor="end" font-size="11" fill="var(--ink-soft)">4</text><line x1="34" y1="121" x2="346" y2="121" stroke="var(--grid)" stroke-width="1"/><text x="28" y="125" text-anchor="end" font-size="11" fill="var(--ink-soft)">8</text><line x1="34" y1="75.5" x2="346" y2="75.5" stroke="var(--grid)" stroke-width="1"/><text x="28" y="79.5" text-anchor="end" font-size="11" fill="var(--ink-soft)">12</text><line x1="34" y1="30" x2="346" y2="30" stroke="var(--grid)" stroke-width="1"/><text x="28" y="34" text-anchor="end" font-size="11" fill="var(--ink-soft)">16</text><text x="34" y="228" text-anchor="start" font-size="11" fill="var(--ink-soft)">10</text><text x="138" y="228" text-anchor="middle" font-size="11" fill="var(--ink-soft)">100</text><text x="242" y="228" text-anchor="middle" font-size="11" fill="var(--ink-soft)">1,000</text><text x="346" y="228" text-anchor="end" font-size="11" fill="var(--ink-soft)">10,000</text><text x="190" y="246" text-anchor="middle" font-size="11" fill="var(--ink-soft)">number of flips (each step ×10)</text><text x="8" y="16" font-size="11" fill="var(--ink-soft)">longest run</text><line x1="34" y1="212" x2="346" y2="212" stroke="var(--ink)" stroke-width="2"/><g filter="url(#sketch)"><polyline points="34.0,173.3 65.3,165.4 106.7,158.5 138.0,155.1 169.3,153.4 210.7,152.8 242.0,152.3 273.3,152.8 314.7,151.7 346.0,151.7" fill="none" stroke="var(--pencil)" stroke-width="3" stroke-dasharray="8 4" stroke-linecap="round"/></g><text x="344" y="171.7125" text-anchor="end" class="h" font-size="14" font-weight="600" fill="var(--pencil)">your curve: levels off</text><polyline points="34.0,170.0 65.3,159.2 106.7,143.9 138.0,133.3 169.3,122.5 210.7,104.7 242.0,94.6 273.3,83.9 314.7,68.4 346.0,57.1" fill="none" stroke="var(--ink)" stroke-width="3.5" stroke-linejoin="round"/><text x="346" y="39.099999999999994" text-anchor="end" class="h" font-size="14" font-weight="800" fill="var(--ink)">real: keeps climbing</text><line x1="242" y1="94.61" x2="242" y2="212" stroke="var(--ink)" stroke-width="1.5" stroke-dasharray="3 3"/><circle cx="242" cy="94.61" r="7" fill="var(--marker)" stroke="var(--ink)" stroke-width="2.5"/><path d="M138 129.285 L138 112.47875 L169.30711954905405 112.47875" stroke="var(--ink)" stroke-width="1.5" fill="none"/><text x="134" y="108.47875" text-anchor="middle" font-size="11" font-weight="700" fill="var(--ink)">×2 flips → +1</text></svg></div><div class="only-desk"><svg viewBox="0 0 620 360" width="100%" style="display:block"><polygon points="34.0,254.7 91.4,237.3 167.3,212.7 224.7,195.7 282.1,178.4 357.9,149.9 415.3,133.7 472.7,116.5 548.6,91.7 606.0,73.4 606.0,225.3 548.6,225.3 472.7,227.1 415.3,226.2 357.9,227.1 282.1,228.0 224.7,230.8 167.3,236.2 91.4,247.2 34.0,259.9" fill="var(--marker-soft)"/><line x1="34" y1="322" x2="606" y2="322" stroke="var(--grid)" stroke-width="1"/><text x="28" y="326" text-anchor="end" font-size="11" fill="var(--ink-soft)">0</text><line x1="34" y1="249" x2="606" y2="249" stroke="var(--grid)" stroke-width="1"/><text x="28" y="253" text-anchor="end" font-size="11" fill="var(--ink-soft)">4</text><line x1="34" y1="176" x2="606" y2="176" stroke="var(--grid)" stroke-width="1"/><text x="28" y="180" text-anchor="end" font-size="11" fill="var(--ink-soft)">8</text><line x1="34" y1="103" x2="606" y2="103" stroke="var(--grid)" stroke-width="1"/><text x="28" y="107" text-anchor="end" font-size="11" fill="var(--ink-soft)">12</text><line x1="34" y1="30" x2="606" y2="30" stroke="var(--grid)" stroke-width="1"/><text x="28" y="34" text-anchor="end" font-size="11" fill="var(--ink-soft)">16</text><text x="34" y="338" text-anchor="start" font-size="11" fill="var(--ink-soft)">10</text><text x="224.66666666666666" y="338" text-anchor="middle" font-size="11" fill="var(--ink-soft)">100</text><text x="415.3333333333333" y="338" text-anchor="middle" font-size="11" fill="var(--ink-soft)">1,000</text><text x="606" y="338" text-anchor="end" font-size="11" fill="var(--ink-soft)">10,000</text><text x="320" y="356" text-anchor="middle" font-size="11" fill="var(--ink-soft)">number of flips (each step ×10)</text><text x="8" y="16" font-size="11" fill="var(--ink-soft)">longest run</text><line x1="34" y1="322" x2="606" y2="322" stroke="var(--ink)" stroke-width="2"/><g filter="url(#sketch)"><polyline points="34.0,259.9 91.4,247.2 167.3,236.2 224.7,230.8 282.1,228.0 357.9,227.1 415.3,226.2 472.7,227.1 548.6,225.3 606.0,225.3" fill="none" stroke="var(--pencil)" stroke-width="3" stroke-dasharray="8 4" stroke-linecap="round"/></g><text x="604" y="245.275" text-anchor="end" class="h" font-size="14" font-weight="600" fill="var(--pencil)">your curve: levels off</text><polyline points="34.0,254.7 91.4,237.3 167.3,212.7 224.7,195.7 282.1,178.4 357.9,149.9 415.3,133.7 472.7,116.5 548.6,91.7 606.0,73.4" fill="none" stroke="var(--ink)" stroke-width="3.5" stroke-linejoin="round"/><text x="606" y="44.60000000000002" text-anchor="end" class="h" font-size="14" font-weight="800" fill="var(--ink)">real: keeps climbing</text><line x1="415.3333333333333" y1="133.66" x2="415.3333333333333" y2="322" stroke="var(--ink)" stroke-width="1.5" stroke-dasharray="3 3"/><circle cx="415.3333333333333" cy="133.66" r="7" fill="var(--marker)" stroke="var(--ink)" stroke-width="2.5"/><path d="M224.66666666666666 191.71 L224.66666666666666 168.3725 L282.0630525065991 168.3725" stroke="var(--ink)" stroke-width="1.5" fill="none"/><text x="220.66666666666666" y="164.3725" text-anchor="middle" font-size="11" font-weight="700" fill="var(--ink)">×2 flips → +1</text></svg></div></div>
+</div><div class="col">
+<div class="card"><div class="lbl ink"><span>Flips</span></div><svg viewBox="0 0 360 60" width="100%"><line x1="14" y1="24" x2="346" y2="24" stroke="var(--grid)" stroke-width="8" stroke-linecap="round"/><line x1="14" y1="24" x2="235.33333333333331" y2="24" stroke="var(--ink)" stroke-width="8" stroke-linecap="round"/>
+<text x="14" y="54" text-anchor="start" font-size="12" fill="var(--ink-soft)">10</text><text x="124.66666666666666" y="54" text-anchor="middle" font-size="12" fill="var(--ink-soft)">100</text><text x="235.33333333333331" y="54" text-anchor="middle" font-size="12" fill="var(--ink-soft)">1,000</text><text x="346" y="54" text-anchor="end" font-size="12" fill="var(--ink-soft)">10,000</text>
+<circle cx="235.33333333333331" cy="24" r="14" fill="var(--marker)" stroke="var(--ink)" stroke-width="3"/></svg>
+<div style="display:flex;align-items:baseline;gap:8px;margin-top:4px;white-space:nowrap"><span class="num" style="font-size:34px">1,000</span><span class="hand">flips →</span><span class="num" style="font-size:34px">≈10</span><span class="hand">in a row</span></div></div>
+<p class="note">Double the flips and the longest run grows by about <b>one</b>. It never levels off; it just climbs slowly (about log₂ of the flips).</p>
+<div class="btn">Next →</div>
+</div></div></div></body></html>
