@@ -3,15 +3,13 @@
   --font-display: 'Bricolage Grotesque', var(--font-body);
   --font-mono: 'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, monospace;
   --empty: #c9c1ae;
-  background: var(--card); border: 2px solid var(--ink); border-radius: var(--radius); box-shadow: 4px 4px 0 var(--ink);
-  padding: 20px; position: relative;
+  /* frame width, header, title, how-sure, lock, stamp and end bar come from components/session (the shared shell) */
+  position: relative;
 }
-@media (max-width: 600px) { .coin-session { padding: 14px; } }
-.coin-session h2 { font: 800 clamp(24px, 5.5vw, 32px)/1.08 var(--font-display); margin: 6px 0 12px; scroll-margin-top: 12px; }
-.coin-session h2:focus { outline: none; }
 .coin-session h3 { margin: 0; }
+.coin-session .tag.red { color: var(--off); }
 .coin-session .num { font-family: var(--font-mono); font-variant-numeric: tabular-nums; }
-/* the one guidance line per screen, like the birthday session's subtitle */
+/* guidance lines inside a step (the screen's own line is the shell subtitle) */
 .coin-session .guide { font: 17px/1.45 var(--font-hand); color: var(--ink-soft); margin: 0 0 14px; max-width: 46em; }
 .coin-session .tryit .guide { margin: 4px 0 8px; }
 .coin-session input[type='range'].unset { opacity: .55; }
@@ -28,17 +26,7 @@
 .coin-session .btn.ghost { background: var(--card); color: var(--ink); }
 .coin-session .btn.small { font-size: 14px; padding: 7px 14px; min-height: 40px; }
 .coin-session .btn:disabled { opacity: .45; cursor: default; }
-.coin-session .lockbtn { background: var(--marker); color: var(--ink); }
-.coin-session .lockbtn:active:not(:disabled) { transform: scale(.95); transition: transform 120ms cubic-bezier(.3, 1.6, .5, 1); }
 .coin-session .next-row { margin-top: 22px; display: flex; justify-content: flex-end; }
-
-/* step nav */
-.coin-session .steps { display: flex; gap: 6px; flex-wrap: wrap; margin: 0 0 12px; }
-.coin-session .steps button { border: 1.5px solid var(--ink); background: var(--paper); border-radius: 999px; padding: 4px 10px; font-size: 13px; min-height: 32px; }
-.coin-session .steps button.on { background: var(--ink); color: var(--paper); }
-.coin-session .steps button:disabled { opacity: .4; cursor: default; }
-.coin-session .steps .n { font-family: var(--font-mono); }
-@media (max-width: 600px) { .coin-session .steps button:not(.on) .s { display: none; } }
 
 /* your model rides along, in pencil */
 .coin-session .pencil-strip { display: flex; flex-wrap: wrap; gap: 6px 16px; margin: 0 0 8px; padding: 6px 10px; border: 2px dashed var(--pencil); border-radius: 10px; font: 400 14px var(--font-hand); color: var(--ink-soft); }
@@ -74,7 +62,10 @@
 .coin-session .tap:disabled { opacity: .4; cursor: default; }
 .coin-session .stats { display: flex; gap: 6px 18px; flex-wrap: wrap; font-size: 14px; color: var(--ink-soft); margin: 6px 0 4px; }
 .coin-session .stats b { font: 500 16px var(--font-mono); color: var(--ink); }
-.coin-session .card { background: var(--card); border: 2px solid var(--ink); border-radius: var(--radius); box-shadow: 0 2px 0 var(--ink); padding: 16px; }
+.coin-session .card { background: var(--card); border: 2px solid var(--ink); border-radius: var(--radius); box-shadow: 0 3px 0 var(--ink); padding: 16px; }
+.coin-session .coin-step.card { min-width: 0; }
+/* the guess box sits inside the step card: a quieter frame, like the birthday guess card */
+.coin-session .coin-step .guessbox { box-shadow: none; max-width: 560px; }
 .coin-session .guessbox { margin-top: 16px; }
 .coin-session .guessnum { display: flex; align-items: baseline; gap: 10px; margin: 4px 0 6px; flex-wrap: wrap; }
 .coin-session .guessnum .big { font: 600 56px/1 var(--font-hand); color: var(--ink); border-bottom: 3px dashed var(--pencil); padding: 0 6px; }
@@ -83,9 +74,6 @@
 .coin-session .stamp { display: inline-block; font: 800 22px var(--font-display); text-transform: uppercase; border: 3px solid currentColor; border-radius: 8px; padding: 2px 10px; transform: rotate(-6deg); animation: coin-stamp 180ms cubic-bezier(.3, 1.6, .5, 1) both; }
 @keyframes coin-stamp { from { transform: rotate(-6deg) scale(1.6); opacity: 0; } }
 .coin-session .stamp.locked { font-size: 16px; color: var(--pencil); border-style: dashed; }
-.coin-session .stamp.called { color: var(--called); }
-.coin-session .stamp.close { color: var(--close); }
-.coin-session .stamp.mistake { color: var(--off); background: var(--card); }
 
 /* step 2 */
 .coin-session .readout { display: flex; gap: 12px 22px; flex-wrap: wrap; align-items: baseline; margin: 4px 0 6px; }
@@ -150,11 +138,9 @@
 .coin-session .hand-ticks button.on { color: var(--ink); text-decoration: underline 3px var(--marker); }
 .coin-session .breaknote { font: 600 18px var(--font-hand); margin: 10px 0 0; min-height: 2.6em; line-height: 1.4; }
 
-/* step 5 */
-.coin-session .verdict-card { padding: 0 16px 18px; margin-top: 34px; }
-.coin-session .verdict-card > .stamp { font-size: clamp(17px, 4.6vw, 22px); margin: -22px 0 24px; background: var(--card); max-width: 100%; }
-.coin-session .mname { font: 800 26px/1.1 var(--font-display); margin: 6px 0 10px !important; }
-.coin-session .mname { background: linear-gradient(transparent 55%, var(--marker) 55%); display: inline; }
+/* step 5: stamp row (shell) above the card, the mistake's name as the card title */
+.coin-session .verdict-card { max-width: 820px; }
+.coin-session .mname { font: 800 clamp(24px, 5.5vw, 32px)/1.15 var(--font-display); margin: 6px 0 10px !important; }
 .coin-session .line { font-size: 19px; line-height: 1.4; margin: 12px 0 14px; }
 .coin-session .evid { list-style: none; padding: 0; margin: 0 0 14px; display: grid; gap: 8px; }
 .coin-session .evid li { display: grid; grid-template-columns: 1fr auto auto; gap: 10px; align-items: baseline; font-size: 15px; border-bottom: 1px dashed var(--grid); padding-bottom: 6px; }
@@ -187,31 +173,19 @@
 .coin-session .tally b.you { font-weight: 600; color: var(--ink-soft); border-bottom: 3px dashed var(--pencil); }
 .coin-session .tally b.ink { font: 800 24px var(--font-display); }
 
-/* header, same pattern as the birthday session: chip, steps, "n of 5" */
-.coin-session .coin-head { display: flex; align-items: center; gap: 8px 10px; flex-wrap: wrap; margin: 0 0 12px; }
-.coin-session .coin-head .steps { margin: 0; }
-.coin-session .chip { font: 700 13px var(--font-body); border: 2px solid var(--ink); border-radius: 999px; padding: 3px 12px; background: var(--card); }
-.coin-session .count { font-size: 13px; color: var(--ink-soft); }
-/* phone: chip + "n of 5" on one line, the step pills under it, same on every step */
-@media (max-width: 600px) { .coin-session .coin-head .steps { order: 3; flex-basis: 100%; } }
+/* pencil strip and step card under the shell title */
+.coin-session .pencil-strip + .coin-step { margin-top: 10px; }
 
-/* how sure? */
-.coin-session .tag.sure { margin-top: 12px; }
-.coin-session .confs { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; margin: 6px 0 4px; max-width: 460px; }
-.coin-session .conf { font: 600 15px var(--font-body); background: var(--card); color: var(--ink); border: 2px solid var(--ink); border-radius: 10px; min-height: 44px; padding: 6px; }
-.coin-session .conf[aria-pressed='true'] { background: var(--ink); color: var(--paper); }
-.coin-session .conf:disabled { cursor: default; }
-.coin-session .conf:disabled:not([aria-pressed='true']) { opacity: .45; }
-
-/* card: what you said, saved bar */
-.coin-session .said { font-size: 17px; margin: -10px 0 10px; }
-.coin-session .said .you { font: 600 22px var(--font-hand); color: var(--ink-soft); border-bottom: 3px dashed var(--pencil); padding: 0 3px; }
-.coin-session .saved { margin-top: 16px; background: var(--marker); border: 2px solid var(--ink); border-radius: var(--radius); box-shadow: 0 3px 0 var(--ink); padding: 12px 14px; }
-.coin-session .saved p { margin: 0; font-size: 16px; line-height: 1.4; }
-.coin-session .saved .row { margin-bottom: 0; }
+/* card: what you said */
+.coin-session .said .you { font-weight: 600; color: var(--pencil); border-bottom: 3px dashed var(--pencil); padding: 0 3px; }
+.coin-session .said .num { font-size: 24px; }
+/* phone: no card inside a card; the guess box keeps the full step width, like the birthday guess card */
+@media (max-width: 480px) {
+  .coin-session .coin-step .guessbox { border: 0; border-top: 2px dashed var(--grid); border-radius: 0; padding: 14px 0 0; }
+}
 
 /* fast taps on phones: no double-tap zoom, no text selection */
-.coin-session .tap, .coin-session .btn, .coin-session .conf, .coin-session .lenpick button, .coin-session .choice button { touch-action: manipulation; user-select: none; -webkit-user-select: none; }
+.coin-session .tap, .coin-session .btn, .coin-session .lenpick button, .coin-session .choice button { touch-action: manipulation; user-select: none; -webkit-user-select: none; }
 
 @media (prefers-reduced-motion: reduce) {
   .coin-session .stamp, .coin-session .coin.fresh b { animation: none; }
