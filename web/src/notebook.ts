@@ -41,6 +41,11 @@ export type Card = {
   caught: number
   /** right answers since the last catch */
   wins: number
+  /**
+   * The latest try at this mistake, so the card can show it (#176): the catching session's own rematch
+   * ('rematch-right' doesn't count toward busting, 'rematch-missed'), or a later session ('right' counts, 'missed').
+   */
+  last: 'rematch-right' | 'rematch-missed' | 'right' | 'missed' | null
   lastSeen: string
   /** Where "try it again" goes: the session, or the round (#172). */
   href: string
@@ -164,16 +169,19 @@ export function notebook(list: Entry[] = entries()): Card[] {
     const id = caughtId(e)
     const right = !id || e.rematch === 'right'
     for (const c of cards.values()) {
-      if (c.session !== e.session || c.id === id || !right) continue
-      c.wins += 1
+      if (c.session !== e.session || c.id === id) continue
+      c.last = right ? 'right' : 'missed'
       c.lastSeen = e.at
+      if (right) c.wins += 1
     }
+    const own = e.rematch === 'right' ? 'rematch-right' : e.rematch === 'wrong' ? 'rematch-missed' : null
     if (!id) continue
     const key = `${e.session}\u0000${id}`
     const c = cards.get(key)
     if (c) {
       c.caught += 1
       c.wins = 0
+      c.last = own
       c.lastSeen = e.at
     } else {
       cards.set(key, {
@@ -184,6 +192,7 @@ export function notebook(list: Entry[] = entries()): Card[] {
         status: 'caught',
         caught: 1,
         wins: 0,
+        last: own,
         lastSeen: e.at,
         href: `${import.meta.env.BASE_URL}?${e.kind === 'round' ? 'round' : 'session'}=${encodeURIComponent(e.session)}`,
       })
