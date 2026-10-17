@@ -90,7 +90,7 @@ Never show a raw error or a spinner. Never run a fresh generation at the table.
 4. **"Does it actually help people learn?"**
    "We can't run a learning study in a weekend, so we don't claim one. What we built on: predicting before a demo beats just watching it (Crouch et al. 2004), and confident mistakes are the ones people correct best (hypercorrection). That's why there's a lock-in and a confidence tap." (Sources in docs/experience.md; add user-test lines from docs/user-testing.md after round 1, Sat 1:30 PM.)
 5. **"Why no streaks or points? And then why is it Entertainment?"**
-   Use the answer in docs/pitch.md ("Judge Q&A: Why no streaks or points?"). Short form: "A 16-week study found badges and a leaderboard lowered motivation and exam scores. The fun is the bet and the reveal: you guess, you draw, reality draws in over your pencil, a stamp lands."
+   Use docs/pitch.md, Judge Q&A 4. Short form: "A 16-week study found badges and a leaderboard lowered motivation and exam scores. The fun is the bet and the reveal: you guess, you draw, reality draws in over your pencil, a stamp lands."
 6. **"Where's Gemini in this, and why isn't typed-topic the headline?"**
    "Gemini writes the typed-topic rounds as structured JSON, never the answer. I measured it: median 27 seconds per topic in a 25-topic trial, and every item came out as a plain number guess, not a visual. That's not good enough to lead with, so the headline is hand-built visual sessions and typed topics are a labelled extra from a reviewed cache." (NOTES.md trial.)
 
