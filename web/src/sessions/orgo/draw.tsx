@@ -3,13 +3,13 @@ import { chargeText, dist, R } from './geom'
 
 // Small SVG pieces both orgo canvases share: atom discs, bond lines, charges, pointer → SVG units.
 
-export function AtomDisc({ el, x, y, charge = 0, partial = false, tone = 'ink', fill }: { el: El; x: number; y: number; charge?: number; partial?: boolean; tone?: 'ink' | 'pencil' | 'off'; fill?: string }) {
+export function AtomDisc({ el, label, x, y, charge = 0, partial = false, tone = 'ink', fill }: { el: El; label?: string; x: number; y: number; charge?: number; partial?: boolean; tone?: 'ink' | 'pencil' | 'off'; fill?: string }) {
   // around the transition state both ends carry part of the − charge
   const c = partial ? 'δ−' : chargeText(charge)
   return (
     <g className={`og-atom og-${tone}`} transform={`translate(${x} ${y})`}>
       <circle r={R} className="og-disc" style={fill ? { fill } : undefined} />
-      <text className="og-el" dy="0.36em" textAnchor="middle">{el}</text>
+      <text className={'og-el' + (label ? ' og-el-sm' : '')} dy="0.36em" textAnchor="middle">{label ?? el}</text>
       {c && (
         <g transform="translate(13 -14)">
           <circle r={c.length > 1 ? 9.5 : 8} className="og-chg-bg" />

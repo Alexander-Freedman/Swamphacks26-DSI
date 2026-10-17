@@ -49,7 +49,7 @@ function Slots({ el, used }: { el: El; used: number }) {
   return <>{arcs}</>
 }
 
-export function BuildStep({ onCheck, onNext, nextLabel = 'Push the electrons →' }: { onCheck: (mistakes: BuildMistake[]) => void; onNext: () => void; nextLabel?: string }) {
+export function BuildStep({ onCheck, onNext, nextLabel = 'Show how the electrons move →' }: { onCheck: (mistakes: BuildMistake[]) => void; onNext: () => void; nextLabel?: string }) {
   const svg = useRef<SVGSVGElement>(null)
   const [atoms, setAtoms] = useState<Atom[]>([])
   const [bonds, setBonds] = useState<Bond[]>([])

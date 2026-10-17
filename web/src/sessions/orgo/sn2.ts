@@ -46,7 +46,7 @@ export const RX: Record<RxId, Rx> = {
   },
 }
 
-export type SAtom = { id: string; el: El; x: number; y: number; lp: number[]; charge: number; partial: boolean; opacity: number }
+export type SAtom = { id: string; el: El; /** a group drawn as one disc, e.g. CH₃ */ label?: string; x: number; y: number; lp: number[]; charge: number; partial: boolean; opacity: number }
 export type SBond = { id: string; a: string; b: string; order: number; dashed: boolean; opacity: number }
 export type Scene = { atoms: SAtom[]; bonds: SBond[]; pair: Pt | null }
 
@@ -58,10 +58,11 @@ export const ease = (t: number, a: number, b: number) => {
 }
 const lerp = (a: number, b: number, u: number) => a + (b - a) * u
 
-export const C_X = 225
+// placed so the starting picture sits in the middle of the frame and the leaving group still fits at the end
+export const C_X = 262
 const BOND = 62
-const NU0 = 90
-const LG_END = 378
+const NU0 = 127
+const LG_END = 380
 
 /** Lone-pair angles in degrees (0 = toward the right, 90 = up). */
 const LP_NU: Record<number, number[]> = { 3: [0, 90, 270], 1: [0] }

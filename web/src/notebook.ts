@@ -66,6 +66,17 @@ const EXTRA_LABELS: Record<string, string> = {
   'leaving-bond-stays': 'The C–Br bond never breaks',
   'cyanide-nitrogen': 'Nitrogen as cyanide’s attacker',
   'wrong-carbon': 'Cyanide’s carbon as the target',
+  'charged-nu-weak': 'A charged nucleophile called weak',
+  'carbon-miscounted': 'Miscounting the carbon type',
+  'bromide-poor-leaving': 'Bromide called a poor leaving group',
+  'sn1-on-methyl': 'SN1 on a methyl carbon',
+  'elimination-no-neighbor': 'Elimination with no neighbor carbon',
+  'sn1-attack-first': 'Water attacks before Br leaves',
+  'e1-base-first': 'H pulled before Br leaves',
+  'e1-base-hits-carbon': 'Water bonds to the C⁺',
+  'e2-base-hits-carbon': 'Base attacks the carbon',
+  'e2-not-anti': 'Not the H across from Br',
+  'ch-bond-lost': 'The C–H electrons go nowhere',
 }
 
 function store(): Storage | null {
