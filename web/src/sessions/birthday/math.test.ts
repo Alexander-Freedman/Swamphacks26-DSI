@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest'
 import {
   addPeople, coverage, dayLabel, firstMatchAt, ROOM_MAX, sharedDays, FIRST_ROOM_SEED, lineFromGuess, monthDay, needForMe, pairs, pct, pMatch, pMine,
-  resample, rng, roomUntilMatch, sizeForChance,
+  resample, rng, roomUntilMatch, sizeForChance, pAnyMatch, PINS, DAYS, sizeForChanceIn,
 } from './math'
 
 describe('exact birthday math', () => {
@@ -101,5 +101,38 @@ describe('room that keeps filling', () => {
     expect(firstMatchAt([1, 2, 3])).toBeNull()
     expect(firstMatchAt([1, 2, 1, 2])).toBe(3)
     expect(sharedDays([1, 2, 1, 2, 2, 5]).sort()).toEqual([1, 2])
+  })
+})
+
+describe('compare screen: shared 4-digit PINs', () => {
+  it('reaches a coin flip at exactly 119 people', () => {
+    expect(pAnyMatch(119, PINS)).toBeGreaterThanOrEqual(0.5)
+    expect(pAnyMatch(118, PINS)).toBeLessThan(0.5)
+    expect(pAnyMatch(119, PINS)).toBeCloseTo(0.5058, 4)
+    expect(sizeForChanceIn(0.5, PINS)).toBe(119)
+  })
+  it('matches the birthday numbers when options = 365', () => {
+    expect(sizeForChanceIn(0.5, DAYS)).toBe(23)
+    expect(pAnyMatch(23, DAYS)).toBeCloseTo(0.5073, 4)
+    for (const n of [1, 2, 10, 23, 57, 80]) expect(pAnyMatch(n, DAYS)).toBe(pMatch(n))
+    expect(pAnyMatch(1, PINS)).toBe(0)
+    expect(pAnyMatch(10_001, PINS)).toBe(1)
+  })
+  it('counts pairs as n(n-1)/2', () => {
+    for (const n of [2, 23, 119, 300]) expect(pairs(n)).toBe((n * (n - 1)) / 2)
+    expect(pairs(23)).toBe(253)
+    expect(pairs(119)).toBe(7021)
+    // both cross 50% when the pairs reach ~70% of the options
+    expect(Math.round((pairs(23) / DAYS) * 100)).toBe(69)
+    expect(Math.round((pairs(119) / PINS) * 100)).toBe(70)
+  })
+})
+
+describe('compare screen: one slider, two crowds', () => {
+  it('scales the PIN crowd by sqrt(10000/365) so the chances track each other', async () => {
+    const { pinCrowd, ROOM_LO, ROOM_HI } = await import('./compareData')
+    expect(pinCrowd(23)).toBe(120)
+    expect(pinCrowd(60)).toBe(314)
+    for (let n = ROOM_LO + 3; n <= ROOM_HI; n++) expect(Math.abs(pAnyMatch(n, DAYS) - pAnyMatch(pinCrowd(n), PINS))).toBeLessThan(0.03)
   })
 })
