@@ -5,6 +5,7 @@ export const session: SessionDef = {
   slug: 'coin-streak',
   title: 'Be a coin',
   blurb: 'Tap out 20 flips, then watch a real coin out-streak you.',
-  order: 2,
+  order: 5,
+  home: false,
   Component: CoinSession,
 }

@@ -18,7 +18,7 @@ vi.mock('./sessions/registry', () => {
     ),
   })
   const sessions = [make('boxes', 'Boxes session', 1), make('coin-streak', 'Coin session', 2)]
-  return { sessions, sessionFor: (slug: string | null) => sessions.find((s) => s.slug === slug) }
+  return { sessions, homeSessions: sessions, sessionFor: (slug: string | null) => sessions.find((s) => s.slug === slug) }
 })
 
 const BASE = import.meta.env.BASE_URL
