@@ -159,3 +159,7 @@
 .orgo .og-paths .og-path { flex: 1 1 140px; font-size: 15px; min-height: 42px; }
 .orgo .og-path.og-picked { background: var(--marker); }
 .orgo .og-fig .og-verdict { margin-top: 8px; }
+/* menu card picture: the topic's starting scene, small and quiet */
+.orgo .og-thumb { display: block; margin: -4px -6px 4px; pointer-events: none; }
+.orgo .og-thumb .og-scene { border: 0; background-size: 14px 14px; }
+.orgo .og-topic:disabled .og-thumb { opacity: 0.5; }
