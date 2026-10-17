@@ -19,7 +19,7 @@ import time
 from collections import defaultdict, deque
 from dataclasses import dataclass
 
-from app.gen import Usage, offline
+from app.gen import DAILY_SOFT_CAP, Usage, offline
 from app.help_context import SESSION_ALIASES, Screen, leaks, screens
 from app.rounds import showcase_rounds
 
@@ -34,7 +34,7 @@ SLOW_DOWN = "Lots of questions at once! Give the screen a minute: "
 
 
 def daily_cap() -> int:
-    return int(os.environ.get("HELP_DAILY_CAP", "300"))
+    return int(os.environ.get("HELP_DAILY_CAP", "150"))
 
 
 def per_ip_limit() -> tuple[int, float]:
@@ -174,7 +174,7 @@ def _ask_model(prompt: str, usage: Usage) -> str | None:
     for model in HELP_MODELS:
         if not usage.available(model):
             continue
-        if usage.help_total() >= daily_cap():
+        if usage.help_total() >= daily_cap() or usage.total() >= DAILY_SOFT_CAP:
             return None
         usage.record_help(model)
         try:
@@ -200,7 +200,7 @@ def answer(
     if not limiter.hit(ip):
         return HelpReply(SLOW_DOWN + screen.hint, True)
     usage = usage or Usage()
-    if offline() or usage.help_total() >= daily_cap():
+    if offline() or (usage.help_total() >= daily_cap() or usage.total() >= DAILY_SOFT_CAP):
         return HelpReply(RESTING + screen.hint, True)
     text = _ask_model(build_prompt(screen, question, locked, guess), usage)
     if text is None:

@@ -155,7 +155,9 @@ class Usage:
         Usage._last_good = data
 
     def total(self) -> int:
-        return sum(self._load()["calls"].values())
+        # Generation and help share the same free-tier quota, so both count here.
+        data = self._load()
+        return sum(data["calls"].values()) + sum(data.get("help", {}).values())
 
     def snapshot(self) -> dict:
         return self._load()

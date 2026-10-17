@@ -129,6 +129,15 @@ def test_daily_cap_returns_static_hint(live, monkeypatch) -> None:
     assert sum(snap["calls"].values()) == 0  # generation bucket untouched
 
 
+def test_shared_daily_total_stops_help(live, monkeypatch) -> None:
+    calls, _ = live
+    monkeypatch.setattr("app.help.DAILY_SOFT_CAP", 1)
+    gen.Usage().record("gemini-3.5-flash-lite")  # generation used the shared quota
+    res = ask()
+    assert res.json()["answer"].startswith("Help is resting for today")
+    assert len(calls) == 0
+
+
 def test_per_ip_limit(live, monkeypatch) -> None:
     calls, _ = live
     monkeypatch.setenv("HELP_PER_IP", "3")
