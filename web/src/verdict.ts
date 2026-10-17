@@ -15,9 +15,16 @@ export function misconceptionFor(item: Item, a: Answer): string | null {
 export function verdictFor(item: Item, a: Answer, truth: number | null): Verdict {
   if (misconceptionFor(item, a) === null) return 'called'
   if (item.input_type !== 'slider' || truth == null || a.value == null || !item.slider) return 'off'
-  // Close = within 15% of the slider's span from the truth.
-  const span = item.slider.max - item.slider.min
-  return Math.abs(a.value - truth) <= 0.15 * span ? 'close' : 'off'
+  // Close = within 25% of the truth, or 5% of the slider's span, whichever is wider.
+  const tol = Math.max(0.25 * Math.abs(truth), 0.05 * (item.slider.max - item.slider.min))
+  return Math.abs(a.value - truth) <= tol ? 'close' : 'off'
 }
 
-export const verdictText: Record<Verdict, string> = { called: 'Called it', close: 'Close', off: 'Way off' }
+export function verdictText(v: Verdict, confidence: Answer['confidence']): string {
+  if (v === 'off' && confidence === 'certain') return 'Sure and wrong'
+  return { called: 'Called it', close: 'Close', off: 'Way off' }[v]
+}
+
+export function fmt(n: number): string {
+  return Number.isInteger(n) ? String(n) : n.toFixed(1)
+}

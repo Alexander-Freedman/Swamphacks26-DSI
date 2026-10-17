@@ -1,10 +1,10 @@
 import { useMemo, useState } from 'react'
-import { Distribution } from './components/Distribution'
 import { Predict, type Answer } from './components/Predict'
+import { Reveal } from './components/Reveal'
 import { showcaseRound, showcaseSlugs } from './rounds'
-import { simulate, shareAtLeast, type Histogram } from './truth'
-import type { Item, Round } from './types'
-import { misconceptionFor, verdictFor, verdictText } from './verdict'
+import { computeTruth, type Computed } from './truth'
+import type { Round } from './types'
+import { misconceptionFor } from './verdict'
 import './App.css'
 
 const BEAT_MS = 400
@@ -25,54 +25,22 @@ function Home({ onPick }: { onPick: (slug: string) => void }) {
   )
 }
 
-type Phase = { kind: 'predict' } | { kind: 'locked'; answer: Answer } | { kind: 'revealed'; answer: Answer; hist: Histogram | null }
-
-function Reveal({ item, round, answer, hist }: { item: Item; round: Round; answer: Answer; hist: Histogram | null }) {
-  const truth = hist?.mean ?? null
-  const v = verdictFor(item, answer, truth)
-  const mid = misconceptionFor(item, answer)
-  const m = round.misconceptions.find((x) => x.id === mid)
-  const t = item.truth
-  return (
-    <div>
-      <h2 className="prompt">{item.prompt}</h2>
-      {hist && t.widget === 'distribution' && (
-        <Distribution
-          hist={hist}
-          xLabel={t.x_label}
-          guess={item.input_type === 'slider' ? answer.value : null}
-          range={item.slider ? { min: item.slider.min, max: item.slider.max } : undefined}
-        />
-      )}
-      <p className={`verdict ${v}`}>{verdictText[v]}</p>
-      {hist && t.widget === 'distribution' && t.sampler === 'coin_longest_run' && (
-        <p className="truth-line">
-          Average longest run: <strong>{hist.mean.toFixed(1)}</strong>. A run of 5+ showed up in{' '}
-          <strong>{Math.round(shareAtLeast(hist, 5) * 100)}%</strong> of {hist.trials.toLocaleString()} simulated tries.
-        </p>
-      )}
-      {m && (
-        <p className="truth-line">
-          This looks like <strong>“{m.label}”</strong>. {m.refutation}
-        </p>
-      )}
-    </div>
-  )
-}
+type Phase = { kind: 'predict' } | { kind: 'locked'; answer: Answer } | { kind: 'revealed'; answer: Answer; truth: Computed }
 
 function Player({ round, onDone }: { round: Round; onDone: () => void }) {
   const [idx, setIdx] = useState(0)
   const [phase, setPhase] = useState<Phase>({ kind: 'predict' })
+  // How many answers this round pointed at each misconception (2+ = named on the card).
+  const [signals, setSignals] = useState<Record<string, number>>({})
   const item = round.items[idx]
   const last = idx === round.items.length - 1
 
   const lock = (answer: Answer) => {
     setPhase({ kind: 'locked', answer })
+    const mid = misconceptionFor(item, answer)
+    if (mid) setSignals((s) => ({ ...s, [mid]: (s[mid] ?? 0) + 1 }))
     // The truth is only computed after lock-in. The beat hides the simulation time.
-    setTimeout(() => {
-      const hist = item.truth.widget === 'distribution' ? simulate(item.truth) : null
-      setPhase({ kind: 'revealed', answer, hist })
-    }, BEAT_MS)
+    setTimeout(() => setPhase({ kind: 'revealed', answer, truth: computeTruth(item) }), BEAT_MS)
   }
 
   const next = () => {
@@ -92,7 +60,7 @@ function Player({ round, onDone }: { round: Round; onDone: () => void }) {
       )}
       {phase.kind === 'revealed' && (
         <>
-          <Reveal item={item} round={round} answer={phase.answer} hist={phase.hist} />
+          <Reveal item={item} round={round} answer={phase.answer} truth={phase.truth} signals={signals} />
           <button className="next" onClick={next}>{last ? 'Done' : 'Next'}</button>
         </>
       )}

@@ -1,0 +1,8 @@
+.verdict-row { display: flex; align-items: center; flex-wrap: wrap; gap: 12px 18px; margin: 18px 0 8px; }
+.stamp { display: inline-block; font-size: 1.6rem; font-weight: 800; padding: 4px 14px; border: 3px solid currentColor; border-radius: 10px; transform: rotate(-4deg); animation: slam 360ms 700ms cubic-bezier(.3, 1.7, .5, 1) both; text-transform: uppercase; letter-spacing: 0.02em; }
+@keyframes slam { from { transform: rotate(-4deg) scale(2.2); opacity: 0; } }
+.stamp.called { color: var(--called); }
+.stamp.close { color: var(--close); }
+.stamp.off { color: var(--off); }
+.callout { font-size: 1.25rem; background: var(--marker-soft); padding: 2px 8px; border-radius: 6px; animation: fade 300ms 900ms both; }
+.sure-wrong { margin: 4px 0 8px; font-weight: 600; color: var(--off); animation: fade 300ms 1000ms both; }

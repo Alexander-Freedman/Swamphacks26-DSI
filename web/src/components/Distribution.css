@@ -2,7 +2,6 @@
 .dist-bar { fill: var(--ink); transform-box: fill-box; transform-origin: bottom; animation: grow 420ms cubic-bezier(.2, .9, .3, 1) both; }
 @keyframes grow { from { transform: scaleY(0); } }
 .dist-gap { fill: var(--marker-soft); animation: fade 300ms 500ms both; }
-@keyframes fade { from { opacity: 0; } }
 .dist-axis { stroke: var(--ink); stroke-width: 2; }
 .dist-tick { font-size: 13px; fill: var(--ink-soft); }
 .dist-xlabel { font-size: 14px; fill: var(--ink-soft); }

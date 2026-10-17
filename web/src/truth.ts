@@ -1,4 +1,5 @@
-import type { DistributionTruth, SamplerParams } from './types'
+import { compile } from 'mathjs'
+import type { CurveTruth, DistributionTruth, Item, SamplerParams } from './types'
 
 // The truth is computed here, after lock-in, never taken from the model.
 // Seeded so the same round always shows the same histogram (and tests are stable).
@@ -87,4 +88,50 @@ export function baseRate(p: SamplerParams) {
   const truePos = sick * (p.sensitivity ?? 0.9)
   const falsePos = (population - sick) * (p.false_positive_rate ?? 0.09)
   return { population, sick, truePos, falsePos, truth: truePos / (truePos + falsePos) }
+}
+
+// Curve truth: a preset or a mathjs expression in x. Only evaluated, never executed as code.
+
+export function birthdayMatch365(x: number): number {
+  let none = 1
+  for (let i = 0; i < x; i++) none *= (365 - i) / 365
+  return 1 - none
+}
+
+export function curveFn(t: CurveTruth): (x: number) => number {
+  if (t.preset === 'birthday_match_probability') return birthdayMatch365
+  if (!t.expr) throw new Error('curve truth needs a preset or expr')
+  const f = compile(t.expr)
+  return (x) => Number(f.evaluate({ x }))
+}
+
+// First integer x where the curve reaches y (the birthday problem's "how many for 50%").
+export function firstReaching(f: (x: number) => number, y: number, lo: number, hi: number): number | null {
+  for (let x = Math.ceil(lo); x <= hi; x++) if (f(x) >= y) return x
+  return null
+}
+
+export type Computed =
+  | { kind: 'distribution'; hist: Histogram; value: number }
+  | { kind: 'icons'; counts: ReturnType<typeof baseRate>; value: number }
+  | { kind: 'curve'; f: (x: number) => number; value: number | null }
+  | { kind: 'none'; value: null }
+
+// The number the guess is compared against, in the guess's own units.
+export function computeTruth(item: Item): Computed {
+  const t = item.truth
+  if (t.widget === 'distribution') {
+    if (t.sampler === 'base_rate_test') {
+      const counts = baseRate(t.params)
+      return { kind: 'icons', counts, value: counts.truth * 100 }
+    }
+    const hist = simulate(t)
+    return { kind: 'distribution', hist, value: hist.mean }
+  }
+  if (t.widget === 'curve') {
+    const f = curveFn(t)
+    const half = t.preset === 'birthday_match_probability' ? firstReaching(f, 0.5, t.x_min, 366) : null
+    return { kind: 'curve', f, value: half }
+  }
+  return { kind: 'none', value: null }
 }
