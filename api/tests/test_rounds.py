@@ -277,7 +277,7 @@ def live_gen(monkeypatch, tmp_path):
         return json.dumps(_fake_generation(topic))
 
     monkeypatch.setattr(gen, "_call_model", fake_call)
-    monkeypatch.setattr(checks, "_blind_answer", lambda item: 50)
+    monkeypatch.setattr(checks, "_blind_text", lambda prompt, timeout_s: '{"answer": 50}')
     main._hits.clear()
     yield calls
     main._hits.clear()
@@ -290,6 +290,8 @@ def test_generated_round_returns_checks_and_cache_keeps_them(live_gen) -> None:
     assert checks["kept"] == 2
     assert checks["dropped"] == [{"item_id": "lying", "reason": "claimed 90.0 but computed 50"}]
     assert checks["blind_checked"] is True
+    assert checks["blind_ok"] == 1 and checks["blind_failed"] == 0
+    assert checks["unchecked"] == []
     assert checks["model"] == "gemini-3.5-flash-lite"
     assert isinstance(checks["seconds"], float)
     assert [i["id"] for i in first["round"]["items"]] == ["computed", "blind"]
@@ -304,7 +306,7 @@ def test_generated_round_returns_checks_and_cache_keeps_them(live_gen) -> None:
 def test_blind_disagreement_is_reported(live_gen, monkeypatch) -> None:
     from app import checks
 
-    monkeypatch.setattr(checks, "_blind_answer", lambda item: 90)
+    monkeypatch.setattr(checks, "_blind_text", lambda prompt, timeout_s: "90")
     res = client.post("/api/rounds", json={"topic": "another topic"}).json()
     dropped = {d["item_id"]: d["reason"] for d in res["checks"]["dropped"]}
     assert set(dropped) == {"lying", "blind"}
@@ -328,3 +330,115 @@ def test_showcase_topic_returns_null_checks(live_gen) -> None:
         assert res["round"]["slug"] == "coin-streak" and res["round"]["reviewed"] is True
         assert res["checks"] is None
     assert live_gen == []  # no model call for a showcase
+
+
+class _ServerError(Exception):
+    code = 500
+
+
+def test_blind_500_is_not_reported_as_checked(live_gen, monkeypatch) -> None:
+    from app import checks, gen
+
+    calls = []
+
+    def boom(prompt, timeout_s):
+        calls.append(1)
+        raise _ServerError("500 INTERNAL")
+
+    monkeypatch.setattr(checks, "_blind_text", boom)
+    monkeypatch.setattr(checks.time, "sleep", lambda s: None)
+    res = client.post("/api/rounds", json={"topic": "server error topic"}).json()
+    c = res["checks"]
+    assert c["blind_checked"] is False
+    assert c["blind_ok"] == 0 and c["blind_failed"] == 1
+    assert c["unchecked"] == ["blind"]  # kept, but labeled
+    assert [i["id"] for i in res["round"]["items"]] == ["computed", "blind"]
+    assert len(calls) == 2  # one retry, no more
+    counted = gen.Usage().snapshot()["calls"]
+    assert counted[checks.BLIND_MODEL] == 2
+    assert counted["gemini-3.5-flash-lite"] == 1
+
+
+def test_blind_reply_parsing() -> None:
+    from app.checks import parse_blind
+    from app.gen import to_round
+
+    slider = to_round(_fake_generation("t")).items[2]
+    assert parse_blind(slider, '```json\n{"answer": 47.5}\n```') == 47.5
+    assert parse_blind(slider, '```\n{"answer": "1,200"}\n```') == 1200
+    assert parse_blind(slider, "About 42 percent.") == 42
+    assert parse_blind(slider, '{"answer": 3e2, "why": "x"') == 300
+    assert parse_blind(slider, "I am not sure.") is None
+    assert parse_blind(slider, "") is None
+    choice = next(i for i in showcase_rounds()["coin-streak"].items if i.options)
+    ids = [o.id for o in choice.options]
+    assert parse_blind(choice, f'```json\n{{"answer": "{ids[0]}"}}\n```') == ids[0]
+    assert parse_blind(choice, f"{ids[1]}") == ids[1]
+    assert parse_blind(choice, "none of them") is None
+
+
+def test_blind_fenced_json_counts_as_checked(live_gen, monkeypatch) -> None:
+    from app import checks
+
+    monkeypatch.setattr(
+        checks, "_blind_text", lambda prompt, timeout_s: '```json\n{"answer": 52}\n```'
+    )
+    c = client.post("/api/rounds", json={"topic": "fenced topic"}).json()["checks"]
+    assert c["blind_checked"] is True and c["blind_ok"] == 1 and c["unchecked"] == []
+
+
+def test_blind_disagreement_drops_item(monkeypatch) -> None:
+    from app import checks
+    from app.gen import to_round
+
+    r = to_round(_fake_generation("t"))
+    monkeypatch.setattr(checks, "_blind_text", lambda prompt, timeout_s: '{"answer": 95}')
+    checked, report = checks.check_round(r, blind=True, usage=_MemUsage())
+    assert "blind" in report.dropped and "blind check" in report.dropped["blind"]
+    assert "blind" not in [i.id for i in checked.items]
+    assert report.blind_ok == 1 and report.blind_checked is True
+
+
+def test_blind_timeout_leaves_item_unchecked(monkeypatch) -> None:
+    import time as _time
+
+    from app import checks
+    from app.gen import to_round
+
+    monkeypatch.setattr(checks, "BLIND_TIMEOUT_S", 0.3)
+    monkeypatch.setattr(checks, "_blind_text", lambda p, t: _time.sleep(1) or "50")
+    r = to_round(_fake_generation("t"))
+    checked, report = checks.check_round(r, blind=True, usage=_MemUsage())
+    assert report.blind_checked is False
+    assert report.blind_ok == 0 and report.blind_failed == 1
+    assert report.unchecked == ["blind"]
+    assert "blind" in [i.id for i in checked.items]
+
+
+def test_blind_respects_daily_cap(monkeypatch) -> None:
+    from app import checks, gen
+    from app.gen import to_round
+
+    monkeypatch.setattr(checks, "_blind_text", lambda p, t: "50")
+    usage = _MemUsage(total=gen.DAILY_SOFT_CAP)
+    _, report = checks.check_round(to_round(_fake_generation("t")), blind=True, usage=usage)
+    assert usage.calls == {} and report.blind_checked is False
+    assert report.unchecked == ["blind"]
+
+
+class _MemUsage:
+    def __init__(self, total: int = 0) -> None:
+        self.base = total
+        self.calls: dict[str, int] = {}
+
+    def available(self, model: str) -> bool:
+        return True
+
+    def total(self) -> int:
+        return self.base + sum(self.calls.values())
+
+    def record(self, model: str) -> None:
+        self.calls[model] = self.calls.get(model, 0) + 1
+
+    def exhaust(self, model: str) -> None:
+        pass
