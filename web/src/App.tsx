@@ -1,7 +1,6 @@
-import { useMemo, useState } from 'react'
+import { useEffect, useState } from 'react'
 import { Distribution } from './components/Distribution'
 import { NotebookLink, NotebookScreen } from './components/Notebook'
-import { wantsNotebook } from './notebook'
 import { useReset } from './reset'
 import { Predict, type Answer } from './components/Predict'
 import { showcaseRound, showcaseSlugs } from './rounds'
@@ -9,11 +8,12 @@ import { sessionFor, sessions } from './sessions/registry'
 import { simulate, shareAtLeast, type Histogram } from './truth'
 import type { Item, Round } from './types'
 import { misconceptionFor, verdictFor, verdictText } from './verdict'
+import { HOME, onScreenChange, pushScreen, readScreen, replaceScreen, type Screen } from './url'
 import './App.css'
 
 const BEAT_MS = 400
 
-function Home({ onPick, onSession }: { onPick: (slug: string) => void; onSession: (slug: string) => void }) {
+function Home({ onPick, onSession, onNotebook }: { onPick: (slug: string) => void; onSession: (slug: string) => void; onNotebook: () => void }) {
   return (
     <div className="home sheet">
       <h1>Bet on your gut. Then watch reality.</h1>
@@ -29,13 +29,13 @@ function Home({ onPick, onSession }: { onPick: (slug: string) => void; onSession
         </div>
       )}
       <div className="showcases">
-        {showcaseSlugs.map((slug) => (
+        {showcaseSlugs.filter((slug) => !sessionFor(slug)).map((slug) => (
           <button key={slug} className="showcase" onClick={() => onPick(slug)}>
             {showcaseRound(slug)!.topic}
           </button>
         ))}
       </div>
-      <NotebookLink />
+      <NotebookLink onOpen={onNotebook} />
     </div>
   )
 }
@@ -116,19 +116,31 @@ function Player({ round, onDone }: { round: Round; onDone: () => void }) {
 }
 
 export default function App() {
-  const [slug, setSlug] = useState<string | null>(() => new URLSearchParams(location.search).get('round'))
-  const round = useMemo(() => (slug ? showcaseRound(slug) : undefined), [slug])
-  const [sessionSlug, setSessionSlug] = useState<string | null>(() => new URLSearchParams(location.search).get('session'))
-  const session = sessionFor(sessionSlug)
-  const [nb, setNb] = useState(() => wantsNotebook(location.search))
-  const home = () => {
-    setSlug(null)
-    setSessionSlug(null)
-    setNb(false)
+  const [urlScreen, setScreen] = useState<Screen>(() => readScreen(location.search))
+  // An old ?round= link whose slug now has a session opens the session instead.
+  const redirected = urlScreen.kind === 'round' && !!sessionFor(urlScreen.slug)
+  const screen: Screen = redirected ? { kind: 'session', slug: urlScreen.slug } : urlScreen
+  const round = screen.kind === 'round' ? showcaseRound(screen.slug) : undefined
+  const session = screen.kind === 'session' ? sessionFor(screen.slug) : undefined
+  const unknown = (screen.kind === 'session' || screen.kind === 'round') && !round && !session
+
+  useEffect(() => onScreenChange(setScreen), [])
+  // A slug that doesn't exist shows Home, so the URL should say Home too.
+  const slug = screen.kind === 'session' || screen.kind === 'round' ? screen.slug : ''
+  useEffect(() => {
+    if (unknown) replaceScreen(HOME)
+    else if (redirected) replaceScreen({ kind: 'session', slug })
+  }, [unknown, redirected, slug])
+
+  const go = (s: Screen) => {
+    pushScreen(s)
+    setScreen(s)
   }
+  const home = () => go(HOME)
+  // Demo reset (Shift+R / ?reset=1) always lands on a clean Home URL.
   const cleared = useReset(!session && !round, () => {
-    if (nb) history.replaceState(null, '', import.meta.env.BASE_URL)
-    home()
+    replaceScreen(HOME)
+    setScreen(HOME)
   })
   if (session) {
     return (
@@ -136,7 +148,7 @@ export default function App() {
         <header className="topbar">
           <button className="logo" style={{ border: 0, background: 'none', padding: 0 }} onClick={home}>mm</button>
         </header>
-        <session.Component onDone={home} />
+        <session.Component key={session.slug} onDone={home} />
       </main>
     )
   }
@@ -147,7 +159,17 @@ export default function App() {
         {round && <span className={`chip ${round.reviewed ? 'reviewed' : ''}`}>{round.reviewed ? 'reviewed' : 'auto-checked'}</span>}
       </header>
       {cleared && <p className="nb-toast" role="status">Notebook cleared</p>}
-      {nb && !round ? <NotebookScreen /> : round ? <Player key={round.slug} round={round} onDone={() => setSlug(null)} /> : <Home onPick={setSlug} onSession={setSessionSlug} />}
+      {screen.kind === 'notebook' ? (
+        <NotebookScreen onHome={home} />
+      ) : round ? (
+        <Player key={round.slug} round={round} onDone={home} />
+      ) : (
+        <Home
+          onPick={(slug) => go({ kind: 'round', slug })}
+          onSession={(slug) => go({ kind: 'session', slug })}
+          onNotebook={() => go({ kind: 'notebook' })}
+        />
+      )}
     </main>
   )
 }

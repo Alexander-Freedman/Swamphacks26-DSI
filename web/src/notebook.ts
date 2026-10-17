@@ -10,9 +10,8 @@ const MAX = 200
 /** Right answers after a catch that it takes to bust a mistake (docs/experience.md, "Coming back"). */
 export const BUST_AFTER = 2
 
-/** `?notebook=1` opens the notebook screen; it's a plain link, so Back works with no router. */
+/** `?notebook=1` is the notebook screen (url.ts); sessions link to it from their end card. */
 export const NOTEBOOK_HREF = `${import.meta.env.BASE_URL}?notebook=1`
-export const wantsNotebook = (search: string) => new URLSearchParams(search).has('notebook')
 
 export type Entry = {
   session: string

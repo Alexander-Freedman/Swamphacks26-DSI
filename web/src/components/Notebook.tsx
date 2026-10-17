@@ -1,8 +1,19 @@
+import type { MouseEvent } from 'react'
 import { BUST_AFTER, NOTEBOOK_HREF, entries, notebook, type Card } from '../notebook'
 import { sessionFor } from '../sessions/registry'
 import './Notebook.css'
 
 const BASE = import.meta.env.BASE_URL
+
+/** In-app navigation for a real link: plain clicks go through `go` (history entry, no reload); modified clicks open normally. */
+const via = (fn?: () => void) =>
+  fn
+    ? (e: MouseEvent<HTMLAnchorElement>) => {
+        if (e.button !== 0 || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return
+        e.preventDefault()
+        fn()
+      }
+    : undefined
 
 function when(iso: string, now = new Date()): string {
   const d = new Date(iso)
@@ -44,7 +55,7 @@ function MistakeCard({ c }: { c: Card }) {
   )
 }
 
-export function NotebookScreen() {
+export function NotebookScreen({ onHome }: { onHome?: () => void }) {
   const cards = notebook()
   const played = entries().length
   const caught = cards.filter((c) => c.status === 'caught')
@@ -77,16 +88,16 @@ export function NotebookScreen() {
           </ul>
         </>
       )}
-      <a className="nb-back" href={BASE}>← Home</a>
+      <a className="nb-back" href={BASE} onClick={via(onHome)}>← Home</a>
     </div>
   )
 }
 
 /** The Home link, with a count so it's worth tapping. */
-export function NotebookLink() {
+export function NotebookLink({ onOpen }: { onOpen?: () => void }) {
   const n = notebook().filter((c) => c.status === 'caught').length
   return (
-    <a className="nb-link" href={NOTEBOOK_HREF}>
+    <a className="nb-link" href={NOTEBOOK_HREF} onClick={via(onOpen)}>
       <span className="nb-link-title">Notebook</span>
       <span className="nb-link-sub">{n > 0 ? `${n} ${n === 1 ? 'mistake' : 'mistakes'} caught, waiting to be busted` : 'Your caught → busted mistakes'}</span>
     </a>
