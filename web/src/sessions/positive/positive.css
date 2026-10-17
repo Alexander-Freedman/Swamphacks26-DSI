@@ -34,7 +34,6 @@
 .pt-btn:active:not(:disabled) { transform: translateY(2px); box-shadow: 0 1px 0 #000; }
 .pt-btn:disabled { opacity: .45; cursor: not-allowed; }
 .pt-btn.pt-go { background: var(--marker); color: var(--ink); }
-.pt-back { display: block; margin-top: 16px; background: none; border: 0; color: var(--ink-soft); text-decoration: underline; padding: 6px 0; }
 
 .pt-seg { display: inline-flex; border: 2px solid var(--ink); border-radius: 999px; overflow: hidden; }
 .pt-seg button { font: 700 14px var(--font-body); background: var(--card); border: 0; padding: 8px 12px; min-height: 36px; }

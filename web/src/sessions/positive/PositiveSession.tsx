@@ -11,6 +11,7 @@ import { baseToSlider, breakEven, CARD, exact, pct, piles, POP, ppv, REMATCH, se
 import './positive.css'
 
 const ORDER = seededOrder()
+const STEPS = ['Your guess', 'Test all 1,000', 'Your pile vs real', 'Change the crowd', 'Your mistake', 'Rematch'] as const
 const reducedMotion = () => typeof matchMedia === 'function' && matchMedia('(prefers-reduced-motion: reduce)').matches
 
 /** The verdict's "close" window: 15% of the 0-100 slider, in points. */
@@ -36,6 +37,11 @@ export function PositiveSession({ onDone }: { onDone: () => void }) {
   const truth = ppv(test)
 
   const [step, setStep] = useState(1)
+  const [reached, setReached] = useState(1)
+  const go = (n: number) => {
+    setStep(n)
+    setReached((r) => Math.max(r, n))
+  }
   const [guess, setGuess] = useState(50)
   const [touched, setTouched] = useState(false)
   const [conf, setConf] = useState<Confidence | null>(null)
@@ -63,7 +69,8 @@ export function PositiveSession({ onDone }: { onDone: () => void }) {
 
   return (
     <Frame className="pt">
-      <SessionHead chip="Positive test" step={step} total={TITLES.length}>
+      {/* step dots navigate like coin's: any step you've reached, never back to the locked guess */}
+      <SessionHead chip="Positive test" step={step} total={TITLES.length} labels={STEPS} canGo={(i) => i > 0 && i < reached} onGo={(i) => go(i + 1)}>
         {step > 1 && (
           <span className="pt-pencil-chip">
             your guess: <b>{guess}%</b>
@@ -84,25 +91,19 @@ export function PositiveSession({ onDone }: { onDone: () => void }) {
           sketch={sketch}
           setSketch={setSketch}
           painted={painted}
-          onLock={() => setStep(2)}
+          onLock={() => go(2)}
         />
       )}
-      {step === 2 && <RunStep test={test} guess={guess} onNext={() => setStep(3)} />}
-      {step === 3 && <CompareStep guess={guess} truth={truth} painted={painted} test={test} onNext={() => setStep(4)} />}
-      {step === 4 && <CrowdStep card={test} guess={guess} onNext={() => setStep(5)} />}
-      {step === 5 && <CardStep guess={guess} conf={conf ?? 'pretty sure'} truth={truth} test={test} round={round} item={item} onNext={() => setStep(6)} />}
+      {step === 2 && <RunStep test={test} guess={guess} onNext={() => go(3)} />}
+      {step === 3 && <CompareStep guess={guess} truth={truth} painted={painted} test={test} onNext={() => go(4)} />}
+      {step === 4 && <CrowdStep card={test} guess={guess} onNext={() => go(5)} />}
+      {step === 5 && <CardStep guess={guess} conf={conf ?? 'pretty sure'} truth={truth} test={test} round={round} item={item} onNext={() => go(6)} />}
       {step === 6 && (
         <RematchStep
           onReveal={(g2) => save({ session: 'positive-test', at: new Date().toISOString(), guess, confidence: conf ?? undefined, misconception: misconceptionId(item, guess), rematch: rematchOf(g2) === 'off' ? 'wrong' : 'right', rematchGuess: g2, rematchTruth: Math.round(ppv(REMATCH) * 1000) / 10 })}
           caught={round.misconceptions.find((x) => x.id === misconceptionId(item, guess))?.label ?? null}
           onDone={onDone}
         />
-      )}
-
-      {step > 2 && (
-        <button className="pt-back" onClick={() => setStep(step - 1)}>
-          ← back
-        </button>
       )}
     </Frame>
   )

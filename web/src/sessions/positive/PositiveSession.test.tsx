@@ -215,6 +215,21 @@ describe('positive card and end bar (same shell as birthday)', () => {
     }
   })
 
+  it('step dots go back to any reached step, never to the locked guess (no "back" link)', async () => {
+    vi.useFakeTimers()
+    render(<Session onDone={() => {}} />)
+    await toCard(30)
+    expect(screen.queryByText('← back')).toBeNull()
+    expect((screen.getByRole('button', { name: '1 Your guess' }) as HTMLButtonElement).disabled).toBe(true)
+    expect((screen.getByRole('button', { name: '6 Rematch' }) as HTMLButtonElement).disabled).toBe(true)
+    expect(screen.getByRole('button', { name: '5 Your mistake' }).getAttribute('aria-current')).toBe('step')
+    fireEvent.click(screen.getByRole('button', { name: '3 Your pile vs real' }))
+    expect(screen.getByText('Your pile vs the real pile.')).toBeTruthy()
+    // forward again to where you were
+    fireEvent.click(screen.getByRole('button', { name: '5 Your mistake' }))
+    expect(screen.getByText('What happened in your head')).toBeTruthy()
+  })
+
   it('rematch at the low end is way off, not close', async () => {
     vi.useFakeTimers()
     render(<Session onDone={() => {}} />)
