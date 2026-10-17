@@ -203,7 +203,7 @@ From demo.md; the numbers were rechecked by me.
 - **Out:** DeepSpace, Roblox, Solana, Nessie, Least Vibe Coded.
 - **After the event:** the DEV post.
 
-## 11. Look (visual.md; needs my sign-off)
+## 11. Look: Notebook Arcade (decided by me, Oct 16)
 - **"Notebook Arcade":** paper + ink = truth, pencil = your guess, marker = the gap, green = called it. A chunky display face, a verdict stamp, a springy lock-in. **The "arcade" is feel and motion, not scorekeeping:** no XP/score counters.
 - **Fonts:** Atkinson Hyperlegible Next for the body, Shantell Sans for hand labels.
 - **Contrast:** the ghost gets a solid `#85827a` (3.6:1).
@@ -228,7 +228,7 @@ From demo.md; the numbers were rechecked by me.
 **Where the research and the hackathon disagree:** the research says an *unchecked* wrong model is worse than nothing, and full model critique is the make-or-break test. For 36h I recommend keeping misconception diagnosis to **closed lists + shape rules**, which are checkable and demoable, and *not* doing open-ended model critique, which is slow and risky live. It's a stretch only if everything else is solid.
 
 ## 13. Open questions for me
-1. The visual direction: Notebook Arcade, OK?
+1. ~~The visual direction~~: **decided: Notebook Arcade.**
 2. Showcase #3: physics (Off the Edge) or calculus (derivative)?
 3. Do we show the "reviewed / auto-checked" label in the UI? *(I recommend yes; it's our accuracy story.)*
 4. The default audience level for generated rounds (intro college?).
