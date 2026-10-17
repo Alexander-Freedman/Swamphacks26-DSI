@@ -71,16 +71,17 @@ export function BuildStep({ onCheck, onNext }: { onCheck: (mistakes: BuildMistak
 
   // Every change goes through edit(), so Undo (button or Ctrl/Cmd+Z) steps back one change at a time:
   // an added atom, a bond, a double bond, a removed bond or atom, a move, even Clear.
-  const history = useRef<{ atoms: Atom[]; bonds: Bond[] }[]>([])
+  const [history, setHistory] = useState<{ atoms: Atom[]; bonds: Bond[] }[]>([])
   const edit = (a: Atom[], b: Bond[]) => {
-    history.current.push({ atoms, bonds })
+    setHistory((h) => [...h, { atoms, bonds }])
     setAtoms(a)
     setBonds(b)
     setResult(null)
   }
   const undo = () => {
-    const prev = history.current.pop()
+    const prev = history[history.length - 1]
     if (!prev) return
+    setHistory((h) => h.slice(0, -1))
     setAtoms(prev.atoms)
     setBonds(prev.bonds)
     setResult(null)
@@ -88,18 +89,17 @@ export function BuildStep({ onCheck, onNext }: { onCheck: (mistakes: BuildMistak
     setBondFrom(null)
     setSay('undone')
   }
-  const undoRef = useRef(undo)
-  undoRef.current = undo
+  // Ctrl/Cmd+Z anywhere on the step; re-bound each render so it always undoes the latest change.
   useEffect(() => {
     const onKey = (e: globalThis.KeyboardEvent) => {
       if ((e.ctrlKey || e.metaKey) && !e.shiftKey && e.key.toLowerCase() === 'z') {
         e.preventDefault()
-        undoRef.current()
+        undo()
       }
     }
     window.addEventListener('keydown', onKey)
     return () => window.removeEventListener('keydown', onKey)
-  }, [])
+  })
 
   const atomAt = (p: Pt, except?: string) => {
     let best: Atom | null = null
@@ -269,7 +269,7 @@ export function BuildStep({ onCheck, onNext }: { onCheck: (mistakes: BuildMistak
               </svg>
             </button>
           ))}
-          <button className="og-btn og-ghost og-undo" onClick={undo} disabled={!history.current.length} aria-keyshortcuts="Control+Z Meta+Z" title="Undo (Ctrl+Z)">
+          <button className="og-btn og-ghost og-undo" onClick={undo} disabled={!history.length} aria-keyshortcuts="Control+Z Meta+Z" title="Undo (Ctrl+Z)">
             ↶ Undo
           </button>
           <button className="og-btn og-ghost og-clear" onClick={clear} disabled={!atoms.length}>
