@@ -83,6 +83,9 @@ class GenResult:
     round: Round
     source: str  # "cache" | model id | "mock"
     seconds: float
+    # Check report from when the round was generated (kept with the cache);
+    # None for rounds cached before reports were stored.
+    checks: dict | None = None
 
 
 def normalize_topic(topic: str) -> str:
@@ -95,6 +98,18 @@ def normalize_topic(topic: str) -> str:
 def _cache_path(topic: str) -> Path:
     key = hashlib.sha256(f"v{PROMPT_VERSION}:{normalize_topic(topic)}".encode()).hexdigest()[:16]
     return CACHE_DIR / "rounds" / f"{key}.json"
+
+
+def _checks_path(cached: Path) -> Path:
+    return cached.with_suffix(".checks.json")
+
+
+def _read_checks(cached: Path) -> dict | None:
+    try:
+        data = json.loads(_checks_path(cached).read_text())
+    except (OSError, ValueError):
+        return None
+    return data if isinstance(data, dict) else None
 
 
 def _atomic_write(path: Path, text: str) -> None:
@@ -455,7 +470,7 @@ def generate_round(topic: str, usage: Usage | None = None) -> GenResult:
     if cached.exists():
         try:
             r = Round.model_validate_json(cached.read_text())
-            return GenResult(r, "cache", time.monotonic() - started)
+            return GenResult(r, "cache", time.monotonic() - started, _read_checks(cached))
         except (ValidationError, ValueError, OSError):
             cached.unlink(missing_ok=True)  # stale or torn; regenerate
     failed = _failed_path(topic)
@@ -492,8 +507,12 @@ def generate_round(topic: str, usage: Usage | None = None) -> GenResult:
                     continue
                 log.warning("api error from %s: %s", model, type(err).__name__)
                 break
+            seconds = time.monotonic() - started
+            report_out = report.public(model, seconds)
+            # Report first, so a cached round always has its report next to it.
+            _atomic_write(_checks_path(cached), json.dumps(report_out))
             _atomic_write(cached, r.model_dump_json(indent=2))
             _atomic_write(_slug_path(r.slug), r.model_dump_json(indent=2))
-            return GenResult(r, model, time.monotonic() - started)
+            return GenResult(r, model, seconds, report_out)
     _atomic_write(failed, "")
     raise GenerationError(f"all models failed: {type(last_err).__name__ if last_err else 'none'}")

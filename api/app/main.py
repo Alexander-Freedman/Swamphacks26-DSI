@@ -7,7 +7,14 @@ from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel, Field
 
 from app.events import collection, record_answer, room
-from app.gen import GenerationError, Usage, generate_round, generated_round, offline
+from app.gen import (
+    GenerationError,
+    Usage,
+    generate_round,
+    generated_round,
+    normalize_topic,
+    offline,
+)
 from app.rounds import showcase_rounds
 from app.schema import Round
 from app.truth import band_for
@@ -77,6 +84,17 @@ def create_round(body: TopicIn, request: Request) -> dict:
     ip = request.client.host if request.client else "unknown"
     if _rate_limited(ip):
         raise HTTPException(status_code=429, detail="slow down: try a showcase topic")
+    key = normalize_topic(body.topic)
+    for r in showcase_rounds().values():
+        if key in (normalize_topic(r.topic), normalize_topic(r.slug)):
+            # Hand-reviewed showcase: no generation, so no check report.
+            return {
+                "status": "ok",
+                "source": "showcase",
+                "seconds": 0.0,
+                "round": r,
+                "checks": None,
+            }
     try:
         res = generate_round(body.topic)
     except GenerationError:
@@ -89,6 +107,7 @@ def create_round(body: TopicIn, request: Request) -> dict:
         "source": res.source,
         "seconds": round(res.seconds, 1),
         "round": res.round,
+        "checks": None if res.round.reviewed else res.checks,
     }
 
 
