@@ -1,8 +1,12 @@
 // @vitest-environment jsdom
 import { act, cleanup, fireEvent, render, screen } from '@testing-library/react'
 import { afterEach, describe, expect, it, vi } from 'vitest'
+import { shellVerdict } from '../../components/session/verdict'
+import { showcaseRound } from '../../rounds'
+import { misconceptionFor } from '../../verdict'
 import { CoinSession } from './CoinSession'
 import { sampleLabel } from './hooks'
+import { expectedLongest } from './math'
 
 afterEach(cleanup)
 
@@ -18,8 +22,11 @@ describe('coin streak session', () => {
     expect(screen.getByText(/^Make up 20 coin flips/)).toBeTruthy()
     expect(screen.queryByText(/sample human row/)).toBeNull() // no fill-for-me: the point is your own pattern
 
+    // the coin-only first step (your own taps), then the same lock copy as every session
     const lock = screen.getByText('Lock it in') as HTMLButtonElement
+    expect(screen.getByText('tap at least 20 flips first (0 so far)')).toBeTruthy()
     expect(lock.disabled).toBe(true)
+    expect(lock.className).toContain('ss-lock')
     // keys H and T tap the coin; alternate every flip (switch rate 100%)
     for (let i = 0; i < 20; i++) fireEvent.keyDown(window, { key: i % 2 ? 'T' : 'H' })
     expect(screen.getByText('20', { selector: '.stats b' })).toBeTruthy()
@@ -30,7 +37,7 @@ describe('coin streak session', () => {
     expect(screen.getByText(/In 20 real flips the longest run averages 4\.66/)).toBeTruthy()
     fireEvent.click(screen.getByText('Flip again'))
     // the guess starts unset (no anchor): lock waits for the slider to move
-    expect(lock.textContent).toBe('Move the slider to guess')
+    expect(lock.textContent).toBe('Move the slider first')
     expect(screen.getByText('?', { selector: '.guessnum .big' })).toBeTruthy()
     fireEvent.change(screen.getByLabelText('Longest run in 100 real flips?'), { target: { value: '3' } })
     // like the birthday session: pick how sure before locking
@@ -38,6 +45,7 @@ describe('coin streak session', () => {
     expect(lock.textContent).toBe('Pick how sure you are')
     fireEvent.click(screen.getByRole('button', { name: 'certain' }))
     expect(lock.disabled).toBe(false)
+    expect(lock.textContent).toBe('Lock it in')
     fireEvent.click(lock)
     await act(async () => vi.advanceTimersByTime(50))
 
@@ -69,6 +77,9 @@ describe('coin streak session', () => {
 
     next(/what your taps say/)
     expect(screen.getByText(/^This is the mistake your guess points to/)).toBeTruthy()
+    // the stamp is the verdict word; the mistake's name is the card title under it (#149)
+    expect(document.querySelector('.ss-stamp')!.textContent).toBe('Way off')
+    expect(document.querySelector('.mname')!.textContent).toBe('“Random means evenly mixed”')
     expect(screen.getByText(/^One more: spot the real coin/)).toBeTruthy()
     expect(screen.getAllByText('Random means evenly mixed').length).toBeGreaterThan(0)
     expect(screen.getByText(/A real coin goes past 3 in/)).toBeTruthy()
@@ -81,7 +92,9 @@ describe('coin streak session', () => {
     // both rematch rows stay plain ink: pencil only ever means "you"
     expect(document.querySelectorAll('.tryit .mine').length).toBe(0)
     // saved to the same notebook as the birthday session, once
-    expect(screen.getByText('Saved.')).toBeTruthy()
+    expect(screen.getByText('Saved to your notebook.')).toBeTruthy()
+    expect(document.querySelector('.ss-end')!.textContent).toContain('Caught: “Random means evenly mixed”. Rematch missed; it stays in your notebook to try again.')
+    expect(screen.getByText('Open notebook').getAttribute('href')).toContain('?notebook=1')
     const saved = JSON.parse(localStorage.getItem('mm.sessions') ?? '[]')
     expect(saved).toHaveLength(1)
     expect(saved[0]).toMatchObject({ session: 'coin-streak', guess: 3, confidence: 'certain', misconception: 'random-means-evenly-mixed', rematch: 'wrong' })
@@ -147,5 +160,65 @@ describe('sample label', () => {
     expect(sampleLabel(0, 3)).toBe('Flipped here: 3 runs of 100 flips')
     expect(sampleLabel(1000, 0)).toBe('Simulated: 1,000 runs of 100 flips')
     expect(sampleLabel(1000, 2)).toBe('Simulated: 1,000 runs + 2 you flipped, of 100 flips each')
+  })
+})
+
+// tap 20, guess, pick how sure, lock, then jump to the card with the step dots
+async function playToCard(guess: number) {
+  render(<CoinSession onDone={() => {}} />)
+  for (let i = 0; i < 20; i++) fireEvent.keyDown(window, { key: i % 3 ? 'T' : 'H' })
+  fireEvent.change(screen.getByLabelText('Longest run in 100 real flips?'), { target: { value: String(guess) } })
+  fireEvent.click(screen.getByRole('button', { name: 'pretty sure' }))
+  fireEvent.click(screen.getByText('Lock it in'))
+  await act(async () => vi.advanceTimersByTime(50))
+  fireEvent.click(screen.getByRole('button', { name: '5 Your mistake' }))
+  await act(async () => vi.advanceTimersByTime(50))
+}
+
+describe('coin card and end bar (same shell as birthday)', () => {
+  it('a called-it guess gets the called-it line and stamp; a missed rematch still shows (#150, #148)', async () => {
+    vi.useFakeTimers()
+    localStorage.clear()
+    await playToCard(7)
+    expect(screen.getByText('What happened in your head')).toBeTruthy()
+    expect(screen.getByText("You called it. Here's the idea that makes it work, so you can do it again.")).toBeTruthy()
+    expect(screen.queryByText(/^This is the mistake your guess points to/)).toBeNull()
+    expect(document.querySelector('.ss-stamp')!.textContent).toBe('Called it')
+    expect(screen.getByText('the right model')).toBeTruthy()
+    // the made-up row: the bar says both parts, never a bare "Called it."
+    fireEvent.click(screen.getByRole('button', { name: /^A: / }))
+    const bar = document.querySelector('.ss-end')!.textContent!
+    expect(bar).toContain('Saved to your notebook. Your first guess called it. Rematch missed; it stays in your notebook to try again.')
+    expect(screen.getByText('Open notebook')).toBeTruthy()
+    vi.useRealTimers()
+  }, 60000)
+
+  it('right guess and right rematch', async () => {
+    vi.useFakeTimers()
+    await playToCard(6)
+    fireEvent.click(screen.getByRole('button', { name: /^B: / }))
+    expect(document.querySelector('.ss-end')!.textContent).toContain('Your first guess called it. Rematch: right.')
+    vi.useRealTimers()
+  }, 60000)
+
+  it('a long-streak guess stamps the verdict word, with the mistake as the title', async () => {
+    vi.useFakeTimers()
+    await playToCard(15)
+    expect(document.querySelector('.ss-stamp')!.textContent).toBe('Way off')
+    expect(document.querySelector('.mname')!.textContent).toBe("“A long streak means something's off”")
+    expect(screen.getByText('the mistake')).toBeTruthy()
+    vi.useRealTimers()
+  }, 60000)
+
+  it('stamp and caught mistake never disagree, for every guess (#151)', () => {
+    const item = showcaseRound('coin-streak')!.items.find((i) => i.id === 'longest-run-100')!
+    const truth = expectedLongest(100)
+    for (let g = 1; g <= 20; g++) {
+      const m = misconceptionFor(item, { value: g, optionId: null, confidence: 'pretty sure' })
+      const v = shellVerdict(m, g, truth, 0.15 * 19)
+      expect(v === 'called').toBe(m === null)
+      // with the 5-9 band, nothing outside it is within 2.85 of 6.98: the coin never stamps "close"
+      expect(v).not.toBe('close')
+    }
   })
 })

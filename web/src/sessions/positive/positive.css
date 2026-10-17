@@ -3,24 +3,11 @@
   --pt-display: 'Bricolage Grotesque', var(--font-body);
   --pt-mono: 'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, monospace;
   --pt-plain: #ddd6c6;
-  /* same width as the birthday session: break out of the page column on desktop */
-  width: min(1040px, calc(100vw - 32px));
-  margin-left: calc(50% - min(520px, 50vw - 16px));
-  color: var(--ink);
+  /* frame width, header, title, lock, stamp and end bar come from components/session (the shared shell) */
 }
 .pt section { animation: pt-in 220ms ease-out; }
 @keyframes pt-in { from { opacity: 0; transform: translateY(6px); } }
 
-/* session chrome, matches the birthday session: chip, step dots, "n of 5" */
-.pt-head { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
-.pt-chip { font: 700 13px var(--font-body); border: 2px solid var(--ink); border-radius: 999px; padding: 3px 12px; background: var(--card); }
-.pt-dots-steps { display: inline-flex; gap: 5px; }
-.pt-dots-steps i { width: 10px; height: 10px; border-radius: 50%; border: 2px solid var(--ink); }
-.pt-dots-steps i.on { background: var(--ink); }
-.pt-count { font-size: 13px; color: var(--ink-soft); }
-.pt-title { font: 800 clamp(30px, 6vw, 42px)/1.05 var(--pt-display); margin: 14px 0 6px; letter-spacing: -0.01em; }
-.pt-title:focus { outline: none; }
-.pt-subtitle { font: 17px/1.45 var(--font-hand); color: var(--ink-soft); margin: 0 0 14px; max-width: 46em; }
 
 .pt-row { display: flex; gap: 10px; align-items: center; justify-content: space-between; flex-wrap: wrap; }
 .pt-card { background: var(--card); border: 2px solid var(--ink); border-radius: var(--radius); box-shadow: var(--shadow); padding: 16px; margin-top: 14px; }
@@ -47,8 +34,6 @@
 .pt-btn:active:not(:disabled) { transform: translateY(2px); box-shadow: 0 1px 0 #000; }
 .pt-btn:disabled { opacity: .45; cursor: not-allowed; }
 .pt-btn.pt-go { background: var(--marker); color: var(--ink); }
-.pt-lock { width: 100%; font-size: 1.1rem; }
-.pt-back { display: block; margin-top: 16px; background: none; border: 0; color: var(--ink-soft); text-decoration: underline; padding: 6px 0; }
 
 .pt-seg { display: inline-flex; border: 2px solid var(--ink); border-radius: 999px; overflow: hidden; }
 .pt-seg button { font: 700 14px var(--font-body); background: var(--card); border: 0; padding: 8px 12px; min-height: 36px; }
@@ -114,12 +99,8 @@
 .pt-logticks span:last-child { transform: translateX(-100%); }
 
 /* verdict card */
+.pt .ss-said b.pt-num { font-size: 24px; }
 .pt-named { font: 800 clamp(22px, 5.4vw, 28px)/1.15 var(--pt-display); margin: 6px 0 10px; }
-.pt-stamp { flex: none; font: 800 20px var(--pt-display); text-transform: uppercase; border: 3px solid currentColor; border-radius: 8px; padding: 2px 10px; transform: rotate(-6deg); animation: pt-stamp 180ms cubic-bezier(.3, 1.6, .5, 1); }
-.pt-stamp.called { color: var(--called); }
-.pt-stamp.close { color: var(--close); }
-.pt-stamp.off { color: var(--off); }
-@keyframes pt-stamp { from { transform: rotate(-6deg) scale(1.6); opacity: 0; } }
 .pt-src { font-size: 13px; color: var(--ink-soft); }
 .pt-src a { color: var(--ink); }
 .pt-next { margin-top: 14px; padding: 12px 14px; border: 3px dashed var(--pencil); border-radius: var(--radius); background: var(--card); }
@@ -158,10 +139,6 @@
 .pt-paint canvas { touch-action: none; user-select: none; -webkit-user-select: none; cursor: crosshair; }
 
 /* guess */
-.pt-opt { text-transform: none; letter-spacing: 0; font-family: var(--font-hand); }
-.pt-choices { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-top: 8px; }
-.pt-choice { font: 600 15px var(--font-body); background: var(--card); border: 2px solid var(--ink); border-radius: 10px; min-height: 44px; padding: 6px; }
-.pt-choice[aria-pressed='true'] { background: var(--ink); color: var(--paper); }
 .pt-sketch summary { cursor: pointer; min-height: 32px; display: flex; align-items: center; gap: 8px; }
 .pt-sketch summary::after { content: '+'; margin-left: auto; font: 700 20px var(--pt-mono); }
 .pt-sketch[open] summary::after { content: '−'; }
@@ -175,20 +152,12 @@
 .pt-sm { font-size: 14px; padding: 8px 14px; min-height: 40px; }
 .pt-truthnum { font: 800 1.35em var(--pt-display); font-variant-numeric: tabular-nums; color: var(--ink); background: linear-gradient(transparent 55%, var(--marker) 55%); }
 
-/* card: stamp row like the birthday session */
-.pt-stamprow { display: flex; align-items: center; gap: 18px; flex-wrap: wrap; margin: 4px 0 14px; }
-.pt-stamprow .pt-stamp { font-size: clamp(28px, 8vw, 40px); padding: 4px 16px; border-width: 4px; background: var(--paper); }
-.pt-said { font: 22px var(--font-hand); margin: 0; }
-.pt-said .pt-num { font-size: 24px; }
 .pt-pencil-c { color: var(--pencil); }
 .pt-red { color: var(--off); }
 .pt-verdict { margin-top: 0; }
-.pt-saved { margin-top: 18px; background: var(--marker); border: 2px solid var(--ink); border-radius: var(--radius); box-shadow: 0 3px 0 var(--ink); padding: 14px 16px; display: flex; gap: 14px; align-items: center; justify-content: space-between; flex-wrap: wrap; }
-.pt-saved p { margin: 0; font-size: 16px; line-height: 1.4; flex: 1 1 260px; }
-.pt-saved .pt-done { margin-top: 0; }
 
 @media (prefers-reduced-motion: reduce) {
-  .pt section, .pt-stamp { animation: none; }
+  .pt section { animation: none; }
 }
 
 /* P3: tap a positive */
