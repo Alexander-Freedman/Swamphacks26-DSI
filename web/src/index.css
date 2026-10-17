@@ -1,5 +1,5 @@
-/* Tokens. Neutral ramp + semantic state colors (USWDS grades, 50+ apart = AA text).
-   --accent gets set once we pick the stack's reference product (docs/design-depth.md). */
+/* Tokens. Lab-notebook system: paper, ink (truth), pencil (the student's own marks), one marker accent.
+   Semantic state colors are USWDS grades (50+ apart = AA text). Canvas colors live in src/mm/ink.ts. */
 :root {
   --gray-0: #ffffff;
   --gray-5: #f0f0f0;
@@ -9,39 +9,33 @@
   --gray-70: #454545;
   --gray-90: #1b1b1b;
 
-  --bg: var(--gray-0);
-  --surface: var(--gray-5);
-  --border: var(--gray-10);
-  --text-muted: var(--gray-50);
-  --text: var(--gray-90);
-  --accent: #005ea2;
+  --bg: #f4efe4;
+  --paper: #fbf8f1;
+  --surface: #ece5d6;
+  --border: #d9d0bd;
+  --text-muted: #6b665c;
+  --text: #22201c;
+  --ink: #1d3c8a;
+  --pencil: #55534e;
+  --accent: #e4572e;
+  --accent-ink: #b8401c;
 
   --ok: #00a91c;
   --watch: #ffbe2e;
   --warn: #e66f0e;
   --danger: #d83933;
 
-  --sans: system-ui, 'Segoe UI', Roboto, sans-serif;
-  --mono: ui-monospace, 'SFMono-Regular', Consolas, monospace;
+  --sans: 'IBM Plex Sans', system-ui, sans-serif;
+  --mono: 'IBM Plex Mono', ui-monospace, Consolas, monospace;
+  --hand: 'Caveat', 'Comic Sans MS', cursive;
   --radius: 4px;
   --space: 8px;
 
   font: 16px/1.5 var(--sans);
   color: var(--text);
   background: var(--bg);
-  color-scheme: light dark;
+  color-scheme: light;
   -webkit-font-smoothing: antialiased;
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --bg: var(--gray-90);
-    --surface: #2e2e2e;
-    --border: var(--gray-70);
-    --text-muted: var(--gray-30);
-    --text: var(--gray-5);
-    --accent: #73b3e7;
-  }
 }
 
 *,
