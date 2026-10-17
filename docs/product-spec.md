@@ -168,19 +168,24 @@ Every live call is logged with a counter on the dev drawer. **At 480/day it swit
 - **Writes** the misconception card text and the cast origin stories, inside the same package.
 - **It never produces the truth numbers**; code computes them.
 
-## 8. Showcase topics (hand-checked, cached, offline)
-From demo.md; the numbers were rechecked by me.
+## 8. Showcase topics (decided: hand-checked, cached, offline, computed in the browser)
+Picked for: demo-reliable (no network, no generation), fun to watch, and only **two widgets** (Distribution + Curve), both of which we build first anyway.
 
-1. **The coin streak.** "In 100 fair flips, what's the longest run of one side?"
-   - Most people say 3-4. Our rerun of 200k simulations: mean longest run **6.98**, ≥5 in **97.2%** of runs.
+1. **The coin streak** (Distribution). "In 100 fair flips, what's the longest run of one side?"
+   - Exact numbers: mean longest run **6.98**, ≥5 in **97.2%** (independently recomputed; showcase-facts.md).
    - **Misconception:** "random means evenly mixed".
-   - **Widget:** Distribution.
-2. **The positive test (base rates).** 1% base rate, 90% sensitivity, 9% false positives → **9.2%** chance you have it (0.009 / (0.009 + 0.0891), our arithmetic).
-   - On a similar mammography case (correct answer 7.7%), doctors' most frequent estimate was **90%**. The source reports 90% for an earlier German doctors' study and says the 160 gynecologists tested in 2007 gave "the same exact result" ([APS Observer](https://www.psychologicalscience.org/observer/helping-physicians-understand-screening-tests-will-improve-health-care)).
-   - **Widget:** Distribution (1,000 dots sorting).
-3. **One for engineers: Off the Edge** (a marble's path off a desk, Trajectory) **or** a derivative-vs-function item (Curve). Use whichever is solid first.
+2. **The positive test** (Distribution, 1,000 dots sorting). 1% base rate, 90% sensitivity, 9% false positives → **9.2%**.
+   - On a similar case, doctors' most frequent estimate was 90% vs a correct 7.7% ([APS Observer](https://www.psychologicalscience.org/observer/helping-physicians-understand-screening-tests-will-improve-health-care)).
+   - **Misconception:** "the test's accuracy is my chance".
+3. **The birthday problem** (Curve of P(match) vs group size, plus a 23-dot calendar lighting up). With 23 people, P(a shared birthday) = **50.7%** (our computation).
+   - People tend to guess about half of 365 ([Live Science](https://www.livescience.com/what-is-birthday-paradox); a teaching observation, not a survey).
+   - **Misconception:** "it's about *my* birthday" (counting matches with me, not all pairs) ([Conversable Economist on Hand](https://conversableeconomist.com/2014/02/22/intuition-behind-the-birthday-bets/)).
 
-**Also:** ~30-40 cached generated topics as a safety net for live requests (demo.md fallback ladder).
+**Dropped as showcases** (they can still come up as generated topics):
+- **Off the Edge:** no solid adult error-rate source, and it needs the Trajectory widget.
+- **Wason 2-4-6:** a rule-discovery game, not a reveal over your guess.
+
+**Plus:** ~30 cached generated topics as a safety net for live requests.
 
 ## 9. Demo (3:00, full script in docs/research/demo.md)
 | Time | What happens |
