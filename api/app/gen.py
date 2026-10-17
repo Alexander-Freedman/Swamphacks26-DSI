@@ -48,14 +48,17 @@ Rules:
   sentence refutation. Prefer ones with a source; set source_url only if you
   are sure it exists, otherwise null and say where it's known from in
   source_note.
-- items: 1-3 prediction questions whose intuitive answer is WRONG for many
+- questions: 1-3 prediction questions whose intuitive answer is WRONG for many
   people. Every wrong option or numeric band must map to exactly one
   misconception id; the correct one has misconception_id null.
 - choice items need exactly one correct option.
-- truth: use widget "distribution" with a sampler, or "curve" with a short
-  expression in x using only numbers, + - * / ^ and sin cos tan exp log sqrt
-  abs min max. If the topic can't be computed, use widget "stepper" with 2-6
-  worked steps.
+- input_type: "slider" (give slider_min/max/step/unit and numeric bands that
+  cover the whole slider) or "choice" (2-4 options).
+- the truth is shown by our code, not by you: set widget "distribution" with a
+  sampler (and its numbers: n, p, dice, group_size, base_rate, sensitivity,
+  false_positive_rate), or "curve" with expr in x using only numbers,
+  + - * / ^ and sin cos tan exp log sqrt abs min max, plus x_min/x_max. If the
+  topic can't be computed, use widget "stepper" with 2-6 worked steps.
 - Put the true numeric value in answer_expr (same expression rules) when you
   can, and your own number in answer_claimed.
 - slug: lowercase words joined by hyphens. reviewed: false. schema_version: 1.
@@ -130,22 +133,212 @@ def offline() -> bool:
     return os.environ.get("MM_OFFLINE") == "1" or not os.environ.get("GEMINI_API_KEY")
 
 
-def _schema_for_model() -> dict:
-    """Round JSON Schema without keywords Gemini ignores or rejects."""
-    schema = Round.model_json_schema()
+_S = {"type": "string"}
+_N = {"type": "number"}
+_NS = {"type": "string", "nullable": True}
+_NN = {"type": "number", "nullable": True}
 
-    def scrub(node):
-        if isinstance(node, dict):
-            for k in ("discriminator", "pattern", "title", "default"):
-                node.pop(k, None)
-            for v in node.values():
-                scrub(v)
-        elif isinstance(node, list):
-            for v in node:
-                scrub(v)
+# Compact schema the model fills. The full Round schema is over the API's
+# complexity limit (generic 400), so the model gets this and to_round() maps it
+# onto Round, which then validates everything strictly.
+GEN_SCHEMA: dict = {
+    "type": "object",
+    "properties": {
+        "slug": _S,
+        "topic": _S,
+        "concept": _S,
+        "misconceptions": {
+            "type": "array",
+            "minItems": 2,
+            "maxItems": 5,
+            "items": {
+                "type": "object",
+                "properties": {
+                    "id": _S,
+                    "label": _S,
+                    "why_tempting": _S,
+                    "refutation": _S,
+                    "source_url": _NS,
+                    "source_note": _NS,
+                },
+                "required": ["id", "label", "why_tempting", "refutation"],
+            },
+        },
+        "questions": {
+            "type": "array",
+            "minItems": 1,
+            "maxItems": 3,
+            "items": {
+                "type": "object",
+                "properties": {
+                    "id": _S,
+                    "prompt": _S,
+                    "input_type": {"type": "string", "enum": ["slider", "choice"]},
+                    "slider_min": _NN,
+                    "slider_max": _NN,
+                    "slider_step": _NN,
+                    "slider_unit": _NS,
+                    "options": {
+                        "type": "array",
+                        "items": {
+                            "type": "object",
+                            "properties": {"id": _S, "text": _S, "misconception_id": _NS},
+                            "required": ["id", "text"],
+                        },
+                    },
+                    "bands": {
+                        "type": "array",
+                        "items": {
+                            "type": "object",
+                            "properties": {"min": _N, "max": _N, "misconception_id": _NS},
+                            "required": ["min", "max"],
+                        },
+                    },
+                    "widget": {"type": "string", "enum": ["distribution", "curve", "stepper"]},
+                    "sampler": {
+                        "type": "string",
+                        "nullable": True,
+                        "enum": [
+                            "coin_longest_run",
+                            "base_rate_test",
+                            "birthday_match",
+                            "binomial_count",
+                            "dice_sum",
+                        ],
+                    },
+                    "n": _NN,
+                    "p": _NN,
+                    "dice": _NN,
+                    "group_size": _NN,
+                    "base_rate": _NN,
+                    "sensitivity": _NN,
+                    "false_positive_rate": _NN,
+                    "expr": _NS,
+                    "x_min": _NN,
+                    "x_max": _NN,
+                    "x_label": _NS,
+                    "y_label": _NS,
+                    "steps": {"type": "array", "items": _S},
+                    "answer_expr": _NS,
+                    "answer_claimed": _NN,
+                    "targets": {"type": "array", "items": _S},
+                },
+                "required": ["id", "prompt", "input_type", "widget"],
+            },
+        },
+    },
+    "required": ["slug", "topic", "concept", "misconceptions", "questions"],
+}
 
-    scrub(schema)
-    return schema
+
+def _int(v):
+    return int(v) if isinstance(v, (int, float)) else None
+
+
+def to_round(data: dict) -> Round:
+    """Map the compact generated shape onto Round (strict validation happens there)."""
+    items = []
+    for q in data.get("questions", []):
+        widget = q.get("widget")
+        if widget == "distribution":
+            params = {
+                "n": _int(q.get("n")),
+                "p": q.get("p"),
+                "dice": _int(q.get("dice")),
+                "group_size": _int(q.get("group_size")),
+                "base_rate": q.get("base_rate"),
+                "sensitivity": q.get("sensitivity"),
+                "false_positive_rate": q.get("false_positive_rate"),
+                "population": 1000 if q.get("sampler") == "base_rate_test" else None,
+            }
+            truth = {
+                "widget": "distribution",
+                "sampler": q.get("sampler"),
+                "params": {k: v for k, v in params.items() if v is not None},
+                "x_label": q.get("x_label") or "",
+            }
+        elif widget == "curve":
+            truth = {
+                "widget": "curve",
+                "expr": q.get("expr"),
+                "x_min": q.get("x_min"),
+                "x_max": q.get("x_max"),
+                "x_label": q.get("x_label") or "",
+                "y_label": q.get("y_label") or "",
+            }
+        else:
+            truth = {"widget": "stepper", "steps": q.get("steps") or []}
+        item = {
+            "id": q.get("id"),
+            "prompt": _clip(q.get("prompt"), 300),
+            "input_type": q.get("input_type"),
+            "options": q.get("options") or [],
+            "bands": q.get("bands") or [],
+            "truth": truth,
+            "answer_expr": q.get("answer_expr"),
+            "answer_claimed": q.get("answer_claimed"),
+            "targets": q.get("targets") or [],
+        }
+        if q.get("input_type") == "slider":
+            item["slider"] = {
+                "min": q.get("slider_min"),
+                "max": q.get("slider_max"),
+                "step": q.get("slider_step") or 1,
+                "unit": q.get("slider_unit") or "",
+            }
+        items.append(item)
+    known = {_slugify(m.get("id", "")) for m in data.get("misconceptions", [])}
+    for it in items:
+        _fix_ids(it)
+        # A dangling reference can't be shown as a named wrong idea, so drop
+        # that band/option rather than silently calling it "correct".
+        it["bands"] = [b for b in it["bands"] if b.get("misconception_id") in known | {None}]
+        it["options"] = [o for o in it["options"] if o.get("misconception_id") in known | {None}]
+        it["targets"] = [t for t in it["targets"] if t in known]
+    return Round.model_validate(
+        {
+            "schema_version": 1,
+            "slug": _slugify(data.get("slug") or data.get("topic") or "topic"),
+            "reviewed": False,
+            "topic": _clip(data.get("topic"), 120),
+            "concept": _clip(data.get("concept"), 300),
+            "misconceptions": [
+                {
+                    **m,
+                    "id": _slugify(m.get("id", "")),
+                    "label": _clip(m.get("label"), 80),
+                    "why_tempting": _clip(m.get("why_tempting"), 280),
+                    "refutation": _clip(m.get("refutation"), 400),
+                    "source_note": _clip(m.get("source_note"), 200),
+                }
+                for m in data.get("misconceptions", [])
+            ],
+            "items": items,
+        }
+    )
+
+
+def _clip(text, n: int):
+    if not isinstance(text, str):
+        return text
+    return text if len(text) <= n else text[: n - 1].rstrip() + "…"
+
+
+def _slugify(text: str) -> str:
+    return re.sub(r"-+", "-", re.sub(r"[^a-z0-9]+", "-", str(text).lower())).strip("-")[:60] or "x"
+
+
+def _fix_ids(item: dict) -> dict:
+    item["id"] = _slugify(item.get("id") or "q")
+    for o in item["options"]:
+        o["id"] = _slugify(o.get("id") or o.get("text", "o"))
+        if o.get("misconception_id"):
+            o["misconception_id"] = _slugify(o["misconception_id"])
+    for b in item["bands"]:
+        if b.get("misconception_id"):
+            b["misconception_id"] = _slugify(b["misconception_id"])
+    item["targets"] = [_slugify(t) for t in item["targets"]]
+    return item
 
 
 def _call_model(model: str, topic: str) -> str:
@@ -164,15 +357,18 @@ def _call_model(model: str, topic: str) -> str:
         # Gemma gets the schema in the prompt; validated afterwards.
         contents = (
             f"{SYSTEM_PROMPT}\n\nReturn only JSON matching this schema:\n"
-            f"{json.dumps(_schema_for_model())}\n\n{contents}"
+            f"{json.dumps(GEN_SCHEMA)}\n\n{contents}"
         )
     else:
         config.system_instruction = SYSTEM_PROMPT
-        config.response_json_schema = _schema_for_model()
+        config.response_json_schema = GEN_SCHEMA
         config.thinking_config = types.ThinkingConfig(thinking_level="minimal")
     resp = client.models.generate_content(model=model, contents=contents, config=config)
     finish = resp.candidates[0].finish_reason if resp.candidates else None
-    if finish is not None and str(finish).split(".")[-1] not in ("STOP", "FINISH_REASON_UNSPECIFIED"):
+    if finish is not None and str(finish).split(".")[-1] not in (
+        "STOP",
+        "FINISH_REASON_UNSPECIFIED",
+    ):
         raise GenerationError(f"{model} stopped early ({finish})")
     return resp.text or ""
 
@@ -206,8 +402,7 @@ def generate_round(topic: str, usage: Usage | None = None) -> GenResult:
             try:
                 raw = _call_model(model, topic)
                 data = json.loads(raw.strip().removeprefix("```json").removesuffix("```"))
-                data["reviewed"] = False
-                r = Round.model_validate(data)
+                r = to_round(data)
             except (ValidationError, ValueError, GenerationError) as err:
                 last_err = err
                 log.warning("bad round from %s: %s", model, str(err)[:200])
