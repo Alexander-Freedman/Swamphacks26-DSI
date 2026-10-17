@@ -194,7 +194,7 @@
 @media (max-width: 899px) {
   .bday-dock { position: sticky; bottom: 8px; z-index: 2; padding: 10px 12px; gap: 8px; box-shadow: 0 3px 0 var(--ink), 0 -6px 18px rgb(0 0 0 / 0.12); }
   .bday-dock .bday-countrow b { font-size: 32px; }
-  .bday-dock .bday-tag { font-size: 11px; }
+  .bday-dock .bday-tag { font-size: 12px; }
   .bday-dock .bday-holdhint { display: none; }
   .bday-stampwrap { min-height: 0; }
 }
