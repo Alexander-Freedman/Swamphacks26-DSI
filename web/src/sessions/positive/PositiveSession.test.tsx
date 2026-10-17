@@ -36,8 +36,9 @@ describe('positive test session', () => {
   it('guess → test everyone → you vs real → change the crowd → card → saved', async () => {
     vi.useFakeTimers()
     localStorage.clear()
+    // off Home now (subjects only), so it opens from its link
+    history.replaceState(null, '', `${import.meta.env.BASE_URL}?session=positive-test`)
     const { container } = render(<App />)
-    fireEvent.click(screen.getByText('You tested positive. Are you sick?'))
 
     // same button as the other sessions: slider, then "Show me" (no how-sure step, #194)
     const lock = screen.getByText('Move the slider first') as HTMLButtonElement
@@ -132,7 +133,7 @@ describe('positive test session', () => {
     expect(saved).toHaveLength(1)
     expect(saved[0]).toMatchObject({ session: 'positive-test', at: atCard[0].at, guess: 21, misconception: 'ignores-false-alarms', rematch: 'wrong', rematchGuess: 60, rematchTruth: 27.9, comparePick: 'accuracy', compareRight: false, compareText: 'too many false alarms' })
     fireEvent.click(screen.getByText('Done'))
-    expect(screen.getByText('You tested positive. Are you sick?')).toBeTruthy()
+    expect(screen.getByText('See your thinking in layers.')).toBeTruthy()
   })
 
   it('reduced motion jumps straight to the piles', () => {

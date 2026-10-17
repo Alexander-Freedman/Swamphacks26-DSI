@@ -10,10 +10,11 @@ beforeEach(() => history.replaceState(null, '', import.meta.env.BASE_URL))
 afterEach(cleanup)
 
 describe('Home cards', () => {
-  it('leads with the subjects; birthday and coin are off Home', () => {
+  it('shows only the subjects; birthday, coin and positive test are off Home', () => {
     render(<App />)
     const titles = [...document.querySelectorAll('.showcases.sessions .card-title')].map((t) => t.textContent)
-    expect(titles).toEqual(['Organic chemistry', 'Calculus', 'You tested positive. Are you sick?'])
+    expect(titles).toEqual(['Organic chemistry', 'Calculus'])
+    expect(screen.queryByText('You tested positive. Are you sick?')).toBeNull()
     expect(screen.queryByText('The birthday problem')).toBeNull()
     expect(screen.queryByText('Be a coin')).toBeNull()
     // the old "Streaks in coin flips" round shares the coin-streak slug, so it stays hidden too

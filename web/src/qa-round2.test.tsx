@@ -89,14 +89,14 @@ describe('topic matching (#167)', () => {
     await waitFor(() => expect(here()).toBe(`${BASE}?session=birthday`))
   }, 15000)
 
-  it('a miss offers the three sessions first, and a session chip opens the session', async () => {
+  it('a miss offers the subject sessions first, and a session chip opens the session', async () => {
     render(<App />)
     await screen.findByRole('button', { name: 'Sums of dice' })
     fireEvent.change(screen.getByLabelText(/topic you want/), { target: { value: 'quantum tunnelling' } })
     fireEvent.click(screen.getByRole('button', { name: 'Go' }))
     await screen.findByText(/No round on “quantum tunnelling” yet/)
     const chips = [...screen.getByRole('group', { name: 'Hand-checked topics' }).querySelectorAll('button')].map((b) => b.textContent)
-    expect(chips.slice(0, 3)).toEqual(['Organic chemistry', 'Calculus', 'You tested positive. Are you sick?'])
+    expect(chips.slice(0, 2)).toEqual(['Organic chemistry', 'Calculus'])
     expect(chips).toContain('Sums of dice')
     fireEvent.click(screen.getByRole('button', { name: 'Calculus' }))
     await waitFor(() => expect(here()).toBe(`${BASE}?session=calculus`))
