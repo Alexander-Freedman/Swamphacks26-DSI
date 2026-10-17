@@ -7,6 +7,7 @@ import { Predict, type Answer } from './components/Predict'
 import { Reveal } from './components/Reveal'
 import { showcaseRound, showcaseSlugs } from './rounds'
 import { sessionFor, sessions } from './sessions/registry'
+import { artFor } from './sessionArt'
 import { withUnit } from './format'
 import { computeTruth, type Computed } from './truth'
 import type { Round } from './types'
@@ -26,12 +27,30 @@ function Home({ onPick, onSession, onNotebook }: { onPick: (slug: string) => voi
       <p className="concept">Predict first, lock it in, and see exactly where your intuition breaks.</p>
       {sessions.length > 0 && (
         <div className="showcases sessions">
-          {sessions.map((s) => (
-            <button key={s.slug} className="showcase" onClick={() => onSession(s.slug)}>
-              {s.title}
-              <span className="blurb">{s.blurb}</span>
-            </button>
-          ))}
+          {sessions.map((s, i) => {
+            const art = artFor(s.slug)
+            return (
+              <button key={s.slug} className={`showcase${art ? ' has-art' : ''}`} onClick={() => onSession(s.slug)}>
+                {art && (
+                  <img
+                    className="card-art"
+                    src={art.src}
+                    srcSet={art.srcSet}
+                    sizes="(max-width: 640px) 120px, 240px"
+                    width={512}
+                    height={512}
+                    loading={i === 0 ? 'eager' : 'lazy'}
+                    decoding="async"
+                    alt=""
+                  />
+                )}
+                <span className="card-text">
+                  <span className="card-title">{s.title}</span>
+                  <span className="blurb">{s.blurb}</span>
+                </span>
+              </button>
+            )
+          })}
         </div>
       )}
       {rounds.length > 0 && (
