@@ -11,7 +11,7 @@
       "why_tempting": "A 90% accurate test that says yes sounds like 90% sure.",
       "refutation": "Accuracy says how the test behaves on sick and healthy people. Your chance also depends on how rare the condition is: with 1 in 100 sick, false alarms from the other 99 outnumber the true hits.",
       "source_url": "https://www.psychologicalscience.org/observer/helping-physicians-understand-screening-tests-will-improve-health-care",
-      "source_note": "On a similar case, doctors' most frequent estimate was 90% vs a correct 7.7%"
+      "source_note": "On a similar case about 95 of 100 doctors guessed around 75%; the right answer was 7.7% (Eddy 1982)"
     },
     {
       "id": "ignores-false-alarms",
