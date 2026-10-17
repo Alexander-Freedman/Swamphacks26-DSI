@@ -71,12 +71,12 @@
         {
           "param": "t",
           "value": 2.0,
-          "watch": "Very fast metabolism clears almost all caffeine in 10 hours."
+          "watch": "A 2-hour half-life means 7.5 halvings by midnight: only about 0.55% is left."
         },
         {
           "param": "t",
           "value": 10.0,
-          "watch": "Slow metabolism means 50% is still present after 10 hours."
+          "watch": "A 10-hour half-life means 1.5 halvings by midnight: about 35% is still in you."
         }
       ],
       "answer_claimed": 12.5
@@ -87,16 +87,16 @@
         "label": "Two half-lives and it's gone",
         "why_tempting": "Half gone in 5 hours sounds like all gone in 10.",
         "refutation": "Each 5 hours removes half of what's left: 100 to 50 to 25 to 12.5 percent.",
-        "source_url": "https://en.wikipedia.org/wiki/Biological_half-life",
-        "source_note": "Page states the correct model; that this mistake is common is unverified"
+        "source_url": "https://en.wikipedia.org/wiki/Caffeine",
+        "source_note": "Page says 'In healthy adults, caffeine's half-life is between 3 and 7 hours' (5 h used here); that this mistake is common is unverified"
       },
       {
         "id": "halves-once",
         "label": "It only halves once",
         "why_tempting": "The half-life sounds like a one-time drop, then it levels off.",
         "refutation": "The halving repeats every half-life, so the amount keeps shrinking.",
-        "source_url": "https://en.wikipedia.org/wiki/Biological_half-life",
-        "source_note": "Page states the correct model; that this mistake is common is unverified"
+        "source_url": "https://en.wikipedia.org/wiki/Caffeine",
+        "source_note": "Page says 'In healthy adults, caffeine's half-life is between 3 and 7 hours' (5 h used here); that this mistake is common is unverified"
       }
     ],
     "compare": null

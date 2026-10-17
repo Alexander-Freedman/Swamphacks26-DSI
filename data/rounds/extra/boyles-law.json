@@ -20,6 +20,14 @@
       "refutation": "Pressure and volume move in opposite directions: squeezing a gas raises its pressure.",
       "source_url": "https://en.wikipedia.org/wiki/Boyle%27s_law",
       "source_note": "Page states the correct model; that this mistake is common is unverified"
+    },
+    {
+      "id": "overshoot",
+      "label": "More than 5x the pressure",
+      "why_tempting": "Squeezing hard feels like it should push the pressure up even more.",
+      "refutation": "Pressure times volume stays constant: 1 atm x 10 L = 5 atm x 2 L, so exactly 5 atm.",
+      "source_url": "https://en.wikipedia.org/wiki/Boyle%27s_law",
+      "source_note": "Page states the correct model; that this mistake is common is unverified"
     }
   ],
   "items": [
@@ -53,7 +61,7 @@
         {
           "min": 5.5,
           "max": 10.0,
-          "misconception_id": "linear-relationship"
+          "misconception_id": "overshoot"
         }
       ],
       "sketch_rules": [],
@@ -83,7 +91,8 @@
       },
       "targets": [
         "direct-relationship",
-        "linear-relationship"
+        "linear-relationship",
+        "overshoot"
       ],
       "variables": [],
       "extremes": [

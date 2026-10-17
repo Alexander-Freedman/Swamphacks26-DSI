@@ -2,7 +2,7 @@
   "schema_version": 1,
   "slug": "terminal-velocity",
   "topic": "Terminal velocity",
-  "concept": "Free fall with air resistance leads to an asymptotic speed limit.",
+  "concept": "Free fall with quadratic air drag (drag grows with speed squared) leads to an asymptotic speed limit.",
   "reviewed": true,
   "misconceptions": [
     {
@@ -17,7 +17,7 @@
       "id": "instant-terminal",
       "label": "Already at top speed",
       "why_tempting": "Top speed sounds like something you hit and stay at.",
-      "refutation": "It only approaches 50 m/s: after 10 s this model gives about 43 m/s.",
+      "refutation": "It only approaches 50 m/s and never quite gets there: after 10 s it's at about 48 m/s.",
       "source_url": "https://en.wikipedia.org/wiki/Terminal_velocity",
       "source_note": "Page states the correct model; that this mistake is common is unverified"
     },
@@ -33,7 +33,7 @@
   "items": [
     {
       "id": "model",
-      "prompt": "A falling object's top speed in air is 50 m/s. Dropped from rest, about how fast is it going after 10 seconds?",
+      "prompt": "A falling object's top speed in air is 50 m/s (quadratic air drag). Dropped from rest, about how fast is it going after 10 seconds?",
       "input_type": "slider",
       "slider": {
         "min": 0.0,
@@ -45,16 +45,16 @@
       "bands": [
         {
           "min": 0.0,
-          "max": 38.0,
+          "max": 43.0,
           "misconception_id": "drag-holds-early"
         },
         {
-          "min": 39.0,
-          "max": 48.0,
+          "min": 44.0,
+          "max": 49.0,
           "misconception_id": null
         },
         {
-          "min": 49.0,
+          "min": 50.0,
           "max": 52.0,
           "misconception_id": "instant-terminal"
         },
@@ -67,7 +67,7 @@
       "sketch_rules": [],
       "truth": {
         "widget": "curve",
-        "expr": "v_t * (1 - 2.71828^(-9.8 * x / v_t))",
+        "expr": "v_t * (1 - exp(-2 * 9.8 * x / v_t)) / (1 + exp(-2 * 9.8 * x / v_t))",
         "preset": null,
         "x_min": 0.0,
         "x_max": 20.0,
@@ -79,8 +79,8 @@
         "area_from": null,
         "area_to": null
       },
-      "answer_expr": "42.957069668559264",
-      "answer_claimed": 43.3,
+      "answer_expr": "48.054491543180696",
+      "answer_claimed": 48.05,
       "explore": {
         "param": "v_t",
         "label": "terminal velocity (m/s)",
@@ -100,16 +100,16 @@
           "param": "v_t",
           "value": 20.0,
           "watch": "Lighter objects hit their low terminal velocity very quickly.",
-          "truth_value": 19.8510678477022
+          "truth_value": 19.997782059011087
         },
         {
           "param": "v_t",
           "value": 90.0,
           "watch": "Objects with high terminal velocity accelerate longer before leveling off.",
-          "truth_value": 59.70685304338153
+          "truth_value": 71.68250212597655
         }
       ],
-      "truth_value": 42.957069668559264,
+      "truth_value": 48.054491543180696,
       "computed": true,
       "approximate": false
     }

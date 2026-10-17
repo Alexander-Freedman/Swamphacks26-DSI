@@ -11,14 +11,14 @@
     "spec_version": 4,
     "slug": "terminal-velocity",
     "topic": "Terminal velocity",
-    "concept": "Free fall with air resistance leads to an asymptotic speed limit.",
+    "concept": "Free fall with quadratic air drag (drag grows with speed squared) leads to an asymptotic speed limit.",
     "definition": "Terminal velocity is the constant maximum speed reached by a body falling through a fluid, occurring when the gravitational force equals the drag force.",
     "case": {
       "widget": "curve",
       "approximate": false,
       "variables": [],
       "curve": {
-        "expr": "v_t * (1 - 2.71828^(-9.8 * x / v_t))",
+        "expr": "v_t * (1 - exp(-2 * 9.8 * x / v_t)) / (1 + exp(-2 * 9.8 * x / v_t))",
         "mode": "value",
         "x_min": 0.0,
         "x_max": 20.0,
@@ -39,7 +39,7 @@
       },
       "sampler": null,
       "prediction": {
-        "prompt": "A falling object's top speed in air is 50 m/s. Dropped from rest, about how fast is it going after 10 seconds?",
+        "prompt": "A falling object's top speed in air is 50 m/s (quadratic air drag). Dropped from rest, about how fast is it going after 10 seconds?",
         "input": "slider",
         "slider": {
           "min": 0,
@@ -52,16 +52,16 @@
       "bands": [
         {
           "min": 0,
-          "max": 38,
+          "max": 43,
           "misconception_id": "drag-holds-early"
         },
         {
-          "min": 39,
-          "max": 48,
+          "min": 44,
+          "max": 49,
           "misconception_id": null
         },
         {
-          "min": 49,
+          "min": 50,
           "max": 52,
           "misconception_id": "instant-terminal"
         },
@@ -83,7 +83,7 @@
           "watch": "Objects with high terminal velocity accelerate longer before leveling off."
         }
       ],
-      "answer_claimed": 43.3
+      "answer_claimed": 48.05
     },
     "misconceptions": [
       {
@@ -98,7 +98,7 @@
         "id": "instant-terminal",
         "label": "Already at top speed",
         "why_tempting": "Top speed sounds like something you hit and stay at.",
-        "refutation": "It only approaches 50 m/s: after 10 s this model gives about 43 m/s.",
+        "refutation": "It only approaches 50 m/s and never quite gets there: after 10 s it's at about 48 m/s.",
         "source_url": "https://en.wikipedia.org/wiki/Terminal_velocity",
         "source_note": "Page states the correct model; that this mistake is common is unverified"
       },

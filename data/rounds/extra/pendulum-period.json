@@ -2,7 +2,7 @@
   "schema_version": 1,
   "slug": "pendulum-period",
   "topic": "Pendulum swing time",
-  "concept": "Pendulum period depends on length and gravity, but not on the mass or small change in amplitude.",
+  "concept": "Pendulum period depends on length and gravity, but not on the mass; the formula T = 2\u03c0\u221a(L/g) is the small-angle approximation.",
   "reviewed": true,
   "misconceptions": [
     {
@@ -25,7 +25,7 @@
   "items": [
     {
       "id": "model",
-      "prompt": "A 1-meter pendulum takes about 2 seconds per swing (there and back). How long does a 4-meter pendulum take?",
+      "prompt": "A 1-meter pendulum takes about 2 seconds per swing (there and back, small swings). How long does a 4-meter pendulum take?",
       "input_type": "slider",
       "slider": {
         "min": 1.0,
@@ -73,7 +73,7 @@
         "label": "gravity (m/s^2)",
         "min": 1.0,
         "max": 20.0,
-        "step": 0.5,
+        "step": 0.01,
         "default": 9.81
       },
       "targets": [
@@ -97,7 +97,7 @@
       ],
       "truth_value": 4.012129972517223,
       "computed": true,
-      "approximate": false
+      "approximate": true
     }
   ],
   "spec_version": 4,

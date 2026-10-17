@@ -20,6 +20,14 @@
       "refutation": "Energy grows faster than shaking: about 32x per step, 1,000x for two steps.",
       "source_url": "https://en.wikipedia.org/wiki/Richter_magnitude_scale",
       "source_note": "Page states the correct model; that this mistake is common is unverified"
+    },
+    {
+      "id": "overshoot",
+      "label": "Way more than 1,000x",
+      "why_tempting": "Logarithmic scales sound like they explode.",
+      "refutation": "Each whole step is about 32x the energy (10^1.5), so two steps is 32 x 32 \u2248 1,000x, not more.",
+      "source_url": "https://en.wikipedia.org/wiki/Richter_magnitude_scale",
+      "source_note": "Page states the correct model; that this mistake is common is unverified"
     }
   ],
   "items": [
@@ -42,13 +50,18 @@
         },
         {
           "min": 11.0,
-          "max": 150.0,
+          "max": 699.0,
           "misconception_id": "ten-per-step"
         },
         {
-          "min": 151.0,
-          "max": 2000.0,
+          "min": 700.0,
+          "max": 1400.0,
           "misconception_id": null
+        },
+        {
+          "min": 1401.0,
+          "max": 2000.0,
+          "misconception_id": "overshoot"
         }
       ],
       "sketch_rules": [],
@@ -78,6 +91,7 @@
       },
       "targets": [
         "linear-scale",
+        "overshoot",
         "ten-per-step"
       ],
       "variables": [],
@@ -85,13 +99,13 @@
         {
           "param": "b",
           "value": 3.0,
-          "watch": "smaller quake magnitude at its lowest",
+          "watch": "A 7 vs a 3 is four steps: 10^6 = 1,000,000x the energy.",
           "truth_value": 1000000.0
         },
         {
           "param": "b",
           "value": 6.0,
-          "watch": "smaller quake magnitude at its highest",
+          "watch": "A 7 vs a 6 is one step: only about 32x the energy.",
           "truth_value": 31.622776601683793
         }
       ],

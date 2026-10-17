@@ -24,7 +24,7 @@ TRUTHS = {
     "caffeine-half-life": 100 * 0.5 ** (15 / 5),
     "earthquake-magnitude": 10 ** (1.5 * 2),
     "enzyme-saturation": 100 * 15 / (5 + 15),
-    "falling-objects": 0.5 * 9.80665 * 4**2,
+    "falling-objects": 0.5 * 9.81 * 4**2,
     "hash-collisions": 100 * (1 - math.exp(-(1000**2) / (2 * 1_000_000))),
     "inflation": 100 / 1.03**30,
     "inverse-square-law": 16 / 4**2,
@@ -38,7 +38,7 @@ TRUTHS = {
     "projectile-motion": 30 * 2 - 0.5 * 9.8 * 2**2,
     "radioactive-half-life": 5730 * math.log2(100 / 10),
     "stopping-distance": 80 / 3.6 + (80 / 3.6) ** 2 / (2 * 6),
-    "terminal-velocity": 50 * (1 - math.exp(-9.8 * 10 / 50)),
+    "terminal-velocity": 50 * math.tanh(9.8 * 10 / 50),
 }
 
 

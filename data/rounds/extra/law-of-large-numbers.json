@@ -76,20 +76,7 @@
         "same-ratio-same-chance"
       ],
       "variables": [],
-      "extremes": [
-        {
-          "param": "n",
-          "value": 10.0,
-          "watch": "With fewer trials, results vary wildly from the expected average.",
-          "truth_value": 0.0
-        },
-        {
-          "param": "n",
-          "value": 1000.0,
-          "watch": "As trials increase, the experimental mean hugs the true probability tightly.",
-          "truth_value": 99.99999999995772
-        }
-      ],
+      "extremes": [],
       "truth_value": 2.844396682048977,
       "computed": true,
       "approximate": false

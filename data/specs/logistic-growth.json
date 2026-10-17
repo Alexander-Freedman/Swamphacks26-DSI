@@ -71,12 +71,12 @@
         {
           "param": "r",
           "value": 0.1,
-          "watch": "growth rate per day at its lowest"
+          "watch": "At 10% a day the island has only about 69 rabbits by day 20."
         },
         {
           "param": "r",
           "value": 0.6,
-          "watch": "growth rate per day at its highest"
+          "watch": "At 60% a day the island is full (about 999) well before day 20."
         }
       ],
       "answer_claimed": 803

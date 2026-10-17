@@ -70,12 +70,12 @@
         {
           "param": "k",
           "value": 100.0,
-          "watch": "Strength at 10m is k/100."
+          "watch": "At 4 m it's k/16 = 6.25."
         },
         {
           "param": "k",
           "value": 1.0,
-          "watch": "Intensity drops very fast."
+          "watch": "A weak source (k = 1) is down to 1/16 = 0.0625 at 4 m."
         }
       ],
       "answer_claimed": 1.0

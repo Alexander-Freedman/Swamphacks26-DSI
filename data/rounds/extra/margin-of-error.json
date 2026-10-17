@@ -85,13 +85,13 @@
         {
           "param": "z",
           "value": 1.0,
-          "watch": "z multiplier (1.96 is usual) at its lowest",
+          "watch": "With z = 1 (a looser \u00b11 standard error) you need only about 1,041 people for \u00b11.55%.",
           "truth_value": 1040.5827263267429
         },
         {
           "param": "z",
           "value": 3.0,
-          "watch": "z multiplier (1.96 is usual) at its highest",
+          "watch": "With z = 3 (3 standard errors wide) you need about 9,365 people.",
           "truth_value": 9365.244536940685
         }
       ],

@@ -9,7 +9,7 @@
       "id": "linear-decay",
       "label": "Lose 3 points a year",
       "why_tempting": "3% a year for 30 years sounds like 90% lost.",
-      "refutation": "Each year takes 3% of what's left, so the losses shrink: 1/1.03^30 = 41%.",
+      "refutation": "A dollar buys 1/1.03 of the year before, so after 30 years it buys 1/1.03^30 \u2248 41%.",
       "source_url": "https://en.wikipedia.org/wiki/Inflation",
       "source_note": "Page states the correct model; that this mistake is common is unverified"
     },

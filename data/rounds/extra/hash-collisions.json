@@ -90,13 +90,13 @@
         {
           "param": "N",
           "value": 100000.0,
-          "watch": "possible IDs at its lowest",
+          "watch": "With only 100,000 possible IDs, a repeat among 1,000 files is almost certain (99.3%).",
           "truth_value": 99.32620530009146
         },
         {
           "param": "N",
           "value": 10000000.0,
-          "watch": "possible IDs at its highest",
+          "watch": "With 10 million possible IDs the chance drops to about 4.9%.",
           "truth_value": 4.877057549928598
         }
       ],

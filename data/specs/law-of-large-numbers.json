@@ -62,18 +62,7 @@
           "misconception_id": "same-ratio-same-chance"
         }
       ],
-      "extremes": [
-        {
-          "param": "n",
-          "value": 10.0,
-          "watch": "With fewer trials, results vary wildly from the expected average."
-        },
-        {
-          "param": "n",
-          "value": 1000.0,
-          "watch": "As trials increase, the experimental mean hugs the true probability tightly."
-        }
-      ],
+      "extremes": [],
       "answer_claimed": 2.84
     },
     "misconceptions": [

@@ -66,15 +66,15 @@
         "area_from": null,
         "area_to": null
       },
-      "answer_expr": "78.4532",
+      "answer_expr": "78.48",
       "answer_claimed": 78.5,
       "explore": {
         "param": "g",
         "label": "gravity (m/s^2)",
         "min": 1.0,
         "max": 20.0,
-        "step": 0.5,
-        "default": 9.80665
+        "step": 0.01,
+        "default": 9.81
       },
       "targets": [
         "final-speed-times-time",
@@ -95,7 +95,7 @@
           "truth_value": 160.0
         }
       ],
-      "truth_value": 78.4532,
+      "truth_value": 78.48,
       "computed": true,
       "approximate": false
     }

@@ -35,8 +35,8 @@
           "label": "gravity (m/s^2)",
           "min": 1.0,
           "max": 20.0,
-          "step": 0.5,
-          "default": 9.80665
+          "step": 0.01,
+          "default": 9.81
         }
       },
       "sampler": null,
