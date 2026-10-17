@@ -3,7 +3,7 @@ import { showcaseRound } from '../../rounds'
 import { misconceptionFor, verdictFor } from '../../verdict'
 import { ExtremeChart, KMAX, RunHistogram } from './Charts'
 import { CoinGrid, Track } from './CoinGrid'
-import { fmt, pct, reducedMotion } from './hooks'
+import { fmt, pct, reducedMotion, sampleLabel } from './hooks'
 import {
   expectedLongest,
   flipSeq,
@@ -26,6 +26,19 @@ const MIN_TAPS = 20
 const E100 = expectedLongest(N)
 const P5 = pLongestAtLeast(N, 5)
 const STEPS = ['Be a coin', 'Flip it', 'Yours vs real', 'Extremes', 'Your mistake'] as const
+const CONFS = ['unsure', 'pretty sure', 'certain'] as const
+export type Confidence = (typeof CONFS)[number]
+
+// Same local notebook as the birthday session: one line per finished session.
+function save(entry: object) {
+  try {
+    const key = 'mm.sessions'
+    const all = JSON.parse(localStorage.getItem(key) ?? '[]') as object[]
+    localStorage.setItem(key, JSON.stringify([...all, entry].slice(-50)))
+  } catch {
+    // private mode or blocked storage: the session still ends fine
+  }
+}
 
 export function CoinSession({ onDone }: { onDone: () => void }) {
   const round = showcaseRound('coin-streak')!
@@ -37,12 +50,15 @@ export function CoinSession({ onDone }: { onDone: () => void }) {
   const [deal, setDeal] = useState<Side[]>([]) // real flips dealt under your row, same length
   const [dealKey, setDealKey] = useState(0)
   const [guess, setGuess] = useState(4)
+  const [conf, setConf] = useState<Confidence | null>(null)
   const [locked, setLocked] = useState(false)
   const rand = useRef(rng(20))
   const [real, setReal] = useState<Side[]>([])
   const [flipKey, setFlipKey] = useState(0)
   const [hist, setHist] = useState<number[]>(() => new Array(KMAX + 1).fill(0))
-  const [total, setTotal] = useState(0)
+  const [sim, setSim] = useState(0) // runs from "Run 1,000 times"
+  const [flipped, setFlipped] = useState(0) // strips flipped one at a time
+  const total = sim + flipped
   const [newest, setNewest] = useState(0)
   const [running, setRunning] = useState(false)
   const heading = useRef<HTMLHeadingElement>(null)
@@ -53,38 +69,42 @@ export function CoinSession({ onDone }: { onDone: () => void }) {
     setDealKey((k) => k + 1)
   }, [])
 
+  // Functional update: taps faster than a render never drop a flip or overshoot the row.
   const tap = useCallback(
     (c: Side) => {
-      if (locked || mine.length >= len) return
-      setMine([...mine, c])
-      if (mine.length + 1 === len) dealRow(len)
+      if (locked) return
+      setMine((m) => (m.length >= len ? m : [...m, c]))
     },
-    [locked, mine, len, dealRow],
+    [locked, len],
   )
 
-  const editMine = (m: Side[]) => {
+  // Any edit takes the real row away; a full row gets a fresh one dealt (below).
+  const editMine = useCallback((m: Side[]) => {
     setMine(m)
-    if (m.length === len) dealRow(len)
-    else setDeal([])
-  }
-
-  const pickLen = (n: number) => {
-    setLen(n)
-    setMine([])
     setDeal([])
+  }, [])
+  useEffect(() => {
+    if (mine.length === len && deal.length !== len) dealRow(len)
+  }, [mine.length, len, deal.length, dealRow])
+
+  // Switching length keeps your taps (cut to 20 going down), so a mid-row toggle never wipes them.
+  const pickLen = (n: number) => {
+    if (n === len) return
+    setLen(n)
+    editMine(mine.slice(0, n))
   }
 
   useEffect(() => {
     if (step !== 0 || locked) return
     const onKey = (e: KeyboardEvent) => {
-      if (e.ctrlKey || e.metaKey || e.altKey || (e.target as HTMLElement).tagName === 'INPUT') return
+      if (e.ctrlKey || e.metaKey || e.altKey || e.repeat || (e.target as HTMLElement).tagName === 'INPUT') return
       const k = e.key.toUpperCase()
       if (k === 'H' || k === 'T') tap(k)
-      if (e.key === 'Backspace') setMine(mine.slice(0, -1))
+      if (e.key === 'Backspace' && mine.length) editMine(mine.slice(0, -1))
     }
     addEventListener('keydown', onKey)
     return () => removeEventListener('keydown', onKey)
-  }, [step, locked, tap, mine])
+  }, [step, locked, tap, mine, editMine])
 
   const addTrials = (ls: number[]) => {
     setHist((h) => {
@@ -92,7 +112,6 @@ export function CoinSession({ onDone }: { onDone: () => void }) {
       for (const l of ls) next[Math.min(l, KMAX)]++
       return next
     })
-    setTotal((t) => t + ls.length)
     setNewest(ls[ls.length - 1])
   }
 
@@ -101,14 +120,17 @@ export function CoinSession({ onDone }: { onDone: () => void }) {
     setReal(s)
     setFlipKey((k) => k + 1)
     addTrials([longestRun(s)])
+    setFlipped((f) => f + 1)
   }
 
-  // A fresh sample of exactly 1,000, so the count reads 1,000 (not 1,000 plus the strips flipped so far).
+  // A fresh sample of exactly 1,000: the label reads "1,000 runs", and strips flipped after it are counted apart.
   const run1k = () => {
     setHist(new Array(KMAX + 1).fill(0))
-    setTotal(0)
+    setFlipped(0)
+    setSim(0)
     if (reducedMotion()) {
       addTrials(Array.from({ length: 1000 }, () => longestOfFlips(N, rand.current)))
+      setSim(1000)
       return
     }
     setRunning(true)
@@ -116,6 +138,7 @@ export function CoinSession({ onDone }: { onDone: () => void }) {
     const tick = () => {
       const b = Math.min(left, 12)
       addTrials(Array.from({ length: b }, () => longestOfFlips(N, rand.current)))
+      setSim((x) => x + b)
       left -= b
       if (left > 0) requestAnimationFrame(tick)
       else setRunning(false)
@@ -145,25 +168,31 @@ export function CoinSession({ onDone }: { onDone: () => void }) {
   }
 
   const sw = switchRate(model)
+  // The round player calls "unsure" "guessing"; the verdict only reads the value.
+  const answer = { value: guess, optionId: null, confidence: conf === 'unsure' ? ('guessing' as const) : (conf ?? 'pretty sure') }
   return (
     <div className="coin-session">
-      <nav className="steps" aria-label="session steps">
-        {STEPS.map((s, i) => (
-          <button key={s} className={i === step ? 'on' : ''} aria-current={i === step ? 'step' : undefined} disabled={i > 0 && !locked} onClick={() => go(i)}>
-            <span className="n">{i + 1}</span> <span className="s">{s}</span>
-          </button>
-        ))}
-      </nav>
+      <div className="coin-head">
+        <span className="chip">Coin streak</span>
+        <nav className="steps" aria-label="session steps">
+          {STEPS.map((s, i) => (
+            <button key={s} className={i === step ? 'on' : ''} aria-current={i === step ? 'step' : undefined} disabled={i > 0 && !locked} onClick={() => go(i)}>
+              <span className="n">{i + 1}</span> <span className="s">{s}</span>
+            </button>
+          ))}
+        </nav>
+        <span className="count">{step + 1} of {STEPS.length}</span>
+      </div>
       {locked && (
         <p className="pencil-strip" aria-label="your model">
-          <span>you guessed <b>{guess}</b> in a row</span>
+          <span>you guessed <b>{guess}</b> in a row{conf ? ` (${conf})` : ''}</span>
           <span>you switch <b>{pct(sw)}</b></span>
           <span>your longest <b>{longestRun(model)}</b></span>
         </p>
       )}
       <section className="coin-step" aria-labelledby="coin-h">
         {step === 0 && (
-          <TapStep h={heading} len={len} pickLen={pickLen} deal={deal} dealKey={dealKey} onDeal={() => dealRow(len)} mine={mine} setMine={editMine} tap={tap} guess={guess} setGuess={setGuess} locked={locked} onLock={lock} onNext={() => go(1)} />
+          <TapStep h={heading} len={len} pickLen={pickLen} deal={deal} dealKey={dealKey} onDeal={() => dealRow(len)} mine={mine} setMine={editMine} tap={tap} guess={guess} setGuess={setGuess} conf={conf} setConf={setConf} locked={locked} onLock={lock} onNext={() => go(1)} />
         )}
         {step === 1 && (
           <>
@@ -181,7 +210,7 @@ export function CoinSession({ onDone }: { onDone: () => void }) {
             <RunHistogram hist={hist} total={total} newest={newest} guess={guess} mean={E100} />
             <Legend items={[['truth', 'real coin'], ['you', 'your guess'], ['gap', 'the gap']]} />
             <p className="simnote" aria-live="polite">
-              Simulated: <b className="num">{fmt(total)}</b> {total === 1 ? 'run' : 'runs'} of 100 flips, <b className="num">{pct(hist.reduce((s, c, k) => s + (k > guess ? c : 0), 0) / Math.max(1, total))}</b> beat your guess of {guess}.
+              {sampleLabel(sim, flipped)}, <b className="num">{pct(hist.reduce((s, c, k) => s + (k > guess ? c : 0), 0) / Math.max(1, total))}</b> beat your guess of {guess}.
               Exact: a run of 5+ shows up <b className="num">{pct(P5, 1)}</b> of the time.
             </p>
             <Next onClick={() => go(2)}>Next: your coin vs the real one</Next>
@@ -190,7 +219,7 @@ export function CoinSession({ onDone }: { onDone: () => void }) {
         {step === 2 && <CompareStep h={heading} model={model} real={real} usedSample={mine.length < MIN_TAPS} onNext={() => go(3)} />}
         {step === 3 && <ExtremeStep h={heading} model={model} guess={guess} onNext={() => go(4)} />}
         {step === 4 && (
-          <CardStep h={heading} model={model} guess={guess} round={round} verdict={verdictFor(item, { value: guess, optionId: null, confidence: 'pretty sure' }, E100)} misId={misconceptionFor(item, { value: guess, optionId: null, confidence: 'pretty sure' })} onRestart={restart} onDone={onDone} />
+          <CardStep h={heading} model={model} guess={guess} round={round} conf={conf ?? 'pretty sure'} verdict={verdictFor(item, answer, E100)} misId={misconceptionFor(item, answer)} onRestart={restart} onDone={onDone} />
         )}
       </section>
     </div>
@@ -217,9 +246,10 @@ function Next({ onClick, children }: { onClick: () => void; children: React.Reac
   )
 }
 
-function TapStep(p: { h: H; len: number; pickLen: (n: number) => void; deal: Side[]; dealKey: number; onDeal: () => void; mine: Side[]; setMine: (m: Side[]) => void; tap: (c: Side) => void; guess: number; setGuess: (g: number) => void; locked: boolean; onLock: () => void; onNext: () => void }) {
-  const { mine, locked, h, setMine, tap, guess, setGuess, onLock, onNext, len, pickLen, deal, dealKey, onDeal } = p
+function TapStep(p: { h: H; len: number; pickLen: (n: number) => void; deal: Side[]; dealKey: number; onDeal: () => void; mine: Side[]; setMine: (m: Side[]) => void; tap: (c: Side) => void; guess: number; setGuess: (g: number) => void; conf: Confidence | null; setConf: (c: Confidence) => void; locked: boolean; onLock: () => void; onNext: () => void }) {
+  const { mine, locked, h, setMine, tap, guess, setGuess, conf, setConf, onLock, onNext, len, pickLen, deal, dealKey, onDeal } = p
   const full = mine.length >= len && deal.length === len
+  const ready = mine.length >= MIN_TAPS && conf != null
   return (
     <>
       <h2 id="coin-h" ref={h} tabIndex={-1}>Be a coin. Tap out {len} flips.</h2>
@@ -269,11 +299,17 @@ function TapStep(p: { h: H; len: number; pickLen: (n: number) => void; deal: Sid
         </div>
         <input id="coin-guess" type="range" min={1} max={20} step={1} value={guess} disabled={locked} onChange={(e) => setGuess(+e.target.value)} />
         <div className="ticks"><span>1</span><span>5</span><span>10</span><span>15</span><span>20</span></div>
+        <div className="tag sure">how sure?</div>
+        <div className="confs" role="group" aria-label="how sure are you">
+          {CONFS.map((c) => (
+            <button key={c} className="conf" aria-pressed={conf === c} disabled={locked} onClick={() => setConf(c)}>{c}</button>
+          ))}
+        </div>
         <div className="row">
           {locked ? (
             <button className="btn" onClick={onNext}>Back to the real coin →</button>
           ) : (
-            <button className="btn lockbtn" disabled={mine.length < MIN_TAPS} onClick={onLock}>Lock it in</button>
+            <button className="btn lockbtn" disabled={!ready} onClick={onLock}>{mine.length < MIN_TAPS || conf ? 'Lock it in' : 'Pick how sure you are'}</button>
           )}
           {!locked && mine.length < MIN_TAPS && <span className="note">tap at least {MIN_TAPS} flips first ({mine.length} so far)</span>}
         </div>
@@ -369,14 +405,22 @@ function CardStep(p: {
   h: H
   model: Side[]
   guess: number
+  conf: Confidence
   round: NonNullable<ReturnType<typeof showcaseRound>>
   verdict: 'called' | 'close' | 'off'
   misId: string | null
   onRestart: () => void
   onDone: () => void
 }) {
-  const { model, guess, round, verdict, h, misId, onRestart, onDone } = p
+  const { model, guess, conf, round, verdict, h, misId, onRestart, onDone } = p
   const m = round.misconceptions.find((x) => x.id === misId)
+  const [picked, setPicked] = useState(false)
+  const saved = useRef(false)
+  const record = (rematch: 'right' | 'wrong' | null) => {
+    if (saved.current) return
+    saved.current = true
+    save({ session: 'coin-streak', at: new Date().toISOString(), guess, confidence: conf, switchRate: Math.round(switchRate(model) * 100) / 100, misconception: misId, rematch })
+  }
   const sw = switchRate(model)
   const stamp = verdict === 'called' ? 'Called it' : verdict === 'close' ? 'Close' : m?.label ?? 'Way off'
   const pPast = 1 - pLongestAtMost(N, guess)
@@ -394,6 +438,9 @@ function CardStep(p: {
       <h2 id="coin-h" ref={h} tabIndex={-1} className="sr-only">Your mistake, named</h2>
       <div className="card verdict-card">
         <span className={`stamp ${verdict === 'called' ? 'called' : verdict === 'close' ? 'close' : 'mistake'}`}>{stamp}</span>
+        <p className="said">
+          You said <b className="you">{guess}</b> ({conf}). A real 100 averages <span className="hl"><b>{E100.toFixed(2)}</b></span>.
+        </p>
         <div className="tag">what your taps and your guess say</div>
         {(verdict !== 'off' || !m) && <h3 className="mname">{m ? m.label : 'Streaky, like a real coin'}</h3>}
         <p className="line">{line}{hand}</p>
@@ -407,17 +454,43 @@ function CardStep(p: {
           {m?.source_url ? <><a href={m.source_url} target="_blank" rel="noreferrer">Source</a>: {m.source_note}. </> : null}
           Numbers here are exact (dynamic programming over run length) unless marked simulated. The sample human row's 68% switch rate is our own parameter (unverified).
         </p>
-        <WhichIsReal round={round} />
-        <div className="row">
-          <button className="btn ghost small" onClick={onRestart}>Tap a new row</button>
-          <button className="btn small" onClick={onDone}>Done</button>
-        </div>
+        <WhichIsReal
+          round={round}
+          onPick={(right) => {
+            setPicked(true)
+            record(right ? 'right' : 'wrong')
+          }}
+        />
+        {picked ? (
+          <div className="saved">
+            <p>
+              <b>Saved.</b> {m ? <>Caught: “{m.label}”.</> : 'Called it.'} Come back tomorrow for a remix with new rows.
+            </p>
+            <div className="row">
+              <button className="btn ghost small" onClick={onRestart}>Tap a new row</button>
+              <button className="btn" onClick={onDone}>Done</button>
+            </div>
+          </div>
+        ) : (
+          <div className="row">
+            <button className="btn ghost small" onClick={onRestart}>Tap a new row</button>
+            <button
+              className="btn small"
+              onClick={() => {
+                record(null)
+                onDone()
+              }}
+            >
+              Done
+            </button>
+          </div>
+        )}
       </div>
     </>
   )
 }
 
-function WhichIsReal({ round }: { round: NonNullable<ReturnType<typeof showcaseRound>> }) {
+function WhichIsReal({ round, onPick }: { round: NonNullable<ReturnType<typeof showcaseRound>>; onPick: (right: boolean) => void }) {
   const item = round.items.find((i) => i.id === 'which-is-real')
   const [pick, setPick] = useState<string | null>(null)
   const seqs = item?.prompt.match(/A:\s*([HT]+)\s+B:\s*([HT]+)/)
@@ -440,7 +513,11 @@ function WhichIsReal({ round }: { round: NonNullable<ReturnType<typeof showcaseR
             className={pick ? (id === real ? 'right' : id === pick ? 'wrong' : '') : ''}
             aria-pressed={pick === id}
             aria-label={`${up(id)}: ${s.join('')}`}
-            onClick={() => setPick(id)}
+            disabled={pick != null}
+            onClick={() => {
+              setPick(id)
+              onPick(id === real)
+            }}
           >
             <b>{up(id)}</b>
             <CoinGrid seq={s} cols={10} hiLongest={!!pick} mine={!!pick && id !== real} label={`${up(id)}: ${s.join('')}`} />

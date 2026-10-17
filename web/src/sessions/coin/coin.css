@@ -131,7 +131,7 @@
 .coin-session .track .tk span.r { left: 6px; }
 .coin-session .track .tk span.l { right: 6px; }
 .coin-session .track .tk.truth span { top: -20px; font: 700 13px var(--font-mono); color: var(--ink); }
-.coin-session .track .tk.you span { bottom: 0; font: 600 15px var(--font-hand); color: var(--ink-soft); }
+.coin-session .track .tk.you span { bottom: -8px; font: 600 15px var(--font-hand); color: var(--ink-soft); }
 .coin-session .anno { font: 600 16px var(--font-hand); margin: 6px 0; }
 .coin-session .anno.big { font-size: 18px; line-height: 1.35; }
 
@@ -163,7 +163,7 @@
 .coin-session .choice { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 10px; }
 @media (max-width: 520px) { .coin-session .choice { grid-template-columns: minmax(0, 1fr); } }
 .coin-session .choice button { min-width: 0; text-align: left; background: var(--card); border: 2px solid var(--ink); border-radius: 10px; padding: 8px 10px; color: var(--ink); }
-.coin-session .choice button b { font: 800 18px var(--font-display); }
+.coin-session .choice button > b { font: 800 18px var(--font-display); }
 .coin-session .choice button .coins { margin: 4px 0; }
 .coin-session .choice button.right { border-color: var(--called); box-shadow: 0 0 0 2px var(--called) inset; }
 .coin-session .choice button.wrong { border-style: dashed; }
@@ -181,3 +181,34 @@
 .coin-session .tally { display: flex; align-items: center; flex-wrap: wrap; gap: 8px 14px; font: 600 20px var(--font-hand); margin: 4px 0; }
 .coin-session .tally b.you { font-weight: 600; color: var(--ink-soft); border-bottom: 3px dashed var(--pencil); }
 .coin-session .tally b.ink { font: 800 24px var(--font-display); }
+
+/* header, same pattern as the birthday session: chip, steps, "n of 5" */
+.coin-session .coin-head { display: flex; align-items: center; gap: 8px 10px; flex-wrap: wrap; margin: 0 0 12px; }
+.coin-session .coin-head .steps { margin: 0; }
+.coin-session .chip { font: 700 13px var(--font-body); border: 2px solid var(--ink); border-radius: 999px; padding: 3px 12px; background: var(--card); }
+.coin-session .count { font-size: 13px; color: var(--ink-soft); }
+/* phone: chip + "n of 5" on one line, the step pills under it, same on every step */
+@media (max-width: 600px) { .coin-session .coin-head .steps { order: 3; flex-basis: 100%; } }
+
+/* how sure? */
+.coin-session .tag.sure { margin-top: 12px; }
+.coin-session .confs { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; margin: 6px 0 4px; max-width: 460px; }
+.coin-session .conf { font: 600 15px var(--font-body); background: var(--card); color: var(--ink); border: 2px solid var(--ink); border-radius: 10px; min-height: 44px; padding: 6px; }
+.coin-session .conf[aria-pressed='true'] { background: var(--ink); color: var(--paper); }
+.coin-session .conf:disabled { cursor: default; }
+.coin-session .conf:disabled:not([aria-pressed='true']) { opacity: .45; }
+
+/* card: what you said, saved bar */
+.coin-session .said { font-size: 17px; margin: -10px 0 10px; }
+.coin-session .said .you { font: 600 22px var(--font-hand); color: var(--ink-soft); border-bottom: 3px dashed var(--pencil); padding: 0 3px; }
+.coin-session .saved { margin-top: 16px; background: var(--marker); border: 2px solid var(--ink); border-radius: var(--radius); box-shadow: 0 3px 0 var(--ink); padding: 12px 14px; }
+.coin-session .saved p { margin: 0; font-size: 16px; line-height: 1.4; }
+.coin-session .saved .row { margin-bottom: 0; }
+
+/* fast taps on phones: no double-tap zoom, no text selection */
+.coin-session .tap, .coin-session .btn, .coin-session .conf, .coin-session .lenpick button, .coin-session .choice button { touch-action: manipulation; user-select: none; -webkit-user-select: none; }
+
+@media (prefers-reduced-motion: reduce) {
+  .coin-session .stamp, .coin-session .coin.fresh b { animation: none; }
+  .coin-session .btn:active:not(:disabled), .coin-session .tap:active:not(:disabled) { transform: none; transition: none; }
+}
