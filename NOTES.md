@@ -100,6 +100,10 @@ Decisions + how to run things. Keep current.
   - Tiger Data service exists; `TIGER_DATABASE_URL` goes in `.env` when I paste it. SQLite until then.
   - Name: @luanamaldaner picks; working name `mm` until she posts it.
 
+- Sat ~12:30 AM, **my decisions on the storyboard + re-plan (#94 approved):**
+  - Every screen gets **one plain-language sentence: what to do and why it matters** (list in docs/experience.md). Keep the visuals, add the guidance.
+  - **Final product feature (Saturday, after the 3 sessions are live): "ask a question" help chat** beside each session. Knows the topic + screen, plain words, a hint (not the answer) before lock-in, never replaces the visuals; free Gemini tier with a per-IP rate limit and a daily cap (rule 16). Gate Sat 4 PM; cut line: a static per-screen hint.
+
 ## How to run
 - **Live site (GitHub Pages):** https://alexander-freedman.github.io/Swamphacks26-DSI/ is served from the `gh-pages` branch. After **every merge to main that touches `web/` or `data/rounds/`**, run `scripts/deploy-pages.sh` on a clean, up-to-date `main`. It builds web/ with base `/Swamphacks26-DSI/`, copies the showcase rounds to `/rounds/*.json` (+ `rounds/index.json`), adds `.nojekyll` and a 404 fallback, refuses to publish anything key-shaped, and pushes gh-pages. The site works with no backend: the frontend falls back to `${import.meta.env.BASE_URL}rounds/<slug>.json`. No API key ever goes in the frontend.
 - **Hosting tonight (decided Fri ~11:25 PM):** frontend on GitHub Pages; backend local on the server for dev/tests only; local SQLite until the Tiger URL arrives. **Sat:** Vultr (MLH code) with HTTPS + CORS, then point the frontend at it. Render free tier if no Vultr code by Sat 2 PM.

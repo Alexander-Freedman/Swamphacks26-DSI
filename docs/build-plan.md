@@ -18,9 +18,12 @@ The product is now **one short visual session per concept** (docs/experience.md,
 | Sat 9:00 AM | Engine: stack merged, honest blind check, tight bands (#86), checks on the response (#80) | me |
 | Sat 1:30 PM | User test round 1 on the 3 sessions (5 people) | both |
 | Sat 6:00 PM | Fixes from testing; Home that sells the sessions; collection; "any topic" extra with reviewed cache; backend on Vultr/Render | both |
+| Sat 4:00 PM | **Ask-a-question help chat** on each session (topic + screen context, hint before lock-in, plain words, per-IP limit + daily cap on free Flash Lite); needs the backend deployed | me (API) + @luanamaldaner (panel) |
 | Sat 10:00 PM | Design pass + motion; backup video recorded | both |
 
-**Cut lines (new order):** 1) "any topic" live generation (keep the cached reviewed set); 2) Auth0; 3) Tiger → SQLite; 4) coin streak C5 "a coin like you" curve and birthday B3 dot-plot; 5) rematch screens. **Never cut:** the three sessions' guess → watch → extremes → your model vs reality → named mistake; the deployed URL; the backup video.
+**Every screen** gets one plain-language guidance line (what to do + why it matters; list in docs/experience.md).
+
+**Cut lines (new order):** 1) "any topic" live generation (keep the cached reviewed set); 1b) the help chat falls back to a static per-screen "stuck?" hint if the backend or the gate slips; 2) Auth0; 3) Tiger → SQLite; 4) coin streak C5 "a coin like you" curve and birthday B3 dot-plot; 5) rematch screens. **Never cut:** the three sessions' guess → watch → extremes → your model vs reality → named mistake; the deployed URL; the backup video.
 
 ---
 
