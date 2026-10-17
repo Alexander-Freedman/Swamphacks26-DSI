@@ -73,7 +73,10 @@ export function PositiveSession({ onDone }: { onDone: () => void }) {
   return (
     <Frame className="pt">
       {/* step dots navigate like coin's: any step you've reached, never back to the locked guess */}
-      <SessionHead chip="Positive test" step={step} total={TITLES.length} labels={STEPS} canGo={(i) => i > 0 && i < reached} onGo={(i) => go(i + 1)}>
+      <SessionHead chip="Positive test" step={step} total={TITLES.length} labels={STEPS} canGo={(i) => i > 0 && i < reached} onGo={(i) => go(i + 1)}
+        // Ask panel: P1 is before lock-in; the rematch (P6) has its own guess, so it stays hint-only.
+        help={{ screen: `P${step}`, locked: step > 1 && step < 6, guess: step < 6 && touched ? guess : null }}
+      >
         {step > 1 && (
           <span className="pt-pencil-chip">
             your guess: <b>{guess}%</b>

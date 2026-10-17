@@ -185,6 +185,8 @@ export function CoinSession({ onDone }: { onDone: () => void }) {
     ['One more case: a 50% shooter', "A made-up shooter who makes exactly half her shots, next to your real coin. Look at both: what's the same?"],
   ]
   const [title, sub] = TITLES[step]
+  // Storyboard screens for the Ask panel: step 1 holds C1 (tapping) and C3 (the guess).
+  const screen = step === 0 ? (locked ? 'C2' : mine.length < len ? 'C1' : 'C3') : ['', 'C4', 'C2', 'C5', 'C6', 'C6'][step]
   const record = (r: 'right' | 'wrong' | null, c: CompareAnswer | null = cmp) => {
     if (savedAt.current) return
     savedAt.current = now()
@@ -197,7 +199,7 @@ export function CoinSession({ onDone }: { onDone: () => void }) {
   const caught = round.misconceptions.find((x) => x.id === misId)?.label ?? null
   return (
     <Frame className="coin-session">
-      <SessionHead chip="Coin streak" step={step + 1} total={STEPS.length} labels={STEPS} canGo={(i) => i === 0 || locked} onGo={go} />
+      <SessionHead chip="Coin streak" step={step + 1} total={STEPS.length} labels={STEPS} canGo={(i) => i === 0 || locked} onGo={go} help={{ screen, locked, guess: guessSet }} />
       <Title h={title} sub={sub} id="coin-h" headingRef={heading} />
       {locked && (
         <p className="pencil-strip" aria-label="your model">
