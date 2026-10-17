@@ -105,6 +105,21 @@ compare_topic, compare_principle (the shared idea in one sentence) and put
 it as cases[1] with the SAME widget and its own prediction and bands.
 slug: lowercase words joined by hyphens. Plain, friendly words, no markdown.
 
+Hard rules (our code rejects the spec otherwise):
+- Every name in expr / answer_expr is x, the knob, or a declared variable.
+  Declare every constant as a variable (name, meaning, unit, value) or write
+  the number. No pi (write 3.14159), no tanh, no other functions.
+- The knob is NOT also a variable. Curves always have numeric x_min, x_max.
+- The prompt asks for EXACTLY the number the spec computes: the curve's y at
+  ask_x (or the x reaching ask_y), the sampler stat in its units, or the dial
+  value. answer_claimed is that number.
+- Exactly ONE band (or option) has misconception_id null and contains the
+  answer; bands are sorted, touch each other (next min = previous max +
+  slider_step) and cover slider_min..slider_max. Every other misconception_id
+  is one of the ids in misconceptions, spelled exactly.
+- Sampler fractions (p, base_rate, sensitivity, false_positive_rate) are 0-1.
+- A stepper has 2-6 steps.
+
 Examples (fields abridged):
 {"recognized": true, "definition": "Compound interest is interest earned on
  both the money you put in and the interest it already earned.",
@@ -410,8 +425,48 @@ def _ref(mid):
     return _slugify(mid) if mid else None
 
 
+def _fraction(v):
+    """Sampler fractions sometimes come back as percents (50 for 0.5)."""
+    if isinstance(v, (int, float)) and 1 < v <= 100:
+        return v / 100
+    return v
+
+
+def _merge_correct_bands(bands: list[dict], step) -> list[dict]:
+    """Two touching 'correct' bands are one correct band (a common, harmless split)."""
+    step = step if isinstance(step, (int, float)) and step > 0 else 1
+    try:
+        bands = sorted(bands, key=lambda b: b["min"])
+    except TypeError:
+        return bands
+    out: list[dict] = []
+    for b in bands:
+        prev = out[-1] if out else None
+        if (
+            prev is not None
+            and prev["misconception_id"] is None
+            and b["misconception_id"] is None
+            and b["min"] - prev["max"] <= step + 1e-9
+        ):
+            prev["max"] = max(prev["max"], b["max"])
+            continue
+        out.append(dict(b))
+    return out
+
+
 def _case_from_gen(c: dict) -> dict:
-    """Compact case → SpecCase dict (no validation here; ModelSpec does that)."""
+    """Compact case → SpecCase dict (no validation here; ModelSpec does that).
+
+    Only harmless shape fixes happen here; anything that changes meaning is
+    left for validation to reject.
+    """
+    c = dict(c)
+    for f in ("p", "base_rate", "sensitivity", "false_positive_rate"):
+        c[f] = _fraction(c.get(f))
+    if c.get("widget") == "curve" and c.get("knob_param"):
+        c["variables"] = [
+            v for v in c.get("variables") or [] if v.get("name") != c.get("knob_param")
+        ]
     widget = c.get("widget")
     out: dict = {
         "widget": widget,
@@ -437,14 +492,17 @@ def _case_from_gen(c: dict) -> dict:
                 for o in c.get("options") or []
             ],
         },
-        "bands": [
-            {
-                "min": b.get("min"),
-                "max": b.get("max"),
-                "misconception_id": _ref(b.get("misconception_id")),
-            }
-            for b in c.get("bands") or []
-        ],
+        "bands": _merge_correct_bands(
+            [
+                {
+                    "min": b.get("min"),
+                    "max": b.get("max"),
+                    "misconception_id": _ref(b.get("misconception_id")),
+                }
+                for b in c.get("bands") or []
+            ],
+            c.get("slider_step"),
+        ),
         "extremes": [
             {"param": e.get("param"), "value": e.get("value"), "watch": _clip(e.get("watch"), 160)}
             for e in (c.get("extremes") or [])[:3]
@@ -576,7 +634,18 @@ def spec_from_gen(data: dict, topic: str) -> ModelSpec:
     )
 
 
-def _call_model(model: str, topic: str) -> str:
+def _reason(err: Exception) -> str:
+    """One readable line for a rejected spec (pydantic errors condensed)."""
+    if isinstance(err, ValidationError):
+        parts = []
+        for e in err.errors()[:4]:
+            loc = ".".join(str(p) for p in e["loc"])
+            parts.append(f"{loc}: {e['msg'].removeprefix('Value error, ')}".strip(": "))
+        return "; ".join(parts)[:400]
+    return str(err).replace("\n", " ")[:400]
+
+
+def _call_model(model: str, topic: str, feedback: str | None = None) -> str:
     from google import genai
     from google.genai import types
 
@@ -588,6 +657,8 @@ def _call_model(model: str, topic: str) -> str:
         http_options=types.HttpOptions(timeout=TIMEOUT_S * 1000),
     )
     contents = f"Topic: {topic}"
+    if feedback:
+        contents += f"\n\n{feedback}"
     if is_gemma:
         # Gemma gets the schema in the prompt; validated afterwards.
         contents = (
@@ -682,17 +753,20 @@ def generate_round(topic: str, usage: Usage | None = None) -> GenResult:
     usage = usage or Usage()
     last_err: Exception | None = None
     content_tries = 0
+    feedback: str | None = None
     for model in MODEL_CHAIN:
         if content_tries >= MAX_CONTENT_TRIES:
             break
         if not usage.available(model):
             continue
-        for attempt in range(2):
+        rate_retried = False
+        while content_tries < MAX_CONTENT_TRIES:
             if usage.total() >= DAILY_SOFT_CAP:
                 raise GenerationError("daily cap reached")
             usage.record(model)
+            raw = ""
             try:
-                raw = _call_model(model, topic)
+                raw = _call_model(model, topic, feedback)
                 data = json.loads(raw.strip().removeprefix("```json").removesuffix("```"))
                 if not isinstance(data, dict):
                     raise ValueError("spec is not an object")
@@ -704,14 +778,22 @@ def generate_round(topic: str, usage: Usage | None = None) -> GenResult:
             except (ValidationError, ValueError, TypeError, SpecRejected, GenerationError) as err:
                 last_err = err
                 content_tries += 1
-                log.warning("bad spec from %s: %s", model, str(err).replace("\n", " ")[:300])
-                break  # content problem: the retry goes to the next model
+                reason = _reason(err)
+                log.warning("bad spec from %s: %s", model, reason)
+                # The retry (same model) sees what our checks rejected and fixes it.
+                feedback = (
+                    f"Your previous JSON failed our check: {reason}\n"
+                    f"Previous JSON:\n{raw[:6000]}\n"
+                    "Fix that problem and return the full corrected JSON."
+                )
+                continue
             except Exception as err:  # API errors
                 last_err = err
                 if _is_daily_quota(err):
                     usage.exhaust(model)
                     break
-                if "429" in str(err) and attempt == 0:
+                if "429" in str(err) and not rate_retried:
+                    rate_retried = True
                     time.sleep(2)
                     continue
                 log.warning("api error from %s: %s", model, type(err).__name__)

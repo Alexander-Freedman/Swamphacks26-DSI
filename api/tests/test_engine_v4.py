@@ -357,8 +357,11 @@ def live_gen(monkeypatch, tmp_path):
     calls = Calls()
     calls.replies = []
 
-    def fake_call(model, topic):
+    calls.feedback = []
+
+    def fake_call(model, topic, feedback=None):
         calls.append(model)
+        calls.feedback.append(feedback)
         reply = calls.replies.pop(0) if calls.replies else gen_data(topic)
         return reply if isinstance(reply, str) else json.dumps(reply)
 
@@ -430,8 +433,10 @@ def test_no_widget_fits_is_a_no_fit(live_gen) -> None:
 def test_bad_spec_gets_one_retry(live_gen) -> None:
     live_gen.replies += ["not json", gen_data()]
     res = client.post("/api/rounds", json={"topic": "Compound interest retry"}).json()
-    assert res["ok"] is True and res["source"] == "gemini-3.1-flash-lite"
-    assert live_gen == ["gemini-3.5-flash-lite", "gemini-3.1-flash-lite"]
+    assert res["ok"] is True and res["source"] == "gemini-3.5-flash-lite"
+    assert live_gen == ["gemini-3.5-flash-lite", "gemini-3.5-flash-lite"]
+    # The retry is told what our checks rejected.
+    assert live_gen.feedback[0] is None and "failed our check" in live_gen.feedback[1]
 
 
 def test_two_bad_specs_is_a_no_fit_not_a_quiz(live_gen) -> None:
@@ -440,6 +445,32 @@ def test_two_bad_specs_is_a_no_fit_not_a_quiz(live_gen) -> None:
     res = client.post("/api/rounds", json={"topic": "Compound interest lies"}).json()
     assert res["status"] == "fallback" and res["ok"] is False
     assert len(live_gen) == 2  # first spec + one retry, never the third model
+
+
+def test_harmless_shape_fixes() -> None:
+    # A percent where a fraction belongs, and the right answer split into two touching bands.
+    case = sampler_case(
+        sampler="base_rate_test",
+        group_size=None,
+        base_rate=0.01,
+        sensitivity=90,
+        false_positive_rate=9,
+        stat="p_true_positive",
+        prompt="1 in 100 people are sick. The test catches 90% and flags 9% of the healthy. "
+        "You test positive. What's the chance you're sick?",
+        bands=[
+            {"min": 0, "max": 4, "misconception_id": "too-high"},
+            {"min": 5, "max": 9, "misconception_id": None},
+            {"min": 10, "max": 15, "misconception_id": None},
+            {"min": 16, "max": 100, "misconception_id": "linear-growth"},
+        ],
+        extremes=[],
+        answer_claimed=9.17,
+    )
+    item = compile_spec(spec_of(gen_data(cases=[case]))).round.items[0]
+    assert item.truth.params.sensitivity == 0.9
+    assert item.truth_value == pytest.approx(9.17, abs=0.01)
+    assert [(b.min, b.max) for b in item.bands if b.misconception_id is None] == [(5, 15)]
 
 
 def test_daily_cap_stops_live_calls(live_gen) -> None:
