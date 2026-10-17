@@ -26,6 +26,7 @@ Nothing is picked yet. Research continues until I say "we have an idea". Code fr
 | [first-6h.md](first-6h.md) | Ready-to-open issues for the first 6 hours of either top idea, split by person, each with "done when" | The minute we pick |
 | [build-plans.md](build-plans.md) | Features, API contract and issue split for the top two | Right after picking |
 | [feasibility.md](feasibility.md) | Libraries and versions, hour estimates, top 5 technical risks | Right after picking |
+| [sponsor-tech.md](sponsor-tech.md) | Live setup checks per sponsor API (Nessie silent-fail key, Vultr plans, Gemini/Tiger limits, desk questions) | Before signups |
 | [sketch-input.md](sketch-input.md) | Paper-card camera input: libraries, card design, stroke pipeline, 50-frame test, fallback ladder | Mental Models + paper only |
 | [deep-mental-models.md](deep-mental-models.md) | How Mental Models beats Loomin/Minerva: the ghost, 3 demo items, eval on real hacker data, instructor dashboard, build order | If we lean Mental Models |
 | [deep-fingerprint.md](deep-fingerprint.md) | Beat the Fingerprint: algorithms, FMA data, live demo, Q&A, build order | If we lean Fingerprint |
