@@ -39,20 +39,6 @@ Never say "proven to make you learn faster", "permanently fixes misconceptions",
 
 | Time | Judge sees / does | Narrator says | Driver clicks |
 |---|---|---|---|
-<<<<<<< HEAD
-| **0:00** | Topic box. **Judge names any topic** they've always found confusing. | "Name any topic you've always found confusing. Anything." Then repeats it out loud. | Types the topic exactly as repeated, **Enter**. Within ~0.4 s the topic echoes back and a small "Building your round…" chip with the step list (writing the question → picking a reveal → computing the truth) appears in the corner. |
-| **0:08** | Coin-streak card: "Flip a fair coin 100 times. What's the longest run of the same side in a row?" Slider 1-20. | "While that builds, a quick one. Your gut answer." | Hands over the trackpad or holds the slider where the judge points. |
-| **0:15** | **Judge sets the slider**, taps confidence (*guessing / pretty sure / certain*), taps **Lock it in**. Pencil stamp on their guess. | "Lock it in. No changing it now." | Nothing; the judge clicks. If they hesitate, the driver locks their spoken number. |
-| **0:22** | ~400 ms beat. 100 tiles stream in; the longest run lights up. Then the histogram of 10,000 simulated runs fills in ink, with the judge's pencil line on it and the gap shaded. Verdict stamp: *Called it / Close / Way off*. | "Let's flip." (pause) "Real randomness is streakier than it feels. In 100 flips the longest run averages about 7, and you get a run of 5 or more 97% of the time." | Nothing. Let it play. |
-| **0:40** | **Misconception card** slides up: *"Random means evenly mixed"*, why it's tempting, the right model in two sentences, the source. | "That gut feeling has a name. Most of us picture random as switching back and forth. It isn't. The app doesn't lecture you: it names the exact wrong idea you just bet on." | Taps the card's **Next**. |
-| **0:50** | Positive-test card: "1% of people have a condition. The test catches 90% of real cases and wrongly says yes for 9% of healthy people. You test positive. Chance you have it?" Slider 0-100%. **Judge answers** and locks. | "Same family, higher stakes. You just tested positive." | Nothing. |
-| **1:02** | 1,000 dots. 10 sick ones light up; the positives get circled: about 9 true hits vs about 89 false alarms. Truth: **9.2%**, ink over the judge's pencil. Card: *"The test's accuracy is my chance."* | "Out of a thousand people, the false alarms from the healthy 990 swamp the real cases. 9%. On a case like this, doctors' most common answer was 90%." | Nothing. |
-| **1:20** | Birthday card: "How many people need to be in a room for a 50% chance two share a birthday?" Slider 2-366. **Judge answers**, locks. | "Last one before your topic." | Nothing. |
-| **1:28** | The curve of P(shared birthday) vs people draws in ink over the judge's pencil mark; it crosses 50% at **23**. Card: *"It's about MY birthday."* | "23. Not because anyone matches you: 23 people make 253 pairs, and any pair can match." | Grabs the **"run it at the extremes"** slider and drags it to 2, then to 80, so the curve and the dot calendar move live. "Push it to the edges, that's where your model breaks." |
-| **1:45** | The corner chip reads **"Your topic's ready"**. Driver opens it: item 1 of the judge's own topic, labeled **auto-checked**. **Judge predicts and locks**; the reveal plays (whichever widget the round picked). | "Your topic's ready. Same loop, built for you just now." | Taps the chip. If it isn't ready: see the fallback ladder below. |
-| **2:15** | **"How it works" drawer** slides in from the right: the generated round JSON on the left, the computed truth and the check results on the right (schema ✓, truth computed ✓, bands agree with the answer ✓, lint ✓, blind check ✓). | "How do we know it's right? Gemini writes the question, the wrong ideas and which reveal to use. It never writes the answer. The truth comes from code: a simulation, a formula, or a cited number. When code can't compute an answer, a second model answers that question blind, and if they disagree it gets dropped." | Opens the drawer (button or `D`), points at the `truth` spec, then at the computed number next to it. |
-| **2:40** | Back to home. If the collection screen exists: the judge's wrong ideas from this session, caught. | "Everyone gamifies learning with points, and the research says points can backfire. So there's no score here. The reward is the feedback: you bet, reality plays out over your guess, and your wrong idea gets named. Then it comes back until you've busted it." | Taps home (or the collection). **Stop talking. Hand over for questions.** |
-=======
 | **0:00** | Home: three session cards. | The story line: "Quizlet tests what you remember. This shows you what you actually believe, next to what's true. Two minutes per idea. Let's do one." | Opens **Birthday** (`?session=birthday`). |
 | **0:10** | **B1 Guess.** "How many people for a 50% chance two share a birthday?" Big slider 2-366 + confidence. **Judge drags and locks.** The pencil tick lands with the squash-and-spring lock. | "Your gut number. Lock it in, no changing it." | Hands over the trackpad / phone. If the judge hesitates, locks their spoken number. |
 | **0:20** | **B2 Fill the room.** Calendar strip + room. People drop onto their days; thin pair lines web up between every two people; counter **people · pairs**. At 23 people it reads **23 · 253**. A match lands: the day circles in marker, the room shakes. | "Let's fill a room. Watch the lines, not the people. Every line is a pair that could match. 23 people already make 253 pairs." | Holds **Add a person** (seeded run). One **Empty the room, try again** if there's time. |
@@ -63,7 +49,6 @@ Never say "proven to make you learn faster", "permanently fixes misconceptions",
 | **2:05** | *Only if we're at or under 2:05:* **Positive test P1-P3.** "You test positive. Chance you have it?" Judge locks a %; **Test everyone**: 1,000 dots, the positives fly into a pile, **9 ink among 89 grey**. Ink readout **9.2%**. | "When the thing is rare, most positives are false alarms. 9 out of about 98. On a case like this, almost all doctors guessed around 75%." | Locks, taps **Test everyone**, one drag of the rarity slider toward 50%. *Over time: skip this beat.* |
 | **2:30** | **Any-topic extra (~15 s).** Home → "Try any topic" → a cached topic chip; one item plays in the round player with the **auto-checked** label visible. | "You can also type your own topic. Those rounds say *auto-checked*, not *reviewed*: code computes the answer, and when code can't compute the answer, a second model answers it blind, and anything they disagree on gets dropped." | Taps a cached chip (never a fresh live generation on stage). Points at the label. |
 | **2:45** | Session end screen: **"Saved to your notebook. Come back tomorrow for a remix."** The notebook shows the judge's mistakes as *caught* (pencil). | "No points, no streaks: the research says points can backfire. The reward is the moment your guess meets reality. Tomorrow it comes back with new numbers until you've busted it." | Taps **Notebook** if it exists. **Stop talking. Hand over for questions.** |
->>>>>>> origin/main
 
 **If the judge gets the birthday guess right:** "You're in the few who knew it. Draw the curve anyway, that's where people miss."
 **If the judge is fast:** do the positive test in full, including the rarity slider.
@@ -72,20 +57,11 @@ Never say "proven to make you learn faster", "permanently fixes misconceptions",
 ## The 90-second version (judge queue / rushed judge)
 | Time | What happens |
 |---|---|
-<<<<<<< HEAD
-| 0:00 | Judge names a topic, Enter, build starts in the corner. |
-| 0:08 | Coin streak: predict, confidence, lock. |
-| 0:20 | Reveal: tiles, histogram, pencil vs ink, verdict stamp. "Longest run averages about 7; 5+ in 97% of runs." |
-| 0:35 | Misconception card: "Random means evenly mixed." One line: "It names the exact wrong idea you just bet on." |
-| 0:50 | "Your topic's ready": one item, predict, lock, reveal. |
-| 1:15 | One sentence: "Gemini writes the question; code computes the truth; anything code can't compute gets a blind second opinion." Stop. |
-=======
 | 0:00 | One line of story. Open Birthday. Judge guesses, locks. |
 | 0:10 | Fill the room to 23: "23 people, 253 pairs." |
 | 0:30 | Judge draws the curve. Ink S-curve over it, gap shaded. Slider to 23 (50.7%) and 57 (99.0%). |
 | 0:55 | Stamp + "It's about MY birthday": 5.9% vs 50.7%. |
 | 1:10 | "Coin streaks and medical tests work the same way; typed topics are a labelled extra. No points: come back tomorrow for a remix." Stop. |
->>>>>>> origin/main
 
 ## Fallbacks (driver decides, no discussion at the table)
 | Breaks | Do this | Say |
@@ -105,21 +81,12 @@ Never show a raw error or a spinner. Never run a fresh generation at the table.
 - **Status: built (#67).** A "Notebook cleared" pill shows for a few seconds. Shift+R is ignored while typing in a field.
 
 ## 6 likely judge questions
-<<<<<<< HEAD
-1. **"How do you know the answer is right? Doesn't the model hallucinate?"**
-   "The model never writes the answer. It writes a spec: a simulation, a formula or a cited number, and our code computes the truth from it. Then we check: the JSON against the schema, the computed answer against the bands, a linter on the wording, and for any question where code can't compute the answer, a second model (Gemma) answers it blind; disagreement drops the item. When code computes the truth, code wins (api/app/checks.py). The three showcase rounds are hand-checked and labeled 'reviewed'; generated ones say 'auto-checked'." (Open the drawer.)
-2. **"What if my topic can't be simulated, like history?"**
-   "Then it doesn't pretend. If fewer than 3 items survive the checks, it falls back to a worked-example stepper or claim cards with sources, and if a topic can't be checked at all, it says so." (product-spec §6.)
-3. **"How is this different from ChatGPT's study mode or Brilliant?"**
-   "Every AI tutor explains. We make you bet first, then show the truth as something you can play with, and name the exact wrong idea you bet on, and that idea comes back until it's busted. Brilliant is closest, but its courses are hand-written and fixed; ours works on whatever you type." (competitors.md via product-spec §1-2.)
-=======
 1. **"How do you know the answers are right? Doesn't the model hallucinate?"**
    "The three sessions are hand-built: every number comes from a formula or an exact calculation, and each mockup carries its check. For typed topics the model never writes the answer. It writes a spec and our code computes the truth. When code can't compute the answer, a second model answers it blind, and anything they disagree on gets dropped. To be straight with you: that blind check is being made honest right now. In our trial it often timed out and still reported a pass, so typed topics come from a reviewed set and are labelled auto-checked until it's fixed." (NOTES.md, Sat ~12:10 AM.)
 2. **"What if my topic can't be visualised, like history?"**
    "Then it doesn't pretend. A typed topic gets a short round with a worked-example stepper or sourced claims, labelled auto-checked. The visual sessions are hand-built for concepts where seeing it run changes your mind." (product-spec §6, experience.md "Any typed topic".)
 3. **"How is this different from Quizlet, ChatGPT's study mode or Brilliant?"**
    "Quizlet checks recall. Chat tutors explain. Here you commit a guess, then reality plays out *on top of* it, and your model stays on screen next to the truth so you see where it broke. Brilliant is closest, but its courses are long and fixed; this is two minutes per idea and comes back with new numbers." (product-spec §1-2.)
->>>>>>> origin/main
 4. **"Does it actually help people learn?"**
    "We can't run a learning study in a weekend, so we don't claim one. What we built on: predicting before a demo beats just watching it (Crouch et al. 2004), and confident mistakes are the ones people correct best (hypercorrection). That's why there's a lock-in and a confidence tap." (Sources in docs/experience.md; add user-test lines from docs/user-testing.md after round 1, Sat 1:30 PM.)
 5. **"Why no streaks or points? And then why is it Entertainment?"**
