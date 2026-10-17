@@ -65,3 +65,4 @@ Rules that keep it safe:
 - Do we let the judge type the topic, or say it while the driver types? (Typing is slower but more "real".)
 - Is the coin streak input a slider or "draw your own fake 100 flips"? Drawing is more fun and gives us a richer misconception signal (alternation rate), but it takes ~20 s longer.
 - Showcase count: 2 polished beats 4 half-done. I'd build coin streak + positive test first, and Off the Edge only if the reveal components already cover it.
+- From engagement.md: add a confidence slider to every lock-in. A confident wrong guess is the one people correct best (hypercorrection), and it makes the coin-streak reveal hit harder ("you were 80% sure").
