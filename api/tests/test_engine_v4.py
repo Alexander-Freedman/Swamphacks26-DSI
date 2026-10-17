@@ -355,6 +355,17 @@ def test_curve_must_move_with_x_and_wording_is_clean() -> None:
         compile_spec(spec_of(gen_data(cases=[betting])))
 
 
+def test_knob_must_move_and_names_must_be_declared() -> None:
+    noop = curve_case(expr="P*1.07^x + r - r", answer_claimed=None)
+    with pytest.raises(SpecRejected, match="knob doesn't change"):
+        compile_spec(spec_of(gen_data(cases=[noop])))
+    undeclared = curve_case(expr="N0*(1+r/100)^x", answer_claimed=None)
+    with pytest.raises(SpecRejected, match="expr uses N0"):
+        compile_spec(spec_of(gen_data(cases=[undeclared])))
+    sci = curve_case(expr="P*(1+r/100)^x + 1e-9*x", answer_claimed=None)
+    assert compile_spec(spec_of(gen_data(cases=[sci]))).round.items[0].computed
+
+
 def test_approximate_picture_is_labelled() -> None:
     item = compile_spec(spec_of(gen_data(cases=[curve_case(approximate=True)]))).round.items[0]
     assert item.approximate is True and item.computed is True

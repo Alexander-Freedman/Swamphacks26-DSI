@@ -28,7 +28,7 @@ from app.schema import (
     SpecCase,
     SpecWidget,
 )
-from app.truth import eval_expr, sampler_stat
+from app.truth import _FUNCS, eval_expr, sampler_stat
 
 _EXPR_ERRORS = (ValueError, ZeroDivisionError, OverflowError, TypeError)
 SAMPLER_PARAMS = (
@@ -200,7 +200,33 @@ def _curve_shape_problem(case: SpecCase) -> str | None:
         return "curve expr must use x (otherwise the picture is a flat line)"
     if c.mode == "area" and re.search(rf"\b{re.escape(c.knob.param)}\b", c.expr):
         return "area curve: the knob is the number of rectangles, not part of the expr"
+    allowed = {"x", c.knob.param, *(v.name for v in case.variables)} | set(_FUNCS)
+    no_numbers = re.sub(r"(?<![A-Za-z_\d])(\d+\.?\d*|\.\d+)([eE][-+]?\d+)?", " ", c.expr)
+    unknown = sorted(set(re.findall(r"[A-Za-z_][A-Za-z0-9_]*", no_numbers)) - allowed)
+    if unknown:
+        return (
+            f"expr uses {', '.join(unknown)}: every name must be x, the knob "
+            f"({c.knob.param}) or a declared variable"
+        )
+    if c.mode != "area" and not _knob_moves(case):
+        return "the knob doesn't change the curve; pick a parameter the curve depends on"
     return None
+
+
+def _knob_moves(case: SpecCase) -> bool:
+    c = case.curve
+    assert c is not None
+    names = _vars(case)
+    xs = [c.x_min + (c.x_max - c.x_min) * i / 7 for i in range(1, 7)]
+    for x in xs:
+        try:
+            lo = eval_expr(c.expr, x=x, **names, **{c.knob.param: c.knob.min})
+            hi = eval_expr(c.expr, x=x, **names, **{c.knob.param: c.knob.max})
+        except _EXPR_ERRORS:
+            continue
+        if not math.isclose(lo, hi, rel_tol=1e-9, abs_tol=1e-12):
+            return True
+    return False
 
 
 def _extreme_params(case: SpecCase) -> set[str]:
