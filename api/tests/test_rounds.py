@@ -131,3 +131,49 @@ def test_to_round_drops_dangling_refs_and_clips() -> None:
     assert r.slug == "dice-sums"
     assert len(r.misconceptions[0].label) <= 80
     assert [b.misconception_id for b in r.items[0].bands] == ["all-equal", None]
+
+
+def test_showcases_pass_checks() -> None:
+    from app.checks import check_round
+
+    for r in showcase_rounds().values():
+        checked, report = check_round(r, blind=False)
+        assert report.dropped == {}, (r.slug, report.dropped)
+
+
+def test_checks_drop_bad_items() -> None:
+    from app.checks import CheckFailed, check_round
+    from app.gen import to_round
+
+    base = {
+        "slug": "t",
+        "topic": "t",
+        "concept": "c",
+        "misconceptions": [{"id": "m", "label": "l", "why_tempting": "w", "refutation": "r"}],
+    }
+    good = {
+        "id": "good",
+        "prompt": "chance of heads?",
+        "input_type": "slider",
+        "slider_min": 0,
+        "slider_max": 100,
+        "bands": [
+            {"min": 0, "max": 40, "misconception_id": "m"},
+            {"min": 41, "max": 60, "misconception_id": None},
+            {"min": 61, "max": 100, "misconception_id": "m"},
+        ],
+        "widget": "curve",
+        "expr": "x",
+        "x_min": 0,
+        "x_max": 1,
+        "answer_expr": "0.5*100",
+        "answer_claimed": 50,
+    }
+    lying = {**good, "id": "lying", "answer_claimed": 90}
+    outside = {**good, "id": "outside", "answer_expr": "90", "answer_claimed": 90}
+    r = to_round({**base, "questions": [good, lying, outside]})
+    checked, report = check_round(r, blind=False)
+    assert [i.id for i in checked.items] == ["good"]
+    assert set(report.dropped) == {"lying", "outside"}
+    with pytest.raises(CheckFailed):
+        check_round(to_round({**base, "questions": [lying]}), blind=False)

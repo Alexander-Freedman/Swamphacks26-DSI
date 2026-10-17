@@ -25,6 +25,7 @@ from zoneinfo import ZoneInfo
 
 from pydantic import ValidationError
 
+from app.checks import CheckFailed, check_round
 from app.schema import Round
 
 log = logging.getLogger("mm.gen")
@@ -402,8 +403,9 @@ def generate_round(topic: str, usage: Usage | None = None) -> GenResult:
             try:
                 raw = _call_model(model, topic)
                 data = json.loads(raw.strip().removeprefix("```json").removesuffix("```"))
-                r = to_round(data)
-            except (ValidationError, ValueError, GenerationError) as err:
+                r, report = check_round(to_round(data))
+                log.info("checks for %r: %s", topic, report.as_dict())
+            except (ValidationError, ValueError, GenerationError, CheckFailed) as err:
                 last_err = err
                 log.warning("bad round from %s: %s", model, str(err)[:200])
                 continue
