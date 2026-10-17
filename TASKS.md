@@ -1,38 +1,70 @@
 # Tasks
 
-> **Direction (decided Oct 16 ~9:50 PM):** Mental Models, general version. One engine for ANY topic: predict first → see the truth interactively → your exact misconception named → keep coming back (Quizlet-style, addictive, for deep understanding not memorizing).
-> - **Track:** Entertainment & Creative Technology.
-> - **Mode:** BUILD (approved; plan in docs/build-plan.md, from 10:48 PM Fri).
-> - **Next:** research issues are done (#17-#26, #31). docs/product-spec.md + docs/build-plan.md posted for my approval at 10:18 PM; they auto-approve at 10:48 PM if I don't answer. Then the build issues get opened from docs/build-plan.md.
->
-> | Issue | Research | Owner |
-> |---|---|---|
-> | #17 | Entertainment track judges + past creative winners | @Alexander-Freedman |
-> | #18 | Learning science for prediction-first | @Alexander-Freedman |
-> | #19 | Misconceptions + detecting the exact one | @Alexander-Freedman |
-> | #20 | Any-topic engine + accuracy | @Alexander-Freedman |
-> | #21 | Add-on prizes that fit | @Alexander-Freedman |
-> | #22 | What makes study apps addictive | @luanamaldaner |
-> | #23 | Competitors / not a chatbot | @luanamaldaner |
-> | #24 | Truth-reveal UI patterns | @luanamaldaner |
-> | #25 | 3-minute demo | @luanamaldaner |
-> | #26 | Visual/brand direction | @luanamaldaner |
->
-> My #22-#26 are done in PR #30 (docs/research/). The visual direction needs my sign-off before building.
+**Goal:** short, visual sessions that take someone from never seeing a concept to a mental model they can run (guess first, play with it, see your model next to reality, your exact mistake named, come back). Track: Entertainment & Creative.
+**Mode:** BUILD (NOTES.md). Gates: docs/build-plan.md (top). Grades + gaps: docs/scorecard.md.
+**Live now:** https://alexander-freedman.github.io/Swamphacks26-DSI/ (Pages, main at e09f264)
+- Three sessions end to end, desktop + phone: birthday, coin streak, positive test (`?session=<slug>`)
+- Notebook (`?notebook=1`), reset (`?reset=1`), URL/Back per session
+- Name is **Onionskin** in the app (#142)
+- **No backend deployed**: no typed topics, no help chat, no room % on the live site
 
-Shared board. Every task is a GitHub issue; assign yourself + comment "on it" before starting. Plan: #1.
+Rules: every task is an issue; assign yourself + comment "on it" before starting; plan comment first (CONTRIBUTING.md). Folders: `web/` = @luanamaldaner, `api/` `shared/schema/` `data/` `docs/` = @Alexander-Freedman.
 
-## Phase 1: research (no building yet)
+Updated Sat Oct 17 morning. Supersedes #70.
 
-| Issue | Task | Owner | Status |
+## Now
+
+### Mine (@Alexander-Freedman: backend, deploy, data, birthday, docs)
+| Issue / PR | What | Status | Next step |
 |---|---|---|---|
-| #2 | docs/strategy.md: how to win, SwampHacks, ranked project directions | @Alexander-Freedman | merged |
-| #5 | Research round 2 (teardowns, prizes, ideas, feasibility, ...; start at docs/README.md) | @Alexander-Freedman | merged via #7 |
-| #3 | docs/sponsor-tech.md: live setup checks of sponsor/MLH APIs (builds on prize-strategy + feasibility) | @luanamaldaner | PR up |
+| #146 | Doctor statistic on the positive card + demo script matches live | approved | merge, redeploy Pages |
+| #145 | Favicon: Onionskin mark | approved | merge, redeploy Pages |
+| #135, #152 | Birthday: "Called it." after a missed rematch; phone label sizes | open | fix in one birthday PR |
+| #149, #150 | One session shell for all three; called-it card copy | shared with @luanamaldaner | agree on the shell on #149, then I do birthday, she does coin + positive |
+| #118 / #116 | Backend deploy kit (Vultr Caddy + systemd, Render fallback) | PR up | deploy once a host account exists (blocked) |
+| #103 / #100 | Answer events on Tiger, SQLite fallback | PR up | merge; room % shows after deploy |
+| #121 | Scorecard re-grade vs live (25/35) | PR up | merge; re-grade after #136 is on Pages |
+| #129 | README for judges | PR up | review |
+| #123 | Pitch 3:00 + 1:30, judge Q&A | PR up | review; update after user tests |
+| #125 | Notes: name is Onionskin | PR up | merge (app rename already in #142) |
+| #131 | DEV post draft | PR up | publish only after the event |
+| #29 | Story: pitch, Devpost, video script | open | AI-disclosure draft to #questions |
+| #45, #47, #48 | Skeleton/CI, pipeline, first deploy | mostly done | close #45/#47; #48 waits on the host account |
 
-## Next
-- Research keeps going until I say "we have an idea". Nothing is picked; hazard radar and Mental Models Tool are candidates only. Going deeper: winner teardowns, judge/organizer interviews, per-prize analysis, new ideas, stress tests, pitch outlines + demo scripts.
-- Then I pick a direction from docs/strategy.md (ranked: 1 hazard radar for Sperry, 2 Mental Models Tool, 3 hazard radar + sensor, 4 Nessie, 5 Roblox/game)
-- No project code until hacking opens Fri ~8pm (event rule)
-- Split phase 2 build into issues per docs/first-6h.md: @Alexander-Freedman backend/data/model, @luanamaldaner frontend/demo
-- Skeleton (FastAPI + Vite) is on branch alexander-freedman/skeleton; @luanamaldaner reviews once it's a PR
+### @luanamaldaner (Home, coin, positive, notebook, topic box, round player, look)
+| Issue / PR | What | Status | Next step |
+|---|---|---|---|
+| #136 / #66 | Home: try any topic box with reviewed chips | changes requested | show the truth + label after the guess on reviewed items, then merge |
+| #144 | Home: session card art (art merged in #124) | open | wire the art into the three Home cards |
+| #143 / #133 | Notebook: bust after two later right answers | PR up | review |
+| #147 | Notebook never counts a positive rematch | open | fix the saved shape |
+| #148 | Coin + positive end bar "Called it." after a missed rematch | open | same fix as my #135 |
+| #151 | Positive: guess 0% stamps CLOSE but card catches a mistake | open | fix |
+| #64 / #51 | Round player reveal + misconception card + Curve | changes requested | rebase on main, address review |
+| #113 | Submission drafts: Devpost + 2-min video script | PR up | review against docs/devpost-draft.md |
+| #71 | How it works drawer, status dot | open | after #136 |
+| #68 | Extremes slider for generated topics | open | after #136; cut if short on time |
+| #11 | Pen input | parked | not in the demo script |
+
+## Next (gate order)
+1. **Sat 1:30 PM: user tests round 1** (both). 3-5 people, one session each, kit in docs/user-testing.md (#120). Log guess, confidence, verdict, one quote. Top 3 fixes go in as issues.
+2. **Backend deploy + help chat panel** (me: deploy #118, API from #105; @luanamaldaner: panel). Starts the moment a host account exists. Per-IP limit, daily cap, demo token. Then point the frontend at it.
+3. **Sat 4:00 PM: help-chat gate.** If it slips: static per-screen "stuck?" hint (cut line 1b).
+4. **Sat 6:00 PM:** fixes from testing, Home that sells the sessions (#144, #136), one shell (#149).
+5. **Sat 10:00 PM: design pass + motion; backup video recorded** (both). Feature freeze at midnight.
+6. **Sun 12-4:30 AM:** README, Devpost write-up, disclosure wording final.
+7. **Sun 7:30 AM: submit** (Devpost closes 8:30 AM). Expo 10 AM-12 PM, closing 2:30 PM.
+
+## Blocked / needs a human
+- **Host account for the backend** (Vultr MLH code or Render). Blocks #118, the help chat panel, typed topics live, Tiger room %. Render fallback if no Vultr code by Sat 2 PM.
+- **AI-tools disclosure wording**: event rule says disclose; I draft in #questions, decide by Sun ~4:30 AM.
+- **License** for the repo: needs a call before submit.
+- **DEV post publishing** (#131): only after the event.
+
+## Done (merged)
+- Research + direction: #30, #33, #34, #50; showcases #42; look #41; no points #39
+- Plan: BUILD mode #43; storyboard #90; re-plan #94; CONTRIBUTING #77
+- Backend: schema + showcase rounds #54; skeleton #52; CI #60, #65; Gemini generator #58; checks #63, #80, #96; answer events #72; stack landed #114; tighter bands #98; reviewed topics #108; help chat API #105; generator v3 #127
+- Frontend: predict/lock #62; look + mockups #79; session scaffold #91; URL state #106; fonts #110
+- Sessions: birthday #101 (+ #122); positive test #99; coin streak #107; notebook #130
+- Pages deploy #56; Onionskin rename #142; session art #124; user-test kit #120; expo table #132; demo script/scorecard #97, #138; Devpost draft + pitch #104

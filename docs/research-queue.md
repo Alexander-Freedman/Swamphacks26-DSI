@@ -6,12 +6,12 @@ Ranked by how much the answer changes what we do. Each pass takes the top open q
 Direction is Mental Models, any-topic (Oct 16 ~9:50 PM). Hazard/Sperry questions are parked at the bottom.
 
 1. Off the Edge has no good adult error-rate source. Swap it for "ball dropped while walking" (McCloskey 1983), or drop it? Goes in the spec for review. → docs/research/demo.md
-2. Base-rate medical card ("positive test"): sourced numbers for how often people get it wrong (Casscells 1978, Gigerenzer natural frequencies). → docs/research/showcase-facts.md
-2b. Is there a sourced number for what people guess as the longest streak in 100 flips? (demo.md says 3-4, unverified.) → docs/research/showcase-facts.md
+2. Log real longest-streak guesses at the event (first 10 testers) so the pitch has our own number instead of an unverified one. → docs/research/showcase-facts.md
+2b. Grid guess input: tap-to-fill vs a slider with a live grid preview. Which gives a more accurate guess (people mark blank grids badly)? → docs/research/frontend-plan.md
 3. Can question 1 run as its own parallel Gemini call, and what does that cost in quota? Does partial-JSON parsing of the stream hold up with our schema? → docs/research/demo.md
 3b. Real time-to-first-token on venue wifi vs a hotspot (time 20 random topics Sat, log in NOTES.md). → NOTES.md
 4. Does the `sketch` item fit in the #20 schema, and which misconception signal does it give per showcase topic? → docs/research/frontend-plan.md
-5. Which UF courses/clubs could we user-test with Saturday (5 people, 2 rounds), and what's on the task card? → plan-extras.md
+5. Who runs each test round (the driver can't also take notes), and does round 2 use the same task card or one changed from round 1's issues? → docs/plan-extras.md
 8. Which judging sheet do judges actually get: Devpost's 7 criteria or the rules page's 5? (Ask at the help desk.) → strategy.md.
 9. Cash split: the guide says among team members, the rules say four ways regardless of size. (Ask at the help desk.) → strategy.md, prizes.md.
 19. What goes on the table tent card and the 10-20 s attract loop? → expo-video.md
@@ -22,6 +22,9 @@ Direction is Mental Models, any-topic (Oct 16 ~9:50 PM). Hazard/Sperry questions
 17, 26, 27, 29 (Sperry/sensor questions); keep for reference only.
 
 ## Done
+- Icon arrays: yes for single-proportion + Bayes items, 10x10 filled row by row, truth builds in over ~1.2 s, guess as pencil outline → docs/research/reveal-patterns.md
+- Saturday user testing plan: round 1 Sat lunch 1:30pm, round 2 dinner 8pm, WERT Lab Lobby; task card + log table → docs/plan-extras.md (also fixed meal times and nap slots there)
+- Base-rate card facts (Manrai 2014 14/61 correct; Gigerenzer & Hoffrage 16% vs 46%) and no study on longest-streak guesses → docs/research/showcase-facts.md
 - Showcase facts (coin streak DP: expected longest run 6.98, P(6+)=80.7%; Falk & Konold alternation .56-.63; Wason 22/29 wrong first; hypercorrection 87% vs 61%, modest r) → docs/research/showcase-facts.md
 - Live-topic latency budget: first question ≤5 s target, 15 s OK, 20 s cutoff to cached chips → docs/research/demo.md
 - What one person can start alone at 8:30 → kickoff.md

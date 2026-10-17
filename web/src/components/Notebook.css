@@ -1,0 +1,50 @@
+/* Notebook: pencil (dashed grey) = caught, ink (solid blue) = busted. */
+.sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; border: 0; }
+
+.nb-link { display: flex; flex-direction: column; gap: 2px; margin-top: 20px; padding: 14px 16px; border: 2px dashed var(--pencil); border-radius: var(--radius); background: var(--paper); color: var(--ink); text-decoration: none; }
+.nb-link:hover { border-color: var(--ink); }
+.nb-link:focus-visible, .nb-btn:focus-visible, .nb-back:focus-visible { outline: 3px solid var(--marker); outline-offset: 2px; }
+.nb-link-title { font-family: var(--font-hand); font-weight: 600; font-size: 1.15rem; }
+.nb-link-title::before { content: '✎ '; }
+.nb-link-sub { color: var(--ink-soft); font-size: 0.95rem; }
+
+.nb-title { font-size: 2rem; margin: 0 0 8px; }
+.nb-tally { font-size: 0.95rem; color: var(--ink-soft); margin: 4px 0 16px; }
+.nb-tally strong { color: var(--ink); font-size: 1.1rem; }
+
+.nb-cards { list-style: none; margin: 0; padding: 0; display: grid; gap: 14px; grid-template-columns: 1fr; }
+@media (min-width: 640px) { .nb-cards { grid-template-columns: 1fr 1fr; } }
+
+.nb-card { position: relative; padding: 16px 16px 14px; border-radius: 12px; min-width: 0; }
+.nb-card.caught { border: 3px dashed var(--pencil); background: var(--paper); color: var(--ink-soft); }
+.nb-card.busted { border: 3px solid var(--ink); background: var(--card); box-shadow: 3px 3px 0 var(--ink); color: var(--ink); }
+.nb-topic { margin: 0 0 4px; font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.06em; padding-right: 84px; }
+.nb-label { margin: 0 0 8px; font-size: 1.25rem; line-height: 1.3; }
+.nb-card.caught .nb-label { font-family: var(--font-hand); font-weight: 600; color: #5f5c55; }
+.nb-card.busted .nb-label { font-weight: 800; }
+.nb-card.busted .nb-topic { margin-bottom: 14px; } /* clear the bigger BUSTED stamp */
+.nb-meta { margin: 0 0 6px; font-size: 0.9rem; }
+.nb-progress { margin: 0; font-size: 0.9rem; display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+.nb-pips { display: inline-flex; gap: 4px; }
+.nb-pips i { width: 14px; height: 14px; border-radius: 50%; border: 2px dashed var(--pencil); }
+.nb-pips i.on { border: 2px solid var(--ink); background: var(--ink); }
+
+.nb-stamp { position: absolute; top: 10px; right: 10px; font-weight: 800; font-size: 0.85rem; text-transform: uppercase; letter-spacing: 0.04em; padding: 1px 8px; border-radius: 6px; transform: rotate(-6deg); }
+.nb-card.caught .nb-stamp { font-family: var(--font-hand); color: var(--pencil); border: 2px dashed var(--pencil); }
+.nb-card.busted .nb-stamp { color: var(--ink); border: 3px solid var(--ink); background: var(--marker); font-size: 1rem; animation: nb-slam 0.3s cubic-bezier(0.2, 1.6, 0.4, 1) both; }
+@keyframes nb-slam { from { transform: scale(2) rotate(-14deg); opacity: 0; } to { transform: scale(1) rotate(-6deg); opacity: 1; } }
+
+.nb-empty { margin: 16px 0 8px; padding: 20px 16px; border: 3px dashed var(--pencil); border-radius: 12px; background: var(--paper); }
+.nb-empty p { margin: 0 0 14px; line-height: 1.45; }
+.nb-empty-hand { font-family: var(--font-hand); font-size: 1.4rem; color: var(--pencil); }
+.nb-btn { display: inline-block; padding: 12px 18px; min-height: 48px; border: 2px solid var(--ink); border-radius: var(--radius-ui); background: var(--marker); color: var(--ink); font-weight: 800; text-decoration: none; box-shadow: 0 3px 0 var(--ink); }
+.nb-back { display: inline-block; margin-top: 20px; padding: 10px 0; color: var(--ink); font-weight: 600; }
+
+.nb-toast { position: fixed; left: 50%; bottom: 24px; transform: translateX(-50%); z-index: 10; margin: 0; padding: 8px 16px; white-space: nowrap; box-shadow: 0 3px 0 var(--ink); border: 2px solid var(--ink); border-radius: var(--radius-ui); background: var(--marker); font-weight: 600; }
+
+@media (max-width: 480px) {
+  .nb .nb-title { font-size: 1.6rem; }
+  .nb-btn { display: block; text-align: center; }
+}
+@media (prefers-reduced-motion: reduce) { .nb-card.busted .nb-stamp { animation: none; } }
+.nb-link-inline { color: var(--ink); font-weight: 700; padding: 12px 4px; }

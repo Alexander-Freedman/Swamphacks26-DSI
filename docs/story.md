@@ -1,6 +1,37 @@
 # Story: name, pitch, Devpost, video, DEV post (#29)
 
-Marketing is a full workstream (a product nobody gets in 30 seconds loses). This file grows through the night. **The name is @luanamaldaner's call** (asked on #1). Until they pick, the code uses the neutral working name `mm`.
+Marketing is a full workstream (a product nobody gets in 30 seconds loses). This file grows through the night. The name is **Onionskin** (picked; in the app since #142).
+
+## 0. Pitch (current, Sat ~1 PM, direction update)
+The name is **Onionskin** (in the app since #142). This section wins over everything further down (older one-liners kept for the name work). Source of the reframe: NOTES.md, Sat ~12:15 PM (#185).
+
+**Headline:** **"ChatGPT tells you the answer. Onionskin builds you a world where you find out you were wrong, and why."**
+
+**One-liner (the AI story, everywhere):** **"The AI builds the simulation; code guarantees the truth; you do the thinking."**
+- Honest scope: the three showcase sessions are hand-built; the AI builds the simulation for a topic you type (engine v4, **landing today**, #179/#184). Never say the AI built the birthday session.
+
+**Tagline (table tent, unchanged):** "Guess in pencil. Truth in ink."
+
+**Retired:** "Quizlet tests what you remember. mm shows you what you actually believe, next to what's true." Use the headline above instead.
+
+**30-second explanation (said out loud, ~80 words):**
+> A chatbot explains; Onionskin makes you predict. Each session is two or three minutes on one concept. You guess first, in pencil. You watch a real example play out: fill a room and watch the birthday pairs pile up. Your guess stays on screen next to the real curve, the gap shaded, and it names your exact mistake. Then a second case that looks different but works the same, so you pull out the structure. Type any other topic and the AI builds a simulation for it, while our code computes the truth.
+
+*Last two sentences (compare screen, engine v4) are **landing today**: drop them until #181 and #179/#184 are live on the site.*
+
+**Numbers we can say with it** (only these; same table as docs/demo-script.md):
+| Claim | Value | Source |
+|---|---|---|
+| Birthday, 50% chance of a shared birthday | 23 people → 50.7% | computed: 1 − ∏(365−i)/365, i = 0..22 = 0.5073 |
+| Birthday, 57 people | 99.0% | computed: same formula, n = 57 → 0.9901 |
+| Positive test (1% have it, 90% caught, 9% false alarms) | 9.2% | computed: 0.009 / (0.009 + 0.99 × 0.09) = 0.0917 |
+| Coin streak, 100 fair flips | longest run averages 6.98; a run of 5+ in 97% | exact DP, [showcase-facts.md](research/showcase-facts.md) |
+| "2-3 minutes per session" | design target | docs/experience.md; **unverified** as a measured time until user tests |
+| Compare case: 4-digit PINs | about 119 people for a 50% chance two share one | computed: 1 − ∏(10000−i)/10000, i = 0..118 = 0.5058 |
+| Comparing two cases | "a marked advantage" over studying them separately | [Gentner, Loewenstein & Thompson 2003](https://doi.org/10.1037/0022-0663.95.2.393) abstract; "nearly three times more likely" only with [Loewenstein, Thompson & Gentner 1999](https://kellogg.northwestern.edu/faculty/research/detail/1999/analogical-encoding-facilitates-knowledge-transfer-in-negotiation?p=1) |
+| Live generation on Vultr | 5.5 s, one topic, old engine | NOTES.md Sat ~12:10 PM smoke test (one run; not engine v4) |
+
+Don't say "proven to make you learn faster" or that a typed topic is "built live in seconds".
 
 ## 1. Name: options for @luanamaldaner to choose from
 - **Hunch & Ink** (research's top pick): your hunch goes down in pencil, the truth lands in ink. That matches the predict-then-reveal moment and the Notebook Arcade look. All of .com/.app/.tech/.space/.study were unregistered on Oct 16 (registry RDAP). No product with that name was found. Trademark: a snippet-level scan only (USPTO blocks scripts), with low risk noted; **not a clearance**.
@@ -79,3 +110,36 @@ Alt: "Bet your hunch. Bust your myths."
 - MythBusters trademark dispute: https://www.techdirt.com/tag/mythbusters/ , https://blogs.luc.edu/ipbytes/?p=4778
 - Pokédex takedown: https://nolanlawson.com/2011/05/26/on-pokedroids-removal/
 - Belief Busting (self-help use): https://courageandspice.buzzsprout.com/1673158/7708237
+
+---
+
+## 3. README outline (what the repo README should give judges)
+
+Judges on the AI-heavy tracks read GitHubs, and every judge clicks the README first. Goal: a judge understands the product in 30 seconds and can run it in 3 commands. `[NAME]` until the name is picked. Draft the real README from this once the demo build is stable.
+
+1. **Title + result line.** `[NAME]`: one line from the one-liners above ("Every AI tutor explains. [NAME] makes you bet first, ..."). Under it, one sentence on what a round is: predict, lock in, the truth is computed and drawn over your guess, your misconception gets named.
+2. **Demo link.** The live site (https://alexander-freedman.github.io/Swamphacks26-DSI/ or the custom domain), the 2-minute video, and the Devpost page. One hero GIF of the coin-streak reveal.
+3. **How it works (text diagram):**
+   ```
+   topic ──> cache? ──hit──────────────────────────────────────────┐
+               │ miss                                               v
+               └─> Gemini 3.5 Flash-Lite (structured JSON: misconceptions, questions, truth SPEC)
+                     └─> our code: compute truth ─> claim agrees? ─> lint ─> Gemma blind check
+                           (items that fail are dropped; 0 items left = rejected)        │
+                                                                                         v
+   browser: predict + confidence ─> lock ─> truth drawn over the pencil guess ─> misconception named ─> collection
+   ```
+   Plus one line: the model never writes the answer; code computes it. Showcase rounds are hand-checked JSON in `data/rounds/` and run with no backend.
+4. **Run it in 3 commands** (verify against the real repo before publishing):
+   ```
+   cd api && uv sync && uv run uvicorn app.main:app      # backend on :8000 (GEMINI_API_KEY from the env; no key or MM_OFFLINE=1 = mock mode)
+   cd web && npm install && npm run dev                  # frontend, proxies /api to :8000
+   ```
+   Note that the showcase rounds work with the frontend alone.
+5. **The checks pipeline** (from `api/app/checks.py`): structural validation, computed truth vs the model's claimed answer, band/slider lint, no answer in the prompt, the time-boxed blind check by a second model, drop-on-fail. Link to the tests (`api/tests`) and, if we have it, the eval table (how many generated items each check dropped on our test topics).
+6. **Model chain + quotas:** Flash-Lite → 3.1 Flash-Lite → Gemma fallback, daily counter, cache by topic, per-IP rate limit and daily cap on the public endpoint, keys only in the server's `.env`.
+7. **Why no points:** the "Everyone gamifies learning with points" paragraph (section 2), with its two sources.
+8. **Limits (honest):** works best on topics with a checkable answer (chance, math, physics); fuzzy topics get fewer questions or none; the blind check catches a lot but not everything; generated rounds are "auto-checked", only showcase rounds are "reviewed"; build time per new topic is an estimate until measured (docs/research/gemini.md); free-tier quotas cap live generation.
+9. **Sources:** the research behind the loop (predict-first, hypercorrection, the points studies), linked, from docs/research/learning-science.md.
+10. **AI tools disclosure: PLACEHOLDER, wording decided by me at submission.** Same text as the Devpost "How we used AI tools" section (SwampHacks XII requires disclosing AI/LLM tool use). Keep it separate from the runtime models the app calls.
+11. **Team + track:** both of us, SwampHacks XII, Entertainment & Creative Technology; challenges entered.

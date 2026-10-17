@@ -175,7 +175,7 @@ Picked for: demo-reliable (no network, no generation), fun to watch, and only **
    - Exact numbers: mean longest run **6.98**, ≥5 in **97.2%** (independently recomputed; showcase-facts.md).
    - **Misconception:** "random means evenly mixed".
 2. **The positive test** (Distribution, 1,000 dots sorting). 1% base rate, 90% sensitivity, 9% false positives → **9.2%**.
-   - On a similar case, doctors' most frequent estimate was 90% vs a correct 7.7% ([APS Observer](https://www.psychologicalscience.org/observer/helping-physicians-understand-screening-tests-will-improve-health-care)).
+   - On a similar case about 95 of 100 doctors guessed around 75% vs a correct 7.7% (Eddy 1982, [APS Observer](https://www.psychologicalscience.org/observer/helping-physicians-understand-screening-tests-will-improve-health-care)).
    - **Misconception:** "the test's accuracy is my chance".
 3. **The birthday problem** (Curve of P(match) vs group size, plus a 23-dot calendar lighting up). With 23 people, P(a shared birthday) = **50.7%** (our computation).
    - People tend to guess about half of 365 ([Live Science](https://www.livescience.com/what-is-birthday-paradox); a teaching observation, not a survey).

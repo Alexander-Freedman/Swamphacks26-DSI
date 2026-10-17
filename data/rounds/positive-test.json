@@ -11,7 +11,7 @@
       "why_tempting": "A 90% accurate test that says yes sounds like 90% sure.",
       "refutation": "Accuracy says how the test behaves on sick and healthy people. Your chance also depends on how rare the condition is: with 1 in 100 sick, false alarms from the other 99 outnumber the true hits.",
       "source_url": "https://www.psychologicalscience.org/observer/helping-physicians-understand-screening-tests-will-improve-health-care",
-      "source_note": "On a similar case, doctors' most frequent estimate was 90% vs a correct 7.7%"
+      "source_note": "On a similar case about 95 of 100 doctors guessed around 75%; the right answer was 7.7% (Eddy 1982)"
     },
     {
       "id": "ignores-false-alarms",
@@ -20,6 +20,14 @@
       "refutation": "9% of a big healthy group is a lot of people: about 89 false alarms per 1,000 vs about 9 true hits.",
       "source_url": null,
       "source_note": "Arithmetic from the numbers on the card"
+    },
+    {
+      "id": "positive-barely-matters",
+      "label": "A positive barely changes anything",
+      "why_tempting": "Once you know false alarms swamp the true hits, it's easy to treat the result as noise.",
+      "refutation": "Before the test your chance was 1%. A positive makes it about 9%, nine times higher: weak evidence, but not nothing.",
+      "source_url": "https://en.wikipedia.org/wiki/Conservatism_(belief_revision)",
+      "source_note": "Under-updating on evidence is the documented conservatism bias (Edwards 1968)"
     }
   ],
   "items": [
@@ -29,8 +37,9 @@
       "input_type": "slider",
       "slider": {"min": 0, "max": 100, "step": 1, "unit": "%"},
       "bands": [
-        {"min": 0, "max": 20, "misconception_id": null},
-        {"min": 21, "max": 59, "misconception_id": "ignores-false-alarms"},
+        {"min": 0, "max": 4, "misconception_id": "positive-barely-matters"},
+        {"min": 5, "max": 15, "misconception_id": null},
+        {"min": 16, "max": 59, "misconception_id": "ignores-false-alarms"},
         {"min": 60, "max": 100, "misconception_id": "accuracy-is-my-chance"}
       ],
       "truth": {"widget": "distribution", "sampler": "base_rate_test", "params": {"population": 1000, "base_rate": 0.01, "sensitivity": 0.9, "false_positive_rate": 0.09, "trials": 1000}, "x_label": "1,000 people tested"},

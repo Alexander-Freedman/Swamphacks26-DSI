@@ -1,0 +1,552 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Coin Streak mockup</title>
+<link rel="stylesheet" href="look.css">
+<!--
+  NUMBER CHECK (python3, Oct 16 2026). Longest run of the same side (H or T) in n fair flips.
+  Exact DP over current run length, P(L<=k), mean = sum_k P(L>k):
+    n=10    mean 3.662
+    n=20    mean 4.659
+    n=50    mean 5.978
+    n=100   mean 6.977   -> "6.98" checks out
+    n=1000  mean 10.299
+    n=10000 mean 13.620  (log2 n = 13.29, so "grows like log2 N" holds, about +0.3)
+    P(L>=5 | n=100) = 0.97169  -> "97.2%" checks out
+    P(L>=7 | n=100) = 0.5423
+  Monte Carlo cross-check, 100,000 runs of 100 flips (seed 1): mean 6.982, P(L>=5) = 0.9727.
+  The page recomputes all of these in JS (function pLongestAtMost below, same math, O(n) per k).
+  Sample human sequence: generated with a 66% switch chance and runs capped at 4 (python seed 18),
+  which lands at 68 switches out of 99 (68.7%), longest run 4, 50 heads. That mimics the pattern
+  reported for people inventing random sequences (unverified: Falk & Konold 1997 not checked; via the source in
+  data/rounds/coin-streak.json); the exact 68% is my parameter choice, not a measured value.
+-->
+<style>
+  .top { max-width: 720px; margin: 0 auto; padding: 20px 16px 0; display: flex; justify-content: space-between; align-items: baseline; gap: 12px; flex-wrap: wrap; }
+  .brand { font: 800 18px var(--font-display); }
+  .brand span { background: var(--marker); padding: 0 4px; }
+  .meta { font: 500 12px var(--font-mono); color: var(--ink-soft); }
+  .lede { font-size: 17px; line-height: 1.45; margin: 0 0 16px; color: var(--ink-soft); }
+  .row { display: flex; gap: 10px; flex-wrap: wrap; align-items: center; }
+  .btn { cursor: pointer; }
+  .btn:disabled { opacity: .45; cursor: default; }
+  .btn.small { font-size: 14px; padding: 7px 14px; }
+
+  /* coins */
+  .coins { display: grid; grid-template-columns: repeat(20, 1fr); margin: 12px 0; }
+  @media (max-width: 600px) { .coins { grid-template-columns: repeat(10, 1fr); } }
+  .coin { aspect-ratio: 1; padding: 3px; display: grid; place-items: stretch; }
+  .coin b { border-radius: 50%; display: grid; place-items: center; font: 500 12px var(--font-mono); }
+  .coin.h b { background: var(--ink); color: var(--paper); }
+  .coin.t b { background: var(--card); color: var(--ink); border: 2px solid var(--ink); }
+  .coin.empty b { border: 1.5px dotted #c9c1ae; }
+  .coin.run { background: var(--marker); }
+  .coin.run-start { border-radius: 999px 0 0 999px; }
+  .coin.run-end { border-radius: 0 999px 999px 0; }
+  .coin.run-start.run-end { border-radius: 999px; }
+  .coins.flipping .coin.run { background: transparent; }
+  .coin.fresh b { animation: flip .28s cubic-bezier(.3,1.6,.6,1) both; animation-delay: calc(var(--i) * 13ms); }
+  @keyframes flip { from { transform: rotateY(90deg) scale(.5); opacity: 0; } to { transform: none; opacity: 1; } }
+  .mine .coin b { background: transparent; border: 2px dashed var(--pencil); color: var(--pencil); font-weight: 700; }
+  .mine .coin.h b { background: repeating-linear-gradient(45deg, transparent 0 2px, rgba(133,130,122,.7) 2px 4px); color: var(--ink-soft); }
+  .mine .coin.empty b { border: 1.5px dotted #c9c1ae; background: none; }
+  .mine .coin.last b { border-style: solid; }
+
+  /* screen 1 */
+  .tapper { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin: 8px 0 10px; }
+  .tap { font: 800 34px var(--font-display); height: 76px; border-radius: 999px; border: 3px dashed var(--pencil); background: var(--card); color: var(--ink); cursor: pointer; box-shadow: 0 3px 0 var(--pencil); }
+  .tap:active { transform: translateY(2px); box-shadow: 0 1px 0 var(--pencil); }
+  .tap:disabled { opacity: .4; cursor: default; }
+  .stats { display: flex; gap: 18px; flex-wrap: wrap; font-size: 14px; color: var(--ink-soft); margin: 6px 0 4px; }
+  .stats b { font: 500 16px var(--font-mono); color: var(--ink); }
+  .guessbox { margin-top: 18px; }
+  .guessnum { display: flex; align-items: baseline; gap: 10px; margin: 4px 0 6px; }
+  .guessnum .big { font: 600 56px var(--font-hand); color: var(--ink); line-height: 1; border-bottom: 3px dashed var(--pencil); padding: 0 6px; }
+  .ticks { display: flex; justify-content: space-between; font: 500 11px var(--font-mono); color: var(--ink-soft); }
+  .locked-stamp { display: none; margin-left: 8px; font-size: 16px; color: var(--pencil); border-color: var(--pencil); border-style: dashed; }
+  .is-locked .locked-stamp { display: inline-block; }
+
+  /* screen 2 */
+  .readout { display: flex; gap: 20px; flex-wrap: wrap; align-items: baseline; margin: 4px 0 10px; }
+  .readout .big { font: 800 40px var(--font-display); line-height: 1; }
+  .readout .lbl { font-size: 14px; color: var(--ink-soft); }
+  svg { display: block; width: 100%; max-width: 560px; height: auto; overflow: visible; }
+  svg text { font-family: var(--font-mono); fill: var(--ink-soft); }
+  svg .h-txt { font-family: var(--font-hand); fill: var(--ink); }
+  .simnote { font-size: 13px; color: var(--ink-soft); margin-top: 6px; }
+
+  /* screen 3 */
+  .pair { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+  .pair h3 { font: 700 15px var(--font-body); margin: 0 0 6px; display: flex; align-items: center; gap: 8px; }
+  .mini { display: grid; grid-template-columns: repeat(10, 1fr); }
+  .mini .coin { padding: 1.5px; }
+  .mini .coin b { font-size: 0; border-width: 1.5px !important; }
+  .mini.mine .coin b { border-width: 1.5px; }
+  .meter { margin: 18px 0 4px; }
+  .meter .name { font-weight: 700; font-size: 15px; display: flex; justify-content: space-between; gap: 8px; flex-wrap: wrap; }
+  .track { position: relative; height: 34px; margin: 26px 0 2px; border-bottom: 2px solid var(--ink); }
+  .track .band { position: absolute; top: 4px; bottom: 0; background: var(--marker); }
+  .track .tk { position: absolute; bottom: 0; width: 0; height: 30px; }
+  .track .tk.truth { border-left: 4px solid var(--ink); margin-left: -2px; }
+  .track .tk.you { border-left: 3px dashed var(--pencil); margin-left: -1.5px; }
+  .track .tk span { position: absolute; top: -18px; left: 4px; white-space: nowrap; font: 500 12px var(--font-mono); }
+  .track .tk.you span { color: var(--pencil); left: auto; right: 4px; }
+  .scale { display: flex; justify-content: space-between; font: 500 11px var(--font-mono); color: var(--ink-soft); }
+  .anno { font: 600 17px var(--font-hand); color: var(--ink); display: flex; gap: 6px; align-items: flex-start; margin: 4px 0 0; }
+  .anno svg { width: 34px; flex: none; }
+  .anno .hl { padding: 0 2px; }
+
+  /* screen 4 */
+  .ext-head { display: flex; gap: 24px; flex-wrap: wrap; align-items: flex-end; margin: 8px 0 12px; }
+  .ext-head .n { font: 800 44px var(--font-display); line-height: 1; }
+  .ext-head .v { font: 800 44px var(--font-display); line-height: 1; }
+  .ext-head .v.you { font-family: var(--font-hand); font-weight: 600; color: var(--pencil); }
+  .ext-head small { display: block; font-size: 13px; color: var(--ink-soft); margin-top: 4px; }
+  @media (max-width: 600px) { .ext-head { gap: 16px; } .ext-head .n, .ext-head .v { font-size: 34px; } }
+  .breaknote { font: 600 18px var(--font-hand); margin: 10px 0 0; min-height: 2.6em; }
+
+  /* screen 5 */
+  .verdict { position: relative; padding: 34px 18px 20px; }
+  .verdict .stamp { font-size: 24px; position: absolute; top: -18px; right: 14px; background: var(--card); }
+  .stamp.mistake { color: var(--ink); background: var(--marker) !important; }
+  .verdict h2 { margin-top: 18px; }
+  .verdict .line { font-size: 19px; line-height: 1.4; margin: 0 0 14px; }
+  .evid { list-style: none; padding: 0; margin: 0 0 14px; display: grid; gap: 8px; }
+  .evid li { display: grid; grid-template-columns: 1fr auto auto; gap: 10px; align-items: baseline; font-size: 15px; border-bottom: 1px dashed var(--grid); padding-bottom: 6px; }
+  .evid .y { font: 600 16px var(--font-hand); color: var(--pencil); }
+  .evid .t { font: 500 15px var(--font-mono); }
+  .why { font-size: 15px; color: var(--ink-soft); line-height: 1.45; margin: 0 0 6px; }
+  .src { font-size: 12px; color: var(--ink-soft); }
+  .src a { color: var(--ink-soft); }
+  .tryit { margin-top: 18px; border-top: 2px dashed var(--grid); padding-top: 14px; }
+  .tryit .q { font-weight: 700; margin: 0 0 8px; }
+  .choice { display: grid; gap: 8px; }
+  .choice button { text-align: left; font: 500 14px var(--font-mono); background: var(--card); border: 2px solid var(--ink); border-radius: 10px; padding: 10px 12px; cursor: pointer; overflow-wrap: anywhere; color: var(--ink); }
+  .choice button b { font-family: var(--font-display); margin-right: 8px; }
+  .choice button.right { border-color: var(--called); box-shadow: 0 0 0 2px var(--called) inset; }
+  .choice button.wrong { background: var(--marker-soft); }
+  .tryres { font: 600 16px var(--font-hand); margin: 8px 0 0; min-height: 1.4em; }
+  .foot { max-width: 720px; margin: 0 auto; padding: 0 16px 40px; font-size: 12px; color: var(--ink-soft); }
+  .sr { position: absolute; left: -9999px; }
+</style>
+</head>
+<body>
+
+<header class="top">
+  <div class="brand">mm <span>(working name)</span></div>
+  <div class="meta">topic: coin streak &middot; ~3 min &middot; low-fi mockup</div>
+</header>
+
+<!-- SCREEN 1 -->
+<section class="screen" id="s1">
+  <div class="tag">Screen 1 &middot; move 1: guess first + sketch your model</div>
+  <h1>Be a coin. Tap out 100 flips.</h1>
+  <p class="lede">Make it look as random as you can. Then guess: in 100 <em>real</em> flips, how long is the longest run of the same side?</p>
+
+  <div class="tapper">
+    <button class="tap" id="tapH" aria-label="Heads">H</button>
+    <button class="tap" id="tapT" aria-label="Tails">T</button>
+  </div>
+  <div class="row">
+    <button class="btn ghost small" id="sample">Use a sample human sequence</button>
+    <button class="btn ghost small" id="undo">Undo</button>
+    <button class="btn ghost small" id="clear">Clear</button>
+  </div>
+  <div class="coins mine" id="mineGrid" aria-label="your sequence"></div>
+  <div class="stats">
+    <span>flips <b id="mCount">0</b>/100</span>
+    <span>side switches <b id="mSwitch">0%</b></span>
+    <span>your longest run <b id="mRun">0</b></span>
+  </div>
+  <p class="note">Your taps are your model of randomness. They stay in pencil the whole session.</p>
+
+  <div class="guessbox card" id="guessCard">
+    <label for="guess" style="font-weight:700">Longest run in 100 real flips?</label>
+    <div class="guessnum"><span class="big" id="guessOut">4</span><span>in a row</span><span class="stamp locked-stamp">locked</span></div>
+    <input type="range" id="guess" min="1" max="20" step="1" value="4">
+    <div class="ticks"><span>1</span><span>5</span><span>10</span><span>15</span><span>20</span></div>
+    <div class="row" style="margin-top:14px"><button class="btn" id="lock">Lock it in</button></div>
+  </div>
+</section>
+
+<!-- SCREEN 2 -->
+<section class="screen" id="s2">
+  <div class="tag">Screen 2 &middot; move 2: a concrete example you watch and manipulate</div>
+  <h2>Now a real coin. Flip it.</h2>
+  <div class="readout">
+    <div><div class="big num" id="rRun">0</div><div class="lbl">longest run this time</div></div>
+    <div><div class="big num" id="rSwitch">0%</div><div class="lbl">side switches</div></div>
+  </div>
+  <div class="coins" id="realGrid" aria-label="100 real flips"></div>
+  <div class="row">
+    <button class="btn" id="flip">Flip 100 again</button>
+    <button class="btn ghost" id="run1k">Run 1,000 times</button>
+  </div>
+  <div style="margin-top:18px">
+    <svg id="hist" viewBox="0 0 400 272" role="img" aria-label="histogram of longest runs"></svg>
+    <div class="legend" style="margin-top:6px">
+      <span><i class="l-truth"></i>coin (simulated)</span>
+      <span><i class="l-you"></i>your guess</span>
+      <span><i class="l-gap"></i>the gap</span>
+    </div>
+    <p class="simnote" id="simNote"></p>
+  </div>
+</section>
+
+<!-- SCREEN 3 -->
+<section class="screen" id="s3">
+  <div class="tag">Screen 3 &middot; move 4: your model drawn next to reality</div>
+  <h2>Your coin vs the real coin</h2>
+  <div class="pair">
+    <div><h3><i style="width:18px;border-top:3px dashed var(--pencil)"></i>yours</h3><div class="mini mine coins" id="cmpMine"></div></div>
+    <div><h3><i style="width:18px;border-top:3px solid var(--ink)"></i>real</h3><div class="mini coins" id="cmpReal"></div></div>
+  </div>
+  <p class="anno"><svg viewBox="0 0 34 30" aria-hidden="true"><path d="M30 26 C 18 24, 8 18, 6 4 M2 10 L6 3 L11 9" class="truth" style="stroke-width:2"/></svg><span>yellow = runs of 5+. <span class="hl" id="cmpRunsNote">the real one has 3, you wrote 0</span></span></p>
+
+  <div class="meter">
+    <div class="name"><span>How often you switch sides</span></div>
+    <div class="track" id="trSwitch"></div>
+    <div class="scale"><span>0%</span><span>50%</span><span>100%</span></div>
+  </div>
+  <div class="meter">
+    <div class="name"><span>Longest run</span></div>
+    <div class="track" id="trRun"></div>
+    <div class="scale"><span>0</span><span>5</span><span>10</span><span>15</span></div>
+  </div>
+  <div style="margin-top:22px">
+    <div class="name" style="font-weight:700;font-size:15px">Runs by length, per 100 flips</div>
+    <svg id="runsChart" viewBox="0 0 400 190" role="img" aria-label="number of runs of each length, yours vs a fair coin"></svg>
+    <div class="legend"><span><i class="l-truth"></i>fair coin, average (exact)</span><span><i class="l-you"></i>yours</span><span><i class="l-gap"></i>the gap</span></div>
+  </div>
+  <p class="anno" style="margin-top:10px"><svg viewBox="0 0 34 30" aria-hidden="true"><path d="M4 26 C 14 22, 24 16, 26 4 M21 9 L26 3 L31 10" class="truth" style="stroke-width:2"/></svg><span id="cmpAnno">too many 1s and 2s, no long ones. you broke every streak before it got going.</span></p>
+</section>
+
+<!-- SCREEN 4 -->
+<section class="screen" id="s4">
+  <div class="tag">Screen 4 &middot; move 3: push it to the extremes until it breaks</div>
+  <h2>More flips, longer streaks?</h2>
+  <div class="ext-head">
+    <div><div class="n num" id="xN">100</div><small>flips</small></div>
+    <div><div class="v num" id="xTruth">6.98</div><small>expected longest run, real coin (exact)</small></div>
+    <div><div class="v you" id="xYou">4.4</div><small>a coin that switches like you</small></div>
+  </div>
+  <label class="sr" for="nSlider">number of flips</label>
+  <input type="range" id="nSlider" min="1" max="4" step="0.01" value="2">
+  <div class="ticks"><span>10</span><span>100</span><span>1,000</span><span>10,000</span></div>
+  <svg id="curve" viewBox="0 0 400 230" role="img" aria-label="expected longest run vs number of flips" style="margin-top:16px"></svg>
+  <div class="legend"><span><i class="l-truth"></i>real coin (exact)</span><span><i class="l-you"></i>switches like you</span><span><i style="border-top:1.5px dotted var(--ink-soft)"></i>log&#8322; N</span></div>
+  <p class="breaknote" id="breakNote"></p>
+</section>
+
+<!-- SCREEN 5 -->
+<section class="screen" id="s5">
+  <div class="tag">Screen 5 &middot; move 5: your exact mistake, named</div>
+  <div class="card verdict" style="margin-top:28px">
+    <span class="stamp mistake" id="vStamp">Switched too often</span>
+    <div class="tag">what your taps and your guess say</div>
+    <h2 id="vName">Random means evenly mixed</h2>
+    <p class="line" id="vLine">You switch too often: real randomness is streakier than it feels.</p>
+    <ul class="evid">
+      <li><span>switches per flip</span><span class="y" id="eSwY">69%</span><span class="t" id="eSwT">50%</span></li>
+      <li><span>longest run you wrote</span><span class="y" id="eRunY">4</span><span class="t">6.98 avg</span></li>
+      <li><span>your guess vs a real 100</span><span class="y" id="eGuessY">4</span><span class="t" id="eGuessT">97.2% go past it</span></li>
+    </ul>
+    <p class="why" id="vWhy"></p>
+    <p class="src">Source: <a href="https://chance.dartmouth.edu/teaching_aids/Profiles/streaks/section3_3.html">Chance (Dartmouth), streaks</a>: in a class test, only one invented 100-flip sequence had a run of 5 or more. The 68% switch rate of the sample human sequence is a mockup parameter (unverified). Numbers on this page are computed live (exact DP) or simulated, as labeled.</p>
+
+    <div class="tryit">
+      <div class="tag">try it on</div>
+      <p class="q">One of these was flipped, one was made up by a person. Which is the real coin?</p>
+      <div class="choice">
+        <button data-c="a"><b>A</b>HTHHTHTTHTHHTHTTHTHT</button>
+        <button data-c="b"><b>B</b>HTTTTHHTHHHHTTHTHHHT</button>
+      </div>
+      <p class="tryres" id="tryRes"></p>
+    </div>
+    <div class="row" style="margin-top:14px"><button class="btn ghost small" id="restart">Start over</button></div>
+  </div>
+</section>
+<p class="foot">Mockup only. Ink = truth, dashed pencil = you, yellow marker = the gap, green = called it.</p>
+
+<script>
+(() => {
+  const HUMAN = 'HTTHTHTHTHTTHHHHTHTTHTTTTHTHHTTHTHHTHTHHTTHTHHTHTHHTHTTTHTHTHTHTTHHHHTTHHHTTHTHTTHTTHTTHTHTHHTHTHTHH'.split('');
+  const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const $ = id => document.getElementById(id);
+  const NS = 'http://www.w3.org/2000/svg';
+  const fmt = x => x.toLocaleString('en-US');
+  const pct = x => Math.round(x * 100) + '%';
+
+  // seeded rng (mulberry32), so the first screen is stable for screenshots; later flips stay random-looking
+  let seed = 20;
+  const rnd = () => { seed |= 0; seed = seed + 0x6D2B79F5 | 0; let t = Math.imul(seed ^ seed >>> 15, 1 | seed); t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t; return ((t ^ t >>> 14) >>> 0) / 4294967296; };
+
+  // ---------- exact math ----------
+  // P(longest run <= k) in n flips where each flip repeats the previous side with prob r (fair coin: r = 0.5).
+  // a(m): runs so far all <= k and a side switch happens right after flip m. T(m) = sum_{j=1..k} a(m-j) r^(j-1).
+  function pLongestAtMost(n, k, r = 0.5) {
+    if (k <= 0) return 0;
+    if (k >= n) return 1;
+    const a = new Float64Array(n + 1); a[0] = 1;
+    const rk1 = Math.pow(r, k - 1);
+    let T = 1; // T(1)
+    for (let m = 1; m < n; m++) {
+      a[m] = (1 - r) * T;
+      T = a[m] + r * (T - (m - k >= 0 ? a[m - k] * rk1 : 0));
+    }
+    return Math.min(1, Math.max(0, T));
+  }
+  function expectedLongest(n, r = 0.5) {
+    let e = 0;
+    for (let k = 0; k < n; k++) { const tail = 1 - pLongestAtMost(n, k, r); e += tail; if (k > 3 && tail < 1e-9) break; }
+    return e;
+  }
+  // expected number of maximal runs of length exactly j in n fair flips
+  function expectedRuns(n, j) {
+    if (j > n) return 0; if (j === n) return Math.pow(.5, n - 1);
+    const p = Math.pow(.5, j - 1);
+    return 2 * p * .5 + Math.max(0, n - j - 1) * p * .25;
+  }
+
+  function runs(seq) { // [{start,len}]
+    const out = []; let s = 0;
+    for (let i = 1; i <= seq.length; i++) if (i === seq.length || seq[i] !== seq[i - 1]) { out.push({ start: s, len: i - s }); s = i; }
+    return out;
+  }
+  const longest = seq => seq.length ? Math.max(...runs(seq).map(r => r.len)) : 0;
+  const switchRate = seq => { if (seq.length < 2) return 0; let c = 0; for (let i = 1; i < seq.length; i++) c += seq[i] !== seq[i - 1]; return c / (seq.length - 1); };
+  const flip100 = () => Array.from({ length: 100 }, () => rnd() < .5 ? 'H' : 'T');
+  const longestFast = () => { let b = 1, c = 1, prev = rnd() < .5; for (let i = 1; i < 100; i++) { const x = rnd() < .5; c = x === prev ? c + 1 : 1; if (c > b) b = c; prev = x; } return b; };
+
+  const E100 = expectedLongest(100);
+  const P5 = 1 - pLongestAtMost(100, 4);
+
+  // ---------- state ----------
+  const S = { mine: HUMAN.slice(), guess: 4, locked: false, real: [], hist: new Array(19).fill(0), total: 0, newest: 0 };
+  const modelSeq = () => S.mine.length >= 30 ? S.mine : HUMAN;
+
+  // ---------- coin grids ----------
+  function drawCoins(el, seq, opts = {}) {
+    const size = opts.size || seq.length;
+    const marks = new Set();
+    const rs = runs(seq);
+    const hi = opts.hiAll ? rs.filter(r => r.len >= opts.hiAll) : (opts.hiLongest ? [rs.reduce((a, b) => b.len > a.len ? b : a, { len: 0 })] : []);
+    const starts = new Set(), ends = new Set();
+    hi.forEach(r => { if (!r.len) return; for (let i = r.start; i < r.start + r.len; i++) marks.add(i); starts.add(r.start); ends.add(r.start + r.len - 1); });
+    let html = '';
+    for (let i = 0; i < size; i++) {
+      const c = seq[i];
+      let cls = 'coin ' + (c ? c.toLowerCase() : 'empty');
+      if (marks.has(i)) cls += ' run' + (starts.has(i) ? ' run-start' : '') + (ends.has(i) ? ' run-end' : '');
+      if (opts.fresh && c) cls += ' fresh';
+      if (opts.last && i === seq.length - 1) cls += ' last';
+      html += `<div class="${cls}" style="--i:${i}"><b>${c || ''}</b></div>`;
+    }
+    el.innerHTML = html;
+  }
+
+  // ---------- screen 1 ----------
+  function renderMine() {
+    drawCoins($('mineGrid'), S.mine, { size: 100, last: true });
+    $('mCount').textContent = S.mine.length;
+    $('mSwitch').textContent = S.mine.length > 1 ? pct(switchRate(S.mine)) : '-';
+    $('mRun').textContent = longest(S.mine);
+    ['tapH', 'tapT'].forEach(id => $(id).disabled = S.locked || S.mine.length >= 100);
+    ['sample', 'undo', 'clear'].forEach(id => $(id).disabled = S.locked);
+  }
+  const tap = c => { if (S.locked || S.mine.length >= 100) return; S.mine.push(c); renderMine(); renderAfter(); };
+  $('tapH').onclick = () => tap('H'); $('tapT').onclick = () => tap('T');
+  addEventListener('keydown', e => { if (e.target.tagName === 'INPUT') return; const k = e.key.toUpperCase(); if (k === 'H' || k === 'T') tap(k); });
+  $('sample').onclick = () => { S.mine = HUMAN.slice(); renderMine(); renderAfter(); };
+  $('undo').onclick = () => { S.mine.pop(); renderMine(); renderAfter(); };
+  $('clear').onclick = () => { S.mine = []; renderMine(); renderAfter(); };
+  $('guess').oninput = e => { S.guess = +e.target.value; $('guessOut').textContent = S.guess; renderAfter(); };
+  $('lock').onclick = () => {
+    S.locked = true; $('guess').disabled = true; $('lock').disabled = true; $('guessCard').classList.add('is-locked'); renderMine();
+    $('s2').scrollIntoView({ behavior: reduce ? 'auto' : 'smooth' }); setTimeout(doFlip, reduce ? 0 : 500);
+  };
+
+  // ---------- screen 2 ----------
+  function doFlip() {
+    S.real = flip100();
+    const L = longest(S.real);
+    addTrial(L); S.newest = L;
+    const g = $('realGrid');
+    drawCoins(g, S.real, { hiLongest: true, fresh: !reduce });
+    $('rRun').textContent = L; $('rSwitch').textContent = pct(switchRate(S.real));
+    if (!reduce) { g.classList.add('flipping'); clearTimeout(doFlip.t); doFlip.t = setTimeout(() => g.classList.remove('flipping'), 100 * 13 + 300); }
+    renderHist(); renderAfter();
+  }
+  function addTrial(L) { S.hist[Math.min(L, 18)]++; S.total++; }
+  $('flip').onclick = doFlip;
+  $('run1k').onclick = () => {
+    const btn = $('run1k'); btn.disabled = true;
+    if (reduce) { for (let i = 0; i < 1000; i++) addTrial(longestFast()); renderHist(); btn.disabled = false; return; }
+    let left = 1000;
+    const step = () => { const b = Math.min(left, 12); for (let i = 0; i < b; i++) addTrial(longestFast()); left -= b; renderHist(); if (left > 0) requestAnimationFrame(step); else btn.disabled = false; };
+    step();
+  };
+
+  function el(tag, attrs, parent, text) { const e = document.createElementNS(NS, tag); for (const k in attrs) e.setAttribute(k, attrs[k]); if (text != null) e.textContent = text; parent && parent.appendChild(e); return e; }
+
+  function renderHist() {
+    const svg = $('hist'); svg.innerHTML = '';
+    const L = 26, R = 392, top = 50, base = 224, kmax = 18;
+    const cw = (R - L) / kmax, x = k => L + (k - .5) * cw;
+    const maxC = Math.max(...S.hist), maxDots = 17;
+    const unit = Math.max(1, Math.ceil(maxC / maxDots));
+    const dy = (base - top) / maxDots, r = Math.min(cw, dy) * .42;
+    // gap between guess and expected
+    const gx = x(S.guess > 18 ? 18 : S.guess), ex = L + (E100 - .5) * cw;
+    el('rect', { x: Math.min(gx, ex), y: top - 4, width: Math.abs(ex - gx), height: base - top + 4, class: 'gap' }, svg);
+    // dots
+    for (let k = 1; k <= kmax; k++) {
+      const n = Math.ceil(S.hist[k] / unit);
+      for (let i = 0; i < n; i++) {
+        const partial = i === n - 1 && S.hist[k] % unit !== 0;
+        const isNew = k === Math.min(S.newest, 18) && i === n - 1;
+        el('circle', { cx: x(k), cy: base - dy * (i + .5), r, fill: isNew ? 'var(--marker)' : 'var(--ink)', stroke: 'var(--ink)', 'stroke-width': isNew ? 2 : 0, opacity: partial && !isNew ? .35 : 1 }, svg);
+      }
+    }
+    el('line', { x1: L, x2: R, y1: base, y2: base, stroke: 'var(--ink)', 'stroke-width': 2 }, svg);
+    for (let k = 1; k <= kmax; k++) if (k % 2 === 1 || k === 18) el('text', { x: x(k), y: base + 16, 'font-size': 11, 'text-anchor': 'middle' }, svg, k === 18 ? '18+' : k);
+    el('text', { x: (L + R) / 2, y: base + 33, 'font-size': 11, 'text-anchor': 'middle' }, svg, 'longest run in 100 flips');
+    // expected (truth)
+    el('line', { x1: ex, x2: ex, y1: top - 10, y2: base, stroke: 'var(--ink)', 'stroke-width': 2 }, svg);
+    const right = ex > gx;
+    el('text', { x: ex + (right ? 5 : -5), y: top - 14, 'font-size': 11, 'text-anchor': right ? 'start' : 'end', fill: 'var(--ink)' }, svg, 'avg ' + E100.toFixed(2) + ' (exact)');
+    // guess (you)
+    el('line', { x1: gx, x2: gx, y1: top - 30, y2: base, class: 'you' }, svg);
+    const gStart = !right || gx < 130; el('text', { x: gx + (gStart ? 5 : -5), y: top - 30, 'font-size': 15, 'text-anchor': gStart ? 'start' : 'end', class: 'h-txt' }, svg, 'your guess: ' + S.guess);
+    el('text', { x: R, y: base + 48, 'font-size': 11, 'text-anchor': 'end' }, svg, unit === 1 ? '1 dot = 1 run of 100 flips' : `1 dot = ${unit} runs of 100 flips`);
+    const ge = S.hist.reduce((s, c, k) => s + (k > S.guess ? c : 0), 0);
+    $('simNote').innerHTML = `Simulated: <b class="num">${fmt(S.total)}</b> runs of 100 flips. <b class="num">${pct(ge / S.total)}</b> beat your guess of ${S.guess}. Exact: a run of 5+ shows up <b class="num">${(P5 * 100).toFixed(1)}%</b> of the time.`;
+  }
+
+  // ---------- screen 3 ----------
+  function track(elm, you, truth, max, fmtV, youLbl, truthLbl) {
+    const p = v => Math.max(0, Math.min(100, v / max * 100)) + '%';
+    const lo = Math.min(you, truth), hi = Math.max(you, truth);
+    const youLeft = you < truth;
+    elm.innerHTML = `<div class="band" style="left:${p(lo)};width:calc(${p(hi)} - ${p(lo)})"></div>
+      <div class="tk truth" style="left:${p(truth)}"><span style="${youLeft ? '' : 'left:auto;right:6px'}">${truthLbl} ${fmtV(truth)}</span></div>
+      <div class="tk you" style="left:${p(you)}"><span class="hand" style="font:600 14px var(--font-hand);top:-20px;${youLeft ? '' : 'right:auto;left:4px'}">${youLbl} ${fmtV(you)}</span></div>`;
+  }
+  function renderCompare() {
+    const mine = modelSeq(), real = S.real;
+    drawCoins($('cmpMine'), mine, { size: 100, hiAll: 5 });
+    drawCoins($('cmpReal'), real, { hiAll: 5 });
+    const nReal = runs(real).filter(r => r.len >= 5).length, nMine = runs(mine).filter(r => r.len >= 5).length;
+    $('cmpRunsNote').textContent = `the real one has ${nReal}, you wrote ${nMine}`;
+    const sw = switchRate(mine);
+    track($('trSwitch'), sw * 100, 50, 100, v => Math.round(v) + '%', 'you', 'coin');
+    track($('trRun'), longest(mine), longest(real), 15, v => v, 'you', 'this coin');
+    // runs-by-length chart
+    const svg = $('runsChart'); svg.innerHTML = '';
+    const L = 30, R = 392, top = 14, base = 150, cats = 7;
+    const scaleN = 100 / mine.length;
+    const myC = new Array(cats + 1).fill(0); runs(mine).forEach(r => myC[Math.min(r.len, cats)] += scaleN);
+    const trC = new Array(cats + 1).fill(0); for (let j = 1; j <= 100; j++) trC[Math.min(j, cats)] += expectedRuns(100, j);
+    const ymax = Math.max(30, ...myC, ...trC) * 1.08, y = v => base - v / ymax * (base - top), cw = (R - L) / cats;
+    for (let v = 0; v <= ymax; v += 10) { el('line', { x1: L, x2: R, y1: y(v), y2: y(v), stroke: 'var(--grid)' }, svg); el('text', { x: L - 6, y: y(v) + 4, 'font-size': 10, 'text-anchor': 'end' }, svg, v); }
+    for (let j = 1; j <= cats; j++) {
+      const cx = L + (j - .5) * cw, a = myC[j], t = trC[j];
+      el('rect', { x: cx - cw * .36, y: y(Math.max(a, t)), width: cw * .72, height: Math.abs(y(a) - y(t)), class: 'gap' }, svg);
+      el('rect', { x: cx - 5, y: y(t), width: 10, height: base - y(t), fill: 'var(--ink)' }, svg);
+      if (a > 0) el('rect', { x: cx - cw * .3, y: y(a), width: cw * .6, height: base - y(a), class: 'you' }, svg);
+      else el('line', { x1: cx - cw * .3, x2: cx + cw * .3, y1: base - 1.5, y2: base - 1.5, class: 'you' }, svg);
+      el('text', { x: cx, y: base + 16, 'font-size': 11, 'text-anchor': 'middle' }, svg, j === cats ? cats + '+' : j);
+    }
+    el('line', { x1: L, x2: R, y1: base, y2: base, stroke: 'var(--ink)', 'stroke-width': 2 }, svg);
+    el('text', { x: (L + R) / 2, y: base + 34, 'font-size': 11, 'text-anchor': 'middle' }, svg, 'run length');
+    const long5 = myC.slice(5).reduce((s, v) => s + v, 0), long5t = trC.slice(5).reduce((s, v) => s + v, 0);
+    $('cmpAnno').textContent = sw > .58
+      ? `${Math.round(myC[1])} single flips where a coin makes ~${Math.round(trC[1])}, and ${long5 < .5 ? 'zero' : long5.toFixed(1)} runs of 5+ where it makes ~${long5t.toFixed(1)}. you broke every streak before it got going.`
+      : `pretty coin-like. ${Math.round(sw * 100)}% switches is close to the coin's 50%.`;
+  }
+
+  // ---------- screen 4 ----------
+  const curveCache = {};
+  function curvePts(r) {
+    if (curveCache[r]) return curveCache[r];
+    const pts = []; for (let v = 1; v <= 4.0001; v += .1) { const n = Math.round(Math.pow(10, v)); pts.push([v, expectedLongest(n, r)]); }
+    return curveCache[r] = pts;
+  }
+  function renderExtreme() {
+    const v = +$('nSlider').value, n = Math.round(Math.pow(10, v));
+    const sw = switchRate(modelSeq()), rYou = Math.min(.95, Math.max(.05, 1 - sw));
+    const et = expectedLongest(n), ey = expectedLongest(n, rYou);
+    $('xN').textContent = fmt(n); $('xTruth').textContent = et.toFixed(2); $('xYou').textContent = ey.toFixed(1);
+    const svg = $('curve'); svg.innerHTML = '';
+    const L = 30, R = 392, top = 10, base = 190, ymax = 16;
+    const X = v => L + (v - 1) / 3 * (R - L), Y = e => base - e / ymax * (base - top);
+    for (let e = 0; e <= ymax; e += 4) { el('line', { x1: L, x2: R, y1: Y(e), y2: Y(e), stroke: 'var(--grid)' }, svg); el('text', { x: L - 6, y: Y(e) + 4, 'font-size': 10, 'text-anchor': 'end' }, svg, e); }
+    [1, 2, 3, 4].forEach(d => el('text', { x: X(d), y: base + 16, 'font-size': 11, 'text-anchor': 'middle' }, svg, fmt(Math.pow(10, d))));
+    el('text', { x: (L + R) / 2, y: base + 34, 'font-size': 11, 'text-anchor': 'middle' }, svg, 'number of flips (log scale)');
+    const pt = curvePts(.5), py = curvePts(Math.round(rYou * 50) / 50);
+    const path = p => p.map((q, i) => (i ? 'L' : 'M') + X(q[0]).toFixed(1) + ' ' + Y(q[1]).toFixed(1)).join(' ');
+    el('path', { d: path(pt) + ' ' + py.slice().reverse().map(q => 'L' + X(q[0]).toFixed(1) + ' ' + Y(q[1]).toFixed(1)).join(' ') + 'Z', class: 'gap' }, svg);
+    el('path', { d: pt.map((q, i) => (i ? 'L' : 'M') + X(q[0]).toFixed(1) + ' ' + Y(Math.log2(Math.pow(10, q[0]))).toFixed(1)).join(' '), stroke: 'var(--ink-soft)', 'stroke-width': 1.5, 'stroke-dasharray': '1 4', fill: 'none', 'stroke-linecap': 'round' }, svg);
+    el('path', { d: path(pt), class: 'truth', 'stroke-width': 4 }, svg);
+    el('path', { d: path(py), class: 'you' }, svg);
+    el('line', { x1: L, x2: R, y1: base, y2: base, stroke: 'var(--ink)', 'stroke-width': 2 }, svg);
+    el('line', { x1: X(v), x2: X(v), y1: top, y2: base, stroke: 'var(--ink-soft)', 'stroke-width': 1, 'stroke-dasharray': '3 3' }, svg);
+    el('circle', { cx: X(v), cy: Y(ey), r: 6, fill: 'var(--card)', stroke: 'var(--pencil)', 'stroke-width': 3, 'stroke-dasharray': '3 2' }, svg);
+    el('circle', { cx: X(v), cy: Y(et), r: 6.5, fill: 'var(--ink)' }, svg);
+    // your guess as a flat pencil line: you guessed it for 100 flips
+    el('line', { x1: X(2) - 22, x2: X(2) + 22, y1: Y(S.guess), y2: Y(S.guess), class: 'you', 'stroke-width': 2 }, svg);
+    el('text', { x: X(2) + 26, y: Y(S.guess) + 4, 'font-size': 13, class: 'h-txt' }, svg, 'your guess');
+    const pBeat = 1 - pLongestAtMost(n, S.guess);
+    let note;
+    if (n < 30) note = `${fmt(n)} flips: even here a run of 3+ is normal (avg ${et.toFixed(1)}). Your gut is fine at this size.`;
+    else if (n < 300) note = `${fmt(n)} flips: a run longer than your ${S.guess} happens ${(pBeat * 100).toFixed(1)}% of the time.`;
+    else if (n < 3000) note = `${fmt(n)} flips: 10 in a row is the normal case. That's the streak people call rigged.`;
+    else note = `${fmt(n)} flips: ${et.toFixed(1)} in a row expected. 100x the flips, only +${(et - E100).toFixed(1)} on the streak: it grows like log₂N, one more per doubling.`;
+    $('breakNote').innerHTML = `<span class="hl">${note}</span>`;
+  }
+  $('nSlider').oninput = () => { cancelAnimationFrame(renderExtreme.raf); renderExtreme.raf = requestAnimationFrame(renderExtreme); };
+
+  // ---------- screen 5 ----------
+  const MIS = {
+    even: { stamp: 'Switched too often', cls: 'mistake', name: 'Random means evenly mixed', line: 'You switch too often: real randomness is streakier than it feels.', why: "Each flip ignores the last one, so switching only half the time is normal. Over 100 flips that makes long runs almost certain." },
+    streak: { stamp: 'Overshot', cls: 'mistake', name: "A long streak means something's off", line: 'You expect streaks, but bigger than they get: 10+ in 100 flips is rare.', why: "Any one run of 7 is unlikely, but with 100 flips there are dozens of places one can start, so some long run is expected. Past 10 it gets rare again." },
+    called: { stamp: 'Called it', cls: 'called', name: 'Streaky, like a real coin', line: 'Your guess sits right where real coins land.', why: 'Most runs of 100 flips top out between 5 and 9.' },
+  };
+  function renderVerdict() {
+    const mine = modelSeq(), sw = switchRate(mine);
+    const key = S.guess <= 4 ? 'even' : S.guess >= 10 ? 'streak' : 'called';
+    const m = MIS[key];
+    const st = $('vStamp'); st.textContent = m.stamp; st.className = 'stamp ' + m.cls;
+    $('vName').textContent = m.name;
+    $('vLine').textContent = key === 'called' && sw > .58 ? 'Your guess was right, but your hand still switched ' + pct(sw) + ' of the time. Tap out a sequence again and let it run.' : m.line;
+    $('vWhy').textContent = m.why;
+    $('eSwY').textContent = 'you ' + pct(sw); $('eSwT').textContent = 'coin 50%';
+    $('eRunY').textContent = 'you ' + longest(mine);
+    $('eGuessY').textContent = 'you ' + S.guess;
+    $('eGuessT').textContent = (100 * (1 - pLongestAtMost(100, S.guess))).toFixed(1) + '% go past it';
+  }
+  document.querySelectorAll('.choice button').forEach(b => b.onclick = () => {
+    document.querySelectorAll('.choice button').forEach(x => x.className = '');
+    const ok = b.dataset.c === 'b';
+    document.querySelector('[data-c=b]').classList.add('right');
+    if (!ok) b.classList.add('wrong');
+    $('tryRes').innerHTML = ok ? '<span style="color:var(--called)">called it.</span> B has a run of 4 heads. A never repeats more than twice: too tidy for a coin.'
+                               : '<span class="hl">that\'s the made-up one.</span> A never goes past 2 in a row. In 20 real flips the longest run averages ' + expectedLongest(20).toFixed(1) + '.';
+  });
+  $('restart').onclick = () => {
+    S.locked = false; S.mine = []; $('guess').disabled = false; $('lock').disabled = false; $('guessCard').classList.remove('is-locked');
+    renderMine(); renderAfter(); $('s1').scrollIntoView({ behavior: reduce ? 'auto' : 'smooth' });
+  };
+
+  function renderAfter() { renderHist(); renderCompare(); renderVerdict(); clearTimeout(renderAfter.t); renderAfter.t = setTimeout(renderExtreme, 150); }
+
+  // ---------- boot: one live flip plus a few dozen simulated runs, so the histogram already has dots ----------
+  renderMine();
+  for (let i = 0; i < 39; i++) addTrial(longestFast());
+  doFlip();
+})();
+</script>
+</body>
+</html>

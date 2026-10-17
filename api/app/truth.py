@@ -21,6 +21,8 @@ _FUNCS = {
     "tan": math.tan,
     "exp": math.exp,
     "log": math.log,
+    "log2": math.log2,
+    "log10": math.log10,
     "sqrt": math.sqrt,
     "abs": abs,
     "min": min,
@@ -110,3 +112,80 @@ def band_for(bands, value: float):
         if b.min <= value <= b.max:
             return b
     return None
+
+
+def dice_sum_pmf(dice: int) -> dict[int, float]:
+    """Exact distribution of the sum of `dice` fair d6."""
+    dist = {0: 1.0}
+    for _ in range(dice):
+        new: dict[int, float] = {}
+        for total, p in dist.items():
+            for face in range(1, 7):
+                new[total + face] = new.get(total + face, 0.0) + p / 6
+        dist = new
+    return dist
+
+
+def binomial_pmf(n: int, p: float) -> dict[int, float]:
+    if p in (0.0, 1.0):
+        return {k: float(k == round(n * p)) for k in range(n + 1)}
+    log_c = math.lgamma(n + 1)
+    lp, lq = math.log(p), math.log(1 - p)
+    return {
+        k: math.exp(log_c - math.lgamma(k + 1) - math.lgamma(n - k + 1) + k * lp + (n - k) * lq)
+        for k in range(n + 1)
+    }
+
+
+MAX_RUN_N = 2000  # the longest-run DP is O(n * k); bigger n would stall a request
+
+
+def sampler_stat(sampler: str, params: dict, stat: str, k: float | None = None) -> float:
+    """The number a sampler question asks about, computed exactly (probabilities in percent).
+
+    Raises ValueError for a stat that doesn't fit the sampler or missing params.
+    """
+
+    def need(name: str):
+        v = params.get(name)
+        if v is None:
+            raise ValueError(f"sampler {sampler} needs {name}")
+        return v
+
+    if sampler == "coin_longest_run":
+        n = int(need("n"))
+        if params.get("p") not in (None, 0.5):
+            raise ValueError("coin_longest_run is a fair coin (p = 0.5)")
+        if n > MAX_RUN_N:
+            raise ValueError(f"coin_longest_run n > {MAX_RUN_N}")
+        if stat == "mean_longest_run":
+            return coin_longest_run_expected(n)
+        if stat == "p_run_at_least" and k is not None:
+            return 100 * (1 - p_longest_run_below(n, math.ceil(k)))
+    elif sampler == "base_rate_test" and stat == "p_true_positive":
+        return 100 * positive_test_chance(
+            need("base_rate"), need("sensitivity"), need("false_positive_rate")
+        )
+    elif sampler == "birthday_match" and stat == "p_match":
+        return 100 * birthday_match_probability(int(need("group_size")))
+    elif sampler in ("binomial_count", "dice_sum"):
+        if sampler == "dice_sum":
+            pmf = dice_sum_pmf(int(need("dice")))
+        else:
+            n = int(need("n"))
+            if n > 10000:
+                raise ValueError("binomial n too big")
+            pmf = binomial_pmf(n, float(need("p")))
+        if stat == "mean":
+            return sum(x * p for x, p in pmf.items())
+        if stat == "mode":
+            best = max(pmf.values())
+            modes = [x for x, p in pmf.items() if math.isclose(p, best, rel_tol=1e-9)]
+            if len(modes) != 1:
+                raise ValueError("no single most likely value")
+            return float(modes[0])
+        if stat == "p_at_least" and k is not None:
+            return 100 * sum(p for x, p in pmf.items() if x >= k - 1e-9)
+        if stat == "p_equals" and k is not None:
+            return 100 * sum(p for x, p in pmf.items() if abs(x - k) < 1e-9)
+    raise ValueError(f"stat {stat} doesn't fit sampler {sampler}")

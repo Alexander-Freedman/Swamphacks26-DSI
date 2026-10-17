@@ -1,0 +1,14 @@
+# Installed to /etc/caddy/Caddyfile by setup.sh with __HOST__ replaced
+# (e.g. 203-0-113-7.sslip.io, or "api.example.tech, 203-0-113-7.sslip.io").
+# Caddy gets the HTTPS certificate on its own; ports 80 and 443 must be open.
+# Caddy drops any X-Forwarded-For the client sends and sets the real client IP,
+# which uvicorn trusts only from 127.0.0.1 (see mm-api.service).
+__HOST__ {
+	encode gzip
+	handle /api/* {
+		reverse_proxy 127.0.0.1:8000
+	}
+	handle {
+		respond "mm api: try /api/health" 200
+	}
+}

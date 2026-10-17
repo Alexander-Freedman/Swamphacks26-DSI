@@ -1,0 +1,162 @@
+{
+  "schema_version": 1,
+  "slug": "opportunity-cost",
+  "topic": "Opportunity cost",
+  "aliases": [
+    "opportunity cost",
+    "opportunity costs",
+    "sunk cost",
+    "sunk costs",
+    "sunk cost fallacy",
+    "the real cost of a choice",
+    "tradeoffs",
+    "trade offs"
+  ],
+  "concept": "The real cost of a choice is what you give up for it: the value of your next-best option, minus what that option would have cost you. Money already spent and gone doesn't count.",
+  "reviewed": true,
+  "misconceptions": [
+    {
+      "id": "free-means-no-cost",
+      "label": "Free means it costs nothing",
+      "why_tempting": "No money leaves your pocket, so it feels free.",
+      "refutation": "Going uses up the evening you could have spent on your next-best option. What that option was worth to you, minus its price, is the cost.",
+      "source_url": "https://crookedtimber.org/2006/02/18/most-economists-arent/",
+      "source_note": "Quotes Ferraro & Taylor's (2005) Clapton/Dylan question; only 21.6% of economists surveyed picked the right answer ($10)"
+    },
+    {
+      "id": "price-is-the-cost",
+      "label": "The cost is the other option's price tag",
+      "why_tempting": "The $40 price is the only cost you can see written down.",
+      "refutation": "Skipping the other show also saves you its $40 price. You give up $50 of enjoyment but keep $40, so you lose $10 of value.",
+      "source_url": "https://crookedtimber.org/2006/02/18/most-economists-arent/",
+      "source_note": "Ferraro & Taylor question as quoted: 'The correct answer is (b), the net value to you of buying a ticket and attending the Dylan concert'"
+    },
+    {
+      "id": "gross-not-net",
+      "label": "The cost is the full value of what I skip",
+      "why_tempting": "You'd enjoy the other show $50 worth, so giving it up feels like losing $50.",
+      "refutation": "You'd have paid $40 to get that $50 of enjoyment, so the net you give up is $50 - $40 = $10.",
+      "source_url": "https://crookedtimber.org/2006/02/18/most-economists-arent/",
+      "source_note": "Ferraro & Taylor: the right answer is the net value, $50 - $40 = $10"
+    },
+    {
+      "id": "only-money",
+      "label": "Only cash you pay counts as cost",
+      "why_tempting": "Bills and prices are visible; pay you never receive leaves no trace.",
+      "refutation": "Income or time you give up is a real cost too, even though no bill arrives.",
+      "source_url": "https://en.wikipedia.org/wiki/Opportunity_cost",
+      "source_note": "'opportunity costs are not restricted to monetary or financial costs: the real cost of output forgone, lost time... should also be considered'"
+    },
+    {
+      "id": "sunk-cost",
+      "label": "Money already spent should steer the choice",
+      "why_tempting": "Skipping something you paid for feels like throwing the money away.",
+      "refutation": "The money is gone whether you go or not, so it can't help you choose. Only what's ahead counts: which evening would you enjoy more?",
+      "source_url": "https://en.wikipedia.org/wiki/Sunk_cost",
+      "source_note": "Sunk cost fallacy: 'a greater tendency to continue an endeavor once an investment in money, effort, or time has been made'"
+    }
+  ],
+  "items": [
+    {
+      "id": "free-concert",
+      "prompt": "You win a free concert ticket for tonight (you can't sell it). Your next-best plan is another show: tickets cost $40, and you'd happily pay up to $50 to go. What do you give up by going to the free concert (its opportunity cost)?",
+      "input_type": "choice",
+      "options": [
+        {
+          "id": "zero",
+          "text": "$0: the ticket was free",
+          "misconception_id": "free-means-no-cost"
+        },
+        {
+          "id": "ten",
+          "text": "$10",
+          "misconception_id": null
+        },
+        {
+          "id": "forty",
+          "text": "$40: the other show's ticket price",
+          "misconception_id": "price-is-the-cost"
+        },
+        {
+          "id": "fifty",
+          "text": "$50: what the other show is worth to me",
+          "misconception_id": "gross-not-net"
+        }
+      ],
+      "truth": {
+        "widget": "stepper",
+        "steps": [
+          "Going to the free concert means skipping the other show.",
+          "The other show would give you $50 worth of enjoyment...",
+          "...but you'd have to pay $40 for it, money you keep by skipping.",
+          "So you give up $50 - $40 = $10 of value: that's the opportunity cost."
+        ],
+        "source_url": "https://crookedtimber.org/2006/02/18/most-economists-arent/"
+      },
+      "answer_expr": "50-40",
+      "answer_claimed": 10,
+      "targets": [
+        "free-means-no-cost",
+        "price-is-the-cost",
+        "gross-not-net"
+      ]
+    },
+    {
+      "id": "year-of-college",
+      "prompt": "A student pays $20,000 a year in tuition. Instead of studying, she could work full time and earn $30,000 a year. Her rent and food cost the same either way. What does a year of college really cost her?",
+      "input_type": "choice",
+      "options": [
+        {
+          "id": "tuition",
+          "text": "$20,000: the tuition bill",
+          "misconception_id": "only-money"
+        },
+        {
+          "id": "both",
+          "text": "$50,000: tuition plus the pay she gives up",
+          "misconception_id": null
+        }
+      ],
+      "truth": {
+        "widget": "estimate",
+        "unit": "$ per year",
+        "source_url": "https://en.wikipedia.org/wiki/Opportunity_cost"
+      },
+      "answer_expr": "20000+30000",
+      "answer_claimed": 50000,
+      "targets": [
+        "only-money"
+      ]
+    },
+    {
+      "id": "paid-ticket",
+      "prompt": "You paid $60 for a concert ticket you can't refund or sell. On the night, you're tired and would honestly enjoy staying home more. Should the $60 you already paid push you toward going?",
+      "input_type": "choice",
+      "options": [
+        {
+          "id": "go",
+          "text": "Yes, or the $60 is wasted",
+          "misconception_id": "sunk-cost"
+        },
+        {
+          "id": "ignore",
+          "text": "No: the $60 is gone either way, so pick the evening you'd enjoy more",
+          "misconception_id": null
+        }
+      ],
+      "truth": {
+        "widget": "stepper",
+        "steps": [
+          "If you go: the $60 is spent, and you get an evening you'd enjoy less.",
+          "If you stay home: the $60 is spent, and you get the evening you'd enjoy more.",
+          "The $60 is the same in both futures, so it can't tip the choice.",
+          "Going 'so it isn't wasted' just adds a worse evening to the lost money."
+        ],
+        "source_url": "https://en.wikipedia.org/wiki/Sunk_cost"
+      },
+      "targets": [
+        "sunk-cost"
+      ]
+    }
+  ]
+}

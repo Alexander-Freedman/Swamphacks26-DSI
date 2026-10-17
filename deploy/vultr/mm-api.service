@@ -1,0 +1,17 @@
+[Unit]
+Description=mm API (FastAPI via uvicorn)
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+User=mm
+Group=mm
+WorkingDirectory=/opt/mm/api
+Environment=HOME=/home/mm
+ExecStart=/usr/local/bin/uv run --no-sync uvicorn app.main:app --host 127.0.0.1 --port 8000 --env-file /etc/mm/env --proxy-headers --forwarded-allow-ips 127.0.0.1
+Restart=always
+RestartSec=2
+NoNewPrivileges=true
+
+[Install]
+WantedBy=multi-user.target

@@ -181,6 +181,82 @@ Effect sizes are reported as within-person gamma correlations between confidence
 
 ---
 
+## 5. Base-rate medical card (positive test)
+
+The card: a rare disease, a decent test, you test positive. What are the odds you actually have it? People (doctors too) answer close to the test's accuracy; the real answer is far lower because the disease is rare.
+
+### 5a. Casscells, Schoenberger & Graboys (1978)
+- "Interpretation by physicians of clinical laboratory results", NEJM 299(18):999-1001 ([DOI](https://doi.org/10.1056/NEJM197811022991808)). I couldn't open the 1978 paper itself. The numbers below are as the 2014 replication reports them (5b), which I did read.
+- Question: a disease with prevalence 1/1000, a test with a 5% false positive rate. Someone tests positive: what's the chance they have it? Correct answer is about **2%** (1.96% if the test catches every real case).
+- Results as reported by Manrai et al.: **11 of 60 (18%)** answered correctly; the most common answer was **95%**, given by **27 of 60 (45%)**.
+- Sample: staff and students at Harvard teaching hospitals. The exact split (attendings / residents / students) I only saw in secondary sources: **unverified**.
+
+### 5b. Manrai et al. (2014), the replication
+Read in source: [Manrai, Bhatia, Strymish, Kohane & Jain 2014, "Medicine's uncomfortable relationship with math: calculating positive predictive value", JAMA Intern Med 174(6):991-993](https://pmc.ncbi.nlm.nih.gov/articles/PMC4955674) ([DOI](https://doi.org/10.1001/jamainternmed.2014.1059)).
+- Same question as Casscells, asked in July 2013 at a Boston-area hospital. 61 respondents: 24 attendings, 26 house officers, 10 medical students, 1 retired physician.
+- "Of 61 respondents, 14 provided the correct answer of 2%." That's **23%** (my division).
+- "The most common answer was 95%, provided by 27 of 61 respondents" (**44%**, my division).
+- Median answer: **66%**, which they note is 33 times the true answer.
+- So 35 years later, basically the same result.
+
+### 5c. Eddy (1982), mammography
+- Eddy, "Probabilistic reasoning in clinical medicine: problems and opportunities", in Kahneman, Slovic & Tversky (eds), *Judgment under Uncertainty*, pp. 249-267 ([Cambridge listing](https://www.cambridge.org/core/books/abs/judgment-under-uncertainty/probabilistic-reasoning-in-clinical-medicine-problems-and-opportunities/661E12D1ECD669EDB5B410407A4BB570)). I couldn't read the chapter.
+- The problem: breast cancer base rate 1%, a positive mammogram 80% of the time if cancer, 9.6% if not. Correct answer: **7.8%**.
+- The famous number is how Gigerenzer & Hoffrage (1995, p. 685, read in source, link in 5d) report it: "Eddy (1982) reported that 95 out of 100 physicians estimated the posterior probability p(cancer|positive) to be between 70% and 80%, rather than 7.8%."
+- Gigerenzer himself elsewhere calls Eddy's sample informal. I haven't seen Eddy's own wording, so "95 out of 100" is **unverified against Eddy's chapter**: always cite it as "as reported by Gigerenzer & Hoffrage".
+
+### 5d. Gigerenzer & Hoffrage (1995), natural frequencies
+Read in source: [Gigerenzer & Hoffrage 1995, "How to improve Bayesian reasoning without instruction: frequency formats", Psychological Review 102(4):684-704](https://pages.ucsd.edu/~scoulson/203/GG_How_1995.pdf) ([DOI](https://doi.org/10.1037/0033-295X.102.4.684)).
+- Study 1: **60 students** at the University of Salzburg, **15 problems** (mammography, cab problem, and others), each in different formats.
+- Same numbers, two ways of writing them. Probability format: "The probability of breast cancer is 1%... 80%... 9.6%". Frequency format: "10 out of every 1,000 women... 8 of every 10 women with breast cancer will get a positive mammography. 95 out of every 990 women without breast cancer will also get a positive mammography."
+- Summary of Study 1, quoted: "The standard probability format ... elicited **16%** Bayesian algorithms. When information was presented in a frequency format, this proportion jumped to **46%** in the standard menu and **50%** in the short menu."
+- Also: "the largest percentage of Bayesian algorithms in the two probability menus (28%) was considerably smaller than the smallest in the two frequency menus (46%)."
+- Careful: these are shares of answers solved with a correct Bayesian method, across all 15 problems, not "share of people who got the mammography question right".
+
+### 5e. Gigerenzer et al. (2007), gynecologists
+Read in source: [Gigerenzer, Gaissmaier, Kurz-Milcke, Schwartz & Woloshin 2007, "Helping doctors and patients make sense of health statistics", Psychological Science in the Public Interest 8(2):53-96](https://kops.uni-konstanz.de/bitstreams/faa74b7c-5f6e-4abe-b6f9-d980100c9c1f/download) ([DOI](https://doi.org/10.1111/j.1539-6053.2008.00033.x)), section "Few Gynecologists Understand Positive Mammograms".
+- **160 gynecologists** at the start of a 2007 continuing-education session.
+- Given: prevalence 1%, sensitivity 90%, false-positive rate 9%. Four choices: (A) about 81%, (B) about 9 in 10, (C) about 1 in 10, (D) about 1%. Best answer: **C, about 1 in 10**.
+- "the majority of them grossly overestimated the probability of cancer, answering '90%' or '81%.'" Answers ranged from 1% to 90%.
+- "The number of physicians who found the best answer ... was slightly less than chance (**21%**)." (Chance with 4 choices = 25%.)
+- After training on natural frequencies ("Ten out of every 1,000 women have breast cancer. Of these 10 women with breast cancer, 9 test positive. Of the 990 women without cancer, about 89 nevertheless test positive"): "**87%** of them now understood that 1 in 10 is the best answer."
+- The per-choice split is in their Fig. 2, which I couldn't read (image). I don't have the exact share who picked "9 in 10".
+
+**Safe on a slide:**
+- "Asked this exact question, 27 of 61 doctors and students at a Boston hospital said 95%. The answer is about 2%." (Manrai et al. 2014)
+- "Only 14 of 61 got it right, about the same as in 1978." (Manrai et al. 2014; Casscells et al. 1978)
+- "Of 160 gynecologists, only 21% picked the right answer for a positive mammogram. After learning to think in 'out of 1,000', 87% did." (Gigerenzer et al. 2007)
+- "Write the same numbers as counts instead of percentages and correct answers roughly triple: 16% to 46%." (Gigerenzer & Hoffrage 1995)
+- This is also our design argument: the reveal should show the 1,000-people picture, not just the percentage.
+
+**Don't say:**
+- "95% of doctors get it wrong." No study here says that. The Eddy "95 out of 100" is about the answer range (70-80%), and it's second-hand.
+- "Most Harvard doctors said 95%." It was 45% (27 of 60), the most common answer but not most people.
+- "Natural frequencies make people get it right." Even with frequencies, about half didn't in the 1995 study.
+
+---
+
+## 6. What people guess for the longest streak in 100 flips
+
+Short version: **I found no study that asked people to guess the longest run in 100 flips and reported the answers.** So demo.md's "Most people guess 3-4" is **unverified**.
+
+What I checked:
+- **Scholl & Greifeneder (2011)**, "Disentangling the effects of alternation rate and maximum run length on judgments of randomness", JDM 6(6):531-541. Read in source ([JDM](https://dlab.sauder.ubc.ca/sjdm/journal/11/101105/jdm101105.html)). People rated how random a sequence looked. Longest runs were set by the researchers (3-5 in 21 flips; 4-6 in 39 flips). Nobody guessed a longest run. Main finding: alternation rate drives randomness judgments, and the longest run had a small, less consistent effect.
+- **Schilling (1990, 1994)**: says people are "quite reluctant to include strings of more than four or five heads (or tails) in a row" when faking (1994, read in source, link in 1b). That's about what people *write*, not what they *guess*, and it's an observation, not a measured rate.
+- **Dartmouth classroom demo** (link in 1b): one class, "only one of the mental sequences contained a run of length at least 5". Also about fake sequences, not guesses.
+- **Wagenaar (1972)**, "Generation of random sequences by human subjects: a critical survey of literature", Psychological Bulletin 77:65-72 ([DOI](https://doi.org/10.1037/h0032060)). Not read; secondary sources say fake sequences have too many short runs. Not a guess study.
+- **Kareev (1992)**, "Not that bad after all: generation of random sequences", JEP:HPP 18(4):1189-1194 ([HUJI record](https://cris.huji.ac.il/en/publications/not-that-bad-after-all-generation-of-random-sequences/)). Abstract only: blames over-alternation on short-term memory limits. Not a guess study.
+- A Bowie State teaching paper says students "generally underestimate" the longest run ([ICTCM proceedings](https://www.math.odu.edu/~bogacki/epictcm/i/13/P002.html)). Teaching note, no numbers. I didn't read it fully.
+- An IMS puzzle column reportedly says few people would write "more than three or four consecutive heads" in 100 imaginary tosses ([IMS](https://imstat.org/2018/10/student-puzzle-corner-22/)); the page was blocked for me, so **unverified**, and it's an opinion anyway.
+
+What we can say instead:
+- "When people fake 100 flips, they rarely include a streak of 5 or more. Real coins almost always have one (97%)." (Schilling 1994; Dartmouth demo; our exact calculation in 1a)
+- Once the app is live, our own guess data is the real source. Log the guesses at the event and say "people we asked guessed X on average", with the count.
+
+**Don't say:** "Studies show people guess 3-4." No study found.
+
+---
+
 ## Unverified list (don't put these on slides)
 - "Most people guess 3-4" for the 100-flip question: our expectation, no study found.
 - Nickerson 2002's conclusions: abstract not read.
@@ -189,3 +265,8 @@ Effect sizes are reported as within-person gamma correlations between confidence
 - "Road Runner" / cartoon path belief: no source found.
 - Any adult error rate for "ball rolls off a table".
 - Whether the 2001b poster data in Butterfield & Metcalfe's 2006 Table 1 is the same dataset as the 2001 JEP:LMC paper.
+- Casscells 1978 numbers (11 of 60 correct, 27 of 60 said 95%): read in Manrai 2014, not in the 1978 paper. Sample split by role: secondary sources only.
+- Eddy 1982 "95 out of 100 physicians said 70-80%": as reported by Gigerenzer & Hoffrage 1995; Eddy's own wording not read, and his sample was informal.
+- Per-choice split for the 160 gynecologists (e.g. how many picked "9 in 10"): in Fig. 2 of Gigerenzer et al. 2007, which I couldn't read.
+- Any number for what people guess as the longest streak in 100 flips: no study found (section 6). demo.md's "3-4" stays unverified.
+- IMS puzzle column "three or four consecutive heads" line: page blocked, not read.
