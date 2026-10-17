@@ -32,9 +32,9 @@ export const SECTIONS: OrgoSection[] = [
     blurb: 'Work it out step by step: find the parts, size them up, pick the mechanism, then draw the arrows.',
     topics: [
       { id: 'sn2', title: 'SN2', blurb: 'One step: the nucleophile hits the back side as the leaving group leaves.', steps: ['parts', 'size', 'decide', 'push'], ready: true },
-      { id: 'sn1', title: 'SN1', blurb: 'Two steps: the leaving group goes first, then the carbocation is attacked.', steps: ['push'], ready: true, mech: 'sn1' },
-      { id: 'e2', title: 'E2', blurb: 'One step: a base pulls a proton as the double bond forms.', steps: ['push'], ready: true, mech: 'e2' },
-      { id: 'e1', title: 'E1', blurb: 'Two steps: carbocation first, then a proton leaves.', steps: ['push'], ready: true, mech: 'e1' },
+      { id: 'sn1', title: 'SN1', blurb: 'Two steps: the leaving group goes first, then the carbocation is attacked.', steps: ['parts', 'size', 'decide', 'push'], ready: true, mech: 'sn1' },
+      { id: 'e2', title: 'E2', blurb: 'One step: a base pulls a proton as the double bond forms.', steps: ['parts', 'size', 'decide', 'push'], ready: true, mech: 'e2' },
+      { id: 'e1', title: 'E1', blurb: 'Two steps: carbocation first, then a proton leaves.', steps: ['parts', 'size', 'decide', 'push'], ready: true, mech: 'e1' },
     ],
   },
   {

@@ -4,6 +4,7 @@ import { EndBar, Frame, SessionHead, Title } from '../../components/session/Shel
 import { BuildStep } from './BuildStep'
 import { MISTAKES } from './chem'
 import { CompareStep } from './CompareStep'
+import { CASES, SN2_CASE } from './analysis'
 import { DecideStep, PartsStep, SizeStep } from './MechSteps'
 import { MechStep } from './MechStep'
 import { MECHS } from './mechs'
@@ -32,6 +33,7 @@ const REMIX: Record<string, string> = {
   e2: 'Next: SN1. Weak nucleophile, same crowded carbon.',
 }
 type M = keyof typeof MISTAKES
+const SIZE_SUB = (nu: string) => `Three questions decide the mechanism: how strong is the ${nu}, what kind of carbon holds the leaving group, and does the leaving group leave easily?`
 
 /** Orgo opens on a menu: pick a section and a topic, so practice is on purpose, not a fixed path. */
 export function OrgoSession({ onDone }: { onDone: () => void }) {
@@ -82,6 +84,7 @@ function OrgoTopicRun({ topic, onTopics, onDone }: { topic: OrgoTopic; onTopics:
   const [mistakes, setMistakes] = useState<M[]>([])
   const [finished, setFinished] = useState(false)
   const mech = topic.mech ? MECHS[topic.mech] : null
+  const kase = CASES[topic.id] ?? SN2_CASE
   const [mechStage, setMechStage] = useState(0)
   const saved = useRef(false)
   const go = (n: number) => {
@@ -118,7 +121,8 @@ function OrgoTopicRun({ topic, onTopics, onDone }: { topic: OrgoTopic; onTopics:
   const after = (s: OrgoStep) => () => (at(s) < steps.length ? go(at(s) + 1) : finish())
   const nextLabel = (s: OrgoStep) => (at(s) < steps.length ? `${TITLES[steps[at(s)]][0]} →` : 'Finish ✓')
   const block = (s: OrgoStep, el: ReactNode) => at(s) > 0 && reached >= at(s) && <div hidden={step !== at(s)}>{el}</div>
-  const [h, sub] = mech && steps[step - 1] === 'push' ? [mech.stages[mechStage].title, mech.stages[mechStage].sub] : TITLES[steps[step - 1]]
+  const cur = steps[step - 1]
+  const [h, sub] = mech && cur === 'push' ? [mech.stages[mechStage].title, mech.stages[mechStage].sub] : cur === 'parts' ? [TITLES.parts[0], kase.partsSub] : cur === 'size' ? [TITLES.size[0], SIZE_SUB(kase.nuWord)] : TITLES[cur]
   const last = step === steps.length
 
   return (
@@ -132,9 +136,9 @@ function OrgoTopicRun({ topic, onTopics, onDone }: { topic: OrgoTopic; onTopics:
           <BuildStep onCheck={caught} onNext={after('build')} nextLabel={nextLabel('build')} />
         </div>
       )}
-      {block('parts', <PartsStep onNext={after('parts')} nextLabel={nextLabel('parts')} />)}
-      {block('size', <SizeStep onNext={after('size')} nextLabel={nextLabel('size')} onMistake={(m) => caught([m])} />)}
-      {block('decide', <DecideStep onNext={after('decide')} nextLabel={nextLabel('decide')} onMistake={(m) => caught([m])} />)}
+      {block('parts', <PartsStep c={kase} onNext={after('parts')} nextLabel={nextLabel('parts')} />)}
+      {block('size', <SizeStep c={kase} onNext={after('size')} nextLabel={nextLabel('size')} onMistake={(m) => caught([m])} />)}
+      {block('decide', <DecideStep c={kase} onNext={after('decide')} nextLabel={nextLabel('decide')} onMistake={(m) => caught([m])} />)}
       {block(
         'push',
         mech ? (
