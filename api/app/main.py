@@ -1,12 +1,14 @@
 import os
 import time
 from collections import defaultdict, deque
+from contextlib import asynccontextmanager
 
 from fastapi import FastAPI, HTTPException, Request
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import JSONResponse
 from pydantic import BaseModel, Field
 
-from app.events import collection, record_answer, room
+from app.events import StoreError, collection, get_store, record_answer, room
 from app.gen import (
     GenerationError,
     Usage,
@@ -19,7 +21,24 @@ from app.rounds import showcase_rounds
 from app.schema import Round
 from app.truth import band_for
 
-app = FastAPI(title="mm API")
+
+@asynccontextmanager
+async def lifespan(_app: FastAPI):
+    # Pick the answer store (Tiger or SQLite fallback) and set up its schema once.
+    store = get_store()
+    yield
+    if hasattr(store, "close"):
+        store.close()
+
+
+app = FastAPI(title="mm API", lifespan=lifespan)
+
+
+@app.exception_handler(StoreError)
+async def store_error(_request: Request, _exc: StoreError) -> JSONResponse:
+    return JSONResponse(status_code=503, content={"detail": "answer store unavailable"})
+
+
 app.add_middleware(
     CORSMiddleware,
     allow_origins=[
