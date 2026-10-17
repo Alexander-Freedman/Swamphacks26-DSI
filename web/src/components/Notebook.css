@@ -3,7 +3,8 @@
 
 .nb-link { display: flex; flex-direction: column; gap: 2px; margin-top: 20px; padding: 14px 16px; border: 2px dashed var(--pencil); border-radius: var(--radius); background: var(--paper); color: var(--ink); text-decoration: none; }
 .nb-link:hover { border-color: var(--ink); }
-.nb-link:focus-visible, .nb-btn:focus-visible, .nb-back:focus-visible { outline: 3px solid var(--marker); outline-offset: 2px; }
+.nb-link:focus-visible, .nb-btn:focus-visible, .nb-back:focus-visible, .nb-again:focus-visible { outline: 3px solid var(--marker); outline-offset: 2px; }
+.nb-again { display: inline-block; margin-top: 8px; padding: 8px 0; min-height: 40px; color: var(--ink); font-weight: 700; font-size: 0.9rem; }
 .nb-link-title { font-family: var(--font-hand); font-weight: 600; font-size: 1.15rem; }
 .nb-link-title::before { content: '✎ '; }
 .nb-link-sub { color: var(--ink-soft); font-size: 0.95rem; }

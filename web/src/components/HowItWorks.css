@@ -38,6 +38,7 @@
 .hiw-options li.correct { list-style: none; margin-left: -18px; }
 .hiw-means { color: var(--ink-soft); font-size: 0.85rem; }
 .hiw-wait p { margin: 0 0 10px; }
+.hiw-held { color: var(--ink-soft); font-style: italic; }
 .hiw-peek { padding: 6px 12px; font: inherit; font-size: 0.85rem; background: var(--card); border: 1.5px dashed var(--ink-soft); border-radius: var(--radius-ui); color: var(--ink); }
 .hiw-checks-box p { margin: 0 0 8px; }
 .hiw-checks, .hiw-sources { margin: 0; padding-left: 18px; font-size: 0.92rem; }
