@@ -7,11 +7,12 @@ export const TITLES: [string, string][] = [
   ['Draw your curve', "Draw how you think the chance grows as the room fills, from 2 to 80 people. There's no wrong drawing; it's your model."],
   ['Your curve vs the real one', "Here's the real curve over yours. Drag the group size to see where your model and reality part."],
   ['What happened in your head', 'This is the mistake your guess points to, and the one idea that fixes it.'],
+  ['Same idea, new place', "Here's a different situation. Drag the crowd size and look at both: what's the same about how they work?"],
   ['Rematch', 'One more, with new numbers: does the idea stick?'],
 ]
 
 
-export const CALLED_IT = "You called it. Here's why it works, so it sticks."
+export const CALLED_IT = "Spot on. Here's why it works, so it sticks."
 
 /** Title and guidance line for a step. A called-it card has no mistake to name, so it says why the guess works (#150). */
 export function guideFor(step: number, guess: number): [string, string] {

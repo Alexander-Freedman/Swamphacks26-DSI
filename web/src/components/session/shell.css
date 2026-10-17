@@ -7,7 +7,7 @@
 }
 
 .ss-head { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
-.ss-chip { font: 700 13px var(--font-body); border: 2px solid var(--ink); border-radius: 999px; padding: 3px 12px; background: var(--card); }
+.ss-chip { font: 700 13px var(--font-body); border: 2px solid var(--ink); border-radius: var(--radius-ui); padding: 3px 12px; background: var(--card); }
 .ss-dots { display: inline-flex; gap: 5px; align-items: center; }
 .ss-dot { display: inline-block; width: 10px; height: 10px; border-radius: 50%; border: 2px solid var(--ink); background: transparent; padding: 0; }
 .ss-dot.on { background: var(--ink); }
@@ -25,12 +25,12 @@ button.ss-dot[aria-current='step'] { box-shadow: 0 0 0 2px var(--marker); }
 .ss-mt { margin-top: 16px; }
 
 .ss-choices { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-top: 8px; }
-.ss-choice { font: 600 15px var(--font-body); background: var(--card); color: var(--ink); border: 2px solid var(--ink); border-radius: 10px; min-height: 46px; padding: 8px; touch-action: manipulation; }
+.ss-choice { font: 600 15px var(--font-body); background: var(--card); color: var(--ink); border: 2px solid var(--ink); border-radius: var(--radius-ui); min-height: 46px; padding: 8px; touch-action: manipulation; }
 .ss-choice[aria-pressed='true'] { background: var(--ink); color: var(--paper); }
 .ss-choice:disabled { cursor: default; }
 .ss-choice:disabled:not([aria-pressed='true']) { opacity: 0.45; }
 
-.ss-btn { font: 700 16px var(--font-body); background: var(--ink); color: var(--paper); border: 2px solid var(--ink); border-radius: 12px; padding: 12px 20px; min-height: 48px; box-shadow: 0 3px 0 #000; touch-action: manipulation; user-select: none; -webkit-user-select: none; }
+.ss-btn { font: 700 16px var(--font-body); background: var(--ink); color: var(--paper); border: 2px solid var(--ink); border-radius: var(--radius-ui); padding: 12px 20px; min-height: 48px; box-shadow: 0 3px 0 #000; touch-action: manipulation; user-select: none; -webkit-user-select: none; }
 .ss-btn:active:not(:disabled) { transform: translateY(2px); box-shadow: 0 1px 0 #000; }
 .ss-btn:disabled { opacity: 0.45; cursor: not-allowed; }
 .ss-lock { display: block; width: 100%; margin-top: 18px; background: var(--marker); color: var(--ink); }

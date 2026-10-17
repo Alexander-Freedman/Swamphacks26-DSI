@@ -1,7 +1,9 @@
 // @vitest-environment jsdom
-import { cleanup, fireEvent, render, screen } from '@testing-library/react'
+import { cleanup, fireEvent, render, renderHook, screen } from '@testing-library/react'
 import { afterEach, describe, expect, it, vi } from 'vitest'
+import { KEY, notebook } from '../../notebook'
 import { cardGuide, endLine, lockLabel } from './copy'
+import { useNotebookEntry } from './entry'
 import { percent } from './percent'
 import { EndBar, SessionHead } from './Shell'
 import { isClose, rematchVerdict, shellVerdict } from './verdict'
@@ -96,5 +98,21 @@ describe('session shell parts', () => {
     expect((screen.getByRole('button', { name: '3 Your mistake' }) as HTMLButtonElement).disabled).toBe(true)
     fireEvent.click(screen.getByRole('button', { name: '1 Be a coin' }))
     expect(go).toHaveBeenCalledWith(0)
+  })
+})
+
+describe('useNotebookEntry extend (compare answer on the same entry)', () => {
+  it('adds extra fields to the card entry, never the core fields, and the rematch keeps them', () => {
+    localStorage.clear()
+    const { result } = renderHook(() => useNotebookEntry('coin-streak'))
+    result.current.extend({ comparePick: 'x' }) // nothing saved yet: no-op
+    expect(localStorage.getItem(KEY)).toBeNull()
+    result.current.atCard({ guess: 3, confidence: 'certain', misconception: 'random-means-evenly-mixed' })
+    result.current.extend({ comparePick: 'due', compareRight: false, misconception: null, rematch: 'right', guess: 7 })
+    result.current.rematch('right', null)
+    const all = JSON.parse(localStorage.getItem(KEY)!)
+    expect(all).toHaveLength(1)
+    expect(all[0]).toMatchObject({ guess: 3, misconception: 'random-means-evenly-mixed', rematch: 'right', comparePick: 'due', compareRight: false })
+    expect(notebook().map((c) => c.id)).toEqual(['random-means-evenly-mixed'])
   })
 })

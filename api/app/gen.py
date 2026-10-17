@@ -1,12 +1,20 @@
-"""Round generation with the Gemini API (free tier).
+"""Engine v4: a typed topic becomes a runnable model spec (Gemini API, free tier).
 
-- One structured-output call per fresh topic returns a whole Round, which is
-  cached on disk by normalized topic + prompt version.
+- One structured-output call per fresh topic returns a compact model spec:
+  which of our visual widgets runs the idea (a curve with a knob, including
+  slope / area / limit views for calculus, or a sampler), its numbers, the
+  prediction, the extremes to try and the named misconception. app/spec.py
+  validates it, computes every truth in code and compiles it into a Round.
+  The model's own number is only cross-checked.
+- Topics that aren't real concepts, or that no widget fits, get an honest
+  no-fit (NoFit) instead of a made-up quiz.
+- The result (spec + round + check report) is cached on disk by normalized
+  topic + prompt version.
 - Model chain: 3.5 Flash-Lite -> 3.1 Flash-Lite -> Gemma 26B. Daily-quota 429s
   are never retried; that model is skipped until the quota day resets
-  (midnight Pacific).
+  (midnight Pacific). A bad spec gets one retry, then no-fit.
 - A per-day request counter stops live calls at DAILY_SOFT_CAP.
-- No key (or MM_OFFLINE=1): mock mode, which never calls the API.
+- No key (or MM_OFFLINE=1): never calls the API.
 The API key is read from the environment only and never logged.
 """
 
@@ -15,6 +23,7 @@ from __future__ import annotations
 import hashlib
 import json
 import logging
+import math
 import os
 import re
 import tempfile
@@ -28,97 +37,150 @@ from zoneinfo import ZoneInfo
 
 from pydantic import ValidationError
 
-from app.checks import CheckFailed, check_round
-from app.schema import Item, Round
+from app.schema import ModelSpec, Round, SpecCase
+from app.spec import (
+    SpecRejected,
+    compile_spec,
+    definition_covers_topic,
+    topic_looks_unreal,
+)
 
 log = logging.getLogger("mm.gen")
 
-PROMPT_VERSION = 3
+PROMPT_VERSION = 4
 MODEL_CHAIN = ["gemini-3.5-flash-lite", "gemini-3.1-flash-lite", "gemma-4-26b-a4b-it"]
 DAILY_SOFT_CAP = 480
+MAX_CONTENT_TRIES = 2  # first spec + one retry
 TIMEOUT_S = 30
 CACHE_DIR = Path(__file__).resolve().parents[2] / "data" / "cache"
 PACIFIC = ZoneInfo("America/Los_Angeles")
 
-SYSTEM_PROMPT = """You write one short "predict first" learning round as JSON.
+SYSTEM_PROMPT = """You turn a topic into a small RUNNABLE, VISUAL MODEL, as JSON.
 
-Goal: a curious college student types a topic. They make a prediction BEFORE
-seeing anything, then our code DRAWS the truth (a curve they can scrub, or a
-histogram from thousands of simulated trials) next to their guess, then we
-name the specific wrong idea their answer reveals. The picture is the lesson.
+A curious college student types a topic. They predict a number BEFORE seeing
+anything, then our code RUNS the model (a curve they drag with a knob, or
+thousands of simulated trials) and shows where their guess was wrong, then we
+name the specific wrong idea. Every result is an interactive picture; labels
+are short. You never write the answer: you fill a spec and our code computes
+the truth from it.
 
-Rules:
-- misconceptions: 2-5 DOCUMENTED, well-known wrong ideas about this topic
-  (things real learners believe), each with why it's tempting and a 1-2
-  sentence refutation. set source_url only if you are sure it exists,
-  otherwise null and say where it's known from in source_note.
-- questions: exactly 3 prediction questions, each testing a DIFFERENT
-  misconception (or the same one in a new setting) whose intuitive answer is
-  WRONG for many people. Every wrong option or numeric band maps to exactly
-  one misconception id; the correct one has misconception_id null.
-- input_type "slider" (slider_min/max/step/unit, and bands that cover the
-  whole slider with exactly one correct band) or "choice" (2-4 options,
-  exactly one correct).
-- widget: how our code shows the truth. Pick in this order:
-  1. "curve": the answer is a point on a real formula y = f(x) (growth,
-     decay, probability vs group size, distance vs time, cost vs quantity).
-     expr in x, using only numbers, + - * / ^, sin cos tan exp log log2
-     log10 sqrt abs min max, and at most one knob name. x_min/x_max: a meaningful range
-     that contains the asked point with room on both sides. x_label, y_label.
-     y must be in the SAME units as the slider answer. If the question asks
-     the y at some x, set ask_x; if it asks which x reaches some y, set ask_y.
-     Knob: the one parameter a learner would want to drag (rate, half-life,
-     number of people). Give explore_param (a short name used in expr),
-     explore_label, explore_min, explore_max, explore_step, and
-     explore_default = the value in the question.
-  2. "distribution": the answer comes from chance; pick a sampler and its
-     numbers: dice_sum (dice = how many six-sided dice), binomial_count (n,
-     p), coin_longest_run (n fair flips), birthday_match (group_size),
-     base_rate_test (base_rate, sensitivity, false_positive_rate).
-  3. "estimate": one number with no honest curve or sampler.
-  4. "stepper" (2-6 worked steps): nothing can be computed; at most once.
-  If the topic involves any quantity, at least one question (ideally two)
-  MUST be "curve" or "distribution". Only use a real formula or a real chance
-  process, never invented survey numbers ("what % of people...").
-- answer_expr: the true value (same expression rules, numbers only, no knob
-  name); answer_claimed: your own number for it.
-- slug: lowercase words joined by hyphens. Plain, friendly language. No
-  markdown. Never reveal the answer in a prompt.
+First: recognized = true only if the topic is a real concept, fact or
+phenomenon you can define. If it is gibberish, made up, or not a topic, set
+recognized = false, no_fit_reason, and leave the rest minimal. definition:
+one plain sentence saying what the topic is (use the topic's own words).
 
-Examples (one question each, other fields omitted):
-{"prompt": "You invest $1,000 at 7% a year, compounded yearly, and leave it for
- 30 years. About how much is it worth?", "input_type": "slider",
- "slider_min": 1000, "slider_max": 15000, "slider_step": 100, "slider_unit": "$",
- "widget": "curve", "expr": "1000*(1+r/100)^x", "x_min": 0, "x_max": 40,
- "x_label": "years", "y_label": "value ($)", "ask_x": 30, "explore_param": "r",
- "explore_label": "interest rate (%)", "explore_min": 1, "explore_max": 12,
- "explore_step": 0.5, "explore_default": 7, "answer_expr": "1000*1.07^30",
- "answer_claimed": 7612}
-{"prompt": "Roll two dice and add them. Which total comes up most often?",
- "input_type": "slider", "slider_min": 2, "slider_max": 12, "slider_step": 1,
- "widget": "distribution", "sampler": "dice_sum", "dice": 2,
- "x_label": "sum of two dice", "answer_expr": "7", "answer_claimed": 7}
-{"prompt": "A 400 mg dose has a half-life of 6 hours. After how many hours is
- only 50 mg left?", "input_type": "slider", "slider_min": 0, "slider_max": 60,
- "slider_step": 1, "slider_unit": "hours", "widget": "curve",
- "expr": "400*0.5^(x/h)", "x_min": 0, "x_max": 36, "x_label": "hours",
- "y_label": "mg left", "ask_y": 50, "explore_param": "h",
- "explore_label": "half-life (hours)", "explore_min": 1, "explore_max": 24,
- "explore_step": 1, "explore_default": 6, "answer_expr": "6*3",
- "answer_claimed": 18}"""
+Then pick ONE widget for cases[0]:
+1. "curve": y = f(x) with a knob the learner drags. expr uses x, the knob
+   name, your variable names, numbers, + - * / ^, sin cos tan exp log log2
+   log10 sqrt abs min max. mode:
+   - "value": the question asks y at ask_x, or (ask_y) which x first reaches
+     that y. Growth, decay, motion, cost, probability vs group size...
+   - "slope": the derivative of the curve at ask_x (derivatives, rates of
+     change, instantaneous speed). The picture draws the tangent at ask_x.
+   - "area": the integral from area_from to area_to (integrals, distance from
+     speed, accumulated total). The knob is the number of rectangles
+     (knob_param "n", knob_min 1, knob_max 50, knob_step 1, knob_default 4)
+     and is NOT in expr.
+   - "limit": the limit of the curve at ask_x (limits, e.g. sin(x)/x at 0).
+   x_min/x_max contain the asked point with room on both sides. y in the
+   SAME units as the slider. knob_*: the one parameter a learner wants to
+   drag (rate, half-life, R0, an exponent); knob_default = the value in the
+   question.
+2. "sampler": the idea is chance and fits one of these exactly:
+   coin_longest_run (n fair flips; stat mean_longest_run, or p_run_at_least
+   with k), base_rate_test (base_rate, sensitivity, false_positive_rate as
+   0-1 fractions; stat p_true_positive), birthday_match (group_size; stat
+   p_match), binomial_count (n, p; stat mean | mode | p_at_least k |
+   p_equals k), dice_sum (dice = number of six-sided dice; same stats).
+   Probabilities (p_*) are answered in PERCENT 0-100.
+approximate: false when the curve is an established formula or the sampler
+is exact; true when it is only a simplified picture of the main relationship
+(then keep it honest and simple, e.g. a saturating or linear trend with a knob).
+If even an approximate picture would mislead (e.g. reaction mechanisms, history,
+events, pure definitions), set widget "none" and say why in no_fit_reason.
+Never invent survey numbers ("what % of people...").
+
+prediction: prompt (never reveals the answer), input "slider" (slider_min,
+slider_max, slider_step, slider_unit, and bands covering the whole slider
+with exactly one correct band, misconception_id null) or "choice" (2-4
+options; each numeric option has its value; exactly one correct option,
+misconception_id null). Every wrong band/option names a misconception id.
+No betting words anywhere (bet, wager, lock in, called it, confidence).
+misconceptions: 1-3 documented wrong ideas real learners hold, the main one
+first: label, why_tempting, refutation (1-2 sentences). source_url only if
+you are sure it exists, else null.
+extremes: 2-3 settings worth trying after the reveal (param = the knob, a
+sampler param, or a variable name; value; watch = one short line on what to
+look for). answer_claimed: your own number for the answer.
+compare: if a second case LOOKS different but WORKS the same, give
+compare_topic, compare_principle (the shared idea in one sentence) and put
+it as cases[1] with the SAME widget and its own prediction and bands.
+slug: lowercase words joined by hyphens. Plain, friendly words, no markdown.
+
+Hard rules (our code rejects the spec otherwise):
+- Every name in expr is x, the knob, or a declared variable. Declare every
+  constant as a variable (name, meaning, unit, value) or write the number.
+  No pi (write 3.14159), no tanh, no other functions. expr must use x.
+- The knob is NOT also a variable. Curves always have numeric x_min, x_max.
+- The prompt asks for EXACTLY the number the spec computes (the curve's
+  value / slope / area / limit, or the sampler stat in its units).
+  answer_claimed is that number.
+- Exactly ONE band (or option) has misconception_id null and contains the
+  answer; bands are sorted, touch each other (next min = previous max +
+  slider_step) and cover slider_min..slider_max. Every other misconception_id
+  is one of the ids in misconceptions, spelled exactly.
+- Sampler fractions (p, base_rate, sensitivity, false_positive_rate) are 0-1.
+
+Examples (fields abridged):
+{"recognized": true, "definition": "Compound interest is interest earned on
+ both the money you put in and the interest it already earned.",
+ "cases": [{"widget": "curve", "mode": "value", "approximate": false,
+ "expr": "P*(1+r/100)^x", "variables": [{"name":
+ "P", "meaning": "money put in", "unit": "$", "value": 1000}], "x_min": 0,
+ "x_max": 40, "x_label": "years", "y_label": "value ($)", "ask_x": 30,
+ "knob_param": "r", "knob_label": "interest rate (%)", "knob_min": 1,
+ "knob_max": 12, "knob_step": 0.5, "knob_default": 7, "prompt": "You put
+ $1,000 in at 7% a year and leave it 30 years. About what is it worth?",
+ "input": "slider", "slider_min": 1000, "slider_max": 15000, "slider_step":
+ 100, "slider_unit": "$", "bands": [{"min": 1000, "max": 3500,
+ "misconception_id": "linear-growth"}, {"min": 3600, "max": 6400,
+ "misconception_id": "underestimate-compounding"}, {"min": 6500, "max": 8700,
+ "misconception_id": null}, {"min": 8800, "max": 15000, "misconception_id":
+ "overestimate"}], "extremes": [{"param": "r", "value": 2, "watch": "Low
+ rates look almost like a straight line."}, {"param": "r", "value": 12,
+ "watch": "At 12% it doubles about every 6 years."}], "answer_claimed": 7612}]}
+{"cases": [{"widget": "sampler", "sampler": "birthday_match", "group_size": 23,
+ "stat": "p_match", "prompt": "23 people in a room. What's the chance two
+ share a birthday?", "input": "slider", "slider_min": 0, "slider_max": 100,
+ "slider_unit": "%", ..., "extremes": [{"param": "group_size", "value": 60,
+ "watch": "Almost certain by 60."}], "answer_claimed": 50.7}],
+ "compare_topic": "Two files with the same short hash", "compare_principle":
+ "Matches grow with the number of PAIRS, not the number of items."}
+{"cases": [{"widget": "curve", "mode": "slope", "approximate": false, "expr":
+ "x^k", "x_min": 0, "x_max": 4, "ask_x": 3, "knob_param": "k", "knob_label":
+ "power", "knob_min": 1, "knob_max": 4, "knob_step": 1, "knob_default": 2,
+ "prompt": "How steep is y = x^2 at x = 3?", ..., "answer_claimed": 6}]}"""
 
 
 class GenerationError(Exception):
     pass
 
 
+class NoFit(GenerationError):
+    """Honest no: the topic isn't a real concept, or no widget can run it."""
+
+    def __init__(self, reason: str) -> None:
+        super().__init__(reason)
+        self.reason = reason
+
+
 @dataclass
 class GenResult:
     round: Round
-    source: str  # "cache" | model id | "mock"
+    source: str  # "cache" | model id
     seconds: float
-    # Check report from when the round was generated (kept with the cache);
-    # None for rounds cached before reports were stored.
+    spec: ModelSpec | None = None
+    # Check report from when the spec was compiled (kept with the cache).
     checks: dict | None = None
 
 
@@ -132,18 +194,6 @@ def normalize_topic(topic: str) -> str:
 def _cache_path(topic: str) -> Path:
     key = hashlib.sha256(f"v{PROMPT_VERSION}:{normalize_topic(topic)}".encode()).hexdigest()[:16]
     return CACHE_DIR / "rounds" / f"{key}.json"
-
-
-def _checks_path(cached: Path) -> Path:
-    return cached.with_suffix(".checks.json")
-
-
-def _read_checks(cached: Path) -> dict | None:
-    try:
-        data = json.loads(_checks_path(cached).read_text())
-    except (OSError, ValueError):
-        return None
-    return data if isinstance(data, dict) else None
 
 
 def _atomic_write(path: Path, text: str) -> None:
@@ -233,19 +283,119 @@ _N = {"type": "number"}
 _NS = {"type": "string", "nullable": True}
 _NN = {"type": "number", "nullable": True}
 
-# Compact schema the model fills. The full Round schema is over the API's
-# complexity limit (generic 400), so the model gets this and to_round() maps it
-# onto Round, which then validates everything strictly.
+_CASE: dict = {
+    "type": "object",
+    "properties": {
+        "widget": {"type": "string", "enum": ["curve", "sampler", "none"]},
+        "approximate": {"type": "boolean"},
+        "mode": {"type": "string", "enum": ["value", "slope", "area", "limit"]},
+        "area_from": _NN,
+        "area_to": _NN,
+        "variables": {
+            "type": "array",
+            "items": {
+                "type": "object",
+                "properties": {"name": _S, "meaning": _S, "unit": _NS, "value": _N},
+                "required": ["name", "meaning", "value"],
+            },
+        },
+        "expr": _NS,
+        "x_min": _NN,
+        "x_max": _NN,
+        "x_label": _NS,
+        "y_label": _NS,
+        "ask_x": _NN,
+        "ask_y": _NN,
+        "knob_param": _NS,
+        "knob_label": _NS,
+        "knob_min": _NN,
+        "knob_max": _NN,
+        "knob_step": _NN,
+        "knob_default": _NN,
+        "sampler": {
+            "type": "string",
+            "nullable": True,
+            "enum": [
+                "coin_longest_run",
+                "base_rate_test",
+                "birthday_match",
+                "binomial_count",
+                "dice_sum",
+            ],
+        },
+        "n": _NN,
+        "p": _NN,
+        "dice": _NN,
+        "group_size": _NN,
+        "base_rate": _NN,
+        "sensitivity": _NN,
+        "false_positive_rate": _NN,
+        "stat": {
+            "type": "string",
+            "nullable": True,
+            "enum": [
+                "mean_longest_run",
+                "p_run_at_least",
+                "p_true_positive",
+                "p_match",
+                "mean",
+                "mode",
+                "p_at_least",
+                "p_equals",
+            ],
+        },
+        "k": _NN,
+        "prompt": _S,
+        "input": {"type": "string", "enum": ["slider", "choice"]},
+        "slider_min": _NN,
+        "slider_max": _NN,
+        "slider_step": _NN,
+        "slider_unit": _NS,
+        "options": {
+            "type": "array",
+            "items": {
+                "type": "object",
+                "properties": {"id": _S, "text": _S, "value": _NN, "misconception_id": _NS},
+                "required": ["id", "text"],
+            },
+        },
+        "bands": {
+            "type": "array",
+            "items": {
+                "type": "object",
+                "properties": {"min": _N, "max": _N, "misconception_id": _NS},
+                "required": ["min", "max"],
+            },
+        },
+        "extremes": {
+            "type": "array",
+            "items": {
+                "type": "object",
+                "properties": {"param": _S, "value": _N, "watch": _S},
+                "required": ["param", "value", "watch"],
+            },
+        },
+        "answer_claimed": _NN,
+    },
+    "required": ["widget", "prompt", "input"],
+}
+
+# Compact schema the model fills (the nested ModelSpec is over the API's
+# schema complexity limit). spec_from_gen() maps it onto ModelSpec, which then
+# validates everything strictly.
 GEN_SCHEMA: dict = {
     "type": "object",
     "properties": {
+        "recognized": {"type": "boolean"},
+        "no_fit_reason": _NS,
         "slug": _S,
         "topic": _S,
+        "definition": _S,
         "concept": _S,
         "misconceptions": {
             "type": "array",
-            "minItems": 2,
-            "maxItems": 5,
+            "minItems": 1,
+            "maxItems": 3,
             "items": {
                 "type": "object",
                 "properties": {
@@ -254,214 +404,27 @@ GEN_SCHEMA: dict = {
                     "why_tempting": _S,
                     "refutation": _S,
                     "source_url": _NS,
-                    "source_note": _NS,
                 },
                 "required": ["id", "label", "why_tempting", "refutation"],
             },
         },
-        "questions": {
-            "type": "array",
-            "minItems": 3,
-            "maxItems": 3,
-            "items": {
-                "type": "object",
-                "properties": {
-                    "id": _S,
-                    "prompt": _S,
-                    "input_type": {"type": "string", "enum": ["slider", "choice"]},
-                    "slider_min": _NN,
-                    "slider_max": _NN,
-                    "slider_step": _NN,
-                    "slider_unit": _NS,
-                    "options": {
-                        "type": "array",
-                        "items": {
-                            "type": "object",
-                            "properties": {"id": _S, "text": _S, "misconception_id": _NS},
-                            "required": ["id", "text"],
-                        },
-                    },
-                    "bands": {
-                        "type": "array",
-                        "items": {
-                            "type": "object",
-                            "properties": {"min": _N, "max": _N, "misconception_id": _NS},
-                            "required": ["min", "max"],
-                        },
-                    },
-                    "widget": {
-                        "type": "string",
-                        "enum": ["distribution", "curve", "estimate", "stepper"],
-                    },
-                    "sampler": {
-                        "type": "string",
-                        "nullable": True,
-                        "enum": [
-                            "coin_longest_run",
-                            "base_rate_test",
-                            "birthday_match",
-                            "binomial_count",
-                            "dice_sum",
-                        ],
-                    },
-                    "n": _NN,
-                    "p": _NN,
-                    "dice": _NN,
-                    "group_size": _NN,
-                    "base_rate": _NN,
-                    "sensitivity": _NN,
-                    "false_positive_rate": _NN,
-                    "expr": _NS,
-                    "x_min": _NN,
-                    "x_max": _NN,
-                    "x_label": _NS,
-                    "y_label": _NS,
-                    "ask_x": _NN,
-                    "ask_y": _NN,
-                    "explore_param": _NS,
-                    "explore_label": _NS,
-                    "explore_min": _NN,
-                    "explore_max": _NN,
-                    "explore_step": _NN,
-                    "explore_default": _NN,
-                    "steps": {"type": "array", "items": _S},
-                    "answer_expr": _NS,
-                    "answer_claimed": _NN,
-                    "targets": {"type": "array", "items": _S},
-                },
-                "required": ["id", "prompt", "input_type", "widget"],
-            },
-        },
+        "cases": {"type": "array", "minItems": 1, "maxItems": 2, "items": _CASE},
+        "compare_topic": _NS,
+        "compare_principle": _NS,
     },
-    "required": ["slug", "topic", "concept", "misconceptions", "questions"],
+    "required": ["recognized", "slug", "topic", "definition", "concept", "cases"],
 }
 
-
-def _int(v):
-    return int(v) if isinstance(v, (int, float)) else None
-
-
-def to_round(data: dict, dropped: dict[str, str] | None = None) -> Round:
-    """Map the compact generated shape onto Round (strict validation happens there).
-
-    With `dropped`, an item that fails validation on its own (no correct option,
-    no answer_expr, ...) is left out and its reason recorded there, instead of
-    rejecting the whole round for one bad question.
-    """
-    items = []
-    for q in data.get("questions", []):
-        widget = q.get("widget")
-        if widget == "distribution":
-            params = {
-                "n": _int(q.get("n")),
-                "p": q.get("p"),
-                "dice": _int(q.get("dice")),
-                "group_size": _int(q.get("group_size")),
-                "base_rate": q.get("base_rate"),
-                "sensitivity": q.get("sensitivity"),
-                "false_positive_rate": q.get("false_positive_rate"),
-                "population": 1000 if q.get("sampler") == "base_rate_test" else None,
-            }
-            truth = {
-                "widget": "distribution",
-                "sampler": q.get("sampler"),
-                "params": {k: v for k, v in params.items() if v is not None},
-                "x_label": q.get("x_label") or "",
-            }
-        elif widget == "curve":
-            truth = {
-                "widget": "curve",
-                "expr": q.get("expr"),
-                "x_min": q.get("x_min"),
-                "x_max": q.get("x_max"),
-                "x_label": q.get("x_label") or "",
-                "y_label": q.get("y_label") or "",
-                "ask_x": q.get("ask_x"),
-                "ask_y": q.get("ask_y"),
-            }
-        elif widget == "estimate":
-            truth = {"widget": "estimate", "unit": q.get("slider_unit") or ""}
-        else:
-            truth = {"widget": "stepper", "steps": q.get("steps") or []}
-        item = {
-            "id": q.get("id"),
-            "prompt": _clip(q.get("prompt"), 300),
-            "input_type": q.get("input_type"),
-            "options": q.get("options") or [],
-            "bands": q.get("bands") or [],
-            "truth": truth,
-            "answer_expr": q.get("answer_expr"),
-            "answer_claimed": q.get("answer_claimed"),
-            "targets": q.get("targets") or [],
-            "explore": _explore(q) if widget == "curve" else None,
-        }
-        if q.get("input_type") == "slider":
-            item["slider"] = {
-                "min": q.get("slider_min"),
-                "max": q.get("slider_max"),
-                "step": q.get("slider_step") or 1,
-                "unit": q.get("slider_unit") or "",
-            }
-        items.append(item)
-    known = {_slugify(m.get("id", "")) for m in data.get("misconceptions", [])}
-    for it in items:
-        _fix_ids(it)
-        # A dangling reference can't be shown as a named wrong idea, so drop
-        # that band/option rather than silently calling it "correct".
-        it["bands"] = [b for b in it["bands"] if b.get("misconception_id") in known | {None}]
-        it["options"] = [o for o in it["options"] if o.get("misconception_id") in known | {None}]
-        it["targets"] = [t for t in it["targets"] if t in known]
-    if dropped is not None:
-        good = []
-        for it in items:
-            try:
-                Item.model_validate(it)
-                good.append(it)
-            except ValidationError as err:
-                msg = err.errors()[0]["msg"].removeprefix("Value error, ")
-                dropped[it["id"]] = msg[:120]
-        items = good
-    return Round.model_validate(
-        {
-            "schema_version": 1,
-            "slug": _slugify(data.get("slug") or data.get("topic") or "topic"),
-            "reviewed": False,
-            "topic": _clip(data.get("topic"), 120),
-            "concept": _clip(data.get("concept"), 300),
-            "misconceptions": [
-                {
-                    **m,
-                    "id": _slugify(m.get("id", "")),
-                    "label": _clip(m.get("label"), 80),
-                    "why_tempting": _clip(m.get("why_tempting"), 280),
-                    "refutation": _clip(m.get("refutation"), 400),
-                    "source_note": _clip(m.get("source_note"), 200),
-                }
-                for m in data.get("misconceptions", [])
-            ],
-            "items": items,
-        }
-    )
-
-
-def _explore(q: dict) -> dict | None:
-    """The curve's knob, if usable: a plain name other than x that the expr uses."""
-    param, lo, hi = q.get("explore_param"), q.get("explore_min"), q.get("explore_max")
-    if not isinstance(param, str) or not re.fullmatch(r"[A-Za-z][A-Za-z0-9]{0,15}", param):
-        return None
-    if param == "x" or not isinstance(lo, (int, float)) or not isinstance(hi, (int, float)):
-        return None
-    if not re.search(rf"\b{param}\b", q.get("expr") or ""):
-        return None  # a knob the curve doesn't use would move nothing
-    step = q.get("explore_step")
-    return {
-        "param": param,
-        "label": _clip(q.get("explore_label") or param, 60),
-        "min": lo,
-        "max": hi,
-        "step": step if isinstance(step, (int, float)) and step > 0 else (hi - lo) / 50 or 1,
-        "default": q.get("explore_default"),
-    }
+_INT_FIELDS = ("n", "dice", "group_size")
+_SAMPLER_FIELDS = (
+    "n",
+    "p",
+    "dice",
+    "group_size",
+    "base_rate",
+    "sensitivity",
+    "false_positive_rate",
+)
 
 
 def _clip(text, n: int):
@@ -470,24 +433,235 @@ def _clip(text, n: int):
     return text if len(text) <= n else text[: n - 1].rstrip() + "…"
 
 
-def _slugify(text: str) -> str:
+def _slugify(text) -> str:
     return re.sub(r"-+", "-", re.sub(r"[^a-z0-9]+", "-", str(text).lower())).strip("-")[:60] or "x"
 
 
-def _fix_ids(item: dict) -> dict:
-    item["id"] = _slugify(item.get("id") or "q")
-    for o in item["options"]:
-        o["id"] = _slugify(o.get("id") or o.get("text", "o"))
-        if o.get("misconception_id"):
-            o["misconception_id"] = _slugify(o["misconception_id"])
-    for b in item["bands"]:
-        if b.get("misconception_id"):
-            b["misconception_id"] = _slugify(b["misconception_id"])
-    item["targets"] = [_slugify(t) for t in item["targets"]]
-    return item
+def _ref(mid):
+    return _slugify(mid) if mid else None
 
 
-def _call_model(model: str, topic: str) -> str:
+def _fraction(v):
+    """Sampler fractions sometimes come back as percents (50 for 0.5)."""
+    if isinstance(v, (int, float)) and 1 < v <= 100:
+        return v / 100
+    return v
+
+
+def _merge_correct_bands(bands: list[dict], step) -> list[dict]:
+    """Two touching 'correct' bands are one correct band (a common, harmless split)."""
+    step = step if isinstance(step, (int, float)) and step > 0 else 1
+    try:
+        bands = sorted(bands, key=lambda b: b["min"])
+    except TypeError:
+        return bands
+    out: list[dict] = []
+    for b in bands:
+        prev = out[-1] if out else None
+        if (
+            prev is not None
+            and prev["misconception_id"] is None
+            and b["misconception_id"] is None
+            and b["min"] - prev["max"] <= step + 1e-9
+        ):
+            prev["max"] = max(prev["max"], b["max"])
+            continue
+        out.append(dict(b))
+    return out
+
+
+def _case_from_gen(c: dict) -> dict:
+    """Compact case → SpecCase dict (no validation here; ModelSpec does that).
+
+    Only harmless shape fixes happen here; anything that changes meaning is
+    left for validation to reject.
+    """
+    c = dict(c)
+    for f in ("p", "base_rate", "sensitivity", "false_positive_rate"):
+        c[f] = _fraction(c.get(f))
+    if c.get("widget") == "curve" and c.get("knob_param"):
+        c["variables"] = [
+            v for v in c.get("variables") or [] if v.get("name") != c.get("knob_param")
+        ]
+    widget = c.get("widget")
+    out: dict = {
+        "widget": widget,
+        "approximate": bool(c.get("approximate")),
+        "variables": [
+            {
+                "name": v.get("name"),
+                "meaning": _clip(v.get("meaning"), 120),
+                "unit": _clip(v.get("unit") or "", 30),
+                "value": v.get("value"),
+            }
+            for v in c.get("variables") or []
+        ],
+        "prediction": {
+            "prompt": _clip(c.get("prompt"), 300),
+            "input": c.get("input"),
+            "options": [
+                {
+                    "id": _slugify(o.get("id") or o.get("text") or "o"),
+                    "text": _clip(o.get("text"), 200),
+                    "value": o.get("value"),
+                    "misconception_id": _ref(o.get("misconception_id")),
+                }
+                for o in c.get("options") or []
+            ],
+        },
+        "bands": _merge_correct_bands(
+            [
+                {
+                    "min": b.get("min"),
+                    "max": b.get("max"),
+                    "misconception_id": _ref(b.get("misconception_id")),
+                }
+                for b in c.get("bands") or []
+            ],
+            c.get("slider_step"),
+        ),
+        "extremes": [
+            {"param": e.get("param"), "value": e.get("value"), "watch": _clip(e.get("watch"), 160)}
+            for e in (c.get("extremes") or [])[:3]
+        ],
+        "answer_claimed": c.get("answer_claimed"),
+    }
+    if c.get("input") == "slider":
+        out["prediction"]["slider"] = {
+            "min": c.get("slider_min"),
+            "max": c.get("slider_max"),
+            "step": c.get("slider_step") or 1,
+            "unit": c.get("slider_unit") or "",
+        }
+    if widget == "curve":
+        lo, hi = c.get("knob_min"), c.get("knob_max")
+        step = c.get("knob_step")
+        if not (isinstance(step, (int, float)) and step > 0):
+            step = (
+                (hi - lo) / 50
+                if isinstance(lo, (int, float)) and isinstance(hi, (int, float))
+                else 1
+            )
+        out["curve"] = {
+            "expr": c.get("expr"),
+            "mode": c.get("mode") or "value",
+            "area_from": c.get("area_from"),
+            "area_to": c.get("area_to"),
+            "x_min": c.get("x_min"),
+            "x_max": c.get("x_max"),
+            "x_label": _clip(c.get("x_label") or "", 60),
+            "y_label": _clip(c.get("y_label") or "", 60),
+            "ask_x": c.get("ask_x"),
+            "ask_y": c.get("ask_y"),
+            "knob": {
+                "param": c.get("knob_param"),
+                "label": _clip(c.get("knob_label") or c.get("knob_param") or "", 60),
+                "min": lo,
+                "max": hi,
+                "step": step or 1,
+                "default": c.get("knob_default"),
+            },
+        }
+    elif widget == "sampler":
+        params = {}
+        for f in _SAMPLER_FIELDS:
+            v = c.get(f)
+            if isinstance(v, (int, float)):
+                params[f] = int(v) if f in _INT_FIELDS else v
+        if c.get("sampler") == "base_rate_test":
+            # Enough people that the icon array shows at least a few sick ones.
+            rate = params.get("base_rate")
+            ok = isinstance(rate, (int, float)) and rate > 0
+            params["population"] = min(100000, max(1000, math.ceil(20 / rate))) if ok else 1000
+        out["sampler"] = {
+            "sampler": c.get("sampler"),
+            "params": params,
+            "stat": c.get("stat"),
+            "k": c.get("k"),
+            "x_label": _clip(c.get("x_label") or "", 60),
+        }
+    return out
+
+
+def _compare_case(c: dict, data: dict) -> dict | None:
+    """The second case, or None if it's malformed (the compare screen then stays text-only)."""
+    case = _case_from_gen(c)
+    known = {_slugify(m.get("id", "")) for m in data.get("misconceptions") or []}
+    refs = [b["misconception_id"] for b in case["bands"]]
+    refs += [o["misconception_id"] for o in case["prediction"]["options"]]
+    if {r for r in refs if r} - known:
+        return None
+    try:
+        SpecCase.model_validate(case)
+    except ValidationError:
+        return None
+    return case
+
+
+def spec_from_gen(data: dict, topic: str) -> ModelSpec:
+    """Compact generated JSON → validated ModelSpec. Raises NoFit for an honest no.
+
+    Raises pydantic ValidationError / ValueError for a malformed spec (worth a retry).
+    """
+    if data.get("recognized") is False:
+        raise NoFit(
+            _clip(data.get("no_fit_reason") or "That doesn't look like a topic I know.", 200)
+        )
+    cases = data.get("cases") or []
+    if not cases or cases[0].get("widget") in (None, "none"):
+        raise NoFit(
+            _clip(data.get("no_fit_reason") or "None of my models can run this topic yet.", 200)
+        )
+    definition = data.get("definition") or ""
+    if not definition_covers_topic(topic, definition, data.get("concept") or ""):
+        raise NoFit("I couldn't pin down what that topic is, so I won't make up a model for it.")
+    compare = None
+    if data.get("compare_topic") and data.get("compare_principle"):
+        second = (
+            cases[1]
+            if len(cases) > 1 and cases[1].get("widget") == cases[0].get("widget")
+            else None
+        )
+        compare = {
+            "topic": _clip(data["compare_topic"], 120),
+            "shared_principle": _clip(data["compare_principle"], 300),
+            "case": _compare_case(second, data) if second else None,
+        }
+    return ModelSpec.model_validate(
+        {
+            "slug": _slugify(data.get("slug") or data.get("topic") or topic),
+            "topic": _clip(data.get("topic") or topic, 120),
+            "concept": _clip(data.get("concept"), 300),
+            "definition": _clip(definition, 300),
+            "case": _case_from_gen(cases[0]),
+            "misconceptions": [
+                {
+                    "id": _slugify(m.get("id", "")),
+                    "label": _clip(m.get("label"), 80),
+                    "why_tempting": _clip(m.get("why_tempting"), 280),
+                    "refutation": _clip(m.get("refutation"), 400),
+                    "source_url": m.get("source_url") or None,
+                    "source_note": None if m.get("source_url") else "unverified",
+                }
+                for m in (data.get("misconceptions") or [])[:3]
+            ],
+            "compare": compare,
+        }
+    )
+
+
+def _reason(err: Exception) -> str:
+    """One readable line for a rejected spec (pydantic errors condensed)."""
+    if isinstance(err, ValidationError):
+        parts = []
+        for e in err.errors()[:4]:
+            loc = ".".join(str(p) for p in e["loc"])
+            parts.append(f"{loc}: {e['msg'].removeprefix('Value error, ')}".strip(": "))
+        return "; ".join(parts)[:400]
+    return str(err).replace("\n", " ")[:400]
+
+
+def _call_model(model: str, topic: str, feedback: str | None = None) -> str:
     from google import genai
     from google.genai import types
 
@@ -499,6 +673,8 @@ def _call_model(model: str, topic: str) -> str:
         http_options=types.HttpOptions(timeout=TIMEOUT_S * 1000),
     )
     contents = f"Topic: {topic}"
+    if feedback:
+        contents += f"\n\n{feedback}"
     if is_gemma:
         # Gemma gets the schema in the prompt; validated afterwards.
         contents = (
@@ -546,25 +722,45 @@ def _failed_path(topic: str) -> Path:
     return _cache_path(topic).with_suffix(".failed")
 
 
-def generate_round(topic: str, usage: Usage | None = None) -> GenResult:
-    """Return a schema-valid, checked Round: cache first, then the model chain.
+def _nofit_path(topic: str) -> Path:
+    return _cache_path(topic).with_suffix(".nofit")
 
-    Each model gets one try for content problems (bad JSON/schema/checks) and
-    one quick retry for a per-minute 429. A topic that fails everywhere is
-    remembered for an hour so repeated requests can't burn the daily quota.
+
+def _read_cache(cached: Path, started: float) -> GenResult | None:
+    try:
+        data = json.loads(cached.read_text())
+        r = Round.model_validate(data["round"])
+        spec = ModelSpec.model_validate(data["spec"])
+    except (OSError, ValueError, KeyError, TypeError, ValidationError):
+        cached.unlink(missing_ok=True)  # stale or torn; regenerate
+        return None
+    checks = data.get("checks") if isinstance(data.get("checks"), dict) else None
+    return GenResult(r, "cache", time.monotonic() - started, spec, checks)
+
+
+def generate_round(topic: str, usage: Usage | None = None) -> GenResult:
+    """Return a checked Round compiled from a model spec: cache first, then the model chain.
+
+    Raises NoFit for an honest no (unreal topic, nothing fits, or the spec still
+    fails validation/checks after one retry) and GenerationError for anything
+    else (offline, cap, API errors). A failed topic is remembered for an hour so
+    repeated requests can't burn the daily quota; a no-fit is remembered for good.
     """
 
     started = time.monotonic()
     topic = topic.strip()[:120]
     if not normalize_topic(topic):
         raise GenerationError("empty topic")
+    if topic_looks_unreal(topic):
+        raise NoFit("That doesn't look like a topic I know, so I won't make up a model for it.")
     cached = _cache_path(topic)
     if cached.exists():
-        try:
-            r = Round.model_validate_json(cached.read_text())
-            return GenResult(r, "cache", time.monotonic() - started, _read_checks(cached))
-        except (ValidationError, ValueError, OSError):
-            cached.unlink(missing_ok=True)  # stale or torn; regenerate
+        hit = _read_cache(cached, started)
+        if hit is not None:
+            return hit
+    nofit = _nofit_path(topic)
+    if nofit.exists():
+        raise NoFit(nofit.read_text()[:200] or "None of my models can run this topic yet.")
     failed = _failed_path(topic)
     if failed.exists() and time.time() - failed.stat().st_mtime < FAILED_TTL_S:
         raise GenerationError("recently failed")
@@ -572,40 +768,68 @@ def generate_round(topic: str, usage: Usage | None = None) -> GenResult:
         raise GenerationError("offline: no live generation")
     usage = usage or Usage()
     last_err: Exception | None = None
+    content_tries = 0
+    feedback: str | None = None
     for model in MODEL_CHAIN:
+        if content_tries >= MAX_CONTENT_TRIES:
+            break
         if not usage.available(model):
             continue
-        for attempt in range(2):
+        rate_retried = False
+        while content_tries < MAX_CONTENT_TRIES:
             if usage.total() >= DAILY_SOFT_CAP:
                 raise GenerationError("daily cap reached")
             usage.record(model)
+            raw = ""
             try:
-                raw = _call_model(model, topic)
+                raw = _call_model(model, topic, feedback)
                 data = json.loads(raw.strip().removeprefix("```json").removesuffix("```"))
-                pre_dropped: dict[str, str] = {}
-                r, report = check_round(to_round(data, pre_dropped), usage=usage)
-                report.dropped = {**pre_dropped, **report.dropped}
-                log.info("checks for %r: %s", topic, report.as_dict())
-            except (ValidationError, ValueError, GenerationError, CheckFailed) as err:
+                if not isinstance(data, dict):
+                    raise ValueError("spec is not an object")
+                spec = spec_from_gen(data, topic)
+                compiled = compile_spec(spec)
+            except NoFit as err:
+                _atomic_write(nofit, err.reason)
+                raise
+            except (ValidationError, ValueError, TypeError, SpecRejected, GenerationError) as err:
                 last_err = err
-                log.warning("bad round from %s: %s", model, str(err).replace("\n", " ")[:300])
-                break  # content problem: move to the next model, don't repeat this one
+                content_tries += 1
+                reason = _reason(err)
+                log.warning("bad spec from %s: %s", model, reason)
+                # The retry (same model) sees what our checks rejected and fixes it.
+                feedback = (
+                    f"Your previous JSON failed our check: {reason}\n"
+                    f"Previous JSON:\n{raw[:6000]}\n"
+                    "Fix that problem and return the full corrected JSON."
+                )
+                continue
             except Exception as err:  # API errors
                 last_err = err
                 if _is_daily_quota(err):
                     usage.exhaust(model)
                     break
-                if "429" in str(err) and attempt == 0:
+                if "429" in str(err) and not rate_retried:
+                    rate_retried = True
                     time.sleep(2)
                     continue
                 log.warning("api error from %s: %s", model, type(err).__name__)
                 break
             seconds = time.monotonic() - started
-            report_out = report.public(model, seconds)
-            # Report first, so a cached round always has its report next to it.
-            _atomic_write(_checks_path(cached), json.dumps(report_out))
-            _atomic_write(cached, r.model_dump_json(indent=2))
+            r = compiled.round
+            report = compiled.report.public(model, seconds)
+            report["computed"] = [i.id for i in r.items if i.computed]
+            log.info("checks for %r: %s", topic, report)
+            entry = {
+                "spec": spec.model_dump(mode="json"),
+                "round": r.model_dump(mode="json"),
+                "checks": report,
+            }
+            _atomic_write(cached, json.dumps(entry, indent=2))
             _atomic_write(_slug_path(r.slug), r.model_dump_json(indent=2))
-            return GenResult(r, model, seconds, report_out)
+            return GenResult(r, model, seconds, spec, report)
+    if content_tries >= MAX_CONTENT_TRIES:
+        # Two specs in a row that don't compute or don't check: say so honestly.
+        _atomic_write(failed, "")
+        raise NoFit("I couldn't build a model I could check for this topic.")
     _atomic_write(failed, "")
     raise GenerationError(f"all models failed: {type(last_err).__name__ if last_err else 'none'}")
