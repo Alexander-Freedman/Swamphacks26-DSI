@@ -16,8 +16,8 @@ export function IconArray({ counts }: { counts: ReturnType<typeof baseRate> }) {
         ))}
       </svg>
       <figcaption>
-        <span className="key tp" /> sick + tested positive: <strong>{tp}</strong>
-        <span className="key fp" /> healthy but tested positive: <strong>{fp}</strong>
+        <span className="key-item"><span className="key tp" /> sick + tested positive: <strong>{tp}</strong></span>
+        <span className="key-item"><span className="key fp" /> healthy but tested positive: <strong>{fp}</strong></span>
       </figcaption>
     </figure>
   )

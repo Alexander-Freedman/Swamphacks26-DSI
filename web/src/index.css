@@ -38,7 +38,7 @@ button:focus-visible, input:focus-visible { outline: 3px solid var(--marker); ou
 .hand { font-family: var(--font-hand); }
 
 @media (prefers-reduced-motion: reduce) {
-  *, *::before, *::after { animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; }
+  *, *::before, *::after { animation-duration: 0.01ms !important; animation-delay: 0s !important; transition-duration: 0.01ms !important; transition-delay: 0s !important; }
 }
 
 @keyframes fade { from { opacity: 0; } }

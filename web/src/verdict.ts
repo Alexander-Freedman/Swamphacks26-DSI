@@ -7,7 +7,9 @@ export type Verdict = 'called' | 'close' | 'off'
 export function misconceptionFor(item: Item, a: Answer): string | null {
   if (item.input_type === 'choice') return item.options?.find((o) => o.id === a.optionId)?.misconception_id ?? null
   if (item.input_type === 'slider' && a.value != null) {
-    return item.bands?.find((b) => a.value! >= b.min && a.value! <= b.max)?.misconception_id ?? null
+    // Sorted so the lowest matching band wins, whatever order the JSON lists them in.
+    const bands = [...(item.bands ?? [])].sort((x, y) => x.min - y.min)
+    return bands.find((b) => a.value! >= b.min && a.value! <= b.max)?.misconception_id ?? null
   }
   return null
 }

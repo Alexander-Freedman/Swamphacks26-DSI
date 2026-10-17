@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import { Predict, type Answer } from './components/Predict'
 import { Reveal } from './components/Reveal'
 import { showcaseRound, showcaseSlugs } from './rounds'
@@ -45,13 +45,17 @@ function Player({ round, onDone }: { round: Round; onDone: () => void }) {
   const [signals, setSignals] = useState<Record<string, number>>({})
   const item = round.items[idx]
   const last = idx === round.items.length - 1
+  const beat = useRef<ReturnType<typeof setTimeout> | undefined>(undefined)
+  // Leaving mid-beat (logo, Done) must not fire a reveal into an unmounted round.
+  useEffect(() => () => clearTimeout(beat.current), [])
 
   const lock = (answer: Answer) => {
     setPhase({ kind: 'locked', answer })
     const mid = misconceptionFor(item, answer)
     if (mid) setSignals((s) => ({ ...s, [mid]: (s[mid] ?? 0) + 1 }))
     // The truth is only computed after lock-in. The beat hides the simulation time.
-    setTimeout(() => setPhase({ kind: 'revealed', answer, truth: computeTruth(item) }), BEAT_MS)
+    clearTimeout(beat.current)
+    beat.current = setTimeout(() => setPhase({ kind: 'revealed', answer, truth: computeTruth(item) }), BEAT_MS)
   }
 
   const next = () => {
@@ -64,6 +68,7 @@ function Player({ round, onDone }: { round: Round; onDone: () => void }) {
     <div className="sheet">
       <p className="progress">{round.topic} · {idx + 1} of {round.items.length}</p>
       {phase.kind === 'predict' && <Predict key={item.id} item={item} onLock={lock} />}
+      {phase.kind !== 'predict' && <h2 className="prompt">{item.prompt}</h2>}
       {phase.kind !== 'predict' && (
         <span className="locked-stamp">
           locked: {phase.answer.value ?? item.options?.find((o) => o.id === phase.answer.optionId)?.text} · {phase.answer.confidence}

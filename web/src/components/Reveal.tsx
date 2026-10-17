@@ -1,3 +1,4 @@
+import { useEffect, useRef } from 'react'
 import type { Computed } from '../truth'
 import { shareAtLeast } from '../truth'
 import type { Item, Round } from '../types'
@@ -40,6 +41,38 @@ function TruthLine({ truth }: { truth: Computed }) {
   return null
 }
 
+// Pencil (the guess) over ink (the truth) on one 0-100% scale, the gap between them in marker.
+function GuessBar({ guess, truth }: { guess: number; truth: number }) {
+  const t = Math.round(truth * 10) / 10
+  const lo = Math.min(guess, t)
+  const hi = Math.max(guess, t)
+  const gap = Math.round((hi - lo) * 10) / 10
+  return (
+    <figure className="gbar" role="img" aria-label={`your guess ${guess}% vs reality ${fmt(t)}%, ${fmt(gap)} points apart`}>
+      <div className="gbar-row">
+        <span className="gbar-label hand">you</span>
+        <div className="gbar-track">
+          <div className="gbar-guess" style={{ width: `${guess}%` }} />
+          <span className="gbar-val hand" style={{ left: `${guess}%` }}>{guess}%</span>
+        </div>
+      </div>
+      <div className="gbar-row">
+        <span className="gbar-label">reality</span>
+        <div className="gbar-track">
+          {gap > 0 && <div className="gbar-gap" style={{ left: `${lo}%`, width: `${hi - lo}%` }} />}
+          <div className="gbar-ink" style={{ width: `${t}%` }} />
+          <span className="gbar-val" style={{ left: `${t}%` }}>{fmt(t)}%</span>
+        </div>
+      </div>
+      {gap > 0 && (
+        <figcaption className="gbar-caption">
+          <span className="gbar-swatch" /> the gap: <strong>{fmt(gap)} points</strong>
+        </figcaption>
+      )}
+    </figure>
+  )
+}
+
 export function Reveal({ item, round, answer, truth, signals }: Props) {
   const v = verdictFor(item, answer, truth.value)
   const mid = misconceptionFor(item, answer)
@@ -47,6 +80,9 @@ export function Reveal({ item, round, answer, truth, signals }: Props) {
   const t = item.truth
   const guess = item.input_type === 'slider' ? answer.value : null
   const unit = item.slider?.unit ?? ''
+  const verdictRef = useRef<HTMLDivElement>(null)
+  // Focus lands on the verdict after lock-in instead of falling back to <body>.
+  useEffect(() => verdictRef.current?.focus({ preventScroll: true }), [])
 
   return (
     <div className="reveal">
@@ -54,9 +90,10 @@ export function Reveal({ item, round, answer, truth, signals }: Props) {
         <Distribution hist={truth.hist} xLabel={t.x_label} guess={guess} range={item.slider ? { min: item.slider.min, max: item.slider.max } : undefined} />
       )}
       {truth.kind === 'icons' && <IconArray counts={truth.counts} />}
+      {truth.kind === 'icons' && guess != null && <GuessBar guess={guess} truth={truth.value} />}
       {truth.kind === 'curve' && t.widget === 'curve' && <Curve t={t} f={truth.f} guess={guess} target={truth.value} />}
 
-      <div className="verdict-row">
+      <div className="verdict-row" ref={verdictRef} tabIndex={-1}>
         <span className={`stamp ${v}`}>{verdictText(v, answer.confidence)}</span>
         {guess != null && truth.value != null && (
           <span className="callout hand">

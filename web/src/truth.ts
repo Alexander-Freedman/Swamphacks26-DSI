@@ -92,9 +92,11 @@ export function baseRate(p: SamplerParams) {
 
 // Curve truth: a preset or a mathjs expression in x. Only evaluated, never executed as code.
 
+// Group sizes are whole people, so a fractional x is floored (22.7 people is 22).
 export function birthdayMatch365(x: number): number {
+  const n = Math.floor(x)
   let none = 1
-  for (let i = 0; i < x; i++) none *= (365 - i) / 365
+  for (let i = 0; i < n; i++) none *= (365 - i) / 365
   return 1 - none
 }
 

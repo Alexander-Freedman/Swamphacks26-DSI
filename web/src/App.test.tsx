@@ -46,6 +46,8 @@ describe('other showcases', () => {
     await act(async () => vi.advanceTimersByTime(500))
     expect(screen.getByLabelText(/of 1000 test positive; 9 of them are sick/)).toBeTruthy()
     expect(screen.getByText(/reality: 9\.2%/)).toBeTruthy()
+    expect(screen.getByLabelText(/your guess 90% vs reality 9\.2%, 80\.8 points apart/)).toBeTruthy()
+    expect(document.activeElement?.className).toBe('verdict-row')
     expect(screen.getByText('This looks like…')).toBeTruthy()
     vi.useRealTimers()
   })

@@ -1,5 +1,6 @@
 import type { Histogram } from '../truth'
 import './Distribution.css'
+import { useNarrow } from './useNarrow'
 
 type Props = {
   hist: Histogram
@@ -9,11 +10,12 @@ type Props = {
   range?: { min: number; max: number }
 }
 
-const W = 640
 const H = 260
 const PAD = { l: 16, r: 16, t: 28, b: 44 }
 
 export function Distribution({ hist, xLabel, guess, range }: Props) {
+  const narrow = useNarrow()
+  const W = narrow ? 360 : 640
   const lo = Math.min(range?.min ?? hist.min, hist.min)
   const hi = Math.max(Math.min(range?.max ?? hist.max, Math.max(hist.max, guess ?? hist.max)), hist.min)
   const xs = Array.from({ length: hi - lo + 1 }, (_, i) => lo + i)
@@ -25,7 +27,7 @@ export function Distribution({ hist, xLabel, guess, range }: Props) {
   const showGuess = guess != null
   const gapL = showGuess ? Math.min(xAt(guess), xAt(mean)) : 0
   const gapR = showGuess ? Math.max(xAt(guess), xAt(mean)) : 0
-  const labelEvery = Math.ceil(xs.length / 16)
+  const labelEvery = Math.ceil(xs.length / (narrow ? 8 : 16))
 
   return (
     <svg className="dist" viewBox={`0 0 ${W} ${H}`} role="img" aria-label={`${xLabel}: average ${mean.toFixed(2)}${showGuess ? `, your guess ${guess}` : ''}`}>

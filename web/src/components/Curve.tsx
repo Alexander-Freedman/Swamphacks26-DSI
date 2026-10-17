@@ -1,16 +1,22 @@
 import type { CurveTruth } from '../types'
 import './Curve.css'
+import { niceTicks } from './ticks'
+import { useNarrow } from './useNarrow'
 
 type Props = { t: CurveTruth; f: (x: number) => number; guess?: number | null; target?: number | null }
 
-const W = 640
 const H = 280
 const PAD = { l: 44, r: 20, t: 28, b: 44 }
 
 export function Curve({ t, f, guess, target }: Props) {
+  const narrow = useNarrow()
+  const W = narrow ? 360 : 640
   const { x_min: lo, x_max: hi } = t
-  const steps = 120
-  const pts = Array.from({ length: steps + 1 }, (_, i) => lo + ((hi - lo) * i) / steps).map((x) => [x, f(x)] as const)
+  // Presets count whole things (people), so plot integer x; an expression gets a smooth sample.
+  const xs = t.preset
+    ? Array.from({ length: Math.floor(hi) - Math.ceil(lo) + 1 }, (_, i) => Math.ceil(lo) + i)
+    : Array.from({ length: 121 }, (_, i) => lo + ((hi - lo) * i) / 120)
+  const pts = xs.map((x) => [x, f(x)] as const)
   const ys = pts.map(([, y]) => y)
   const yLo = Math.min(0, ...ys)
   const yHi = Math.max(1, ...ys)
@@ -18,7 +24,8 @@ export function Curve({ t, f, guess, target }: Props) {
   const yAt = (y: number) => H - PAD.b - ((y - yLo) / (yHi - yLo)) * (H - PAD.t - PAD.b)
   const d = pts.map(([x, y], i) => `${i ? 'L' : 'M'}${xAt(x).toFixed(1)},${yAt(y).toFixed(1)}`).join('')
   const offChart = guess != null && guess > hi
-  const ticks = Array.from({ length: 5 }, (_, i) => lo + ((hi - lo) * i) / 4)
+  // Skip a tick that would sit under the target's marker.
+  const ticks = niceTicks(lo, hi, narrow ? 5 : 9).filter((x) => target == null || Math.abs(xAt(x) - xAt(target)) > 26)
 
   return (
     <svg className="curve" viewBox={`0 0 ${W} ${H}`} role="img" aria-label={`${t.y_label} vs ${t.x_label}${target != null ? `; reaches 50% at ${target}` : ''}`}>
@@ -35,7 +42,7 @@ export function Curve({ t, f, guess, target }: Props) {
         </>
       )}
       {ticks.map((x) => (
-        <text key={x} className="curve-tick" x={xAt(x)} y={H - PAD.b + 18} textAnchor="middle">{Math.round(x)}</text>
+        <text key={x} className="curve-tick" x={xAt(x)} y={H - PAD.b + 18} textAnchor="middle">{x}</text>
       ))}
       <text className="curve-tick" x={(W + PAD.l) / 2} y={H - 6} textAnchor="middle">{t.x_label}</text>
       <path className="curve-ink" d={d} pathLength={1} />
