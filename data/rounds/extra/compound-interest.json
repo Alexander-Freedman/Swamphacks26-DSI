@@ -1,0 +1,163 @@
+{
+  "schema_version": 1,
+  "slug": "compound-interest",
+  "topic": "Compound interest",
+  "concept": "Interest earns interest, so money grows by multiplying, not adding. At 8% a year it doubles in about 9 years (rule of 72: 72 / 8), and over decades the gap from simple adding gets huge.",
+  "reviewed": true,
+  "misconceptions": [
+    {
+      "id": "interest-paid-once",
+      "label": "Interest only counts once",
+      "why_tempting": "2% of $100 is $2, and the number 2 sticks, so 'exactly $102' sounds right.",
+      "refutation": "Interest is paid every year, and each year's interest also earns interest: $100 at 2% for 5 years is about $110.41.",
+      "source_url": "https://www.nber.org/system/files/working_papers/w18952/w18952.pdf",
+      "source_note": "Lusardi & Mitchell's compound-interest question; in HRS 2004, 22.2% answered wrong and 9.4% didn't know (Table 1)"
+    },
+    {
+      "id": "simple-interest",
+      "label": "Growth adds the same amount each year",
+      "why_tempting": "Adding the same interest every year ($2 a year, or 8% of the start each year) feels exact: $110 after 5 years, 12.5 years to double.",
+      "refutation": "Each year's 8% is taken on a bigger balance than the year before, so doubling comes sooner (about 9 years) and long horizons end far higher than adding would give.",
+      "source_url": "https://research.cgu.edu/dpe-events-and-conferences/wp-content/uploads/sites/37/2016/12/EGB.pdf",
+      "source_note": "Levy & Tasoff: exponential-growth bias is 'the tendency... to partially neglect compounding'"
+    },
+    {
+      "id": "exponential-growth-bias",
+      "label": "Compounding is a small bonus",
+      "why_tempting": "People know interest compounds but picture it as a little extra on top of steady growth.",
+      "refutation": "Over 30 years at 7%, compounding doesn't add a bit: it makes the final amount about 2.5 times what simple adding gives.",
+      "source_url": "https://en.wikipedia.org/wiki/Exponential_growth#Exponential_growth_bias",
+      "source_note": "'Exponential growth bias is the tendency to underestimate compound growth processes'"
+    }
+  ],
+  "items": [
+    {
+      "id": "hundred-at-two-percent",
+      "prompt": "You put $100 in a savings account that pays 2% interest a year (each year the bank adds 2% of what's in the account). You leave it alone. After 5 years, about how much is there?",
+      "input_type": "choice",
+      "options": [
+        {
+          "id": "one-year",
+          "text": "$102",
+          "misconception_id": "interest-paid-once"
+        },
+        {
+          "id": "five-times-two",
+          "text": "$110 exactly: $2 a year for 5 years",
+          "misconception_id": "simple-interest"
+        },
+        {
+          "id": "compounded",
+          "text": "About $110.41",
+          "misconception_id": null
+        }
+      ],
+      "truth": {
+        "widget": "curve",
+        "expr": "100*1.02^x",
+        "x_min": 0,
+        "x_max": 5,
+        "x_label": "years",
+        "y_label": "balance ($)"
+      },
+      "answer_expr": "100*1.02^5",
+      "answer_claimed": 110.41,
+      "targets": [
+        "interest-paid-once",
+        "simple-interest"
+      ]
+    },
+    {
+      "id": "doubling-time",
+      "prompt": "Money grows at 8% a year, compounded yearly (each year's 8% is added to the balance, and the next year's 8% is taken on that bigger balance). About how many years until it doubles?",
+      "input_type": "slider",
+      "slider": {
+        "min": 5,
+        "max": 40,
+        "step": 1,
+        "unit": "years"
+      },
+      "bands": [
+        {
+          "min": 5,
+          "max": 11,
+          "misconception_id": null
+        },
+        {
+          "min": 12,
+          "max": 13,
+          "misconception_id": "simple-interest"
+        },
+        {
+          "min": 14,
+          "max": 40,
+          "misconception_id": "exponential-growth-bias"
+        }
+      ],
+      "truth": {
+        "widget": "curve",
+        "expr": "1000*1.08^x",
+        "x_min": 0,
+        "x_max": 30,
+        "x_label": "years",
+        "y_label": "value of $1,000"
+      },
+      "answer_expr": "log(2)/log(1.08)",
+      "answer_claimed": 9.01,
+      "targets": [
+        "simple-interest",
+        "exponential-growth-bias"
+      ]
+    },
+    {
+      "id": "thirty-years",
+      "prompt": "You invest $10,000 at 7% a year, compounded yearly (each year's gain is added in and earns 7% too), and don't touch it for 30 years. Roughly how much is it worth?",
+      "input_type": "slider",
+      "slider": {
+        "min": 10000,
+        "max": 100000,
+        "step": 1000,
+        "unit": "$"
+      },
+      "bands": [
+        {
+          "min": 10000,
+          "max": 40000,
+          "misconception_id": "simple-interest"
+        },
+        {
+          "min": 40001,
+          "max": 60000,
+          "misconception_id": "exponential-growth-bias"
+        },
+        {
+          "min": 60001,
+          "max": 100000,
+          "misconception_id": null
+        }
+      ],
+      "truth": {
+        "widget": "curve",
+        "expr": "10000*1.07^x",
+        "x_min": 0,
+        "x_max": 30,
+        "x_label": "years",
+        "y_label": "value ($)"
+      },
+      "answer_expr": "10000*1.07^30",
+      "answer_claimed": 76123,
+      "targets": [
+        "simple-interest",
+        "exponential-growth-bias"
+      ]
+    }
+  ],
+  "aliases": [
+    "compound interest",
+    "compounding",
+    "interest on interest",
+    "rule of 72",
+    "how compound interest works",
+    "compound growth"
+  ]
+}

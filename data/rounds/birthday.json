@@ -20,6 +20,14 @@
       "refutation": "The chance grows with the number of pairs, not people, so it passes 50% at 23 and 99% at 57.",
       "source_url": "https://www.livescience.com/what-is-birthday-paradox",
       "source_note": "Many people intuitively guess ~183 (teaching observation, not a survey)"
+    },
+    {
+      "id": "a-handful-is-enough",
+      "label": "A handful of people is enough",
+      "why_tempting": "Once you know matches come from pairs, even a small group can feel like it has plenty of them.",
+      "refutation": "10 people make only 45 pairs, an 11.7% chance. It takes 23 people (253 pairs) to pass 50%.",
+      "source_url": "https://en.wikipedia.org/wiki/Birthday_problem",
+      "source_note": "Plain underestimate checked against the standard table (10 people = 11.7%), not a surveyed misconception"
     }
   ],
   "items": [
@@ -29,7 +37,8 @@
       "input_type": "slider",
       "slider": {"min": 2, "max": 366, "step": 1, "unit": "people"},
       "bands": [
-        {"min": 2, "max": 30, "misconception_id": null},
+        {"min": 2, "max": 17, "misconception_id": "a-handful-is-enough"},
+        {"min": 18, "max": 30, "misconception_id": null},
         {"min": 31, "max": 150, "misconception_id": "its-about-my-birthday"},
         {"min": 151, "max": 366, "misconception_id": "half-of-365"}
       ],

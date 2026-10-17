@@ -1,0 +1,142 @@
+{
+  "schema_version": 1,
+  "slug": "ph-scale",
+  "topic": "pH and acids",
+  "aliases": [
+    "ph",
+    "ph scale",
+    "acids",
+    "acids and bases",
+    "acidity",
+    "what is ph",
+    "ph and acids"
+  ],
+  "concept": "pH counts dissolved hydrogen ions on a powers-of-ten scale that runs backwards: each step DOWN means 10 times more hydrogen ions, so pH 3 has 100 times as many as pH 5.",
+  "reviewed": true,
+  "misconceptions": [
+    {
+      "id": "bigger-number-more-acid",
+      "label": "A bigger pH number means more acid",
+      "why_tempting": "On most scales a bigger number means more of the thing being measured.",
+      "refutation": "pH runs backwards: below 7 is acidic, above 7 is basic, and the lower the number, the more hydrogen ions and the more acidic.",
+      "source_url": "https://en.wikipedia.org/wiki/PH",
+      "source_note": "'solutions of which the pH is less than 7 are acidic, and solutions of which the pH is greater than 7 are basic'"
+    },
+    {
+      "id": "ph-is-linear",
+      "label": "Each pH step is the same amount",
+      "why_tempting": "Rulers and thermometers add the same amount per step, so pH 3 vs 5 feels like 'a bit more'.",
+      "refutation": "pH counts powers of ten: 1 step is 10 times, 2 steps 100 times, 3 steps 1,000 times the hydrogen ions.",
+      "source_url": "https://en.wikipedia.org/wiki/PH",
+      "source_note": "'Since pH is a logarithmic scale, a difference of one in pH is equivalent to a tenfold difference in hydrogen ion concentration'"
+    },
+    {
+      "id": "ph-fixed-property",
+      "label": "An acid's pH is fixed",
+      "why_tempting": "pH sounds like a label of the substance, like its color, so watering it down shouldn't change it.",
+      "refutation": "pH measures how concentrated the hydrogen ions are. Spread a strong acid into 10 times the water and its pH goes up by 1.",
+      "source_url": "https://en.wikipedia.org/wiki/PH",
+      "source_note": "pH is defined from the hydrogen ion concentration, pH = -log10[H+]; the misconception itself is not separately sourced (unverified)"
+    }
+  ],
+  "items": [
+    {
+      "id": "which-more-acidic",
+      "prompt": "pH is a number, usually 0 to 14, that measures how acidic a liquid is by counting dissolved hydrogen ions (pure water is 7, neutral). Liquid A has pH 2. Liquid B has pH 6. Which is more acidic?",
+      "input_type": "choice",
+      "options": [
+        {
+          "id": "a",
+          "text": "Liquid A (pH 2), by a lot",
+          "misconception_id": null
+        },
+        {
+          "id": "b",
+          "text": "Liquid B (pH 6): the bigger number means more acid",
+          "misconception_id": "bigger-number-more-acid"
+        }
+      ],
+      "truth": {
+        "widget": "curve",
+        "expr": "10^(6-x)",
+        "x_min": 2,
+        "x_max": 6,
+        "x_label": "pH",
+        "y_label": "hydrogen ions (times liquid B)"
+      },
+      "answer_expr": "10^(6-2)",
+      "answer_claimed": 10000,
+      "targets": [
+        "bigger-number-more-acid"
+      ]
+    },
+    {
+      "id": "five-to-three",
+      "prompt": "Lower pH means more hydrogen ions (more acidic). A liquid goes from pH 5 to pH 3. How many times more hydrogen ions does it have now?",
+      "input_type": "choice",
+      "options": [
+        {
+          "id": "two",
+          "text": "2 times: it moved 2 steps",
+          "misconception_id": "ph-is-linear"
+        },
+        {
+          "id": "twenty",
+          "text": "20 times: 10 more for each step",
+          "misconception_id": "ph-is-linear"
+        },
+        {
+          "id": "hundred",
+          "text": "100 times",
+          "misconception_id": null
+        }
+      ],
+      "truth": {
+        "widget": "curve",
+        "expr": "10^(5-x)",
+        "x_min": 3,
+        "x_max": 5,
+        "x_label": "pH",
+        "y_label": "hydrogen ions (times the amount at pH 5)"
+      },
+      "answer_expr": "10^(5-3)",
+      "answer_claimed": 100,
+      "targets": [
+        "ph-is-linear"
+      ]
+    },
+    {
+      "id": "dilute-ten-times",
+      "prompt": "Hydrochloric acid, a strong acid, is at pH 3. You mix 1 cup of it into 9 cups of pure water, so its hydrogen ions are spread through 10 times the liquid. What's the new pH?",
+      "input_type": "choice",
+      "options": [
+        {
+          "id": "same",
+          "text": "Still pH 3: it's the same acid",
+          "misconception_id": "ph-fixed-property"
+        },
+        {
+          "id": "four",
+          "text": "pH 4",
+          "misconception_id": null
+        },
+        {
+          "id": "tenth",
+          "text": "pH 0.3: a tenth of the acid, a tenth of the pH",
+          "misconception_id": "ph-is-linear"
+        }
+      ],
+      "truth": {
+        "widget": "estimate",
+        "unit": "pH",
+        "source_url": "https://en.wikipedia.org/wiki/PH"
+      },
+      "answer_expr": "-log(10^(-3)/10)/log(10)",
+      "answer_claimed": 4,
+      "targets": [
+        "ph-fixed-property",
+        "ph-is-linear"
+      ]
+    }
+  ]
+}

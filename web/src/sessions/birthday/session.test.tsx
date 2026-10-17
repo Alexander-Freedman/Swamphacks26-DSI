@@ -45,6 +45,8 @@ describe('birthday session', () => {
     expect(verdictOf(2).v).toBe('close')
     expect(verdictOf(2).m?.refutation).toContain('1 pair: a 0.3% chance')
     expect(verdictOf(14).m?.id).toBe('too-few')
-    expect(verdictOf(15).v).toBe('called')
+    // 15 people is a 25% chance: below the tightened 18-30 band (#98), so not "called it"
+    expect(verdictOf(15).v).not.toBe('called')
+    expect(verdictOf(23).v).toBe('called')
   })
 })
