@@ -1,0 +1,133 @@
+/* Orgo session. Notebook Arcade: ink = truth, dashed pencil = you, marker = the gap. Scoped to .orgo.
+   No pills: 4px corners on boxes and buttons; circles only for atoms and dots. */
+.orgo .ss-chip, .orgo .ss-end, .orgo .ss-btn { border-radius: 4px; }
+.orgo .og-sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; margin: 0; }
+
+.orgo .og-step { display: grid; grid-template-columns: minmax(0, 680px) minmax(260px, 320px); gap: 20px; align-items: start; }
+@media (max-width: 760px) { .orgo .og-step { grid-template-columns: minmax(0, 1fr); gap: 14px; } }
+.orgo .og-work, .orgo .og-scenebox { min-width: 0; }
+
+/* buttons */
+.orgo .og-btn { font: 700 16px var(--font-body); background: var(--ink); color: var(--paper); border: 2px solid var(--ink); border-radius: 4px; padding: 10px 16px; min-height: 46px; box-shadow: 0 3px 0 #000; touch-action: manipulation; user-select: none; -webkit-user-select: none; }
+.orgo .og-btn:active:not(:disabled) { transform: translateY(2px); box-shadow: 0 1px 0 #000; }
+.orgo .og-btn:disabled { opacity: 0.45; cursor: not-allowed; }
+.orgo .og-ghost { background: var(--card); color: var(--ink); }
+.orgo .og-go { background: var(--marker); color: var(--ink); }
+.orgo .og-next { width: 100%; }
+.orgo .og-row { display: flex; gap: 10px; flex-wrap: wrap; align-items: center; margin-top: 12px; }
+.orgo .og-row .og-btn { flex: 1 1 auto; }
+.orgo aside > .og-btn { display: block; width: 100%; margin-top: 14px; }
+
+/* palette */
+.orgo .og-palette { display: flex; gap: 8px; align-items: center; margin-bottom: 10px; flex-wrap: wrap; }
+.orgo .og-pal { width: 56px; height: 56px; padding: 4px; background: var(--card); border: 2px solid var(--ink); border-radius: 4px; box-shadow: 0 3px 0 var(--ink); touch-action: none; user-select: none; -webkit-user-select: none; cursor: grab; }
+.orgo .og-pal svg { width: 100%; height: 100%; display: block; pointer-events: none; }
+.orgo .og-pal:active { transform: translateY(2px); box-shadow: 0 1px 0 var(--ink); cursor: grabbing; }
+.orgo .og-clear { margin-left: auto; min-height: 40px; padding: 6px 12px; font-size: 14px; }
+@media (max-width: 420px) { .orgo .og-pal { width: 50px; height: 50px; } .orgo .og-palette { gap: 6px; } }
+
+/* the paper you build on: graph grid only inside the play area */
+.orgo .og-canvas, .orgo .og-scene { display: block; width: 100%; height: auto; background-color: var(--card); background-image: linear-gradient(var(--grid) 1px, transparent 1px), linear-gradient(90deg, var(--grid) 1px, transparent 1px); background-size: 20px 20px; border: 2px solid var(--ink); border-radius: 4px; touch-action: none; user-select: none; -webkit-user-select: none; }
+.orgo .og-paper { fill: transparent; }
+.orgo .og-empty { font: 18px var(--font-hand); fill: var(--pencil); }
+.orgo .og-cap { font: 15px/1.4 var(--font-hand); color: var(--ink-soft); margin: 8px 0 0; }
+.orgo .og-ink-cap { color: var(--ink); font-size: 16px; min-height: 2.8em; }
+
+/* atoms */
+.orgo .og-disc { fill: var(--card); stroke: var(--ink); stroke-width: 2; }
+.orgo .og-el { font: 700 14px var(--font-display); fill: var(--ink); pointer-events: none; }
+.orgo .og-chg-bg { fill: var(--card); stroke: var(--ink); stroke-width: 1.5; }
+.orgo .og-chg { font: 700 11px var(--font-mono); fill: var(--ink); }
+.orgo .og-chg-sm { font-size: 9px; letter-spacing: -0.04em; }
+.orgo .og-pencil .og-disc { stroke: var(--pencil); stroke-dasharray: 4 3; }
+.orgo .og-pencil .og-el { fill: var(--pencil); }
+.orgo .og-off .og-disc { fill: var(--marker); stroke: var(--off); stroke-width: 3; }
+.orgo .og-off .og-chg-bg { fill: var(--marker); stroke: var(--off); }
+.orgo .og-node { cursor: grab; outline: none; }
+.orgo .og-node:focus-visible .og-halo { stroke: var(--ink); stroke-width: 2; stroke-dasharray: 3 3; }
+.orgo .og-halo { fill: transparent; }
+.orgo .og-node.sel .og-halo { fill: var(--marker-soft); }
+.orgo .og-node.from .og-halo { fill: var(--marker); }
+.orgo .og-node.drop .og-halo { fill: var(--marker); }
+
+/* valence slots: solid ink = used, dashed pencil = open, red = one too many */
+.orgo .og-slot { fill: none; stroke: var(--pencil); stroke-width: 2; stroke-dasharray: 3 3; }
+.orgo .og-slot.full { stroke: var(--ink); stroke-width: 3.5; stroke-dasharray: none; }
+.orgo .og-slot.over { stroke: var(--off); stroke-width: 3.5; stroke-dasharray: none; }
+
+/* bonds */
+.orgo .og-bond line { stroke: var(--ink); stroke-width: 3; stroke-linecap: round; }
+.orgo .og-hit { stroke: transparent; stroke-width: 22; fill: transparent; }
+.orgo .og-bondhit { cursor: pointer; outline: none; }
+.orgo .og-bondhit:hover .og-bond line, .orgo .og-bondhit:focus-visible .og-bond line { stroke: var(--ink-soft); }
+.orgo .og-bondhit:focus-visible .og-hit { stroke: var(--marker-soft); }
+.orgo .og-pencil-line { stroke: var(--pencil); stroke-width: 3; stroke-dasharray: 6 5; stroke-linecap: round; pointer-events: none; }
+
+/* side panel */
+.orgo .og-side { background: var(--card); border: 2px solid var(--ink); border-radius: 4px; box-shadow: 0 3px 0 var(--ink); padding: 14px 16px; min-width: 0; }
+.orgo .og-tag { font: 700 12px var(--font-mono); text-transform: uppercase; letter-spacing: 0.08em; color: var(--ink-soft); }
+.orgo .og-formula { font: 800 44px/1.1 var(--font-display); margin: 4px 0 2px; font-variant-numeric: tabular-nums; }
+.orgo .og-formula.empty { color: var(--pencil); }
+.orgo .og-target { font-size: 16px; }
+.orgo .og-pencil-text { font-family: var(--font-hand); color: var(--pencil); }
+.orgo .og-live, .orgo .og-verdict { margin-top: 12px; }
+.orgo .og-mname { display: inline-block; font: 700 15px var(--font-body); background: var(--marker); padding: 2px 6px; border-radius: 4px; }
+.orgo .og-mistake p, .orgo .og-note p { margin: 6px 0 10px; font-size: 15px; line-height: 1.4; }
+.orgo .og-hint { margin: 6px 0; font: 15px/1.4 var(--font-hand); color: var(--ink-soft); }
+.orgo .og-okay { font: 700 22px var(--font-display); display: flex; align-items: baseline; gap: 8px; flex-wrap: wrap; }
+.orgo .og-check { display: inline-grid; place-items: center; width: 34px; height: 34px; border-radius: 50%; background: var(--ink); color: var(--paper); font-size: 20px; align-self: center; }
+.orgo .og-cond { font: 500 15px var(--font-mono); color: var(--ink-soft); }
+.orgo .og-skel { width: 100%; max-width: 270px; display: block; margin-top: 4px; }
+.orgo .og-skl { stroke: currentColor; stroke-width: 3; }
+.orgo .og-skel .og-ink { color: var(--ink); }
+.orgo .og-skel .og-pencil { color: var(--pencil); }
+.orgo .og-skel .og-pencil .og-skl { stroke-dasharray: 5 4; }
+.orgo .og-skel-l { font: 15px var(--font-hand); fill: var(--ink-soft); }
+
+/* step 2: arrows */
+.orgo .og-drawable { cursor: crosshair; }
+.orgo .og-sources circle { fill: var(--marker-soft); stroke: var(--pencil); stroke-width: 1.5; stroke-dasharray: 2 3; }
+.orgo .og-lp circle { fill: var(--ink); }
+.orgo .og-pair circle { fill: var(--off); }
+.orgo .og-dots { color: var(--ink); letter-spacing: -2px; font-weight: 700; }
+.orgo .og-pen { fill: none; stroke: var(--pencil); stroke-width: 3; stroke-dasharray: 6 5; stroke-linecap: round; stroke-linejoin: round; pointer-events: none; }
+.orgo .og-target-hl { fill: var(--marker-soft); stroke: var(--ink); stroke-width: 1.5; pointer-events: none; }
+.orgo .og-arrow { pointer-events: none; }
+.orgo .og-arrow-line { fill: none; stroke-width: 3; stroke-linecap: round; }
+.orgo .og-pencil-arrow .og-arrow-line { stroke: var(--pencil); stroke-dasharray: 0.03 0.022; }
+.orgo .og-pencil-arrow .og-arrow-head { fill: var(--pencil); }
+.orgo .og-ink-arrow .og-arrow-line { stroke: var(--ink); stroke-dasharray: 1; stroke-dashoffset: 1; animation: og-draw 0.7s ease-out var(--d, 0s) forwards; }
+.orgo .og-ink-arrow .og-arrow-head { fill: var(--ink); opacity: 0; animation: og-show 0.15s calc(var(--d, 0s) + 0.6s) forwards; }
+@keyframes og-draw { to { stroke-dashoffset: 0; } }
+@keyframes og-show { to { opacity: 1; } }
+.orgo .og-legend { display: flex; gap: 14px; align-items: center; margin-top: 6px; font: 15px var(--font-hand); color: var(--ink-soft); flex-wrap: wrap; }
+.orgo .og-key-pencil::before, .orgo .og-key-ink::before { content: ''; display: inline-block; width: 26px; vertical-align: middle; margin-right: 6px; border-top: 3px dashed var(--pencil); }
+.orgo .og-key-ink::before { border-top: 3px solid var(--ink); }
+.orgo .og-rx { margin-left: auto; font: 700 16px var(--font-body); color: var(--ink); }
+.orgo .og-scrub { display: flex; align-items: center; gap: 10px; font: 14px var(--font-hand); color: var(--ink-soft); margin-top: 8px; flex: 1 1 220px; }
+.orgo .og-scrub input { flex: 1; min-width: 0; accent-color: var(--ink); height: 28px; }
+.orgo .og-arrowlist { margin: 6px 0 0; padding-left: 20px; font-size: 15px; line-height: 1.45; min-height: 1em; }
+.orgo .og-keys { margin-top: 12px; font-size: 15px; }
+.orgo .og-keys summary { cursor: pointer; font-weight: 700; }
+.orgo .og-keys label { display: grid; gap: 2px; margin-top: 8px; font: 700 12px var(--font-mono); text-transform: uppercase; letter-spacing: 0.06em; color: var(--ink-soft); }
+.orgo .og-keys select { font: 15px var(--font-body); color: var(--ink); text-transform: none; letter-spacing: 0; padding: 6px; border: 2px solid var(--ink); border-radius: 4px; background: var(--card); min-height: 40px; max-width: 100%; }
+.orgo .og-keys .og-btn { margin-top: 10px; width: 100%; min-height: 40px; }
+
+/* step 3: compare */
+.orgo .og-compare { grid-template-columns: minmax(0, 1fr); }
+.orgo .og-ask { font: 700 18px var(--font-body); margin: 0; min-height: 1.4em; }
+.orgo .og-pair-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; }
+@media (max-width: 760px) { .orgo .og-pair-grid { grid-template-columns: minmax(0, 1fr); } }
+.orgo .og-fig { margin: 0; min-width: 0; }
+.orgo .og-fig figcaption { font: 700 16px var(--font-body); margin-bottom: 6px; }
+.orgo .og-tap { cursor: pointer; outline: none; }
+.orgo .og-tap:hover .og-disc, .orgo .og-tap:focus-visible .og-disc { fill: var(--marker-soft); }
+.orgo .og-tap:focus-visible .og-hit { stroke: var(--ink); stroke-width: 2; stroke-dasharray: 3 3; }
+.orgo .og-mark circle { fill: var(--marker); }
+.orgo .og-mark line { stroke: var(--ink); stroke-width: 1.5; stroke-dasharray: 3 3; }
+.orgo .og-mark rect { fill: var(--marker); stroke: var(--ink); stroke-width: 1.5; }
+.orgo .og-mark text { font: 700 12px var(--font-mono); fill: var(--ink); }
+.orgo .og-note { margin-top: 8px; }
+.orgo .og-principle { margin-top: 16px; border-top: 2px solid var(--ink); padding-top: 12px; }
+.orgo .og-ink-big { font: 700 clamp(19px, 3.2vw, 24px)/1.35 var(--font-display); margin: 0; max-width: 40em; }
+.orgo .og-mastered { font-weight: 700; }

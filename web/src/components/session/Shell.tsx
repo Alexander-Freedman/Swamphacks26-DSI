@@ -98,13 +98,16 @@ export function StampRow({ v, children, className = '' }: { v: Verdict; children
   )
 }
 
-/** The yellow end bar: saved, what happened, the remix, Open notebook, Done. */
-/** `rematchCaught`: the mistake a missed rematch points to, when the first guess called it (#162). */
-export function EndBar(p: { caught: string | null; rematch: RematchResult; rematchCaught?: string | null; remix: string; onDone: () => void }) {
+/**
+ * The yellow end bar: saved, what happened, the remix, Open notebook, Done.
+ * `rematchCaught`: the mistake a missed rematch points to, when the first guess called it (#162).
+ * `line` replaces the caught/rematch sentence for sessions without a rematch.
+ */
+export function EndBar(p: { caught: string | null; rematch: RematchResult; rematchCaught?: string | null; remix: string; onDone: () => void; line?: ReactNode }) {
   return (
     <div className="ss-end" role="status">
       <p>
-        <b>Saved to your notebook.</b> {endLine(p.caught, p.rematch, p.rematchCaught ?? null)} {p.remix}
+        <b>Saved to your notebook.</b> {p.line ?? endLine(p.caught, p.rematch, p.rematchCaught ?? null)} {p.remix}
       </p>
       <div className="ss-endact">
         <a className="ss-nblink" href={NOTEBOOK_HREF}>Open notebook</a>

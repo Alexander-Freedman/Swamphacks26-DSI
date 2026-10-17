@@ -1,6 +1,6 @@
 // Card art for Home, keyed by session slug (files in public/art/, see docs/art-manifest.md).
 // Built from BASE_URL so it works under /Swamphacks26-DSI/ on Pages too.
-const WITH_ART = new Set(['birthday', 'coin-streak', 'positive-test', 'calculus'])
+const WITH_ART = new Set(['birthday', 'coin-streak', 'positive-test', 'calculus', 'orgo'])
 
 export type CardArt = { src: string; srcSet: string }
 

@@ -54,6 +54,18 @@ export type Card = {
 // Session-only misconceptions that aren't in a round JSON.
 const EXTRA_LABELS: Record<string, string> = {
   'too-few': 'A handful of people is enough',
+  // orgo (sessions/orgo/chem.ts MISTAKES)
+  'carbon-five-bonds': 'A carbon with 5 bonds',
+  'hydrogen-two-bonds': 'Hydrogen with 2 bonds',
+  'oxygen-three-bonds': 'Oxygen with 3 bonds, no charge',
+  'missing-hydrogens': 'Missing hydrogens',
+  'same-formula-different-molecule': 'Same formula, different molecule',
+  'arrow-from-electrophile': 'Arrow starts at the carbon',
+  'arrow-backwards': 'Arrow from Br toward C (backwards)',
+  'front-side-attack': 'Front-side attack',
+  'leaving-bond-stays': 'The C–Br bond never breaks',
+  'cyanide-nitrogen': 'Nitrogen as cyanide’s attacker',
+  'wrong-carbon': 'Cyanide’s carbon as the target',
 }
 
 function store(): Storage | null {
