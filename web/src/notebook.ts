@@ -54,6 +54,8 @@ export type Card = {
 // Session-only misconceptions that aren't in a round JSON.
 const EXTRA_LABELS: Record<string, string> = {
   'too-few': 'A handful of people is enough',
+  // calculus, Calc 3 (sessions/calculus/Surface.tsx)
+  'partial-wrong-way': 'Walking a slice the wrong way',
   // orgo (sessions/orgo/chem.ts MISTAKES)
   'carbon-five-bonds': 'A carbon with 5 bonds',
   'hydrogen-two-bonds': 'Hydrogen with 2 bonds',

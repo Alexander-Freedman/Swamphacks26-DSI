@@ -9,28 +9,90 @@ import {
 import { reducedMotion, useWidth } from './plot'
 import { SlopeChart } from './SlopeChart'
 import { FINE, fineXs, pencilAt } from './slopeGeo'
+import { SurfaceStep } from './Surface'
+import { COURSES, type CalcStep, type CalcTopic } from './topics'
 import './calculus.css'
 
-const STEPS = ['Draw the slope', 'Drag the tangent', 'Fill the area', 'Your mistake', 'Same idea twice'] as const
+const LABEL: Record<CalcStep, string> = { draw: 'Draw the slope', tangent: 'Drag the tangent', area: 'Fill the area', card: 'Your mistake', compare: 'Same idea twice', surface: 'Slices' }
 
 // One plain-language guidance line per screen.
-const TITLES: [string, string][] = [
-  ['Draw the slope.', 'This curve climbs, dips, then climbs again. In the bottom box, draw how steep it is along the way: above 0 is uphill, below 0 is downhill.'],
-  ['Drag the tangent.', 'Drag the dot along the curve. The real slope draws itself over your pencil.'],
-  ['Fill the area.', 'One rectangle says 7.5 squares. Drag your pencil to where you think the real area under the curve is.'],
-  ['What your pencil says.', 'The idea your sketch and your guess point to, and the one-line fix.'],
-  ['Same idea, twice.', 'Drag time on either graph. Watch which numbers match, then pick what the two have in common.'],
-]
+const TITLES: Record<CalcStep, [string, string]> = {
+  draw: ['Draw the slope.', 'This curve climbs, dips, then climbs again. In the bottom box, draw how steep it is along the way: above 0 is uphill, below 0 is downhill.'],
+  tangent: ['Drag the tangent.', 'Drag the dot along the curve. The real slope draws itself over your pencil.'],
+  area: ['Fill the area.', 'One rectangle says 7.5 squares. Drag your pencil to where you think the real area under the curve is.'],
+  card: ['What your pencil says.', 'The idea your sketch and your guess point to, and the one-line fix.'],
+  compare: ['Same idea, twice.', 'Drag time on either graph. Watch which numbers match, then pick what the two have in common.'],
+  surface: ['Slices of a surface.', 'With two inputs, x and y, the graph is a surface: a height above every point of the floor. Drag it to turn it around. Slicing it straight along x or y gives an ordinary curve, and that curve’s slope is a partial derivative.'],
+}
+const REMIX: Record<string, string> = {
+  slope: 'Next: the area under the same curve.',
+  area: 'Next: see how slope and area undo each other.',
+  ftc: 'Next: the guided path, start to finish.',
+}
 
 const slopeWord = (s: number) => (Math.abs(s) < 0.05 ? 'flat' : s > 0 ? 'uphill' : 'downhill')
 
+/** Calculus opens on a chapter menu, so practice is on purpose, not a fixed path. */
 export function CalculusSession({ onDone }: { onDone: () => void }) {
+  const [topic, setTopic] = useState<CalcTopic | null>(null)
+  // a new key per pick remounts the steps, so every chapter starts clean
+  const [play, setPlay] = useState(0)
+  const start = (t: CalcTopic) => {
+    setTopic(t)
+    setPlay((p) => p + 1)
+  }
+  if (!topic) return <CalcMenu onPick={start} />
+  return <CalcRun key={play} topic={topic} onTopics={() => setTopic(null)} onDone={onDone} />
+}
+
+function CalcMenu({ onPick }: { onPick: (t: CalcTopic) => void }) {
+  const title = useRef<HTMLHeadingElement>(null)
+  return (
+    <Frame className="calc">
+      <div className="ss-head">
+        <span className="ss-chip">Calculus</span>
+      </div>
+      <Title h="What do you want to practice?" sub="Pick a course and a chapter, then a topic." headingRef={title} />
+      <div className="calc-menu">
+        {COURSES.map((c) => (
+          <section key={c.id} className="calc-course" aria-labelledby={`calc-c-${c.id}`}>
+            <h2 id={`calc-c-${c.id}`} className="calc-course-title">{c.title}</h2>
+            <p className="calc-sec-blurb">{c.blurb}</p>
+            {c.sections.map((s) => (
+              <div key={s.id} className="calc-section">
+                {c.sections.length > 1 && <h3 className="calc-sec-title">{s.title}</h3>}
+                {c.sections.length > 1 && <p className="calc-sec-blurb">{s.blurb}</p>}
+                <div className="calc-topics">
+                  {s.topics.map((t) => (
+                    <button key={t.id} className="calc-topic" disabled={!t.ready} onClick={() => onPick(t)} aria-describedby={`calc-t-${t.id}`}>
+                      <span className="calc-topic-title">{t.title}</span>
+                      <span id={`calc-t-${t.id}`} className="calc-topic-blurb">{t.blurb}</span>
+                      {!t.ready && <span className="calc-soon">coming next</span>}
+                    </button>
+                  ))}
+                </div>
+              </div>
+            ))}
+          </section>
+        ))}
+      </div>
+    </Frame>
+  )
+}
+
+function CalcRun({ topic, onTopics, onDone }: { topic: CalcTopic; onTopics: () => void; onDone: () => void }) {
+  const steps = topic.steps
   const [step, setStep] = useState(1)
   const [reached, setReached] = useState(1)
   const go = (n: number) => {
     setStep(n)
     setReached((r) => Math.max(r, n))
   }
+  const cur = steps[step - 1]
+  const at = (s: CalcStep) => steps.indexOf(s) + 1
+  const next = (s: CalcStep) => go(at(s) + 1)
+  const isLast = (s: CalcStep) => at(s) === steps.length
+  const nextLabel = (s: CalcStep, fallback: string) => (isLast(s) ? 'Finish ✓' : steps[at(s)] === 'card' ? 'What did my pencil get wrong? →' : fallback)
   const [stroke, setStroke] = useState<Pt[]>([])
   const [sketch, setSketch] = useState<number[] | null>(null)
   const [guess, setGuess] = useState<number | null>(null)
@@ -49,42 +111,53 @@ export function CalculusSession({ onDone }: { onDone: () => void }) {
   // Saved when the mistake card is reached, so leaving early still keeps it.
   const saved = useRef(false)
   useEffect(() => {
-    if (step !== 4 || saved.current || !slope || !area || guess == null) return
+    if (cur !== 'card' || saved.current || (!slope && !area)) return
     saved.current = true
     record({
       session: 'calculus',
       at: new Date().toISOString(),
-      guess,
-      misconception: slope.mistake ?? area.mistake ?? null,
+      guess: guess ?? '',
+      misconception: slope?.mistake ?? area?.mistake ?? null,
       rematch: null,
-      slopeMistake: slope.mistake,
-      areaMistake: area.mistake,
-      mastered: mastered(slope, area),
+      slopeMistake: slope?.mistake ?? null,
+      areaMistake: area?.mistake ?? null,
+      mastered: (!slope || slope.mistake === null) && (!area || area.close),
+      calcTopic: topic.id,
     })
-  }, [step, slope, area, guess])
+  }, [cur, slope, area, guess, topic.id])
+  // the fundamental-theorem chapter has no card: it's saved when you pick what's the same
+  const savePick = (right: boolean) => {
+    if (saved.current) return
+    saved.current = true
+    record({ session: 'calculus', at: new Date().toISOString(), guess: '', misconception: null, rematch: null, mastered: right, calcTopic: topic.id })
+  }
 
-  const [h, sub] = TITLES[step - 1]
+  const [h, sub] = TITLES[cur]
   // you can step back to anything you've reached, but not back into the sketch once it's been checked
-  const canGo = (i: number) => i < reached && (i > 0 || reached === 1)
+  const canGo = (i: number) => i < reached && (steps[i] !== 'draw' || reached === 1)
 
   return (
     <Frame className="calc">
-      <SessionHead chip="Calculus" step={step} total={STEPS.length} labels={STEPS} canGo={canGo} onGo={(i) => go(i + 1)} />
+      <SessionHead chip={`Calculus · ${topic.title}`} step={step} total={steps.length} labels={steps.map((s) => LABEL[s])} canGo={canGo} onGo={(i) => go(i + 1)} />
+      <button className="calc-btn calc-ghost calc-sm calc-back" onClick={onTopics}>← All calculus topics</button>
       <Title h={h} sub={sub} headingRef={title} />
-      {step === 1 && (
+      {cur === 'draw' && (
         <DrawStep
           stroke={stroke}
           setStroke={setStroke}
           onNext={() => {
             setSketch(resample(stroke))
-            go(2)
+            next('draw')
           }}
         />
       )}
-      {step === 2 && sketch && <TangentStep sketch={sketch} onNext={() => go(3)} />}
-      {step === 3 && <AreaStep guess={guess} setGuess={setGuess} onNext={() => go(4)} />}
-      {step === 4 && slope && area && guess != null && sketch && <CardStep slope={slope} area={area} guess={guess} sketch={sketch} onNext={() => go(5)} />}
-      {step === 5 && slope && area && <CompareStep slope={slope} area={area} onDone={onDone} />}
+      {cur === 'tangent' && sketch && <TangentStep sketch={sketch} onNext={() => next('tangent')} nextLabel={nextLabel('tangent', 'Now the area →')} />}
+      {cur === 'area' && <AreaStep guess={guess} setGuess={setGuess} onNext={() => next('area')} nextLabel={nextLabel('area', 'What did my pencil get wrong? →')} />}
+      {cur === 'card' && (slope || area) && (
+        <CardStep slope={slope} area={area} guess={guess} sketch={sketch} onNext={() => next('card')} end={isLast('card') ? { remix: REMIX[topic.id] ?? '', onDone } : null} />
+      )}
+      {cur === 'compare' && <CompareStep slope={slope} area={area} onDone={onDone} onPick={savePick} />}
+      {cur === 'surface' && <SurfaceStep onDone={onDone} topic={topic.id} />}
     </Frame>
   )
 }
@@ -134,7 +207,7 @@ function DrawStep({ stroke, setStroke, onNext }: { stroke: Pt[]; setStroke: (f: 
 
 const idx = (x: number) => Math.round(((x - X0) / (X1 - X0)) * (FINE - 1))
 
-function TangentStep({ sketch, onNext }: { sketch: number[]; onNext: () => void }) {
+function TangentStep({ sketch, onNext, nextLabel }: { sketch: number[]; onNext: () => void; nextLabel: string }) {
   const [ref, w] = useWidth<HTMLDivElement>(640)
   const [at, setAt] = useState(0.2)
   const [revealed, setRevealed] = useState<boolean[]>(() => fineXs.map((_, i) => Math.abs(i - idx(0.2)) <= 1))
@@ -181,7 +254,7 @@ function TangentStep({ sketch, onNext }: { sketch: number[]; onNext: () => void 
               trace the whole slope
             </button>
           )}
-          <button className="calc-btn calc-go" disabled={!all} onClick={onNext}>Now the area →</button>
+          <button className="calc-btn calc-go" disabled={!all} onClick={onNext}>{nextLabel}</button>
         </div>
       </div>
     </section>
@@ -200,7 +273,7 @@ function Legend({ you = 'your pencil' }: { you?: string }) {
 
 /* ---------- 3: fill the area ---------- */
 
-function AreaStep({ guess, setGuess, onNext }: { guess: number | null; setGuess: (v: number) => void; onNext: () => void }) {
+function AreaStep({ guess, setGuess, onNext, nextLabel }: { guess: number | null; setGuess: (v: number) => void; onNext: () => void; nextLabel: string }) {
   const [ref, w] = useWidth<HTMLDivElement>(640)
   const [barRef, bw] = useWidth<HTMLDivElement>(640, 1000)
   const [filling, setFilling] = useState(false)
@@ -294,7 +367,7 @@ function AreaStep({ guess, setGuess, onNext }: { guess: number | null; setGuess:
       )}
       <div className="calc-row">
         {filling ? (
-          <button className="calc-btn calc-go" disabled={maxN < 50} onClick={onNext}>{maxN < 50 ? 'Add more rectangles first' : 'What did my pencil get wrong? →'}</button>
+          <button className="calc-btn calc-go" disabled={maxN < 50} onClick={onNext}>{maxN < 50 ? 'Add more rectangles first' : nextLabel}</button>
         ) : (
           <button className="calc-btn calc-go" disabled={guess == null} onClick={() => setFilling(true)}>{guess == null ? 'Drag the pencil on the bar first' : 'Fill it with rectangles →'}</button>
         )}
@@ -305,19 +378,25 @@ function AreaStep({ guess, setGuess, onNext }: { guess: number | null; setGuess:
 
 /* ---------- 4: the mistake, named ---------- */
 
-function CardStep({ slope, area, guess, sketch, onNext }: { slope: SlopeRead; area: AreaRead; guess: number; sketch: number[]; onNext: () => void }) {
+type End = { remix: string; onDone: () => void }
+
+function CardStep(p: { slope: SlopeRead | null; area: AreaRead | null; guess: number | null; sketch: number[] | null; onNext: () => void; end: End | null }) {
+  const { slope, area, guess, sketch, onNext, end } = p
   const exact = exactArea()
-  const hill = pencilAt(sketch, 1)
+  const caught = [slope?.mistake, area?.mistake].filter((m): m is NonNullable<typeof m> => m != null).map((m) => `“${LABELS[m]}”`)
   return (
     <section>
-      <div className="calc-two">
+      <div className={slope && sketch && area && guess != null ? 'calc-two' : 'calc-one'}>
+        {slope && sketch && (
         <div className="calc-card calc-verdict">
           <div className={'calc-k' + (slope.mistake ? ' calc-red' : '')}>slope · {slope.mistake ? 'the mistake' : 'the right model'}</div>
           <h3 className="calc-named">{slope.mistake ? <>“<span className="calc-hl">{LABELS[slope.mistake]}</span>”</> : <>Your slope had the <span className="calc-hl">right shape</span>.</>}</h3>
-          <p>{slopeLine(slope, hill)}</p>
+          <p>{slopeLine(slope, pencilAt(sketch, 1))}</p>
           <p className="calc-fix"><b>{slope.mistake ? 'Fix:' : 'The rule:'}</b> {slopeFix(slope)}</p>
           <MiniTangent at={slope.mistake === 'slope-sign-flipped' || slope.mistake === 'slope-never-negative' ? 2 : 1} note={slope.mistake === 'slope-sign-flipped' || slope.mistake === 'slope-never-negative' ? 'going downhill: slope −1.5' : 'highest point, slope 0'} />
         </div>
+        )}
+        {area && guess != null && (
         <div className="calc-card calc-verdict">
           <div className={'calc-k' + (area.mistake ? ' calc-red' : '')}>area · {area.mistake ? 'the mistake' : area.close ? 'the right model' : 'the gap'}</div>
           <h3 className="calc-named">
@@ -334,8 +413,13 @@ function CardStep({ slope, area, guess, sketch, onNext }: { slope: SlopeRead; ar
           <p className="calc-fix"><b>{area.mistake || !area.close ? 'Fix:' : 'The rule:'}</b> rectangles only estimate the area; as they get thinner the sum closes in on one exact number.</p>
           <MiniRects />
         </div>
+        )}
       </div>
-      <button className="calc-btn calc-go" onClick={onNext}>One more picture →</button>
+      {end ? (
+        <CalcEnd caught={caught} mastered={(!slope || slope.mistake === null) && (!area || area.close)} remix={end.remix} onDone={end.onDone} />
+      ) : (
+        <button className="calc-btn calc-go" onClick={onNext}>One more picture →</button>
+      )}
     </section>
   )
 }
@@ -375,14 +459,25 @@ const PICKS = [
   { id: 'none', text: 'Nothing: slopes and areas are different topics', right: false, why: 'Drag time again: the slope on the left is always the height on the right.' },
 ] as const
 
-function CompareStep({ slope, area, onDone }: { slope: SlopeRead; area: AreaRead; onDone: () => void }) {
+function CompareStep({ slope, area, onDone, onPick }: { slope: SlopeRead | null; area: AreaRead | null; onDone: () => void; onPick?: (firstTry: boolean) => void }) {
   const [refL, wl] = useWidth<HTMLDivElement>(320, 480)
   const [refR, wr] = useWidth<HTMLDivElement>(320, 480)
   const [t, setT] = useState(1.2)
-  const [pick, setPick] = useState<string | null>(null)
-  const chosen = PICKS.find((p) => p.id === pick)
-  const caught = [slope.mistake, area.mistake].filter((m): m is NonNullable<typeof m> => m != null).map((m) => `“${LABELS[m]}”`)
-  const done = mastered(slope, area)
+  const [wrong, setWrong] = useState<string[]>([])
+  const [right, setRight] = useState(false)
+  const [last, setLast] = useState<string | null>(null)
+  const missed = PICKS.find((p) => p.id === last && !p.right)
+  const choose = (p: (typeof PICKS)[number]) => {
+    if (right) return
+    setLast(p.id)
+    if (p.right) {
+      setRight(true)
+      onPick?.(wrong.length === 0)
+    } else setWrong((w) => (w.includes(p.id) ? w : [...w, p.id]))
+  }
+  const caught = [slope?.mistake, area?.mistake].filter((m): m is NonNullable<typeof m> => m != null).map((m) => `“${LABELS[m]}”`)
+  // alone (its own chapter) it's mastered on a first-try right pick; on the guided path, by the sketch and the guess
+  const done = slope && area ? mastered(slope, area) : wrong.length === 0
   return (
     <section>
       <div className="calc-two">
@@ -408,13 +503,29 @@ function CompareStep({ slope, area, onDone }: { slope: SlopeRead; area: AreaRead
       <div className="calc-card">
         <div className="calc-k">What's the same?</div>
         <div className="calc-picks" role="group" aria-label="what's the same">
-          {PICKS.map((p) => (
-            <button key={p.id} className="calc-pick" aria-pressed={pick === p.id} onClick={() => setPick(p.id)}>{p.text}</button>
-          ))}
+          {PICKS.map((p) => {
+            const isWrong = wrong.includes(p.id)
+            const isRight = right && p.right
+            return (
+              <button key={p.id} className={'calc-pick' + (isRight ? ' right' : '') + (isWrong ? ' wrong' : '')} aria-pressed={isRight} disabled={right || isWrong} onClick={() => choose(p)}>
+                {isRight && <span className="calc-mark" aria-hidden="true">✓</span>}
+                {isWrong && <span className="calc-mark" aria-hidden="true">✗</span>}
+                {p.text}
+              </button>
+            )
+          })}
         </div>
-        {chosen && (
-          <div className="calc-principle" aria-live="polite">
-            {!chosen.right && <p className="calc-small">{'why' in chosen ? chosen.why : ''}</p>}
+        {missed && !right && (
+          <p className="calc-wrong" role="status">
+            <b>✗ Not quite.</b> {'why' in missed ? missed.why : ''} Try another one.
+          </p>
+        )}
+        {right && (
+          <div className="calc-principle" role="status">
+            <p className="calc-correct">
+              <span className="calc-check" aria-hidden="true">✓</span>
+              <span><b>Correct!</b> The slope of the position graph at any moment is the height of the velocity graph, and the area under velocity so far is the height of position.</span>
+            </p>
             <p className="calc-rule">
               <span><span className="calc-hl">Slope</span> = rate of change.</span>
               <span><span className="calc-box">Area</span> = accumulated change.</span>
@@ -423,18 +534,23 @@ function CompareStep({ slope, area, onDone }: { slope: SlopeRead; area: AreaRead
           </div>
         )}
       </div>
-      {chosen && (
-        <div className="calc-end" role="status">
-          <p>
-            <b>Saved to your notebook.</b> {caught.length ? `Caught: ${caught.join(' and ')}.` : 'No mistake caught this time.'}{' '}
-            {done && <span className="calc-mastered" aria-label="mastered">✓ mastered</span>}
-          </p>
-          <div className="calc-endact">
-            <a className="calc-nblink" href={NOTEBOOK_HREF}>Open notebook</a>
-            <button className="calc-btn" onClick={onDone}>Done</button>
-          </div>
-        </div>
-      )}
+      {right && <CalcEnd caught={caught} mastered={done} remix="" onDone={onDone} />}
     </section>
+  )
+}
+
+/** The yellow end bar: saved, what was caught, Open notebook, Done. */
+function CalcEnd({ caught, mastered: ok, remix, onDone }: { caught: string[]; mastered: boolean; remix: string; onDone: () => void }) {
+  return (
+    <div className="calc-end" role="status">
+      <p>
+        <b>Saved to your notebook.</b> {caught.length ? `Caught: ${caught.join(' and ')}.` : 'No mistake caught this time.'}{' '}
+        {ok && <span className="calc-mastered" aria-label="mastered">✓ mastered</span>} {remix}
+      </p>
+      <div className="calc-endact">
+        <a className="calc-nblink" href={NOTEBOOK_HREF}>Open notebook</a>
+        <button className="calc-btn" onClick={onDone}>Done</button>
+      </div>
+    </div>
   )
 }
