@@ -215,7 +215,7 @@ export function PushStep({ onGrade, onNext }: { onGrade: (mistakes: ArrowMistake
           <span className="og-rx">{t < 0.68 ? RX['oh-mebr'].text.reactants : RX['oh-mebr'].text.products}</span>
         </div>
         {phase === 'draw' ? (
-          <p className="og-cap">drag from a lone pair <span className="og-dots" aria-hidden="true">••</span> or a bond to where the electrons go</p>
+          <p className="og-cap">start an arrow on the electrons that move (a lone pair <span className="og-dots" aria-hidden="true">••</span> or a bond) and drag it to the atom they move to</p>
         ) : (
           <>
             <p className="og-cap og-ink-cap">{CAPTION(t)}</p>
@@ -288,7 +288,7 @@ export function PushStep({ onGrade, onNext }: { onGrade: (mistakes: ArrowMistake
         {phase !== 'draw' && (
           <div className="og-row">
             <button className="og-btn og-ghost" onClick={reset}>Draw again</button>
-            <button className="og-btn og-next" onClick={onNext}>Same pattern →</button>
+            <button className="og-btn og-next" onClick={onNext}>Find the same pattern →</button>
           </div>
         )}
       </aside>

@@ -12,9 +12,9 @@ export const SLUG = 'orgo'
 const LABEL: Record<OrgoStep, string> = { build: 'Build', push: 'Push', compare: 'Compare' }
 // Short captions only: the pictures do the explaining.
 const TITLES: Record<OrgoStep, [string, string]> = {
-  build: ['Build ethanol', 'Drag atoms onto the paper and bond them until every slot is full.'],
-  push: ['Push the electrons', 'Draw the curved arrows for HO⁻ + CH₃Br. Then watch it happen.'],
-  compare: ['Same pattern', 'A new reaction. Find the same three parts.'],
+  build: ['Build ethanol', 'Ethanol (C₂H₆O) is the alcohol in drinks. Drag atoms onto the paper and connect them until each one has its full set of bonds: carbon 4, oxygen 2, hydrogen 1.'],
+  push: ['Show how the electrons move', 'Hydroxide (HO⁻) kicks the bromine off CH₃Br and takes its place. Chemists draw this with curved arrows: each one starts on a pair of electrons and ends where that pair goes. Draw the arrows, then watch the reaction play out.'],
+  compare: ['Find the same pattern', 'A new reaction sits next to the one you just did. In both, tap the atom that attacks, the carbon it hits, and the atom that leaves.'],
 }
 const REMIX: Record<string, string> = {
   'build-ethanol': 'Next: push the electrons in a real mechanism.',
