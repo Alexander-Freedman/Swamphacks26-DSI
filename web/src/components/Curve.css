@@ -1,0 +1,14 @@
+.curve { width: 100%; height: auto; display: block; overflow: visible; }
+.curve-axis { stroke: var(--ink); stroke-width: 2; }
+.curve-half { stroke: var(--ink-soft); stroke-dasharray: 3 5; }
+.curve-tick { font-size: 14px; fill: var(--ink-soft); }
+.curve-ylabel { font-size: 13px; }
+.curve-ink { fill: none; stroke: var(--ink); stroke-width: 4; stroke-linecap: round; stroke-dasharray: 1; stroke-dashoffset: 1; animation: ink 900ms cubic-bezier(.4, 0, .2, 1) forwards; }
+@keyframes ink { to { stroke-dashoffset: 0; } }
+/* ink = the truth, pencil = the guess, marker = the gap between them */
+.curve-gap { fill: var(--marker-soft); animation: fade 300ms 900ms both; }
+.curve-guess line { stroke: var(--pencil); stroke-width: 3; stroke-dasharray: 6 5; }
+.curve-guess text { font-family: var(--font-hand); font-size: 16px; fill: var(--pencil); }
+.curve-drop { stroke: var(--ink); stroke-width: 1.5; stroke-dasharray: 2 4; animation: fade 300ms 900ms both; }
+.curve-target circle { fill: var(--ink); stroke: var(--paper); stroke-width: 3; animation: pop 300ms 900ms cubic-bezier(.3, 1.6, .5, 1) both; transform-box: fill-box; transform-origin: center; }
+.curve-target text { font-weight: 800; font-size: 18px; fill: var(--ink); paint-order: stroke; stroke: var(--paper); stroke-width: 5px; stroke-linejoin: round; animation: fade 300ms 1000ms both; }

@@ -1,13 +1,15 @@
-import { useEffect, useState } from 'react'
-import { Distribution } from './components/Distribution'
+import { useEffect, useRef, useState } from 'react'
+import { CheckedTag } from './components/CheckedTag'
 import { NotebookLink, NotebookScreen } from './components/Notebook'
 import { useReset } from './reset'
 import { Predict, type Answer } from './components/Predict'
+import { Reveal } from './components/Reveal'
 import { showcaseRound, showcaseSlugs } from './rounds'
 import { sessionFor, sessions } from './sessions/registry'
-import { simulate, shareAtLeast, type Histogram } from './truth'
-import type { Item, Round } from './types'
-import { misconceptionFor, verdictFor, verdictText } from './verdict'
+import { withUnit } from './format'
+import { computeTruth, type Computed } from './truth'
+import type { Round } from './types'
+import { misconceptionFor } from './verdict'
 import { HOME, onScreenChange, pushScreen, readScreen, replaceScreen, type Screen } from './url'
 import './App.css'
 
@@ -40,54 +42,26 @@ function Home({ onPick, onSession, onNotebook }: { onPick: (slug: string) => voi
   )
 }
 
-type Phase = { kind: 'predict' } | { kind: 'locked'; answer: Answer } | { kind: 'revealed'; answer: Answer; hist: Histogram | null }
-
-function Reveal({ item, round, answer, hist }: { item: Item; round: Round; answer: Answer; hist: Histogram | null }) {
-  const truth = hist?.mean ?? null
-  const v = verdictFor(item, answer, truth)
-  const mid = misconceptionFor(item, answer)
-  const m = round.misconceptions.find((x) => x.id === mid)
-  const t = item.truth
-  return (
-    <div>
-      <h2 className="prompt">{item.prompt}</h2>
-      {hist && t.widget === 'distribution' && (
-        <Distribution
-          hist={hist}
-          xLabel={t.x_label}
-          guess={item.input_type === 'slider' ? answer.value : null}
-          range={item.slider ? { min: item.slider.min, max: item.slider.max } : undefined}
-        />
-      )}
-      <p className={`verdict ${v}`}>{verdictText[v]}</p>
-      {hist && t.widget === 'distribution' && t.sampler === 'coin_longest_run' && (
-        <p className="truth-line">
-          Average longest run: <strong>{hist.mean.toFixed(1)}</strong>. A run of 5+ showed up in{' '}
-          <strong>{Math.round(shareAtLeast(hist, 5) * 100)}%</strong> of {hist.trials.toLocaleString()} simulated tries.
-        </p>
-      )}
-      {m && (
-        <p className="truth-line">
-          This looks like <strong>“{m.label}”</strong>. {m.refutation}
-        </p>
-      )}
-    </div>
-  )
-}
+type Phase = { kind: 'predict' } | { kind: 'locked'; answer: Answer } | { kind: 'revealed'; answer: Answer; truth: Computed }
 
 function Player({ round, onDone }: { round: Round; onDone: () => void }) {
   const [idx, setIdx] = useState(0)
   const [phase, setPhase] = useState<Phase>({ kind: 'predict' })
+  // How many answers this round pointed at each misconception (2+ = named on the card).
+  const [signals, setSignals] = useState<Record<string, number>>({})
   const item = round.items[idx]
   const last = idx === round.items.length - 1
+  const beat = useRef<ReturnType<typeof setTimeout> | undefined>(undefined)
+  // Leaving mid-beat (logo, Done) must not fire a reveal into an unmounted round.
+  useEffect(() => () => clearTimeout(beat.current), [])
 
   const lock = (answer: Answer) => {
     setPhase({ kind: 'locked', answer })
+    const mid = misconceptionFor(item, answer)
+    if (mid) setSignals((s) => ({ ...s, [mid]: (s[mid] ?? 0) + 1 }))
     // The truth is only computed after lock-in. The beat hides the simulation time.
-    setTimeout(() => {
-      const hist = item.truth.widget === 'distribution' ? simulate(item.truth) : null
-      setPhase({ kind: 'revealed', answer, hist })
-    }, BEAT_MS)
+    clearTimeout(beat.current)
+    beat.current = setTimeout(() => setPhase({ kind: 'revealed', answer, truth: computeTruth(item) }), BEAT_MS)
   }
 
   const next = () => {
@@ -100,14 +74,15 @@ function Player({ round, onDone }: { round: Round; onDone: () => void }) {
     <div className="sheet">
       <p className="progress">{round.topic} · {idx + 1} of {round.items.length}</p>
       {phase.kind === 'predict' && <Predict key={item.id} item={item} onLock={lock} />}
+      {phase.kind !== 'predict' && <h2 className="prompt">{item.prompt}</h2>}
       {phase.kind !== 'predict' && (
         <span className="locked-stamp">
-          locked: {phase.answer.value ?? item.options?.find((o) => o.id === phase.answer.optionId)?.text} · {phase.answer.confidence}
+          locked: {phase.answer.value != null ? withUnit(phase.answer.value, item.slider?.unit ?? '') : item.options?.find((o) => o.id === phase.answer.optionId)?.text} · {phase.answer.confidence}
         </span>
       )}
       {phase.kind === 'revealed' && (
         <>
-          <Reveal item={item} round={round} answer={phase.answer} hist={phase.hist} />
+          <Reveal item={item} round={round} answer={phase.answer} truth={phase.truth} signals={signals} />
           <button className="next" onClick={next}>{last ? 'Done' : 'Next'}</button>
         </>
       )}
@@ -156,7 +131,7 @@ export default function App() {
     <main className="app">
       <header className="topbar">
         <button className="logo" style={{ border: 0, background: 'none', padding: 0 }} onClick={home}>Onionskin</button>
-        {round && <span className={`chip ${round.reviewed ? 'reviewed' : ''}`}>{round.reviewed ? 'reviewed' : 'auto-checked'}</span>}
+        {round && <CheckedTag reviewed={round.reviewed} />}
       </header>
       {cleared && <p className="nb-toast" role="status">Notebook cleared</p>}
       {screen.kind === 'notebook' ? (
