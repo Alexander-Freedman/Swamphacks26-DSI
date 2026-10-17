@@ -37,10 +37,10 @@
 .nb-empty { margin: 16px 0 8px; padding: 20px 16px; border: 3px dashed var(--pencil); border-radius: 12px; background: var(--paper); }
 .nb-empty p { margin: 0 0 14px; line-height: 1.45; }
 .nb-empty-hand { font-family: var(--font-hand); font-size: 1.4rem; color: var(--pencil); }
-.nb-btn { display: inline-block; padding: 12px 18px; min-height: 48px; border: 2px solid var(--ink); border-radius: 12px; background: var(--marker); color: var(--ink); font-weight: 800; text-decoration: none; box-shadow: 0 3px 0 var(--ink); }
+.nb-btn { display: inline-block; padding: 12px 18px; min-height: 48px; border: 2px solid var(--ink); border-radius: var(--radius-ui); background: var(--marker); color: var(--ink); font-weight: 800; text-decoration: none; box-shadow: 0 3px 0 var(--ink); }
 .nb-back { display: inline-block; margin-top: 20px; padding: 10px 0; color: var(--ink); font-weight: 600; }
 
-.nb-toast { position: fixed; left: 50%; bottom: 24px; transform: translateX(-50%); z-index: 10; margin: 0; padding: 8px 16px; white-space: nowrap; box-shadow: 0 3px 0 var(--ink); border: 2px solid var(--ink); border-radius: 999px; background: var(--marker); font-weight: 600; }
+.nb-toast { position: fixed; left: 50%; bottom: 24px; transform: translateX(-50%); z-index: 10; margin: 0; padding: 8px 16px; white-space: nowrap; box-shadow: 0 3px 0 var(--ink); border: 2px solid var(--ink); border-radius: var(--radius-ui); background: var(--marker); font-weight: 600; }
 
 @media (max-width: 480px) {
   .nb .nb-title { font-size: 1.6rem; }

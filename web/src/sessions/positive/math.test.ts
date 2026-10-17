@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { baseToSlider, breakEven, CARD, exact, pct, piles, ppv, REMATCH, secondTest, seededOrder, sliderToBase } from './math'
+import { BAG_DAY, BAGS, baseToSlider, breakEven, CARD, exact, pct, piles, ppv, REMATCH, secondTest, seededOrder, sliderToBase } from './math'
 
 describe('positive test math', () => {
   it('1% / 90% / 9% gives 9.17%, shown as 9.2%', () => {
@@ -62,5 +62,20 @@ describe('positive test math', () => {
   it('rematch: 2% sick, 95% caught, 5% false alarms → 27.9%, 19 of 68 per 1,000', () => {
     expect(exact(ppv(REMATCH))).toBe('27.9%')
     expect(piles(REMATCH)).toEqual({ sick: 20, healthy: 980, truePos: 19, falsePos: 49, positives: 68 })
+  })
+})
+
+describe('compare step: airport bags (#183, illustrative numbers)', () => {
+  it('1 in 1,000 bags, 99% flagged, 2% false alarms: 99 of 2,097 alarms are real, 4.72%', () => {
+    const b = piles(BAGS, BAG_DAY)
+    expect(b).toEqual({ sick: 100, healthy: 99_900, truePos: 99, falsePos: 1_998, positives: 2_097 })
+    // whole bags, no rounding: the counts are the exact expectation
+    expect(BAG_DAY * BAGS.baseRate * BAGS.sensitivity).toBeCloseTo(99, 9)
+    expect(BAG_DAY * (1 - BAGS.baseRate) * BAGS.falseAlarm).toBeCloseTo(1_998, 9)
+    expect(ppv(BAGS)).toBeCloseTo(99 / 2_097, 12)
+    expect(ppv(BAGS)).toBeCloseTo(0.04721, 5)
+    expect(exact(ppv(BAGS))).toBe('4.7%')
+    // most alarms are false: about 20 false for every real one
+    expect(Math.round(b.falsePos / b.truePos)).toBe(20)
   })
 })

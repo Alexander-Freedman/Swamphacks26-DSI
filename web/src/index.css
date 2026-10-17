@@ -17,6 +17,8 @@
   --font-display: 'Bricolage Grotesque', system-ui, sans-serif;
   --font-mono: 'JetBrains Mono', ui-monospace, monospace;
   --radius: 14px;
+  /* Buttons, chips, tags, toggles, pickers, toasts: a small corner, never a pill (#190). */
+  --radius-ui: 4px;
   color-scheme: light;
 }
 

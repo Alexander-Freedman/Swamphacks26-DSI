@@ -59,6 +59,7 @@ Shared across topics, so step 3 builds them once:
 - **Hand notes are HTML text under or beside the SVG** (with a paper-colored halo when they must sit on a chart), so they never collide with lines on a phone.
 - **The ink truth readout is the biggest type on the screen** (9 / 98, 50.7%, 6.98).
 - The verdict stamp comes from the round JSON's guess bands; the mistake label comes from the round's misconception.
+- **No pill shapes** (#190): buttons, chips, tags, toggles, pickers and toasts use a small 4px corner (they read as cards/stamps, not pills). Use `border-radius: var(--radius-ui)` (set in `web/src/index.css`). Circles are fine for dots, coins and slider thumbs.
 
 ## What each mockup shows (screen order)
 | Topic | 1 Guess + sketch | 2 Run it | 3 Your model vs reality | 4 Extremes | 5 Mistake named |

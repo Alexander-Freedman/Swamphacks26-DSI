@@ -323,3 +323,33 @@ Next:
 - The web Curve widget must evaluate the expr with the knob (`{x, [explore.param]:
   value}`), and can mark `ask_x` / `ask_y` on the plot.
 - Drop or fix the Gemma fallback (0 rounds from it in 2 trials, 500/504 every time here).
+
+## Engine v4 trial (2026-10-17)
+
+Local runs with the real key against `gemini-3.5-flash-lite` (minimal thinking, structured output), `api/scripts/trial.py`, a temp cache each run, model calls capped per run. Truth is computed by code from each spec (`api/app/spec.py`); a spec counts as built only if it validates, computes, matches its own claimed number within 2%, and its correct band holds the computed truth. 62 calls in total over three runs (27 + 22 + 13): run 1 came in far below target, so I fixed it and measured again, and the visual-only decision (Sat 1:03 PM) needed a calculus/orgo check.
+
+**Run 1: first v4 prompt; a rejected spec retried on the next model without being told why.** 15 topics, 27 calls: **2/15 built**, 12 failed checks twice, 1 gibberish refused before any call. The failures were mostly fixable: bands naming misconception ids that weren't in the list (4), 3.1 Flash-Lite leaving `x_min/x_max` null (3), names in `expr` that weren't declared (`th`, `P`, `light`) or `tanh` (4), percents given where fractions belong (`p = 50`) (2), two touching "correct" bands (3), and claimed numbers that didn't match the spec (5). The last group is the check doing its job: e.g. a birthday spec asking "how many people for 50%?" while the spec computes the chance for 23.
+
+**Run 2: the retry goes back to the same model with the failed check, plus a tighter prompt and harmless fixes in code** (percent to fraction, merging touching correct bands, dropping a knob that was also declared as a variable). Same 15 topics, 22 calls:
+| | result |
+|---|---|
+| built | **10/15** (9 visual + 1 stepper, which is now removed) |
+| honest no-fit | 4 real topics failed checks twice (radioactive half-life, gambler's fallacy, projectile motion, photosynthesis); gibberish refused with 0 calls |
+| latency (built) | 1 call: 5.2-6.0 s (5 topics); with the retry: 11.0-12.0 s (5 topics); median 6.0 s |
+| widget mix | curve 6, sampler 3 (base_rate_test, binomial_count, birthday_match), stepper 1 |
+| compare | 7/10 specs named a second case + shared principle, but 0 had a second case that compiled, so compare screens are text-only for now |
+
+**Run 3: visual-only (no stepper/dial), calculus modes, approximate label.** 8 topics, 13 calls:
+| topic | result |
+|---|---|
+| derivative | curve, `slope`, k·x² at x = 3 → 6 (2 calls, 45.8 s: one call took ~34 s) |
+| the definite integral | curve, `area`, ∫₀⁴ x² → 21.33, knob = rectangles (1 call, 6.5 s) |
+| limits in calculus | curve, `limit`, (x²−4)/(x−2) at 2 → 4 (2 calls, 14.1 s) |
+| photosynthesis | curve marked `approximate` (light-saturation curve), 75% (2 calls, 12.6 s) |
+| SN2 reactions (orgo) | honest no-fit from the model: "complex reaction mechanisms … cannot be adequately represented by a simple numerical curve" (1 call) |
+| the French Revolution | honest no-fit from the model (1 call) |
+| radioactive half-life, projectile motion | failed checks twice (undeclared `N0`, `g`) → no-fit with nearest topics |
+
+**Hand-checked by recomputing (8 specs):** Newton's cooling 20 + 70·e^(−0.05·20) = 45.75 °C ✓; inflation 100/1.03²⁵ = $47.76 ✓; Moore's law 1000·2^(10/2) = 32,000 ✓; hash collisions (365 outputs, 23 items) 50.73% ✓; airport screening 1e-5·0.99 / (1e-5·0.99 + 0.99999·0.01) = 0.0989% ✓; derivative of x² at 3 = 6 ✓; ∫₀⁴ x² = 64/3 ✓ and 30 left rectangles = 20.28 ✓; terminal velocity 50.4·(1 − e^(−8)) = 50.38 ✓. Two specs were numerically right but bad pictures, which I turned into new checks: herd immunity put R0 on the knob and never used x (flat curve → now "expr must use x"), and the limit spec used a fake knob `+ k − k` (now "the knob doesn't change the curve"). Undeclared names now get a plain reason ("expr uses N0 …") so the retry can fix them; half-life and projectile motion failed on exactly that.
+
+**Takeaways.** Expect about 2 in 3 quantitative topics to build live, at ~6 s (one call) or ~12 s (with the retry), with an occasional 30-45 s call. Non-quantitative topics (history, reaction mechanisms) come back as honest no-fits. Gibberish never reaches the model. Every truth shown was recomputed by code; the model's number is only a cross-check. Since live building is slow and misses about a third of topics, the plan stays: pre-build and hand-check 20-30 topics with v4 and serve them cached, with live building as the extra.

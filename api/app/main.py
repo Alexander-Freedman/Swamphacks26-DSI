@@ -10,6 +10,7 @@ from app import help as help_chat
 from app.events import collection, record_answer, room
 from app.gen import (
     GenerationError,
+    NoFit,
     Usage,
     generate_round,
     generated_round,
@@ -18,6 +19,7 @@ from app.gen import (
 )
 from app.rounds import extra_for_topic, extra_rounds, showcase_rounds
 from app.schema import Round
+from app.spec import nearest_topics
 from app.truth import band_for
 
 app = FastAPI(title="Onionskin API")
@@ -82,7 +84,10 @@ def get_round(slug: str) -> Round:
 
 @app.post("/api/rounds")
 def create_round(body: TopicIn, request: Request) -> dict:
-    """Build (or fetch from cache) a round for any topic. Falls back to showcase suggestions."""
+    """Turn any topic into a runnable model (engine v4), or say honestly that none fits.
+
+    Showcase and reviewed-extra topics are served as-is with no model call.
+    """
     ip = request.client.host if request.client else "unknown"
     if _rate_limited(ip):
         raise HTTPException(status_code=429, detail="slow down: try a showcase topic")
@@ -90,36 +95,40 @@ def create_round(body: TopicIn, request: Request) -> dict:
     for r in showcase_rounds().values():
         if key in (normalize_topic(r.topic), normalize_topic(r.slug)):
             # Hand-reviewed showcase: no generation, so no check report.
-            return {
-                "status": "ok",
-                "source": "showcase",
-                "seconds": 0.0,
-                "round": r,
-                "checks": None,
-            }
+            return _ok("showcase", 0.0, r, None, None)
     extra = extra_for_topic(body.topic)
     if extra is not None:
         # Hand-reviewed extra topic: served as-is, no model call.
-        return {
-            "status": "ok",
-            "source": "reviewed",
-            "seconds": 0.0,
-            "round": extra,
-            "checks": None,
-        }
+        return _ok("reviewed", 0.0, extra, None, None)
     try:
         res = generate_round(body.topic)
+    except NoFit as err:
+        return _no_fit(body.topic, err.reason)
     except GenerationError:
-        return {
-            "status": "fallback",
-            "suggestions": [r.slug for r in showcase_rounds().values()],
-        }
+        return _no_fit(body.topic, "I can't build a new model right now; try one of these.")
+    return _ok(res.source, round(res.seconds, 1), res.round, res.spec, res.checks)
+
+
+def _ok(source: str, seconds: float, r: Round, spec, checks: dict | None) -> dict:
     return {
         "status": "ok",
-        "source": res.source,
-        "seconds": round(res.seconds, 1),
-        "round": res.round,
-        "checks": None if res.round.reviewed else res.checks,
+        "ok": True,
+        "source": source,
+        "seconds": seconds,
+        "round": r,
+        "spec": spec,
+        "checks": None if r.reviewed else checks,
+    }
+
+
+def _no_fit(topic: str, reason: str) -> dict:
+    nearest = nearest_topics(topic)
+    return {
+        "status": "fallback",
+        "ok": False,
+        "reason": reason,
+        "nearest": nearest,
+        "suggestions": [n["slug"] for n in nearest],
     }
 
 
