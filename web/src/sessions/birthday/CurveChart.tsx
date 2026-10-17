@@ -1,5 +1,5 @@
 import { useId, type ReactNode, type PointerEvent as RPointerEvent } from 'react'
-import { frameFor, pathOf, sx, sy, TRUTH, type Frame } from './chart'
+import { frameFor, guessLabelSpot, handWidth, pathOf, sx, sy, TRUTH, type Frame } from './chart'
 import { pct, pMatch, X_MAX, X_MIN } from './math'
 
 /** Where the "n → p%" label goes: above-left of the dot, or below-right when there is no room on the left. */
@@ -47,6 +47,17 @@ export function CurveChart({ width, pencil, rawPath, truth, animate, gap, at, gu
   const yt = [0, 0.25, 0.5, 0.75, 1]
   const narrow = width < 420
   const youX = 68
+  const youY = pencil ? Math.min(f.h - f.b - 8, sy(f, pencil[youX]) + (pencil[youX] > TRUTH[youX] - 0.12 && pencil[youX] < 0.85 ? 22 : -10)) : 0
+  const realBox = { x0: f.w - f.r - 4 - handWidth('real (exact)'), x1: f.w - f.r - 4, y0: sy(f, 1) + 8, y1: sy(f, 1) + 24 }
+  // the slider marker: its "n → p%" label, the dot and the drop line under it
+  const atBoxes = []
+  if (truth && at != null) {
+    const a = atLabel(f, at)
+    const aw = `${at} → ${pct(pMatch(at))}`.length * 8.6
+    atBoxes.push({ x0: a.textAnchor === 'start' ? a.x : a.x - aw, x1: a.textAnchor === 'start' ? a.x + aw : a.x, y0: a.y - 15, y1: a.y + 5 })
+    atBoxes.push({ x0: sx(f, at) - 10, x1: sx(f, at) + 10, y0: sy(f, pMatch(at)) - 10, y1: f.h - f.b })
+  }
+  const youBox = { x0: sx(f, youX) - 18, x1: sx(f, youX) + 18, y0: youY - 12, y1: youY + 4 }
   return (
     <svg
       className={'bday-chart' + (pointer ? ' bday-drawpad' : '')}
@@ -87,7 +98,7 @@ export function CurveChart({ width, pencil, rawPath, truth, animate, gap, at, gu
       {guess != null && guess <= X_MAX && (
         <g>
           <line className="bday-you" x1={sx(f, guess)} x2={sx(f, guess)} y1={f.t} y2={f.h - f.b} strokeWidth={1.5} />
-          <text className="bday-h bday-pencil-t" x={sx(f, guess) + (guess > 60 ? -5 : 5)} y={f.t + 16} textAnchor={guess > 60 ? 'end' : 'start'}>your guess: {guess}</text>
+          <text className="bday-h bday-pencil-t" {...guessLabelSpot(f, guess, `your guess: ${guess}`, [...(pencil ? [pencil] : []), ...(truth ? [TRUTH] : [])], [...(pencil ? [youBox] : []), ...(truth ? [realBox] : []), ...atBoxes])}>your guess: {guess}</text>
         </g>
       )}
       {guess != null && guess > X_MAX && !truth && (
@@ -96,7 +107,7 @@ export function CurveChart({ width, pencil, rawPath, truth, animate, gap, at, gu
       {gapPath && <path key={'g' + String(animate)} className={'bday-gap' + (animate ? ' bday-gap-in' : '')} d={gapPath} clipPath={`url(#${clip})`} />}
       {pencil && <path className="bday-you" d={pathOf(f, pencil)} />}
       {pencil && (
-        <text className="bday-h bday-pencil-t" x={sx(f, youX)} y={Math.min(f.h - f.b - 8, sy(f, pencil[youX]) + (pencil[youX] > TRUTH[youX] - 0.12 && pencil[youX] < 0.85 ? 22 : -10))} textAnchor="middle">
+        <text className="bday-h bday-pencil-t" x={sx(f, youX)} y={youY} textAnchor="middle">
           you
         </text>
       )}
