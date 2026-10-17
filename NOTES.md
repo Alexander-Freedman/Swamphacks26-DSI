@@ -47,5 +47,7 @@ Decisions + how to run things. Keep current.
 
 - Oct 16 10:50 PM: **learning-first, no XP/points/badges/levels/leaderboards.** The reward is the feedback (reveal, misconception named, busted, a mastery map). I kept a light informational "N of the last 7 days" line: forgiving, nothing to lose, cut if user tests read it as a counter. Talking point + Q&A in docs/pitch.md. My Mental Models research is a resource, not a rulebook.
 
+- Oct 16 ~10:55 PM, **my decision: the look is Notebook Arcade.** Pencil = your guess, ink = truth, marker = the gap, a stamped verdict, a chunky display face. (The name is still @luanamaldaner's call.)
+
 ## How to run
 Nothing to run yet. Build box tooling (my side): Python 3.12, uv 0.13, Node 22.23 / npm 10.9 in `~/.local/bin` (DeepSpace would also need `npm i -g npm@11`). No Docker on the build box; deploys go to Vultr/Render. The box is 1 CPU, so heavy model training should be kept small or run on Vultr.
