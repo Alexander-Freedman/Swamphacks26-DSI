@@ -11,7 +11,10 @@
 .coin-session h2:focus { outline: none; }
 .coin-session h3 { margin: 0; }
 .coin-session .num { font-family: var(--font-mono); font-variant-numeric: tabular-nums; }
-.coin-session .lede { font-size: 17px; line-height: 1.45; margin: 0 0 14px; color: var(--ink-soft); }
+/* the one guidance line per screen, like the birthday session's subtitle */
+.coin-session .guide { font: 17px/1.45 var(--font-hand); color: var(--ink-soft); margin: 0 0 14px; max-width: 46em; }
+.coin-session .tryit .guide { margin: 4px 0 8px; }
+.coin-session input[type='range'].unset { opacity: .55; }
 .coin-session .note { font-family: var(--font-hand); color: var(--ink-soft); font-size: 15px; margin: 6px 0; }
 .coin-session .q { font-weight: 800; display: block; margin: 0 0 6px; }
 .coin-session .tag { font: 600 12px var(--font-mono); text-transform: uppercase; letter-spacing: .08em; color: var(--ink-soft); }
@@ -137,10 +140,12 @@
 
 /* step 4 */
 .coin-session .ext-head { display: flex; gap: 12px 24px; flex-wrap: wrap; align-items: flex-end; margin: 8px 0 14px; }
-.coin-session .ext-head .n, .coin-session .ext-head .v { font: 800 44px/1 var(--font-display); }
+.coin-session .ext-head .n, .coin-session .ext-head .v { font: 800 34px/1 var(--font-display); }
+/* the ink truth is the biggest number on the screen */
+.coin-session .ext-head .v.truth { font-size: 56px; }
 .coin-session .ext-head .v.you { font-family: var(--font-hand); font-weight: 600; color: var(--ink-soft); border-bottom: 3px dashed var(--pencil); }
 .coin-session .ext-head small { display: block; font-size: 13px; color: var(--ink-soft); margin-top: 4px; max-width: 14em; }
-@media (max-width: 600px) { .coin-session .ext-head .n, .coin-session .ext-head .v { font-size: 34px; } }
+@media (max-width: 600px) { .coin-session .ext-head .n, .coin-session .ext-head .v { font-size: 26px; } .coin-session .ext-head .v.truth { font-size: 42px; } }
 .coin-session .hand-ticks button { font: 600 14px var(--font-hand); background: none; border: 0; padding: 6px 2px; min-height: 32px; color: var(--ink-soft); }
 .coin-session .hand-ticks button.on { color: var(--ink); text-decoration: underline 3px var(--marker); }
 .coin-session .breaknote { font: 600 18px var(--font-hand); margin: 10px 0 0; min-height: 2.6em; line-height: 1.4; }

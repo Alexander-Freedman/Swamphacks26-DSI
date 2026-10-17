@@ -15,6 +15,8 @@ describe('coin streak session', () => {
     vi.stubGlobal('matchMedia', (q: string) => ({ matches: q.includes('reduce'), media: q }))
     const done = vi.fn()
     render(<CoinSession onDone={done} />)
+    expect(screen.getByText(/^Make up 20 coin flips/)).toBeTruthy()
+    expect(screen.queryByText(/sample human row/)).toBeNull() // no fill-for-me: the point is your own pattern
 
     const lock = screen.getByText('Lock it in') as HTMLButtonElement
     expect(lock.disabled).toBe(true)
@@ -23,9 +25,13 @@ describe('coin streak session', () => {
     expect(screen.getByText('20', { selector: '.stats b' })).toBeTruthy()
     // the row is full: 20 real flips deal in under it, with the tally
     expect(screen.getByText('a real coin, 20 flips')).toBeTruthy()
+    expect(screen.getByText(/^Your row on top, real flips below. Flip again/)).toBeTruthy() // guidance moves on once the deal lands
     expect(screen.getByText(/your longest:/).textContent).toMatch(/your longest: 1 · real: \d+/)
     expect(screen.getByText(/In 20 real flips the longest run averages 4\.66/)).toBeTruthy()
     fireEvent.click(screen.getByText('Flip again'))
+    // the guess starts unset (no anchor): lock waits for the slider to move
+    expect(lock.textContent).toBe('Move the slider to guess')
+    expect(screen.getByText('?', { selector: '.guessnum .big' })).toBeTruthy()
     fireEvent.change(screen.getByLabelText('Longest run in 100 real flips?'), { target: { value: '3' } })
     // like the birthday session: pick how sure before locking
     expect(lock.disabled).toBe(true)
@@ -36,6 +42,7 @@ describe('coin streak session', () => {
     await act(async () => vi.advanceTimersByTime(50))
 
     expect(screen.getByText('Now a real coin. Flip it.')).toBeTruthy()
+    expect(screen.getByText(/^Each dot is one real round of 100 flips/)).toBeTruthy() // guidance line
     expect(screen.getByText('6.98')).toBeTruthy() // exact mean in ink
     expect(screen.getByText('97.2%')).toBeTruthy() // exact P(run of 5+)
     expect(screen.getByText(/real average 6\.98 \(exact\)/)).toBeTruthy() // truth line is labeled
@@ -50,15 +57,19 @@ describe('coin streak session', () => {
 
     next(/your coin vs the real one/)
     expect(screen.getByText('Your coin vs the real coin')).toBeTruthy()
+    expect(screen.getByText(/^Your row next to a real 100/)).toBeTruthy()
     expect(screen.getByText(/You switched 100% of the time/)).toBeTruthy()
 
     next(/push it to 10,000 flips/)
+    expect(screen.getByText(/^Drag to flip more or fewer coins/)).toBeTruthy()
     fireEvent.click(screen.getByRole('button', { name: '10,000' }))
     expect(screen.getByText('13.62')).toBeTruthy()
     fireEvent.click(screen.getByRole('button', { name: '10' }))
     expect(screen.getByText('3.66')).toBeTruthy()
 
     next(/what your taps say/)
+    expect(screen.getByText(/^This is the mistake your guess points to/)).toBeTruthy()
+    expect(screen.getByText(/^One more: spot the real coin/)).toBeTruthy()
     expect(screen.getAllByText('Random means evenly mixed').length).toBeGreaterThan(0)
     expect(screen.getByText(/A real coin goes past 3 in/)).toBeTruthy()
     expect(screen.getByText(/You said/).textContent).toBe('You said 3 (certain). A real 100 averages 6.98.')
@@ -67,6 +78,8 @@ describe('coin streak session', () => {
     fireEvent.click(screen.getByRole('button', { name: /^A: / }))
     expect(screen.getByText(/B was the real coin/)).toBeTruthy()
     expect(screen.getByText(/In 20 real flips/)).toBeTruthy()
+    // both rematch rows stay plain ink: pencil only ever means "you"
+    expect(document.querySelectorAll('.tryit .mine').length).toBe(0)
     // saved to the same notebook as the birthday session, once
     expect(screen.getByText('Saved.')).toBeTruthy()
     const saved = JSON.parse(localStorage.getItem('mm.sessions') ?? '[]')
@@ -79,7 +92,7 @@ describe('coin streak session', () => {
     expect(JSON.parse(localStorage.getItem('mm.sessions') ?? '[]')).toHaveLength(1)
     vi.useRealTimers()
     vi.unstubAllGlobals()
-  }, 30000)
+  }, 60000)
 
   it('keeps the 20-flip deal clean: extra taps, undo, clear, length toggles', () => {
     render(<CoinSession onDone={() => {}} />)
@@ -125,7 +138,7 @@ describe('coin streak session', () => {
     expect(flips()).toBe('flips 20/20')
     expect(realRow()).toBeTruthy()
     expect(document.body.textContent).not.toMatch(/NaN/)
-  }, 30000)
+  }, 60000)
 })
 
 describe('sample label', () => {

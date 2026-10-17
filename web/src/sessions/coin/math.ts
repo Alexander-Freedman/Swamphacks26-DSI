@@ -136,8 +136,3 @@ export function longestOfFlips(n: number, rand: () => number): number {
 
 export const toSides = (s: string): Side[] => s.split('').filter((c): c is Side => c === 'H' || c === 'T')
 
-// A sample "human" sequence: 66% switch chance, runs capped at 4 (68 switches in 99, longest run 4).
-// It mimics what people inventing random sequences tend to write; the exact 68% is our parameter (unverified).
-export const HUMAN_SAMPLE = toSides(
-  'HTTHTHTHTHTTHHHHTHTTHTTTTHTHHTTHTHHTHTHHTTHTHHTHTHHTHTTTHTHTHTHTTHHHHTTHHHTTHTHTTHTTHTTHTHTHHTHTHTHH',
-)

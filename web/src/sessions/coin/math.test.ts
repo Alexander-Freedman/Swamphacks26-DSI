@@ -2,7 +2,6 @@ import { describe, expect, it } from 'vitest'
 import {
   expectedLongest,
   expectedLongestSlow,
-  HUMAN_SAMPLE,
   longestOfFlips,
   longestRun,
   pLongestAtLeast,
@@ -81,11 +80,10 @@ describe('sequence helpers', () => {
     expect(longestRun([])).toBe(0)
   })
 
-  it('sample human row: 100 flips, 68 switches, longest run 4', () => {
-    expect(HUMAN_SAMPLE.length).toBe(100)
-    expect(Math.round(switchRate(HUMAN_SAMPLE) * 99)).toBe(68)
-    expect(longestRun(HUMAN_SAMPLE)).toBe(4)
-    expect(repeatRateLike(HUMAN_SAMPLE)).toBeCloseTo(31 / 99)
+  it('repeat rate from your taps: 1 - switch rate, clamped to 0.05..0.9', () => {
+    expect(repeatRateLike(toSides('HTTHHHTH'))).toBeCloseTo(1 - 4 / 7)
+    expect(repeatRateLike(toSides('HTHTHTHT'))).toBe(0.05)
+    expect(repeatRateLike(toSides('HHHHHHHH'))).toBe(0.9)
   })
 
   it('the which-is-real pair: A tops out at 2, B at 4', () => {

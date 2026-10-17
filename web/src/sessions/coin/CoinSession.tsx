@@ -7,7 +7,6 @@ import { fmt, pct, reducedMotion, sampleLabel } from './hooks'
 import {
   expectedLongest,
   flipSeq,
-  HUMAN_SAMPLE,
   longestOfFlips,
   longestRun,
   pLongestAtLeast,
@@ -49,10 +48,11 @@ export function CoinSession({ onDone }: { onDone: () => void }) {
   const dealRand = useRef(rng(10))
   const [deal, setDeal] = useState<Side[]>([]) // real flips dealt under your row, same length
   const [dealKey, setDealKey] = useState(0)
-  const [guess, setGuess] = useState(4)
+  const [guessSet, setGuessSet] = useState<number | null>(null) // unset until you move the slider: no anchor
+  const guess = guessSet ?? 0
   const [conf, setConf] = useState<Confidence | null>(null)
   const [locked, setLocked] = useState(false)
-  const rand = useRef(rng(20))
+  const rand = useRef(rng(25)) // seed: the first real 100 tops out at 8, a typical row (avg 6.98)
   const [real, setReal] = useState<Side[]>([])
   const [flipKey, setFlipKey] = useState(0)
   const [hist, setHist] = useState<number[]>(() => new Array(KMAX + 1).fill(0))
@@ -62,7 +62,7 @@ export function CoinSession({ onDone }: { onDone: () => void }) {
   const [newest, setNewest] = useState(0)
   const [running, setRunning] = useState(false)
   const heading = useRef<HTMLHeadingElement>(null)
-  const model = mine.length >= MIN_TAPS ? mine : HUMAN_SAMPLE
+  const model = mine // you can only lock (and leave step 1) with 20+ taps of your own
 
   const dealRow = useCallback((n: number) => {
     setDeal(flipSeq(n, dealRand.current))
@@ -192,11 +192,12 @@ export function CoinSession({ onDone }: { onDone: () => void }) {
       )}
       <section className="coin-step" aria-labelledby="coin-h">
         {step === 0 && (
-          <TapStep h={heading} len={len} pickLen={pickLen} deal={deal} dealKey={dealKey} onDeal={() => dealRow(len)} mine={mine} setMine={editMine} tap={tap} guess={guess} setGuess={setGuess} conf={conf} setConf={setConf} locked={locked} onLock={lock} onNext={() => go(1)} />
+          <TapStep h={heading} len={len} pickLen={pickLen} deal={deal} dealKey={dealKey} onDeal={() => dealRow(len)} mine={mine} setMine={editMine} tap={tap} guess={guessSet} setGuess={setGuessSet} conf={conf} setConf={setConf} locked={locked} onLock={lock} onNext={() => go(1)} />
         )}
         {step === 1 && (
           <>
             <h2 id="coin-h" ref={heading} tabIndex={-1}>Now a real coin. Flip it.</h2>
+            <p className="guide">Each dot is one real round of 100 flips. See where most of them land compared with your guess.</p>
             <div className="readout">
               <div><div className="big num">{longestRun(real)}</div><div className="lbl">longest run this time</div></div>
               <div><div className="big num">{pct(switchRate(real))}</div><div className="lbl">side switches</div></div>
@@ -216,7 +217,7 @@ export function CoinSession({ onDone }: { onDone: () => void }) {
             <Next onClick={() => go(2)}>Next: your coin vs the real one</Next>
           </>
         )}
-        {step === 2 && <CompareStep h={heading} model={model} real={real} usedSample={mine.length < MIN_TAPS} onNext={() => go(3)} />}
+        {step === 2 && <CompareStep h={heading} model={model} real={real} onNext={() => go(3)} />}
         {step === 3 && <ExtremeStep h={heading} model={model} guess={guess} onNext={() => go(4)} />}
         {step === 4 && (
           <CardStep h={heading} model={model} guess={guess} round={round} conf={conf ?? 'pretty sure'} verdict={verdictFor(item, answer, E100)} misId={misconceptionFor(item, answer)} onRestart={restart} onDone={onDone} />
@@ -246,14 +247,27 @@ function Next({ onClick, children }: { onClick: () => void; children: React.Reac
   )
 }
 
-function TapStep(p: { h: H; len: number; pickLen: (n: number) => void; deal: Side[]; dealKey: number; onDeal: () => void; mine: Side[]; setMine: (m: Side[]) => void; tap: (c: Side) => void; guess: number; setGuess: (g: number) => void; conf: Confidence | null; setConf: (c: Confidence) => void; locked: boolean; onLock: () => void; onNext: () => void }) {
+function TapStep(p: { h: H; len: number; pickLen: (n: number) => void; deal: Side[]; dealKey: number; onDeal: () => void; mine: Side[]; setMine: (m: Side[]) => void; tap: (c: Side) => void; guess: number | null; setGuess: (g: number) => void; conf: Confidence | null; setConf: (c: Confidence) => void; locked: boolean; onLock: () => void; onNext: () => void }) {
   const { mine, locked, h, setMine, tap, guess, setGuess, conf, setConf, onLock, onNext, len, pickLen, deal, dealKey, onDeal } = p
   const full = mine.length >= len && deal.length === len
-  const ready = mine.length >= MIN_TAPS && conf != null
+  const ready = mine.length >= MIN_TAPS && guess != null && conf != null
+  // When the real row deals in (tap 20, Flip again), bring it on screen: on a 360x640 phone it lands below the fold.
+  const realRef = useRef<HTMLParagraphElement>(null)
+  const seenDeal = useRef(dealKey)
+  useEffect(() => {
+    if (!full || seenDeal.current === dealKey) return
+    seenDeal.current = dealKey
+    realRef.current?.scrollIntoView?.({ block: 'nearest', behavior: reducedMotion() ? 'auto' : 'smooth' })
+  }, [full, dealKey])
+  const lockText = mine.length < MIN_TAPS ? 'Lock it in' : guess == null ? 'Move the slider to guess' : conf ? 'Lock it in' : 'Pick how sure you are'
   return (
     <>
       <h2 id="coin-h" ref={h} tabIndex={-1}>Be a coin. Tap out {len} flips.</h2>
-      <p className="lede">Make it look as random as you can. A real coin flips {len} times right under your row.</p>
+      <p className="guide">
+        {full
+          ? 'Your row on top, real flips below. Flip again a few times: which one clumps?'
+          : `Make up ${len} coin flips the way you think a fair coin looks. We'll compare yours with real ones.`}
+      </p>
       <div className="lenpick" role="radiogroup" aria-label="row length">
         {[20, 100].map((n) => (
           <button key={n} role="radio" aria-checked={len === n} className={len === n ? 'on' : ''} disabled={locked} onClick={() => pickLen(n)}>
@@ -266,7 +280,6 @@ function TapStep(p: { h: H; len: number; pickLen: (n: number) => void; deal: Sid
         <button className="tap" aria-label="Tails (key T)" disabled={locked || mine.length >= len} onClick={() => tap('T')}>T</button>
       </div>
       <div className="row">
-        <button className="btn ghost small" disabled={locked} onClick={() => setMine(HUMAN_SAMPLE.slice(0, len))}>Use a sample human row</button>
         <button className="btn ghost small" disabled={locked || !mine.length} onClick={() => setMine(mine.slice(0, -1))}>Undo</button>
         <button className="btn ghost small" disabled={locked || !mine.length} onClick={() => setMine([])}>Clear</button>
       </div>
@@ -276,7 +289,7 @@ function TapStep(p: { h: H; len: number; pickLen: (n: number) => void; deal: Sid
         <>
           <h3 className="rowname"><i className="l-truth" />a real coin, {len} flips</h3>
           <CoinGrid key={dealKey} seq={deal} hiLongest fresh={!reducedMotion()} cols={len === 20 ? 10 : undefined} label={`${len} real flips, longest run ${longestRun(deal)}`} />
-          <p className="tally" aria-live="polite">
+          <p className="tally" aria-live="polite" ref={realRef}>
             your longest: <b className="you">{longestRun(mine)}</b> · real: <b className="ink">{longestRun(deal)}</b>
             <button className="btn ghost small" onClick={onDeal}>Flip again</button>
           </p>
@@ -292,12 +305,26 @@ function TapStep(p: { h: H; len: number; pickLen: (n: number) => void; deal: Sid
       </div>
       <p className="note">Keys H and T work too. Your taps are your model of randomness: they stay in pencil the whole session.</p>
       <div className={`card guessbox ${locked ? 'is-locked' : ''}`}>
+        <p className="guide">Guess first: in 100 flips, what's the longest run of the same side? Your guess stays on screen.</p>
         <label htmlFor="coin-guess" className="q">Longest run in 100 real flips?</label>
         <div className="guessnum">
-          <span className="big">{guess}</span><span>in a row</span>
+          <span className="big">{guess ?? '?'}</span><span>in a row</span>
           {locked && <span className="stamp locked">locked</span>}
         </div>
-        <input id="coin-guess" type="range" min={1} max={20} step={1} value={guess} disabled={locked} onChange={(e) => setGuess(+e.target.value)} />
+        <input
+          id="coin-guess"
+          type="range"
+          className={guess == null ? 'unset' : ''}
+          min={1}
+          max={20}
+          step={1}
+          value={guess ?? 10}
+          aria-valuetext={guess == null ? 'not set yet' : `${guess} in a row`}
+          disabled={locked}
+          onChange={(e) => setGuess(+e.target.value)}
+          // a click right on the resting thumb doesn't fire change; it still counts as a pick
+          onPointerUp={(e) => guess == null && setGuess(+e.currentTarget.value)}
+        />
         <div className="ticks"><span>1</span><span>5</span><span>10</span><span>15</span><span>20</span></div>
         <div className="tag sure">how sure?</div>
         <div className="confs" role="group" aria-label="how sure are you">
@@ -309,7 +336,7 @@ function TapStep(p: { h: H; len: number; pickLen: (n: number) => void; deal: Sid
           {locked ? (
             <button className="btn" onClick={onNext}>Back to the real coin →</button>
           ) : (
-            <button className="btn lockbtn" disabled={!ready} onClick={onLock}>{mine.length < MIN_TAPS || conf ? 'Lock it in' : 'Pick how sure you are'}</button>
+            <button className="btn lockbtn" disabled={!ready} onClick={onLock}>{lockText}</button>
           )}
           {!locked && mine.length < MIN_TAPS && <span className="note">tap at least {MIN_TAPS} flips first ({mine.length} so far)</span>}
         </div>
@@ -318,7 +345,7 @@ function TapStep(p: { h: H; len: number; pickLen: (n: number) => void; deal: Sid
   )
 }
 
-function CompareStep({ h, model, real, usedSample, onNext }: { h: H; model: Side[]; real: Side[]; usedSample: boolean; onNext: () => void }) {
+function CompareStep({ h, model, real, onNext }: { h: H; model: Side[]; real: Side[]; onNext: () => void }) {
   const nReal = runs(real).filter((r) => r.len >= 5).length
   const nMine = runs(model).filter((r) => r.len >= 5).length
   const sw = switchRate(model)
@@ -326,7 +353,7 @@ function CompareStep({ h, model, real, usedSample, onNext }: { h: H; model: Side
   return (
     <>
       <h2 id="coin-h" ref={h} tabIndex={-1}>Your coin vs the real coin</h2>
-      {usedSample && <p className="note">You tapped fewer than {MIN_TAPS}, so this uses the sample human row.</p>}
+      <p className="guide">Your row next to a real 100, runs of 5 or more marked. Which one clumps?</p>
       <div className="pair">
         <div>
           <h3><i className="l-you" />yours{scaled}</h3>
@@ -381,9 +408,10 @@ function ExtremeStep({ h, model, guess, onNext }: { h: H; model: Side[]; guess: 
   return (
     <>
       <h2 id="coin-h" ref={h} tabIndex={-1}>More flips, longer streaks?</h2>
+      <p className="guide">Drag to flip more or fewer coins. Watch how slowly, but surely, streaks grow.</p>
       <div className="ext-head">
         <div><div className="n num">{fmt(n)}</div><small>flips</small></div>
-        <div><div className="v num">{truthNow.toFixed(2)}</div><small>expected longest run, real coin (exact)</small></div>
+        <div><div className="v truth num">{truthNow.toFixed(2)}</div><small>expected longest run, real coin (exact)</small></div>
         <div><div className="v you">{youNow.toFixed(1)}</div><small>a coin that switches like you (exact)</small></div>
       </div>
       <label htmlFor="coin-n" className="q">Number of flips</label>
@@ -436,6 +464,7 @@ function CardStep(p: {
   return (
     <>
       <h2 id="coin-h" ref={h} tabIndex={-1} className="sr-only">Your mistake, named</h2>
+      <p className="guide">This is the mistake your guess points to, and the one idea that fixes it.</p>
       <div className="card verdict-card">
         <span className={`stamp ${verdict === 'called' ? 'called' : verdict === 'close' ? 'close' : 'mistake'}`}>{stamp}</span>
         <p className="said">
@@ -452,7 +481,7 @@ function CardStep(p: {
         {m && <p className="why">{m.refutation}</p>}
         <p className="src">
           {m?.source_url ? <><a href={m.source_url} target="_blank" rel="noreferrer">Source</a>: {m.source_note}. </> : null}
-          Numbers here are exact (dynamic programming over run length) unless marked simulated. The sample human row's 68% switch rate is our own parameter (unverified).
+          Numbers here are exact (dynamic programming over run length) unless marked simulated.
         </p>
         <WhichIsReal
           round={round}
@@ -505,6 +534,7 @@ function WhichIsReal({ round, onPick }: { round: NonNullable<ReturnType<typeof s
   return (
     <div className="tryit">
       <div className="tag">try it on</div>
+      <p className="guide">One more: spot the real coin. Does the idea stick?</p>
       <p className="q">One of these {n}-flip rows was flipped, one was made up by a person. Which is the real coin?</p>
       <div className="choice">
         {pair.map(([id, s]) => (
@@ -520,7 +550,7 @@ function WhichIsReal({ round, onPick }: { round: NonNullable<ReturnType<typeof s
             }}
           >
             <b>{up(id)}</b>
-            <CoinGrid seq={s} cols={10} hiLongest={!!pick} mine={!!pick && id !== real} label={`${up(id)}: ${s.join('')}`} />
+            <CoinGrid seq={s} cols={10} hiLongest={!!pick} label={`${up(id)}: ${s.join('')}`} />
             {pick && <span className="tile-note">{id === real ? 'real coin' : 'made up'}, longest run {longestRun(s)}</span>}
           </button>
         ))}
