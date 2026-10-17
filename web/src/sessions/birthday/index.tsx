@@ -114,6 +114,7 @@ export const session: SessionDef = {
   slug: 'birthday',
   title: 'The birthday problem',
   blurb: 'How many people until two share a birthday?',
-  order: 1,
+  order: 4,
+  home: false,
   Component: Birthday,
 }

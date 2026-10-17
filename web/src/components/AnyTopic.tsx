@@ -1,7 +1,7 @@
 import { useEffect, useId, useRef, useState, type FormEvent } from 'react'
 import { apiBase, clearBuild, loadExtraIndex, matchTopic, startBuild, useBuild, type ExtraTopic } from '../extras'
 import { showcaseRound } from '../rounds'
-import { sessionFor, sessions } from '../sessions/registry'
+import { homeSessions, sessionFor } from '../sessions/registry'
 import './AnyTopic.css'
 
 const FIRST_CHIPS = 4
@@ -67,7 +67,7 @@ export function AnyTopic({
   const missed = offline !== null || build.kind === 'failed'
   const suggested = build.kind === 'failed' && offline === null ? build.suggestions.filter((s) => topicName(s)) : []
   // After a miss the three sessions come first (#167): they're the site's best-built rounds.
-  const sessionChips = missed && onSession ? sessions.map((s) => s.slug) : []
+  const sessionChips = missed && onSession ? homeSessions.map((s) => s.slug) : []
   const chips = [
     ...sessionChips,
     ...suggested.filter((s) => !sessionChips.includes(s)),

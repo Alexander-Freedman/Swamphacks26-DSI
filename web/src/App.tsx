@@ -14,7 +14,7 @@ import { useReset } from './reset'
 import { Predict, type Answer } from './components/Predict'
 import { Reveal } from './components/Reveal'
 import { showcaseRound, showcaseSlugs } from './rounds'
-import { sessionFor, sessions } from './sessions/registry'
+import { homeSessions, sessionFor } from './sessions/registry'
 import { artFor } from './sessionArt'
 import { withUnit } from './format'
 import { computeTruth, type Computed } from './truth'
@@ -33,9 +33,9 @@ function Home({ onPick, onSession, onNotebook }: { onPick: (slug: string) => voi
     <div className="home sheet">
       <h1>See your thinking in layers.</h1>
       <p className="concept">Type any topic. Watch it come alive.</p>
-      {sessions.length > 0 && (
+      {homeSessions.length > 0 && (
         <div className="showcases sessions">
-          {sessions.map((s, i) => {
+          {homeSessions.map((s, i) => {
             const art = artFor(s.slug)
             return (
               <button key={s.slug} className={`showcase${art ? ' has-art' : ''}`} onClick={() => onSession(s.slug)}>
