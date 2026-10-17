@@ -1,24 +1,28 @@
-import { useCallback, useEffect, useRef, useState } from 'react'
+import { useCallback, useEffect, useRef, useState, type ReactNode } from 'react'
 import { record } from '../../notebook'
 import { EndBar, Frame, SessionHead, Title } from '../../components/session/Shell'
 import { BuildStep } from './BuildStep'
 import { MISTAKES } from './chem'
 import { CompareStep } from './CompareStep'
+import { DecideStep, PartsStep, SizeStep } from './MechSteps'
 import { PushStep } from './PushStep'
 import { SECTIONS, type OrgoStep, type OrgoTopic } from './topics'
 import './orgo.css'
 
 export const SLUG = 'orgo'
-const LABEL: Record<OrgoStep, string> = { build: 'Build', push: 'Push', compare: 'Compare' }
+const LABEL: Record<OrgoStep, string> = { build: 'Build', parts: 'Parts', size: 'Size up', decide: 'Mechanism', push: 'Arrows', compare: 'Compare' }
 // Short captions only: the pictures do the explaining.
 const TITLES: Record<OrgoStep, [string, string]> = {
   build: ['Build ethanol', 'Ethanol (C₂H₆O) is the alcohol in drinks. Drag atoms onto the paper and connect them until each one has its full set of bonds: carbon 4, oxygen 2, hydrogen 1.'],
-  push: ['Show how the electrons move', 'Hydroxide (HO⁻) kicks the bromine off CH₃Br and takes its place. Chemists draw this with curved arrows: each one starts on a pair of electrons and ends where that pair goes. Draw the arrows, then watch the reaction play out.'],
+  parts: ['Find the parts', 'Every substitution has three players: the nucleophile brings electrons, the substrate carbon receives them, and the leaving group breaks off with its bond’s electrons. Tap each one in HO⁻ + CH₃Br.'],
+  size: ['Size them up', 'Three questions decide the mechanism: how strong is the nucleophile, what kind of carbon is it, and does the leaving group leave easily?'],
+  decide: ['Pick the mechanism', 'Your answers point to one spot on the chart. Pick the mechanism that belongs there.'],
+  push: ['Show how the electrons move', 'Hydroxide (HO⁻) kicks the bromine off CH₃Br and takes its place in one step (SN2). Chemists draw this with curved arrows: each one starts on a pair of electrons and ends where that pair goes. Draw the arrows, then watch the reaction play out.'],
   compare: ['Find the same pattern', 'A new reaction sits next to the one you just did. In both, tap the atom that attacks, the carbon it hits, and the atom that leaves.'],
 }
 const REMIX: Record<string, string> = {
   'build-ethanol': 'Next: push the electrons in a real mechanism.',
-  sn2: 'Next time: a new nucleophile, a new leaving group.',
+  sn2: 'Next: SN1, E2 and E1, worked out the same way.',
   full: 'Next time: a new molecule, a new nucleophile.',
 }
 type M = keyof typeof MISTAKES
@@ -98,6 +102,7 @@ function OrgoTopicRun({ topic, onTopics, onDone }: { topic: OrgoTopic; onTopics:
   // after a step: the next one in this topic, or the end bar if it was the last
   const after = (s: OrgoStep) => () => (at(s) < steps.length ? go(at(s) + 1) : finish())
   const nextLabel = (s: OrgoStep) => (at(s) < steps.length ? `${TITLES[steps[at(s)]][0]} →` : 'Finish ✓')
+  const block = (s: OrgoStep, el: ReactNode) => at(s) > 0 && reached >= at(s) && <div hidden={step !== at(s)}>{el}</div>
   const [h, sub] = TITLES[steps[step - 1]]
   const last = step === steps.length
 
@@ -112,11 +117,10 @@ function OrgoTopicRun({ topic, onTopics, onDone }: { topic: OrgoTopic; onTopics:
           <BuildStep onCheck={caught} onNext={after('build')} nextLabel={nextLabel('build')} />
         </div>
       )}
-      {at('push') > 0 && reached >= at('push') && (
-        <div hidden={step !== at('push')}>
-          <PushStep onGrade={caught} onNext={after('push')} />
-        </div>
-      )}
+      {block('parts', <PartsStep onNext={after('parts')} nextLabel={nextLabel('parts')} />)}
+      {block('size', <SizeStep onNext={after('size')} nextLabel={nextLabel('size')} onMistake={(m) => caught([m])} />)}
+      {block('decide', <DecideStep onNext={after('decide')} nextLabel={nextLabel('decide')} onMistake={(m) => caught([m])} />)}
+      {block('push', <PushStep onGrade={caught} onNext={after('push')} nextLabel={nextLabel('push')} />)}
       {at('compare') > 0 && reached >= at('compare') && (
         <div hidden={step !== at('compare')}>
           <CompareStep onMistake={(m) => caught([m])} onDone={finish} />

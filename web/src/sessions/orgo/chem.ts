@@ -1,3 +1,4 @@
+import { ANALYSIS_MISTAKES, type AnalysisMistake } from './analysis'
 // Chemistry rules for the orgo session. Everything the screens claim is computed here:
 // valence, molecular formula, formal charge, isomer checks and curved-arrow checks.
 
@@ -272,7 +273,8 @@ export function tapVerdict(map: PartMap, part: Part, atom: string): { ok: boolea
   return { ok: false, mistake: trap && trap.part === part ? trap.mistake : null }
 }
 
-export const MISTAKES: Record<BuildMistake | ArrowMistake | TapMistake, { label: string; line: string }> = {
+export const MISTAKES: Record<BuildMistake | ArrowMistake | TapMistake | AnalysisMistake, { label: string; line: string }> = {
+  ...ANALYSIS_MISTAKES,
   'carbon-five-bonds': { label: 'A carbon with 5 bonds', line: 'Carbon has 4 slots. A 5th bond has no electrons to use.' },
   'hydrogen-two-bonds': { label: 'Hydrogen with 2 bonds', line: 'Hydrogen holds exactly one bond.' },
   'oxygen-three-bonds': { label: 'Oxygen with 3 bonds, no charge', line: 'Three bonds on oxygen make it O⁺: FC = 6 − 2 − 3 = +1. Ethanol has no charge.' },

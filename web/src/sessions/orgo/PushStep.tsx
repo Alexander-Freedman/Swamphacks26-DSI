@@ -85,7 +85,7 @@ const pointAlong = (pts: Pt[], f: number): Pt => {
 const CAPTION = (t: number) =>
   t < 0.3 ? 'The O’s lone pair heads for the back of the carbon.' : t < 0.68 ? 'Halfway: O–C forming, C–Br breaking, the H’s flat.' : 'Br leaves with the bond’s two electrons. The carbon turned inside out.'
 
-export function PushStep({ onGrade, onNext }: { onGrade: (mistakes: ArrowMistake[]) => void; onNext: () => void }) {
+export function PushStep({ onGrade, onNext, nextLabel = 'Find the same pattern →' }: { onGrade: (mistakes: ArrowMistake[]) => void; onNext: () => void; nextLabel?: string }) {
   const svg = useRef<SVGSVGElement>(null)
   const [arrows, setArrows] = useState<Drawn[]>([])
   const [pen, setPen] = useState<{ from: Cand<Source>; pts: Pt[] } | null>(null)
@@ -288,7 +288,7 @@ export function PushStep({ onGrade, onNext }: { onGrade: (mistakes: ArrowMistake
         {phase !== 'draw' && (
           <div className="og-row">
             <button className="og-btn og-ghost" onClick={reset}>Draw again</button>
-            <button className="og-btn og-next" onClick={onNext}>Find the same pattern →</button>
+            <button className="og-btn og-next" onClick={onNext}>{nextLabel}</button>
           </div>
         )}
       </aside>

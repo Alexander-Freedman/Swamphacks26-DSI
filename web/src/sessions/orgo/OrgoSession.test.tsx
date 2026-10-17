@@ -25,7 +25,17 @@ const choose = (label: string, text: string) => {
 
 /** Orgo opens on the topic menu; most tests take the guided path through all three steps. */
 const pickTopic = (title: RegExp) => fireEvent.click(screen.getByRole('button', { name: title }))
-const guidedPath = () => pickTopic(/^Build → Push → Compare/)
+const guidedPath = () => pickTopic(/^Start to finish/)
+
+/** Work out HO⁻ + CH₃Br the right way: tap the three parts, answer the three questions, pick SN2. */
+function analyzeSN2() {
+  for (const n of ['O of hydroxide', 'carbon of CH₃Br', 'Br']) fireEvent.click(screen.getByRole('button', { name: n }))
+  fireEvent.click(screen.getByText('Size them up →'))
+  for (const a of ['Strong', 'Methyl', 'Good']) fireEvent.click(screen.getByRole('button', { name: new RegExp(`^${a}`) }))
+  fireEvent.click(screen.getByText('Pick the mechanism →'))
+  fireEvent.click(screen.getByRole('button', { name: /^SN2/ }))
+  fireEvent.click(screen.getByText('Show how the electrons move →'))
+}
 
 /** Ethanol with the keyboard-friendly path: pick an atom, press an element to add it bonded. */
 function buildEthanol() {
@@ -61,7 +71,8 @@ describe('orgo session', () => {
     expect(document.querySelector('.og-formula')!.textContent).toBe('C₂H₆O')
     fireEvent.click(screen.getByText('Check it'))
     expect(screen.getByText('CH₃–CH₂–OH')).toBeTruthy()
-    fireEvent.click(screen.getByText('Show how the electrons move →'))
+    fireEvent.click(screen.getByText('Find the parts →'))
+    analyzeSN2()
 
     // step 2: the two real arrows from the lists
     expect(screen.getByText('Show how the electrons move')).toBeTruthy()
@@ -124,7 +135,8 @@ describe('orgo session', () => {
     guidedPath()
     buildEthanol()
     fireEvent.click(screen.getByText('Check it'))
-    fireEvent.click(screen.getByText('Show how the electrons move →'))
+    fireEvent.click(screen.getByText('Find the parts →'))
+    analyzeSN2()
     choose('from', 'the C atom')
     choose('to', 'O atom')
     fireEvent.click(screen.getByText('Add arrow'))
@@ -144,7 +156,8 @@ describe('orgo session', () => {
     guidedPath()
     buildEthanol()
     fireEvent.click(screen.getByText('Check it'))
-    fireEvent.click(screen.getByText('Show how the electrons move →'))
+    fireEvent.click(screen.getByText('Find the parts →'))
+    analyzeSN2()
     choose('from', 'lone pair on O (right)')
     choose('to', 'C atom')
     fireEvent.click(screen.getByText('Add arrow'))
@@ -216,15 +229,62 @@ describe('orgo session', () => {
     expect(entries()[0]).toMatchObject({ session: 'orgo', orgoTopic: 'build-ethanol', misconception: null })
   })
 
-  it('Mechanisms > SN2 starts at the arrows, and the topics link goes back to the menu', () => {
+  it('Mechanisms > SN2 works it out before the arrows, and the topics link goes back to the menu', () => {
     render(<session.Component onDone={() => {}} />)
     pickTopic(/^SN2/)
-    expect(screen.getByText('Show how the electrons move')).toBeTruthy()
-    expect(screen.getByText('1 of 2')).toBeTruthy()
+    expect(screen.getByText('Find the parts')).toBeTruthy()
+    expect(screen.getByText('1 of 4')).toBeTruthy()
     expect(screen.queryByText('Build ethanol')).toBeNull()
     fireEvent.click(screen.getByText('← All orgo topics'))
     expect(screen.getByText('What do you want to practice?')).toBeTruthy()
   })
+
+  it('SN2 step by step: parts, size up (wrong answers named), the chart, then arrows and Finish', () => {
+    vi.useFakeTimers()
+    render(<session.Component onDone={() => {}} />)
+    pickTopic(/^SN2/)
+    // parts: a wrong tap gets a hint, not a pass
+    expect(screen.getByText(/Tap the nucleophile/)).toBeTruthy()
+    fireEvent.click(screen.getByRole('button', { name: 'H of hydroxide' }))
+    expect(screen.getByText(/Look for lone pairs/)).toBeTruthy()
+    for (const n of ['O of hydroxide', 'carbon of CH₃Br', 'Br']) fireEvent.click(screen.getByRole('button', { name: n }))
+    expect(screen.getByText('All three found.')).toBeTruthy()
+    fireEvent.click(screen.getByText('Size them up →'))
+
+    // size up: calling HO⁻ weak and CH₃Br 3° are named mistakes
+    fireEvent.click(screen.getByRole('button', { name: /^Weak/ }))
+    expect(screen.getByText(MISTAKES['charged-nu-weak'].label)).toBeTruthy()
+    fireEvent.click(screen.getByRole('button', { name: /^Strong/ }))
+    expect(screen.getByText(/Oxygen carries a − charge/)).toBeTruthy()
+    fireEvent.click(screen.getByRole('button', { name: /^3°/ }))
+    expect(screen.getByText(MISTAKES['carbon-miscounted'].label)).toBeTruthy()
+    fireEvent.click(screen.getByRole('button', { name: /^Methyl/ }))
+    fireEvent.click(screen.getByRole('button', { name: /^Good/ }))
+    fireEvent.click(screen.getByText('Pick the mechanism →'))
+
+    // the chart hides the one cell your answers point to until you pick
+    const target = () => document.querySelector('.og-cell.target')!
+    expect(target().textContent).toBe('?')
+    fireEvent.click(screen.getByRole('button', { name: /^SN1/ }))
+    expect(screen.getByText(MISTAKES['sn1-on-methyl'].label)).toBeTruthy()
+    fireEvent.click(screen.getByRole('button', { name: /^SN2/ }))
+    expect(target().textContent).toBe('SN2')
+    expect(screen.getByText(/nothing blocks the back side/)).toBeTruthy()
+    fireEvent.click(screen.getByText('Show how the electrons move →'))
+
+    // arrows are the last step here, so the button finishes
+    choose('from', 'lone pair on O (right)')
+    choose('to', 'C atom')
+    fireEvent.click(screen.getByText('Add arrow'))
+    choose('from', 'C–Br bond')
+    choose('to', 'Br atom')
+    fireEvent.click(screen.getByText('Add arrow'))
+    fireEvent.click(screen.getByText('Show me'))
+    fireEvent.click(screen.getByText('Finish ✓'))
+    expect(screen.getByText(/Caught: /)).toBeTruthy()
+    expect(entries()[0]).toMatchObject({ session: 'orgo', orgoTopic: 'sn2', misconception: 'charged-nu-weak' })
+    expect(entries()[0]).toMatchObject({ mistakes: ['charged-nu-weak', 'carbon-miscounted', 'sn1-on-methyl'] })
+  }, 60000)
 
   it('the notebook shows the same names as the session', () => {
     for (const [id, m] of Object.entries(MISTAKES)) expect(labelFor('orgo', id)).toBe(m.label)

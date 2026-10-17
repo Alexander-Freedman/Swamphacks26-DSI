@@ -1,8 +1,8 @@
 // What you can practice in orgo, grouped so you pick a topic on purpose instead of a fixed path.
-// A topic is a list of steps from the session (build, push, compare). Topics that aren't built yet
+// A topic is a list of steps from the session (build; parts, size, decide, push for a mechanism; compare). Topics that aren't built yet
 // stay on the menu as "coming next" so the map of the subject is visible.
 
-export type OrgoStep = 'build' | 'push' | 'compare'
+export type OrgoStep = 'build' | 'parts' | 'size' | 'decide' | 'push' | 'compare'
 
 export type OrgoTopic = {
   id: string
@@ -25,9 +25,9 @@ export const SECTIONS: OrgoSection[] = [
   {
     id: 'mechanisms',
     title: 'Mechanisms',
-    blurb: 'Draw the curved arrows, then watch the electrons move.',
+    blurb: 'Work it out step by step: find the parts, size them up, pick the mechanism, then draw the arrows.',
     topics: [
-      { id: 'sn2', title: 'SN2', blurb: 'One step: the nucleophile hits the back side as the leaving group leaves.', steps: ['push', 'compare'], ready: true },
+      { id: 'sn2', title: 'SN2', blurb: 'One step: the nucleophile hits the back side as the leaving group leaves.', steps: ['parts', 'size', 'decide', 'push'], ready: true },
       { id: 'sn1', title: 'SN1', blurb: 'Two steps: the leaving group goes first, then the carbocation is attacked.', steps: [], ready: false },
       { id: 'e2', title: 'E2', blurb: 'One step: a base pulls a proton as the double bond forms.', steps: [], ready: false },
       { id: 'e1', title: 'E1', blurb: 'Two steps: carbocation first, then a proton leaves.', steps: [], ready: false },
@@ -36,8 +36,8 @@ export const SECTIONS: OrgoSection[] = [
   {
     id: 'path',
     title: 'Guided path',
-    blurb: 'All of it in order: build a molecule, push the electrons, spot the pattern.',
-    topics: [{ id: 'full', title: 'Build → Push → Compare', blurb: 'Ethanol, then SN2, then a new reaction with the same parts.', steps: ['build', 'push', 'compare'], ready: true }],
+    blurb: 'All of it in order, from building a molecule to drawing a mechanism.',
+    topics: [{ id: 'full', title: 'Start to finish', blurb: 'Build ethanol, work out HO⁻ + CH₃Br, draw its arrows, then spot the same pattern in a new reaction.', steps: ['build', 'parts', 'size', 'decide', 'push', 'compare'], ready: true }],
   },
 ]
 
