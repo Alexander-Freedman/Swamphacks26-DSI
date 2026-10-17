@@ -81,3 +81,10 @@ The other two: in 100 fair flips the longest run averages 6.98, and a run of 5 o
 - **Computed numbers** (formulas: birthday 1 − ∏(365−i)/365; my-birthday 1 − (364/365)^22; pairs C(n,2); test 0.009 / (0.009 + 0.99 × 0.09); re-run for this draft in Python): birthday 23 → 0.5073, 57 → 0.9901, my-birthday 22 others → 0.0586, C(23,2) = 253; positive test 0.0917. Coin 6.98 / 97.2% from showcase-facts.md (exact DP).
 - **Gemma model IDs:** list the exact ones the code calls at submit time.
 - Body word count (Inspiration through Built with, link URLs and this list excluded): ~1,110 with the disclosure placeholder, ~1,075 without. Near the 1,100 cap: trim before adding anything (the real disclosure text will add words).
+
+
+## Best Use of Vultr (notes)
+- The API runs on one Vultr VM (`onionskin-api`, vc2-1c-1gb, Ubuntu 24.04, Miami) paid from the MLH credit: FastAPI + uvicorn under systemd, Caddy in front with automatic HTTPS on sslip.io, CORS locked to our Pages origin, per-IP limits and a daily cap on the free Gemini tier.
+- It powers the any-topic engine (topic → runnable model spec → code-computed truth), the ask-a-question help chat, and answer events. Setup is one script (`deploy/vultr/setup.sh`), updates are `deploy/vultr/update.sh`.
+- Measured on it: live generation 5.5 s for a two-curve round (Sat 12:10 PM); re-measure with the new engine before quoting.
+- Cost control: one server, no extra resources; it is destroyed after judging on Mon Oct 19.
