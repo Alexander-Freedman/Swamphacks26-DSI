@@ -1,5 +1,7 @@
 .app { max-width: 760px; margin: 0 auto; padding: 24px 16px 64px; }
 .topbar { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 20px; }
+/* on a session screen the header lines up with the session frame (1040px), not the page column */
+.app:has(.ss-frame, .bday) .topbar { width: min(1040px, calc(100vw - 32px)); margin-left: calc(50% - min(520px, 50vw - 16px)); }
 .logo { font-weight: 800; font-size: 1.25rem; letter-spacing: -0.02em; }
 .chip { display: inline-flex; align-items: center; gap: 6px; padding: 3px 10px; border: 1.5px solid var(--ink); border-radius: 999px; font-size: 0.8rem; background: var(--card); }
 .checked-tag { font-size: 0.8rem; color: var(--ink-soft); cursor: help; border-bottom: 1px dotted var(--ink-soft); }
