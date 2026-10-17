@@ -15,6 +15,31 @@
 
 **Visual rules (Notebook Arcade):** graph paper background; **pencil** (grey, sketchy, dashed) = you; **ink** (deep blue, solid) = truth; **highlighter** (marker yellow) = the gap; verdict = rubber stamp that lands with a thud; chunky display face for numbers. Truth always animates *in* over your guess, never replaces it.
 
+**Guidance line on every screen (decided Sat ~12:30 AM):** each screen opens with **one plain-language sentence: what to do, and why it matters**, so a first-time user is never lost. The visuals stay; the sentence sits above the main visual (body or hand font, ink-soft, ≥ 15px on phone).
+
+| Screen | Guidance line |
+|---|---|
+| C1 | "Make up 20 coin flips the way you think a fair coin looks. We'll compare yours with real ones." |
+| C2 | "Your row on top, real flips below. Flip again a few times: which one clumps?" |
+| C3 | "Guess first: in 100 flips, what's the longest run of the same side? Your guess stays on screen." |
+| C4 | "Each dot is one real round of 100 flips. See where most of them land compared with your guess." |
+| C5 | "Drag to flip more or fewer coins. Watch how slowly, but surely, streaks grow." |
+| C6 | "This is the mistake your guess points to, and the one idea that fixes it." |
+| C7 | "One more: spot the real coin. Does the idea stick?" |
+| P1 | "Guess first: you tested positive. What's the chance you actually have it? Your guess stays on screen." |
+| P2 | "Here are 1,000 people; 10 are sick. Test everyone and watch who comes up positive." |
+| P3 | "These are all the positives. Tap a few: how many are actually sick?" |
+| P4 | "Drag how common the condition is. Watch what a positive result really means change." |
+| P5 | "This is the mistake your guess points to, and the one idea that fixes it." |
+| P6 | "Same test, new numbers: does the idea stick?" |
+| B1 | "Guess first: how many people until it's a coin flip that two share a birthday? Your guess stays on screen." |
+| B2 | "Add people one by one. Each line is a pair that could share a birthday: notice how fast pairs pile up." |
+| B3 | "A match! Empty the room and try again a few times: how many people does it usually take?" |
+| B4 | "Draw how you think the chance grows as the room fills. There's no wrong drawing; it's your model." |
+| B5 | "Here's the real curve over yours. Drag the group size to see where your model and reality part." |
+| B6 | "This is the mistake your guess points to, and the one idea that fixes it." |
+| B7 | "One more, with new numbers: does the idea stick?" |
+
 ---
 
 ## Topic 1: Coin streak ("random is streakier than it feels")
@@ -68,6 +93,15 @@ The same five moves, with what the engine can honestly compute:
 - **Your model vs reality:** pencil marker vs ink truth on every widget; sketch-your-curve only on curve items.
 - **Mistake named:** the band/option → misconception card.
 Generated rounds are labelled *auto-checked*, not *reviewed*. Our own earlier prototype showed one-shot authoring of a whole new topic is not reliable without a second check (undefined notation, assumed knowledge), so generated topics stay short (3 items), plain-language, code-computed truth, and a blind second-model check where code can't compute it.
+
+## Ask a question (help chat): final product feature, Saturday
+Decided Sat ~12:30 AM; built **after the three sessions are live**, not tonight.
+- **What:** a small "ask a question" panel on the side of each session. Anyone who doesn't get something can ask and keep going.
+- **Knows the context:** the current topic, the current screen, and (after lock-in) your guess and the truth. It answers in plain words, in 2-3 sentences.
+- **Hint before lock-in, never the answer:** before you lock a guess it gives a hint or rephrases the question; the number only comes after lock-in.
+- **Never replaces the visuals:** answers point back at the screen ("drag the slider to 57 and watch the dot").
+- **Limits (rule 16):** free Gemini tier only (Flash Lite), backend-only key, per-IP rate limit and a hard daily cap; when the cap is hit, the panel says so and the session keeps working.
+- **Where it goes:** shown on every session; off in reduced-data/offline mode (the static site without a backend shows "help is offline").
 
 ## Coming back
 - End of session: "Saved to your notebook." The collection page shows each misconception you hit as a card: *caught* (pencil) → *busted* (ink) after two later right answers.
