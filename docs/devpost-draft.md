@@ -1,5 +1,7 @@
 # Devpost draft: Onionskin
 
+> **Superseded:** the single submission text is now [docs/submission/devpost.md](submission/devpost.md). This file is kept for history only; don't edit or paste from it.
+
 **Status:** draft, rewritten Sat ~1 PM for the direction update (NOTES.md, Sat ~12:15 PM, #185): the new headline, the compare screen and the any-topic engine. Every number has a source link or a "computed" note; anything we couldn't check is marked *unverified*. Parts marked **[landing today]** describe work that isn't merged yet: keep them only if they're live at submit time (checklist at the bottom). The submission copy in docs/submission/devpost.md is not on main yet (PR #113, @luanamaldaner's side); bring the same changes over there when it merges.
 
 **Tagline:** "ChatGPT tells you the answer. Onionskin builds you a world where you find out you were wrong, and why."
