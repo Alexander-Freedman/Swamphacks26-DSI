@@ -1,0 +1,57 @@
+/* Session shell, shared by the sessions that use components/session (values match the birthday session). */
+.ss-frame {
+  /* the session column: wider than the page column on desktop, same left edge in every session */
+  width: min(1040px, calc(100vw - 32px));
+  margin-left: calc(50% - min(520px, 50vw - 16px));
+  color: var(--ink);
+}
+
+.ss-head { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+.ss-chip { font: 700 13px var(--font-body); border: 2px solid var(--ink); border-radius: 999px; padding: 3px 12px; background: var(--card); }
+.ss-dots { display: inline-flex; gap: 5px; align-items: center; }
+.ss-dot { display: inline-block; width: 10px; height: 10px; border-radius: 50%; border: 2px solid var(--ink); background: transparent; padding: 0; }
+.ss-dot.on { background: var(--ink); }
+/* clickable dots: same look, a bigger hit area around each one */
+button.ss-dot { position: relative; cursor: pointer; }
+button.ss-dot::after { content: ''; position: absolute; inset: -9px -4px; }
+button.ss-dot:disabled { cursor: default; }
+button.ss-dot[aria-current='step'] { box-shadow: 0 0 0 2px var(--marker); }
+.ss-count { font-size: 13px; color: var(--ink-soft); }
+.ss-title { font: 800 clamp(30px, 6vw, 42px)/1.05 var(--font-display); margin: 14px 0 6px; letter-spacing: -0.01em; scroll-margin-top: 12px; }
+.ss-title:focus { outline: none; }
+.ss-subtitle { font: 17px/1.45 var(--font-hand); color: var(--ink-soft); margin: 0 0 18px; max-width: 46em; }
+
+.ss-tag { font: 700 12px var(--font-mono); text-transform: uppercase; letter-spacing: 0.08em; color: var(--ink-soft); }
+.ss-mt { margin-top: 16px; }
+
+.ss-choices { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-top: 8px; }
+.ss-choice { font: 600 15px var(--font-body); background: var(--card); color: var(--ink); border: 2px solid var(--ink); border-radius: 10px; min-height: 46px; padding: 8px; touch-action: manipulation; }
+.ss-choice[aria-pressed='true'] { background: var(--ink); color: var(--paper); }
+.ss-choice:disabled { cursor: default; }
+.ss-choice:disabled:not([aria-pressed='true']) { opacity: 0.45; }
+
+.ss-btn { font: 700 16px var(--font-body); background: var(--ink); color: var(--paper); border: 2px solid var(--ink); border-radius: 12px; padding: 12px 20px; min-height: 48px; box-shadow: 0 3px 0 #000; touch-action: manipulation; user-select: none; -webkit-user-select: none; }
+.ss-btn:active:not(:disabled) { transform: translateY(2px); box-shadow: 0 1px 0 #000; }
+.ss-btn:disabled { opacity: 0.45; cursor: not-allowed; }
+.ss-lock { display: block; width: 100%; margin-top: 18px; background: var(--marker); color: var(--ink); }
+
+.ss-stamprow { display: flex; align-items: center; gap: 22px; flex-wrap: wrap; margin-bottom: 18px; }
+.ss-stamp { display: inline-block; flex: none; font: 800 clamp(30px, 8vw, 44px) var(--font-display); text-transform: uppercase; border: 5px solid currentColor; border-radius: 8px; padding: 4px 16px; transform: rotate(-5deg); background: var(--paper); animation: ss-slam 0.32s cubic-bezier(0.2, 1.6, 0.4, 1) both; }
+@keyframes ss-slam { from { transform: scale(2.2) rotate(-14deg); opacity: 0; } to { transform: scale(1) rotate(-5deg); opacity: 1; } }
+.ss-stamp-called { color: var(--called); }
+.ss-stamp-close { color: var(--close); }
+.ss-stamp-off { color: var(--off); }
+.ss-said { font: 22px var(--font-hand); margin: 0; display: flex; align-items: center; gap: 8px 12px; flex-wrap: wrap; }
+.ss-said p { margin: 0; }
+
+.ss-end { margin-top: 18px; background: var(--marker); border: 2px solid var(--ink); border-radius: var(--radius); box-shadow: 0 3px 0 var(--ink); padding: 14px 16px; display: flex; gap: 14px; align-items: center; justify-content: space-between; flex-wrap: wrap; }
+.ss-end p { margin: 0; font-size: 16px; line-height: 1.4; flex: 1 1 260px; }
+.ss-endact { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
+.ss-nblink { color: var(--ink); font-weight: 700; padding: 12px 4px; }
+
+@media (max-width: 480px) {
+  .ss-stamprow { gap: 14px; }
+  /* phone: the actions get their own line, link left, Done right */
+  .ss-endact { flex: 1 1 100%; justify-content: space-between; }
+}
+@media (prefers-reduced-motion: reduce) { .ss-stamp { animation: none; } }

@@ -1,7 +1,10 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { record as save } from '../../notebook'
 import { showcaseRound } from '../../rounds'
-import { misconceptionFor, verdictFor } from '../../verdict'
+import { misconceptionFor } from '../../verdict'
+import { ConfidencePicker, EndBar, Frame, LockButton, SessionHead, StampRow, Title } from '../../components/session/Shell'
+import { cardGuide, lockLabel, type Confidence } from '../../components/session/copy'
+import { shellVerdict } from '../../components/session/verdict'
 import { ExtremeChart, KMAX, RunHistogram } from './Charts'
 import { CoinGrid, Track } from './CoinGrid'
 import { fmt, pct, reducedMotion, sampleLabel } from './hooks'
@@ -26,8 +29,8 @@ const MIN_TAPS = 20
 const E100 = expectedLongest(N)
 const P5 = pLongestAtLeast(N, 5)
 const STEPS = ['Be a coin', 'Flip it', 'Yours vs real', 'Extremes', 'Your mistake'] as const
-const CONFS = ['unsure', 'pretty sure', 'certain'] as const
-export type Confidence = (typeof CONFS)[number]
+/** The verdict's "close" window: 15% of the 1-20 slider. */
+const WINDOW = 0.15 * 19
 
 export function CoinSession({ onDone }: { onDone: () => void }) {
   const round = showcaseRound('coin-streak')!
@@ -158,21 +161,24 @@ export function CoinSession({ onDone }: { onDone: () => void }) {
   }
 
   const sw = switchRate(model)
-  // The round player calls "unsure" "guessing"; the verdict only reads the value.
-  const answer = { value: guess, optionId: null, confidence: conf === 'unsure' ? ('guessing' as const) : (conf ?? 'pretty sure') }
+  // The verdict only reads the value; confidence never changes which mistake a guess names.
+  const misId = misconceptionFor(item, { value: guess, optionId: null, confidence: 'pretty sure' })
+  const full = mine.length >= len && deal.length === len
+  const TITLES: [string, string][] = [
+    [
+      `Be a coin. Tap out ${len} flips.`,
+      full ? 'Your row on top, real flips below. Flip again a few times: which one clumps?' : `Make up ${len} coin flips the way you think a fair coin looks. We'll compare yours with real ones.`,
+    ],
+    ['Now a real coin. Flip it.', 'Each dot is one real round of 100 flips. See where most of them land compared with your guess.'],
+    ['Your coin vs the real coin', 'Your row next to a real 100, runs of 5 or more marked. Which one clumps?'],
+    ['More flips, longer streaks?', 'Drag to flip more or fewer coins. Watch how slowly, but surely, streaks grow.'],
+    ['What happened in your head', cardGuide(misId === null)],
+  ]
+  const [title, sub] = TITLES[step]
   return (
-    <div className="coin-session">
-      <div className="coin-head">
-        <span className="chip">Coin streak</span>
-        <nav className="steps" aria-label="session steps">
-          {STEPS.map((s, i) => (
-            <button key={s} className={i === step ? 'on' : ''} aria-current={i === step ? 'step' : undefined} disabled={i > 0 && !locked} onClick={() => go(i)}>
-              <span className="n">{i + 1}</span> <span className="s">{s}</span>
-            </button>
-          ))}
-        </nav>
-        <span className="count">{step + 1} of {STEPS.length}</span>
-      </div>
+    <Frame className="coin-session">
+      <SessionHead chip="Coin streak" step={step + 1} total={STEPS.length} labels={STEPS} canGo={(i) => i === 0 || locked} onGo={go} />
+      <Title h={title} sub={sub} id="coin-h" headingRef={heading} />
       {locked && (
         <p className="pencil-strip" aria-label="your model">
           <span>you guessed <b>{guess}</b> in a row{conf ? ` (${conf})` : ''}</span>
@@ -180,14 +186,12 @@ export function CoinSession({ onDone }: { onDone: () => void }) {
           <span>your longest <b>{longestRun(model)}</b></span>
         </p>
       )}
-      <section className="coin-step" aria-labelledby="coin-h">
+      <section className={step === 4 ? 'coin-step' : 'coin-step card'} aria-labelledby="coin-h">
         {step === 0 && (
-          <TapStep h={heading} len={len} pickLen={pickLen} deal={deal} dealKey={dealKey} onDeal={() => dealRow(len)} mine={mine} setMine={editMine} tap={tap} guess={guessSet} setGuess={setGuessSet} conf={conf} setConf={setConf} locked={locked} onLock={lock} onNext={() => go(1)} />
+          <TapStep len={len} pickLen={pickLen} deal={deal} dealKey={dealKey} onDeal={() => dealRow(len)} mine={mine} setMine={editMine} tap={tap} guess={guessSet} setGuess={setGuessSet} conf={conf} setConf={setConf} locked={locked} onLock={lock} onNext={() => go(1)} />
         )}
         {step === 1 && (
           <>
-            <h2 id="coin-h" ref={heading} tabIndex={-1}>Now a real coin. Flip it.</h2>
-            <p className="guide">Each dot is one real round of 100 flips. See where most of them land compared with your guess.</p>
             <div className="readout">
               <div><div className="big num">{longestRun(real)}</div><div className="lbl">longest run this time</div></div>
               <div><div className="big num">{pct(switchRate(real))}</div><div className="lbl">side switches</div></div>
@@ -207,17 +211,15 @@ export function CoinSession({ onDone }: { onDone: () => void }) {
             <Next onClick={() => go(2)}>Next: your coin vs the real one</Next>
           </>
         )}
-        {step === 2 && <CompareStep h={heading} model={model} real={real} onNext={() => go(3)} />}
-        {step === 3 && <ExtremeStep h={heading} model={model} guess={guess} onNext={() => go(4)} />}
+        {step === 2 && <CompareStep model={model} real={real} onNext={() => go(3)} />}
+        {step === 3 && <ExtremeStep model={model} guess={guess} onNext={() => go(4)} />}
         {step === 4 && (
-          <CardStep h={heading} model={model} guess={guess} round={round} conf={conf ?? 'pretty sure'} verdict={verdictFor(item, answer, E100)} misId={misconceptionFor(item, answer)} onRestart={restart} onDone={onDone} />
+          <CardStep model={model} guess={guess} round={round} conf={conf ?? 'pretty sure'} verdict={shellVerdict(misId, guess, E100, WINDOW)} misId={misId} onRestart={restart} onDone={onDone} />
         )}
       </section>
-    </div>
+    </Frame>
   )
 }
-
-type H = React.RefObject<HTMLHeadingElement | null>
 
 function Legend({ items }: { items: [string, string][] }) {
   return (
@@ -237,8 +239,8 @@ function Next({ onClick, children }: { onClick: () => void; children: React.Reac
   )
 }
 
-function TapStep(p: { h: H; len: number; pickLen: (n: number) => void; deal: Side[]; dealKey: number; onDeal: () => void; mine: Side[]; setMine: (m: Side[]) => void; tap: (c: Side) => void; guess: number | null; setGuess: (g: number) => void; conf: Confidence | null; setConf: (c: Confidence) => void; locked: boolean; onLock: () => void; onNext: () => void }) {
-  const { mine, locked, h, setMine, tap, guess, setGuess, conf, setConf, onLock, onNext, len, pickLen, deal, dealKey, onDeal } = p
+function TapStep(p: { len: number; pickLen: (n: number) => void; deal: Side[]; dealKey: number; onDeal: () => void; mine: Side[]; setMine: (m: Side[]) => void; tap: (c: Side) => void; guess: number | null; setGuess: (g: number) => void; conf: Confidence | null; setConf: (c: Confidence) => void; locked: boolean; onLock: () => void; onNext: () => void }) {
+  const { mine, locked, setMine, tap, guess, setGuess, conf, setConf, onLock, onNext, len, pickLen, deal, dealKey, onDeal } = p
   const full = mine.length >= len && deal.length === len
   const ready = mine.length >= MIN_TAPS && guess != null && conf != null
   // When the real row deals in (tap 20, Flip again), bring it on screen: on a 360x640 phone it lands below the fold.
@@ -249,15 +251,10 @@ function TapStep(p: { h: H; len: number; pickLen: (n: number) => void; deal: Sid
     seenDeal.current = dealKey
     realRef.current?.scrollIntoView?.({ block: 'nearest', behavior: reducedMotion() ? 'auto' : 'smooth' })
   }, [full, dealKey])
-  const lockText = mine.length < MIN_TAPS ? 'Lock it in' : guess == null ? 'Move the slider to guess' : conf ? 'Lock it in' : 'Pick how sure you are'
+  // Same lock copy as the other sessions once your 20 taps are in; before that the note under the button says why it waits.
+  const lockText = mine.length < MIN_TAPS ? 'Lock it in' : lockLabel(guess != null, conf)
   return (
     <>
-      <h2 id="coin-h" ref={h} tabIndex={-1}>Be a coin. Tap out {len} flips.</h2>
-      <p className="guide">
-        {full
-          ? 'Your row on top, real flips below. Flip again a few times: which one clumps?'
-          : `Make up ${len} coin flips the way you think a fair coin looks. We'll compare yours with real ones.`}
-      </p>
       <div className="lenpick" role="radiogroup" aria-label="row length">
         {[20, 100].map((n) => (
           <button key={n} role="radio" aria-checked={len === n} className={len === n ? 'on' : ''} disabled={locked} onClick={() => pickLen(n)}>
@@ -316,34 +313,29 @@ function TapStep(p: { h: H; len: number; pickLen: (n: number) => void; deal: Sid
           onPointerUp={(e) => guess == null && setGuess(+e.currentTarget.value)}
         />
         <div className="ticks"><span>1</span><span>5</span><span>10</span><span>15</span><span>20</span></div>
-        <div className="tag sure">how sure?</div>
-        <div className="confs" role="group" aria-label="how sure are you">
-          {CONFS.map((c) => (
-            <button key={c} className="conf" aria-pressed={conf === c} disabled={locked} onClick={() => setConf(c)}>{c}</button>
-          ))}
-        </div>
-        <div className="row">
-          {locked ? (
+        <ConfidencePicker value={conf} onPick={setConf} disabled={locked} />
+        {locked ? (
+          <div className="row">
             <button className="btn" onClick={onNext}>Back to the real coin →</button>
-          ) : (
-            <button className="btn lockbtn" disabled={!ready} onClick={onLock}>{lockText}</button>
-          )}
-          {!locked && mine.length < MIN_TAPS && <span className="note">tap at least {MIN_TAPS} flips first ({mine.length} so far)</span>}
-        </div>
+          </div>
+        ) : (
+          <>
+            <LockButton ready={ready} onLock={onLock}>{lockText}</LockButton>
+            {mine.length < MIN_TAPS && <p className="note">tap at least {MIN_TAPS} flips first ({mine.length} so far)</p>}
+          </>
+        )}
       </div>
     </>
   )
 }
 
-function CompareStep({ h, model, real, onNext }: { h: H; model: Side[]; real: Side[]; onNext: () => void }) {
+function CompareStep({ model, real, onNext }: { model: Side[]; real: Side[]; onNext: () => void }) {
   const nReal = runs(real).filter((r) => r.len >= 5).length
   const nMine = runs(model).filter((r) => r.len >= 5).length
   const sw = switchRate(model)
   const scaled = model.length === N ? '' : ` (${model.length} taps)`
   return (
     <>
-      <h2 id="coin-h" ref={h} tabIndex={-1}>Your coin vs the real coin</h2>
-      <p className="guide">Your row next to a real 100, runs of 5 or more marked. Which one clumps?</p>
       <div className="pair">
         <div>
           <h3><i className="l-you" />yours{scaled}</h3>
@@ -380,7 +372,7 @@ function CompareStep({ h, model, real, onNext }: { h: H; model: Side[]; real: Si
 
 const TICKS: [number, string][] = [[10, '10'], [100, '100'], [1000, '1,000'], [10000, '10,000']]
 
-function ExtremeStep({ h, model, guess, onNext }: { h: H; model: Side[]; guess: number; onNext: () => void }) {
+function ExtremeStep({ model, guess, onNext }: { model: Side[]; guess: number; onNext: () => void }) {
   const [v, setV] = useState(2)
   const n = Math.round(10 ** v)
   const rYou = Math.round(repeatRateLike(model) * 100) / 100
@@ -397,8 +389,6 @@ function ExtremeStep({ h, model, guess, onNext }: { h: H; model: Side[]; guess: 
           : `${fmt(n)} flips: ${truthNow.toFixed(1)} in a row expected. 100x the flips of 100, only +${(truthNow - E100).toFixed(1)}: it grows like log₂N, one more per doubling.`
   return (
     <>
-      <h2 id="coin-h" ref={h} tabIndex={-1}>More flips, longer streaks?</h2>
-      <p className="guide">Drag to flip more or fewer coins. Watch how slowly, but surely, streaks grow.</p>
       <div className="ext-head">
         <div><div className="n num">{fmt(n)}</div><small>flips</small></div>
         <div><div className="v truth num">{truthNow.toFixed(2)}</div><small>expected longest run, real coin (exact)</small></div>
@@ -420,7 +410,6 @@ function ExtremeStep({ h, model, guess, onNext }: { h: H; model: Side[]; guess: 
 }
 
 function CardStep(p: {
-  h: H
   model: Side[]
   guess: number
   conf: Confidence
@@ -430,9 +419,9 @@ function CardStep(p: {
   onRestart: () => void
   onDone: () => void
 }) {
-  const { model, guess, conf, round, verdict, h, misId, onRestart, onDone } = p
+  const { model, guess, conf, round, verdict, misId, onRestart, onDone } = p
   const m = round.misconceptions.find((x) => x.id === misId)
-  const [picked, setPicked] = useState(false)
+  const [picked, setPicked] = useState<boolean | null>(null)
   const saved = useRef(false)
   const record = (rematch: 'right' | 'wrong' | null) => {
     if (saved.current) return
@@ -440,7 +429,6 @@ function CardStep(p: {
     save({ session: 'coin-streak', at: new Date().toISOString(), guess, confidence: conf, switchRate: Math.round(switchRate(model) * 100) / 100, misconception: misId, rematch })
   }
   const sw = switchRate(model)
-  const stamp = verdict === 'called' ? 'Called it' : verdict === 'close' ? 'Close' : m?.label ?? 'Way off'
   const pPast = 1 - pLongestAtMost(N, guess)
   const pReach = pLongestAtLeast(N, guess)
   const p59 = pLongestAtMost(N, 9) - pLongestAtMost(N, 4)
@@ -453,15 +441,14 @@ function CardStep(p: {
   const hand = sw > 0.58 ? ` But your hand still switched ${pct(sw)} of the time, where a coin switches 50%.` : ''
   return (
     <>
-      <h2 id="coin-h" ref={h} tabIndex={-1} className="sr-only">Your mistake, named</h2>
-      <p className="guide">This is the mistake your guess points to, and the one idea that fixes it.</p>
-      <div className="card verdict-card">
-        <span className={`stamp ${verdict === 'called' ? 'called' : verdict === 'close' ? 'close' : 'mistake'}`}>{stamp}</span>
+      <StampRow v={verdict}>
         <p className="said">
-          You said <b className="you">{guess}</b> ({conf}). A real 100 averages <span className="hl"><b>{E100.toFixed(2)}</b></span>.
+          You said <b className="you">{guess}</b> ({conf}). A real 100 averages <span className="hl"><b className="num">{E100.toFixed(2)}</b></span>.
         </p>
-        <div className="tag">what your taps and your guess say</div>
-        {(verdict !== 'off' || !m) && <h3 className="mname">{m ? m.label : 'Streaky, like a real coin'}</h3>}
+      </StampRow>
+      <div className="card verdict-card">
+        <div className={`tag ${m ? 'red' : ''}`}>{m ? 'the mistake' : 'the right model'}</div>
+        <h3 className="mname">{m ? <>“<span className="hl">{m.label}</span>”</> : <>Streaky, <span className="hl">like a real coin</span>.</>}</h3>
         <p className="line">{line}{hand}</p>
         <ul className="evid">
           <li><span>switches per flip</span><span className="y">you {pct(sw)}</span><span className="t">coin 50%</span></li>
@@ -476,35 +463,32 @@ function CardStep(p: {
         <WhichIsReal
           round={round}
           onPick={(right) => {
-            setPicked(true)
+            setPicked(right)
             record(right ? 'right' : 'wrong')
           }}
         />
-        {picked ? (
-          <div className="saved">
-            <p>
-              <b>Saved.</b> {m ? <>Caught: “{m.label}”.</> : 'Called it.'} Come back tomorrow for a remix with new rows.
-            </p>
-            <div className="row">
-              <button className="btn ghost small" onClick={onRestart}>Tap a new row</button>
-              <button className="btn" onClick={onDone}>Done</button>
-            </div>
-          </div>
-        ) : (
-          <div className="row">
-            <button className="btn ghost small" onClick={onRestart}>Tap a new row</button>
-            <button
-              className="btn small"
-              onClick={() => {
-                record(null)
-                onDone()
-              }}
-            >
-              Done
-            </button>
-          </div>
-        )}
       </div>
+      {picked != null ? (
+        <EndBar
+          caught={m?.label ?? null}
+          rematch={picked ? 'right' : 'wrong'}
+          remix="Come back tomorrow for a remix with new rows."
+          onDone={onDone}
+        />
+      ) : (
+        <div className="row">
+          <button className="btn ghost small" onClick={onRestart}>Tap a new row</button>
+          <button
+            className="btn small"
+            onClick={() => {
+              record(null)
+              onDone()
+            }}
+          >
+            Done
+          </button>
+        </div>
+      )}
     </>
   )
 }
