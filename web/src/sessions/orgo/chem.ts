@@ -273,7 +273,12 @@ export function tapVerdict(map: PartMap, part: Part, atom: string): { ok: boolea
   return { ok: false, mistake: trap && trap.part === part ? trap.mistake : null }
 }
 
-export const MISTAKES: Record<BuildMistake | ArrowMistake | TapMistake | AnalysisMistake, { label: string; line: string }> = {
+// ---------- SN1, E2, E1 (mechs.ts) ----------
+
+export type MechMistake = 'sn1-attack-first' | 'e1-base-first' | 'e1-base-hits-carbon' | 'e2-base-hits-carbon' | 'e2-not-anti' | 'ch-bond-lost'
+export type MechHint = 'mech-leave' | 'mech-attack' | 'mech-base' | 'mech-ch'
+
+export const MISTAKES: Record<BuildMistake | ArrowMistake | TapMistake | MechMistake | AnalysisMistake, { label: string; line: string }> = {
   ...ANALYSIS_MISTAKES,
   'carbon-five-bonds': { label: 'A carbon with 5 bonds', line: 'Carbon has 4 slots. A 5th bond has no electrons to use.' },
   'hydrogen-two-bonds': { label: 'Hydrogen with 2 bonds', line: 'Hydrogen holds exactly one bond.' },
@@ -286,9 +291,15 @@ export const MISTAKES: Record<BuildMistake | ArrowMistake | TapMistake | Analysi
   'leaving-bond-stays': { label: 'The C–Br bond never breaks', line: 'Without that arrow the carbon ends with 5 bonds.' },
   'cyanide-nitrogen': { label: 'Nitrogen as cyanide’s attacker', line: 'The lone pair and the − charge sit on cyanide’s carbon (FC −1). Carbon attacks.' },
   'wrong-carbon': { label: 'Cyanide’s carbon as the target', line: 'That carbon is electron-rich. The target is the carbon holding I.' },
+  'sn1-attack-first': { label: 'Water attacks before Br leaves', line: 'Three CH₃ groups block the back of this carbon. Br leaves on its own first; water hits the flat C⁺ after.' },
+  'e1-base-first': { label: 'H pulled before Br leaves', line: 'That’s E2, and water is too weak a base for it. In E1, Br leaves first; only then does water pull an H⁺.' },
+  'e1-base-hits-carbon': { label: 'Water bonds to the C⁺', line: 'That’s the SN1 product (it does happen too). E1 is the other path: water pulls an H⁺ from a carbon next door.' },
+  'e2-base-hits-carbon': { label: 'Base attacks the carbon', line: 'That’s SN2, and this carbon is too crowded for it. A strong base pulls an H off the carbon next door.' },
+  'e2-not-anti': { label: 'Not the H across from Br', line: 'E2 needs the H and Br on opposite sides, lined up (anti). Pull the H straight across from Br.' },
+  'ch-bond-lost': { label: 'The C–H electrons go nowhere', line: 'When the H⁺ leaves, its bond’s two electrons swing in between the carbons. That’s the new C=C.' },
 }
 
-export const HINTS: Record<BuildHint | ArrowHint, string> = {
+export const HINTS: Record<BuildHint | ArrowHint | MechHint, string> = {
   empty: 'Drag a C onto the paper to start.',
   loose: 'Some atoms aren’t connected yet.',
   'too-many-bonds': 'An atom has more bonds than slots.',
@@ -299,4 +310,8 @@ export const HINTS: Record<BuildHint | ArrowHint, string> = {
   'wrong-target': 'Where do those electrons go?',
   'extra-arrow': 'One arrow isn’t part of this reaction.',
   none: 'Draw an arrow first.',
+  'mech-leave': 'Which bond breaks, and where do its electrons go?',
+  'mech-attack': 'Which lone pair fills the empty spot on C⁺?',
+  'mech-base': 'Which lone pair grabs an H?',
+  'mech-ch': 'The H left its bond’s electrons behind. Where do they go?',
 }

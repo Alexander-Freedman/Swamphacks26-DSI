@@ -46,7 +46,7 @@ export const RX: Record<RxId, Rx> = {
   },
 }
 
-export type SAtom = { id: string; el: El; x: number; y: number; lp: number[]; charge: number; partial: boolean; opacity: number }
+export type SAtom = { id: string; el: El; /** a group drawn as one disc, e.g. CH₃ */ label?: string; x: number; y: number; lp: number[]; charge: number; partial: boolean; opacity: number }
 export type SBond = { id: string; a: string; b: string; order: number; dashed: boolean; opacity: number }
 export type Scene = { atoms: SAtom[]; bonds: SBond[]; pair: Pt | null }
 

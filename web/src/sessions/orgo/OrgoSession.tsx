@@ -5,6 +5,8 @@ import { BuildStep } from './BuildStep'
 import { MISTAKES } from './chem'
 import { CompareStep } from './CompareStep'
 import { DecideStep, PartsStep, SizeStep } from './MechSteps'
+import { MechStep } from './MechStep'
+import { MECHS } from './mechs'
 import { PushStep } from './PushStep'
 import { SECTIONS, type OrgoStep, type OrgoTopic } from './topics'
 import './orgo.css'
@@ -24,6 +26,9 @@ const REMIX: Record<string, string> = {
   'build-ethanol': 'Next: push the electrons in a real mechanism.',
   sn2: 'Next: SN1, E2 and E1, worked out the same way.',
   full: 'Next time: a new molecule, a new nucleophile.',
+  sn1: 'Next: E1. Same carbocation, a different ending.',
+  e1: 'Next: E2. A strong base skips the carbocation.',
+  e2: 'Next: SN1. Weak nucleophile, same crowded carbon.',
 }
 type M = keyof typeof MISTAKES
 
@@ -75,6 +80,8 @@ function OrgoTopicRun({ topic, onTopics, onDone }: { topic: OrgoTopic; onTopics:
   const [reached, setReached] = useState(1)
   const [mistakes, setMistakes] = useState<M[]>([])
   const [finished, setFinished] = useState(false)
+  const mech = topic.mech ? MECHS[topic.mech] : null
+  const [mechStage, setMechStage] = useState(0)
   const saved = useRef(false)
   const go = (n: number) => {
     setStep(n)
@@ -103,7 +110,7 @@ function OrgoTopicRun({ topic, onTopics, onDone }: { topic: OrgoTopic; onTopics:
   const after = (s: OrgoStep) => () => (at(s) < steps.length ? go(at(s) + 1) : finish())
   const nextLabel = (s: OrgoStep) => (at(s) < steps.length ? `${TITLES[steps[at(s)]][0]} →` : 'Finish ✓')
   const block = (s: OrgoStep, el: ReactNode) => at(s) > 0 && reached >= at(s) && <div hidden={step !== at(s)}>{el}</div>
-  const [h, sub] = TITLES[steps[step - 1]]
+  const [h, sub] = mech && steps[step - 1] === 'push' ? [mech.stages[mechStage].title, mech.stages[mechStage].sub] : TITLES[steps[step - 1]]
   const last = step === steps.length
 
   return (
@@ -120,7 +127,14 @@ function OrgoTopicRun({ topic, onTopics, onDone }: { topic: OrgoTopic; onTopics:
       {block('parts', <PartsStep onNext={after('parts')} nextLabel={nextLabel('parts')} />)}
       {block('size', <SizeStep onNext={after('size')} nextLabel={nextLabel('size')} onMistake={(m) => caught([m])} />)}
       {block('decide', <DecideStep onNext={after('decide')} nextLabel={nextLabel('decide')} onMistake={(m) => caught([m])} />)}
-      {block('push', <PushStep onGrade={caught} onNext={after('push')} nextLabel={nextLabel('push')} />)}
+      {block(
+        'push',
+        mech ? (
+          <MechStep mech={mech} onGrade={caught} onNext={after('push')} nextLabel={nextLabel('push')} onStage={setMechStage} />
+        ) : (
+          <PushStep onGrade={caught} onNext={after('push')} nextLabel={nextLabel('push')} />
+        ),
+      )}
       {at('compare') > 0 && reached >= at('compare') && (
         <div hidden={step !== at('compare')}>
           <CompareStep onMistake={(m) => caught([m])} onDone={finish} />

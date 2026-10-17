@@ -208,13 +208,73 @@ describe('orgo session', () => {
     expect(document.querySelector('.og-correct')).toBeNull()
   })
 
-  it('opens on a topic menu: sections, ready topics, and the ones coming next', () => {
+  it('opens on a topic menu: sections and every mechanism playable', () => {
     render(<session.Component onDone={() => {}} />)
     expect(screen.getByText('What do you want to practice?')).toBeTruthy()
     for (const sec of ['Molecules', 'Mechanisms', 'Guided path']) expect(screen.getByRole('heading', { name: sec })).toBeTruthy()
-    expect((screen.getByRole('button', { name: /^SN2/ }) as HTMLButtonElement).disabled).toBe(false)
-    for (const t of [/^SN1/, /^E2/, /^E1/]) expect((screen.getByRole('button', { name: t }) as HTMLButtonElement).disabled).toBe(true)
-    expect(screen.getAllByText('coming next')).toHaveLength(3)
+    for (const t of [/^SN2/, /^SN1/, /^E2/, /^E1/]) expect((screen.getByRole('button', { name: t }) as HTMLButtonElement).disabled).toBe(false)
+    expect(screen.queryByText('coming next')).toBeNull()
+  })
+
+  const arrow = (from: string, to: string) => {
+    choose('from', from)
+    choose('to', to)
+    fireEvent.click(screen.getByText('Add arrow'))
+  }
+  const watch = () => {
+    fireEvent.click(screen.getByText('Show me'))
+    act(() => void vi.advanceTimersByTime(1800)) // ink arrows
+    act(() => void vi.advanceTimersByTime(3400)) // atoms move
+  }
+
+  it('Mechanisms > SN1: attacking first is named, then step 2 is drawn on the carbocation', () => {
+    vi.useFakeTimers()
+    render(<session.Component onDone={() => {}} />)
+    pickTopic(/^SN1/)
+    expect(screen.getByText('SN1, step 1: the slow step')).toBeTruthy()
+    arrow('lone pair on O of water (lower left)', 'central C')
+    arrow('central C–Br bond', 'Br')
+    watch()
+    expect(screen.getByText(MISTAKES['sn1-attack-first'].label)).toBeTruthy()
+    expect(screen.getByText('(CH₃)₃C⁺ + Br⁻')).toBeTruthy()
+    fireEvent.click(screen.getByText('Step 2 →'))
+    expect(screen.getByText('SN1, step 2: fill the C⁺')).toBeTruthy()
+    arrow('lone pair on O of water (lower left)', 'central C')
+    watch()
+    expect(screen.getByText('your arrows match')).toBeTruthy()
+    fireEvent.click(screen.getByText('Finish ✓'))
+    expect(entries()[0]).toMatchObject({ session: 'orgo', orgoTopic: 'sn1', misconception: 'sn1-attack-first' })
+  })
+
+  it('Mechanisms > E2: the base on the carbon is named as SN2; three right arrows match', () => {
+    vi.useFakeTimers()
+    render(<session.Component onDone={() => {}} />)
+    pickTopic(/^E2/)
+    arrow('lone pair on O of hydroxide (right)', 'central C')
+    watch()
+    expect(screen.getByText(MISTAKES['e2-base-hits-carbon'].label)).toBeTruthy()
+    fireEvent.click(screen.getByText('Draw again'))
+    arrow('lone pair on O of hydroxide (right)', 'H straight across from Br')
+    arrow('left C–H straight across from Br bond', 'left C–central C bond')
+    arrow('central C–Br bond', 'Br')
+    watch()
+    expect(screen.getByText('your arrows match')).toBeTruthy()
+    expect(screen.getByText('H₂O + (CH₃)₂C=CH₂ + Br⁻')).toBeTruthy()
+  })
+
+  it('Mechanisms > E1: two steps, the H comes off the carbon next to C⁺', () => {
+    vi.useFakeTimers()
+    render(<session.Component onDone={() => {}} />)
+    pickTopic(/^E1/)
+    arrow('central C–Br bond', 'Br')
+    watch()
+    fireEvent.click(screen.getByText('Step 2 →'))
+    arrow('lone pair on O of water (upper right)', 'H on the left C (top)')
+    arrow('left C–H on the left C (top) bond', 'central C–left C bond')
+    watch()
+    expect(screen.getByText('your arrows match')).toBeTruthy()
+    fireEvent.click(screen.getByText('Finish ✓'))
+    expect(screen.getByText('✓ mastered')).toBeTruthy()
   })
 
   it('Molecules > Build ethanol is just the build, then Finish', () => {
