@@ -65,7 +65,7 @@ Onionskin is short visual sessions (2-3 minutes each, our design target) that ta
 ## AI tools disclosure (DRAFT, needs approval)
 **How we built it.** We used AI coding assistants heavily, mainly Claude Code. They helped with research (finding and summarizing sources), planning, writing code and tests, reviewing pull requests, and drafting docs, including this write-up. We directed the product: we picked the idea, designed the sessions and the look, made the decisions, reviewed the work, and approved what shipped. We checked every number and source against code or the linked page.
 
-**What the app calls at runtime.** The typed-topic generator calls Google's Gemini 3.5 Flash-Lite (falling back to Gemini 3.1 Flash-Lite, then Gemma 4 26B), and a Gemma 4 31B model double-checks answers. The three main sessions and the 10 reviewed topics use no AI at runtime. Every number shown in the sessions is computed by our own code, not by a model.
+**What the app calls at runtime.** The typed-topic generator calls Google's Gemini 3.5 Flash-Lite (falling back to Gemini 3.1 Flash-Lite, then Gemma 4 26B), and a Gemma 4 31B model double-checks answers that code can't compute. The three main sessions and the 10 reviewed topics use no AI at runtime. Every number shown in the sessions is computed by our own code, not by a model.
 
 ## Built with
 - React, TypeScript, Vite, Vitest
