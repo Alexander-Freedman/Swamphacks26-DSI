@@ -72,7 +72,7 @@ export function CrowdCurve({ test, guess, cardBase }: { test: Test; guess: numbe
   const g = guess / 100
   const youRight = LX(cardBase) > 300
   return (
-    <svg className="pt-chart" viewBox="0 0 400 236" role="img" aria-label={`chance you're sick if positive: ${pct(now)} at ${pct(test.baseRate)} sick`}>
+    <svg className="pt-chart" viewBox="0 -14 400 250" role="img" aria-label={`chance you're sick if positive: ${pct(now)} at ${pct(test.baseRate)} sick`}>
       <line className="pt-axis" x1={52} x2={380} y1={196} y2={196} />
       <line className="pt-axis" x1={52} x2={52} y1={20} y2={196} />
       {([[0.001, '0.1%'], [0.01, '1%'], [0.1, '10%'], [0.5, '50%']] as const).map(([v, s]) => (
@@ -86,12 +86,13 @@ export function CrowdCurve({ test, guess, cardBase }: { test: Test; guess: numbe
       ))}
       <line className="pt-coin" x1={LX(bStar)} x2={LX(bStar)} y1={20} y2={196} />
       <line className="pt-coin" x1={52} x2={380} y1={LY(0.5)} y2={LY(0.5)} />
-      <text className="pt-coin-label" x={LX(bStar) + 5} y={LY(0.5) + 18}>coin flip at {pct(bStar)} sick</text>
+      {/* above the plot, so it never sits on the curve or your mark at any false alarm rate */}
+      <text className="pt-coin-label" x={clampX(LX(bStar), 120, 330)} y={6} textAnchor="middle">coin flip at {pct(bStar)} sick</text>
       <path className="pt-truth" d={d} />
       <text className="pt-truth-label" x={LX(0.15) - 6} y={LY(ppv({ ...test, baseRate: 0.15 })) - 8} textAnchor="end">real</text>
       <rect className="pt-gap" x={LX(cardBase) - 6} y={LY(Math.max(g, atCard))} width={12} height={Math.abs(LY(g) - LY(atCard))} />
       <circle className="pt-you-dot" cx={LX(cardBase)} cy={LY(g)} r={6} />
-      <text className="pt-you-label" x={LX(cardBase) + (youRight ? -10 : 10)} y={LY(g) + 5} textAnchor={youRight ? 'end' : 'start'}>
+      <text className="pt-you-label" x={LX(cardBase) + (youRight ? -10 : 10)} y={clampX(LY(g) + 5, 30, 188)} textAnchor={youRight ? 'end' : 'start'}>
         you, {guess}%
       </text>
       <circle className="pt-now" cx={LX(test.baseRate)} cy={LY(now)} r={7} />
