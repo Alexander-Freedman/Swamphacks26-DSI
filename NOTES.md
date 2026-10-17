@@ -45,5 +45,7 @@ Decisions + how to run things. Keep current.
 
 - Oct 16 10:40 PM: **the product name is @luanamaldaner's call** (asked on #1, options in docs/story.md). Code uses the neutral working name `mm` until it's recorded here. Look / showcase #3 / label follow the auto-approval rule unless I answer first.
 
+- Oct 16 10:50 PM: **learning-first, no XP/points/badges/levels/leaderboards.** The reward is the feedback (reveal, misconception named, busted, a mastery map). I kept a light informational "N of the last 7 days" line: forgiving, nothing to lose, cut if user tests read it as a counter. Talking point + Q&A in docs/pitch.md. My Mental Models research is a resource, not a rulebook.
+
 ## How to run
 Nothing to run yet. Build box tooling (my side): Python 3.12, uv 0.13, Node 22.23 / npm 10.9 in `~/.local/bin` (DeepSpace would also need `npm i -g npm@11`). No Docker on the build box; deploys go to Vultr/Render. The box is 1 CPU, so heavy model training should be kept small or run on Vultr.

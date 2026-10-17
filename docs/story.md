@@ -9,6 +9,10 @@ Marketing is a full workstream (a product nobody gets in 30 seconds loses). This
 - **Tagline (table tent):** "Guess in pencil. Truth in ink."
 - **One-liner:** "Every AI tutor explains. Hunch & Ink makes you bet first, then inks the truth over your guess and names the exact wrong idea you bet on."
 
+## 2. Devpost draft lines (grows through the night)
+- **Tagline candidates:** see the name section. Pending @luanamaldaner's name pick.
+- **"What makes it different" paragraph:** "Everyone gamifies learning with points. The research says points can backfire: in a semester-long class, badges and a leaderboard lowered motivation and final-exam scores ([Hanus & Fox 2015](https://doi.org/10.1016/j.compedu.2014.08.019)), and across 128 experiments, expected rewards undermined people's own motivation ([Deci, Koestner & Ryan 1999](https://leeds-faculty.colorado.edu/dahe7472/deci%201999.pdf)). So we made the feedback the reward. You bet first, reality plays out over your guess, and your exact wrong idea gets a name. Then you bust it." (Full talking point + Q&A in docs/pitch.md.)
+
 The full option table (10 names, domain/product/trademark checks) is below.
 
 ---
