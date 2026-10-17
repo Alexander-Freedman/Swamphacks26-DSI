@@ -23,7 +23,7 @@ Response, always HTTP 200 for a known screen: `{answer: string, hint_only: bool}
 - `answer`: plain text, ≤ 3 sentences, no markdown; points back at the visual on screen.
 - `hint_only: true` = a hint, not the answer: before lock-in, or a fallback. Before lock-in the answer is scanned for the true value; if it leaks, the screen's static hint is sent instead.
 - Fallbacks (still 200): no key/offline or daily cap hit → `"Help is resting for today; the screen has everything you need: <static hint>"`; per-IP limit hit → `"Lots of questions at once! Give the screen a minute: <static hint>"`. The panel can show the text as is; the session never depends on it.
-- Limits: daily cap `HELP_DAILY_CAP` (default 300, own `help` bucket in the usage file, shown under `help` in `GET /api/usage`), per IP `HELP_PER_IP` per `HELP_PER_IP_WINDOW_S` (default 10 per 600 s), separate from the round/answer limiters. Model: 3.5 Flash-Lite (minimal thinking), then 3.1 Flash-Lite.
+- Limits: daily cap `HELP_DAILY_CAP` (default 150, plus a shared total with generation at the 480/day soft cap; own `help` bucket in the usage file, shown under `help` in `GET /api/usage`), per IP `HELP_PER_IP` per `HELP_PER_IP_WINDOW_S` (default 10 per 600 s), separate from the round/answer limiters. Model: 3.5 Flash-Lite (minimal thinking), then 3.1 Flash-Lite.
 
 ## Truth: what the browser computes (the backend re-derives the same numbers in `api/app/truth.py` for checks)
 
