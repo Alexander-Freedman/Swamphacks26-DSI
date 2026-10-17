@@ -41,5 +41,7 @@ Decisions + how to run things. Keep current.
 
 - Oct 16 ~10:10 PM, approval rule: I post the product spec + build plan in #questions with an @. If there's no answer in 30 min, it counts as approved: set "Mode: BUILD (auto-approved at <time>)" here, comment on #1 that building starts and which issues are @luanamaldaner's, open the build issues, and build through the night (claim lock, small PRs, main always runs, hourly digests). A later answer from me overrides the plan.
 
+- Oct 16 10:30 PM: **spending stays $0.** Free Gemini only (key saved on the server; free tier). OpenAI has no billing, so no AI image generation: visuals are SVG/CSS. Showcase topics are written by us during the build and stored.
+
 ## How to run
 Nothing to run yet. Build box tooling (my side): Python 3.12, uv 0.13, Node 22.23 / npm 10.9 in `~/.local/bin` (DeepSpace would also need `npm i -g npm@11`). No Docker on the build box; deploys go to Vultr/Render. The box is 1 CPU, so heavy model training should be kept small or run on Vultr.
