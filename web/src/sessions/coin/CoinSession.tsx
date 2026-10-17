@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
+import { record as save } from '../../notebook'
 import { showcaseRound } from '../../rounds'
 import { misconceptionFor, verdictFor } from '../../verdict'
 import { ExtremeChart, KMAX, RunHistogram } from './Charts'
@@ -27,17 +28,6 @@ const P5 = pLongestAtLeast(N, 5)
 const STEPS = ['Be a coin', 'Flip it', 'Yours vs real', 'Extremes', 'Your mistake'] as const
 const CONFS = ['unsure', 'pretty sure', 'certain'] as const
 export type Confidence = (typeof CONFS)[number]
-
-// Same local notebook as the birthday session: one line per finished session.
-function save(entry: object) {
-  try {
-    const key = 'mm.sessions'
-    const all = JSON.parse(localStorage.getItem(key) ?? '[]') as object[]
-    localStorage.setItem(key, JSON.stringify([...all, entry].slice(-50)))
-  } catch {
-    // private mode or blocked storage: the session still ends fine
-  }
-}
 
 export function CoinSession({ onDone }: { onDone: () => void }) {
   const round = showcaseRound('coin-streak')!

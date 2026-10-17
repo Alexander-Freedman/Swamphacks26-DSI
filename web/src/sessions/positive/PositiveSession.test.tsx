@@ -87,7 +87,7 @@ describe('positive test session', () => {
     expect(container.textContent).toContain('68 test positive: 19 sick, 49 false alarms')
     expect(screen.getByText('Saved.')).toBeTruthy()
     const saved = JSON.parse(localStorage.getItem('mm.sessions') ?? '[]')
-    expect(saved.at(-1)).toMatchObject({ session: 'positive-test', guess: 21, confidence: 'certain', misconception: 'ignores-false-alarms', rematch: { guess: 60, truth: 27.9 } })
+    expect(saved.at(-1)).toMatchObject({ session: 'positive-test', guess: 21, confidence: 'certain', misconception: 'ignores-false-alarms', rematch: 'wrong', rematchGuess: 60, rematchTruth: 27.9 })
     fireEvent.click(screen.getByText('Done'))
     expect(screen.getByText('You tested positive. Are you sick?')).toBeTruthy()
   })

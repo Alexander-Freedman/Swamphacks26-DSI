@@ -22,6 +22,7 @@
 .nb-label { margin: 0 0 8px; font-size: 1.25rem; line-height: 1.3; }
 .nb-card.caught .nb-label { font-family: var(--font-hand); font-weight: 600; color: #5f5c55; }
 .nb-card.busted .nb-label { font-weight: 800; }
+.nb-card.busted .nb-topic { margin-bottom: 14px; } /* clear the bigger BUSTED stamp */
 .nb-meta { margin: 0 0 6px; font-size: 0.9rem; }
 .nb-progress { margin: 0; font-size: 0.9rem; display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
 .nb-pips { display: inline-flex; gap: 4px; }
