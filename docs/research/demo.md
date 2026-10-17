@@ -66,3 +66,39 @@ Rules that keep it safe:
 - Is the coin streak input a slider or "draw your own fake 100 flips"? Drawing is more fun and gives us a richer misconception signal (alternation rate), but it takes ~20 s longer.
 - Showcase count: 2 polished beats 4 half-done. I'd build coin streak + positive test first, and Off the Edge only if the reveal components already cover it.
 - From engagement.md: add a confidence slider to every lock-in. A confident wrong guess is the one people correct best (hypercorrection), and it makes the coin-streak reveal hit harder ("you were 80% sure").
+
+## Live-topic latency budget (queue #3)
+Question: the judge types a topic and Gemini needs several seconds to ~15 s for the full JSON. How long can the live beat wait, and what's on screen meanwhile?
+
+**What the research says**
+- **Nielsen's 3 limits:** 0.1 s feels instant, 1 s keeps flow of thought, 10 s is about the limit for keeping attention on the task; past that, show when it'll finish ([NN/g, Response Times: The 3 Important Limits](https://nngroup.com/articles/response-times-3-important-limits)). Our 5-15 s straddles the 10 s line, so the wait has to be filled, not just indicated.
+- **Doherty threshold:** acknowledge input within ~400 ms (Doherty & Thadani, IBM 1982, via [Laws of UX](https://lawsofux.com/doherty-threshold/)). The exact year/original paper I haven't checked: **unverified**. Practical rule: something visibly changes on Enter, under 0.4 s.
+- **Labor illusion:** people can prefer a slower service when it shows the work being done, even for identical results (Buell & Norton 2011, *Management Science* 57(9):1564-1579, [RePEc/HBS listing](https://ideas.repec.org/p/hbs/wpaper/14-034.html) for the authors' related work). I only read secondary summaries, not the paper: details like effect size are **unverified**. Takeaway: show real build steps, not a spinner.
+- **Occupied time feels shorter than unoccupied time:** Maister's first proposition ([The Psychology of Waiting Lines](https://davidmaister.com/articles/5/52/index.html)). A Utrecht study (n=410) found active waiting was judged shorter than passive watching of a progress bar ([van Nimwegen & van Rijn, UU repository PDF](https://dspace.library.uu.nl/bitstream/handle/1874/431886/3552327.3552329.pdf?sequence=1)). PDF returned 403 for me, so that's from the search summary: **unverified**.
+- **Progress bars:** bar behavior changes perceived duration even when the real time is the same ([Harrison et al., Rethinking the Progress Bar, UIST '07](https://www.chrisharrison.net/index.php/Research/ProgressBars); [Faster Progress Bars, CHI '10](https://www.figlab.com/research/2010/faster-progress-bars)). The commonly quoted details (accelerating toward the end feels faster, backwards-moving ribbing reads ~11% faster) I couldn't confirm from the pages I could open: **unverified**.
+- **Skeleton screens are not a sure win:** Viget's test (136 people) had skeletons perceived as the *longest* wait (2.82 s vs 2.41 s spinner vs 2.29 s blank), possibly because an unfamiliar skeleton draws attention to the wait ([Viget](https://www.viget.com/articles/a-bone-to-pick-with-skeleton-screens)). One study, small effect, but enough that I won't lean on a skeleton for a UI the judge has never seen.
+- **Our model's real numbers:** Artificial Analysis lists Gemini 3.7 Flash (high) at ~9.8 s time to first answer token (includes thinking) and ~340 tokens/s output ([Artificial Analysis](https://artificialanalysis.ai/models/gemini-3-7-flash/providers)). A secondary post gives ~0.7 s TTFT at low thinking and ~4.2 s at medium ([Pillitteri](https://pasqualepillitteri.it/en/news/11139/gemini-3-7-flash-fastest-ai-model)): **unverified**. So thinking level is the biggest single latency knob; at ~300 tok/s, a ~1.5k-token question set is ~5 s of output after the first token (my estimate, measure it).
+- **Streaming JSON works:** Gemini supports `generateContentStream` with a response schema; chunks are text fragments you concatenate and parse with a partial-JSON parser ([Google AI forum](https://discuss.ai.google.dev/t/do-stream-responses-support-structured-output/79482)). Not from official docs: **unverified** until I try it Saturday.
+
+**Patterns that make 5-15 s feel fast**
+1. **Stream the first question, generate the rest behind it.** Put question 1 first in the schema (or make it a separate small call) so the judge is answering while questions 2-N arrive. Once they're answering, the wait is gone from their point of view. Best option by far.
+2. **Warm-up prediction during the wait.** The coin-streak question already in our ladder: it's on-brand (predict first), it takes ~10-20 s to answer, and it keeps them occupied (Maister). The judge doesn't sit and watch a loader.
+3. **Labor-illusion step list, real events only.** "Writing your question → picking a reveal → computing the truth", each step ticking when the matching JSON field arrives in the stream. Don't fake ticks on a timer; if it stalls, a fake bar is worse.
+4. **Cached showcase topics are instant.** Fuzzy-match the input to the ~40 pre-generated topics; on a hit, still show the step list for ~1 s so it reads as "built for you" and not a lookup (that's design choice, not research).
+5. **Low thinking, small prompt, short JSON.** Lowest thinking setting, schema-only output, no explanations in the first pass. Cheapest latency win before any UI trick.
+
+**Recommendation for the live beat**
+- **Target:** first question on screen by ~5 s. **Max acceptable:** 15 s to first question. **Hard cap:** 20 s, then fall back (matches the 20 s budget in the ladder above).
+- Second by second:
+  - **0-0.4 s:** on Enter, the input locks, the topic echoes back big ("Black holes. Building your questions…"), step 1 starts animating. (Doherty)
+  - **0.4-1 s:** the coin-streak warm-up slides in: "While I build yours: 100 coin flips, longest streak?" Driver/narrator hands the judge the slider.
+  - **1-10 s:** judge answers the warm-up, gets the reveal. Step list ticks on real stream events in the corner. If question 1 lands earlier, a "Your topic's ready" chip shows; it doesn't interrupt the warm-up reveal.
+  - **10-15 s:** if not ready after the warm-up reveal: a second short warm-up (positive test) or the narrator's line "it's computing the real answer, not making one up". Step list stays honest.
+  - **15-20 s:** show "Almost there" plus the 3 closest cached topic chips alongside, so the judge can tap one or keep waiting.
+  - **20 s:** fallback. Cancel or keep the request in the background, switch to "That one's taking a while. Try the closest:" with the 3 cached chips. If the live result lands later, quietly drop a "Your topic's ready" chip; never a spinner or raw error.
+- **Rehearsal rule:** log time-to-first-question and time-to-full-JSON for 20 random topics on Saturday into NOTES.md. If the p90 to first question is over 10 s, split the first question into its own call and drop thinking to the lowest level.
+
+**New questions this raised**
+- Can we stream question 1 as a separate small call in parallel with the full set, and what does that cost in quota?
+- Does partial-JSON parsing of Gemini's stream hold up with our schema, or do we need a line-delimited format instead?
+- What's our measured TTFT on venue Wi-Fi vs a phone hotspot?

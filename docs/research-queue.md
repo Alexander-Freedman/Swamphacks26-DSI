@@ -3,23 +3,27 @@
 Ranked by how much the answer changes what we do. Each pass takes the top open question, answers it with sources into the right doc, marks it done, and adds the 2-3 new questions it raised. The queue is never empty.
 
 ## Open
-8. Which judging sheet do judges actually get: Devpost's 7 criteria or the rules page's 5? Both reward "works live + we can explain it". (Ask at the help desk.) → strategy.md.
+Direction is Mental Models, any-topic (Oct 16 ~9:50 PM). Hazard/Sperry questions are parked at the bottom.
+
+1. Off the Edge has no good adult error-rate source. Swap it for "ball dropped while walking" (McCloskey 1983), or drop it? Goes in the spec for review. → docs/research/demo.md
+2. Base-rate medical card ("positive test"): sourced numbers for how often people get it wrong (Casscells 1978, Gigerenzer natural frequencies). → docs/research/showcase-facts.md
+2b. Is there a sourced number for what people guess as the longest streak in 100 flips? (demo.md says 3-4, unverified.) → docs/research/showcase-facts.md
+3. Can question 1 run as its own parallel Gemini call, and what does that cost in quota? Does partial-JSON parsing of the stream hold up with our schema? → docs/research/demo.md
+3b. Real time-to-first-token on venue wifi vs a hotspot (time 20 random topics Sat, log in NOTES.md). → NOTES.md
+4. Does the `sketch` item fit in the #20 schema, and which misconception signal does it give per showcase topic? → docs/research/frontend-plan.md
+5. Which UF courses/clubs could we user-test with Saturday (5 people, 2 rounds), and what's on the task card? → plan-extras.md
+8. Which judging sheet do judges actually get: Devpost's 7 criteria or the rules page's 5? (Ask at the help desk.) → strategy.md.
 9. Cash split: the guide says among team members, the rules say four ways regardless of size. (Ask at the help desk.) → strategy.md, prizes.md.
-17. Do the Sperry reps accept NCEI strike tiles for training and a per-day index (vs per-hour)? (Ask Friday.) → hazard-ml.md
-19. What exactly goes on the table tent card and the 10-20 s attract loop for the picked idea? (Do after the pick.) → expo-video.md
-
+19. What goes on the table tent card and the 10-20 s attract loop? → expo-video.md
 23. Does the Vultr MLH credit need a credit card? (Ask at the MLH desk.) → 36-hour-plan.md
-24. What goes on the 1-page task card for user testing for the picked idea? (After the pick.) → plan-extras.md
+31. Which Gemini calls should run in the first hour so the showcase topics are cached before the venue wifi gets busy? → kickoff.md
 
-26. Which sensors does the CpE lab actually have on request (temp/humidity? load cell? mic)? (Ask at 8:30 PM.) → scorecard.md
-27. What do the Sperry reps say at Company Connect about our board/index? (Sat 10:30.) → sperry-deep.md
-
-29. For whichever stack is picked: which 2-3 Q&A questions will that sponsor's judges ask first, with answers drawn from our docs? (After the pick.) → pitch.md
-
-
-31. After the pick: which public dataset/API calls should run in the first hour so they're cached before venue wifi gets busy? → kickoff.md
+### Parked (hazard direction, dropped)
+17, 26, 27, 29 (Sperry/sensor questions); keep for reference only.
 
 ## Done
+- Showcase facts (coin streak DP: expected longest run 6.98, P(6+)=80.7%; Falk & Konold alternation .56-.63; Wason 22/29 wrong first; hypercorrection 87% vs 61%, modest r) → docs/research/showcase-facts.md
+- Live-topic latency budget: first question ≤5 s target, 15 s OK, 20 s cutoff to cached chips → docs/research/demo.md
 - What one person can start alone at 8:30 → kickoff.md
 - First 30-60 min setup steps at 8:30 → kickoff.md
 - What DSI judges check in a repo → ai-ml-track.md
