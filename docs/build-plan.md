@@ -1,5 +1,29 @@
 # Build plan: from approval to the 7:30 AM Sun submit
 
+## Re-plan (Sat ~12:30 AM): visual sessions first
+The product is now **one short visual session per concept** (docs/experience.md, look in docs/experience-look.md). The block table below is kept for times and owners, but this list wins where they differ.
+
+**Keep:** predict → confidence → lock; the Distribution + Curve widgets (reused inside sessions); stamp verdict; misconception card (now quotes your number); the extremes slider idea (#68, now inside each session); collection (#67, local first); How it works drawer (#71); the engine + checks (labelled extra, below).
+
+**Change:**
+- The demo runs on **3 hand-built sessions**: birthday (me, #78), coin streak (@luanamaldaner, #81), positive test (@luanamaldaner, #82). Each lives in `web/src/sessions/<topic>/` on the scaffold (#91).
+- Every reveal draws **ink over your pencil** with the marker gap; no text-only verdicts.
+- **Typed topics are a labelled extra, not the headline.** Trial (25 topics): median 27 s, every item a plain estimate, some wrong answers slipped past the checks. So generated rounds play in the existing round player, labelled *auto-checked*, from the pre-generated reviewed set first. The blind check gets fixed before anyone relies on it.
+
+**Order (gates):**
+| By | Gate | Owner |
+|---|---|---|
+| Sat 6:00 AM | **Birthday session live on Pages**, end to end, desktop + phone | me |
+| Sat 9:00 AM | Coin streak + positive test sessions live | @luanamaldaner |
+| Sat 9:00 AM | Engine: stack merged, honest blind check, tight bands (#86), checks on the response (#80) | me |
+| Sat 1:30 PM | User test round 1 on the 3 sessions (5 people) | both |
+| Sat 6:00 PM | Fixes from testing; Home that sells the sessions; collection; "any topic" extra with reviewed cache; backend on Vultr/Render | both |
+| Sat 10:00 PM | Design pass + motion; backup video recorded | both |
+
+**Cut lines (new order):** 1) "any topic" live generation (keep the cached reviewed set); 2) Auth0; 3) Tiger → SQLite; 4) coin streak C5 "a coin like you" curve and birthday B3 dot-plot; 5) rematch screens. **Never cut:** the three sessions' guess → watch → extremes → your model vs reality → named mistake; the deployed URL; the backup video.
+
+---
+
 **Status:** **approved** (plan in force from 10:48 PM Fri). The product is in docs/product-spec.md.
 
 **Split:** **me = engine/backend/data** (Gemini generation, validation, cache, API, the event DB, deploy) · **@luanamaldaner = frontend/demo** (screens, truth widgets, the reveal, the visual design).
