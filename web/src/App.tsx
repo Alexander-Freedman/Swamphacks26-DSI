@@ -1,10 +1,12 @@
 import { useEffect, useRef, useState } from 'react'
+import { CheckedTag } from './components/CheckedTag'
 import { NotebookLink, NotebookScreen } from './components/Notebook'
 import { useReset } from './reset'
 import { Predict, type Answer } from './components/Predict'
 import { Reveal } from './components/Reveal'
 import { showcaseRound, showcaseSlugs } from './rounds'
 import { sessionFor, sessions } from './sessions/registry'
+import { withUnit } from './format'
 import { computeTruth, type Computed } from './truth'
 import type { Round } from './types'
 import { misconceptionFor } from './verdict'
@@ -75,7 +77,7 @@ function Player({ round, onDone }: { round: Round; onDone: () => void }) {
       {phase.kind !== 'predict' && <h2 className="prompt">{item.prompt}</h2>}
       {phase.kind !== 'predict' && (
         <span className="locked-stamp">
-          locked: {phase.answer.value ?? item.options?.find((o) => o.id === phase.answer.optionId)?.text} · {phase.answer.confidence}
+          locked: {phase.answer.value != null ? withUnit(phase.answer.value, item.slider?.unit ?? '') : item.options?.find((o) => o.id === phase.answer.optionId)?.text} · {phase.answer.confidence}
         </span>
       )}
       {phase.kind === 'revealed' && (
@@ -129,7 +131,7 @@ export default function App() {
     <main className="app">
       <header className="topbar">
         <button className="logo" style={{ border: 0, background: 'none', padding: 0 }} onClick={home}>mm</button>
-        {round && <span className={`chip ${round.reviewed ? 'reviewed' : ''}`}>{round.reviewed ? 'reviewed' : 'auto-checked'}</span>}
+        {round && <CheckedTag reviewed={round.reviewed} />}
       </header>
       {cleared && <p className="nb-toast" role="status">Notebook cleared</p>}
       {screen.kind === 'notebook' ? (

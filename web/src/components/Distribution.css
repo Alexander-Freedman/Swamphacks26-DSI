@@ -1,5 +1,5 @@
 .dist { width: 100%; height: auto; display: block; overflow: visible; }
-.dist-bar { fill: var(--ink); transform-box: fill-box; transform-origin: bottom; animation: grow 420ms cubic-bezier(.2, .9, .3, 1) both; }
+.dist-bar { fill: var(--ink); opacity: 0.55; transform-box: fill-box; transform-origin: bottom; animation: grow 420ms cubic-bezier(.2, .9, .3, 1) both; }
 @keyframes grow { from { transform: scaleY(0); } }
 .dist-gap { fill: var(--marker-soft); animation: fade 300ms 500ms both; }
 .dist-axis { stroke: var(--ink); stroke-width: 2; }
@@ -7,4 +7,5 @@
 .dist-xlabel { font-size: 15px; fill: var(--ink-soft); }
 .dist-guess line { stroke: var(--pencil); stroke-width: 3; stroke-dasharray: 6 5; stroke-linecap: round; }
 .dist-guess text { font-family: var(--font-hand); font-size: 16px; fill: var(--pencil); }
-.dist-mean line { stroke: var(--marker); stroke-width: 4; mix-blend-mode: multiply; }
+.dist-mean line { stroke: var(--ink); stroke-width: 3; }
+.dist-mean text { font-weight: 800; font-size: 15px; fill: var(--ink); paint-order: stroke; stroke: var(--paper); stroke-width: 5px; stroke-linejoin: round; }

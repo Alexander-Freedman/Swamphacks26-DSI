@@ -2,7 +2,7 @@
 .topbar { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 20px; }
 .logo { font-weight: 800; font-size: 1.25rem; letter-spacing: -0.02em; }
 .chip { display: inline-flex; align-items: center; gap: 6px; padding: 3px 10px; border: 1.5px solid var(--ink); border-radius: 999px; font-size: 0.8rem; background: var(--card); }
-.chip.reviewed { border-color: var(--called); color: var(--called); }
+.checked-tag { font-size: 0.8rem; color: var(--ink-soft); cursor: help; border-bottom: 1px dotted var(--ink-soft); }
 .progress { font-size: 0.85rem; color: var(--ink-soft); }
 
 .sheet { background: var(--card); border: 2px solid var(--ink); border-radius: var(--radius); box-shadow: 4px 4px 0 var(--ink); padding: 24px; }

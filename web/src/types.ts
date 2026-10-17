@@ -32,9 +32,13 @@ export type CurveTruth = {
   x_max: number
   x_label: string
   y_label: string
+  // The spot the question asks about: the y at ask_x, or the x where the curve reaches ask_y.
+  ask_x?: number | null
+  ask_y?: number | null
 }
+export type EstimateTruth = { widget: 'estimate'; unit?: string; source_url?: string | null }
 export type StepperTruth = { widget: 'stepper'; steps: string[]; source_url?: string | null }
-export type Truth = DistributionTruth | CurveTruth | StepperTruth
+export type Truth = DistributionTruth | CurveTruth | EstimateTruth | StepperTruth
 
 export type Band = { min: number; max: number; misconception_id: string | null }
 export type Option = { id: string; text: string; misconception_id: string | null }
@@ -47,6 +51,8 @@ export type Item = {
   options?: Option[]
   bands?: Band[]
   truth: Truth
+  // The true value as an expression (numbers only); the reveal shows this, computed here.
+  answer_expr?: string | null
   answer_claimed?: number | null
   // default: the knob's value in the question as asked; curve exprs may use param next to x.
   explore?: { param: string; label: string; min: number; max: number; step: number; default?: number | null } | null

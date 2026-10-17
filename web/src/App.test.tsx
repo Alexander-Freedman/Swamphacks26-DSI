@@ -1,6 +1,6 @@
 // @vitest-environment jsdom
-import { act, cleanup, fireEvent, render, screen } from '@testing-library/react'
-import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
+import { cleanup, fireEvent, render, screen } from '@testing-library/react'
+import { afterEach, beforeEach, describe, expect, it } from 'vitest'
 import App from './App'
 import { Reveal } from './components/Reveal'
 import { showcaseRound } from './rounds'
@@ -23,20 +23,16 @@ describe('coin streak on Home', () => {
 })
 
 describe('other showcases', () => {
-  it('positive test reveals 9.2% with the icon array + card', async () => {
-    vi.useFakeTimers()
-    render(<App />)
-    fireEvent.click(screen.getByText(/positive/i))
-    fireEvent.change(screen.getByLabelText('your guess'), { target: { value: '90' } })
-    fireEvent.click(screen.getByText('certain'))
-    fireEvent.click(screen.getByText('Lock it in'))
-    await act(async () => vi.advanceTimersByTime(500))
+  // Home opens the positive-test session now; the round's reveal is what icon-array rounds use.
+  it('positive test reveals 9.2% with the icon array + card', () => {
+    const round = showcaseRound('positive-test')!
+    const item = round.items[0]
+    render(<Reveal item={item} round={round} answer={{ value: 90, optionId: null, confidence: 'certain' }} truth={computeTruth(item)} signals={{}} />)
     expect(screen.getByLabelText(/of 1000 test positive; 9 of them are sick/)).toBeTruthy()
-    expect(screen.getByText(/reality: 9\.2%/)).toBeTruthy()
+    expect(document.querySelector('.reality')!.textContent).toMatch(/Reality: 9\.2%/)
     expect(screen.getByLabelText(/your guess 90% vs reality 9\.2%, 80\.8 points apart/)).toBeTruthy()
     expect(document.activeElement?.className).toBe('verdict-row')
     expect(screen.getByText('This looks like…')).toBeTruthy()
-    vi.useRealTimers()
   })
   // Home opens the birthday session now; the round's curve reveal is still what other curve rounds use.
   it('birthday round reveals 23 on the curve', () => {

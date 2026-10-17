@@ -14,17 +14,20 @@ export function misconceptionFor(item: Item, a: Answer): string | null {
   return null
 }
 
-export function verdictFor(item: Item, a: Answer, truth: number | null): Verdict {
+// tol: how far from the truth still counts as close (default: the rule below).
+export function verdictFor(item: Item, a: Answer, truth: number | null, tol?: number): Verdict {
   if (misconceptionFor(item, a) === null) return 'called'
   if (item.input_type !== 'slider' || truth == null || a.value == null || !item.slider) return 'off'
   // Close = within 25% of the truth, or 5% of the slider's span, whichever is wider.
-  const tol = Math.max(0.25 * Math.abs(truth), 0.05 * (item.slider.max - item.slider.min))
-  return Math.abs(a.value - truth) <= tol ? 'close' : 'off'
+  const within = tol ?? Math.max(0.25 * Math.abs(truth), 0.05 * (item.slider.max - item.slider.min))
+  return Math.abs(a.value - truth) <= within ? 'close' : 'off'
 }
+
+export const verdictLabel: Record<Verdict, string> = { called: 'Called it', close: 'Close', off: 'Way off' }
 
 export function verdictText(v: Verdict, confidence: Answer['confidence']): string {
   if (v === 'off' && confidence === 'certain') return 'Sure and wrong'
-  return { called: 'Called it', close: 'Close', off: 'Way off' }[v]
+  return verdictLabel[v]
 }
 
 export function fmt(n: number): string {

@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { showcaseRound } from '../../rounds'
-import { misconceptionFor, verdictFor, verdictText } from '../../verdict'
+import { misconceptionFor, verdictFor, verdictLabel } from '../../verdict'
 import { CrowdCurve, GuessBar, MiniPile, PileCompare } from './Charts'
 import { DotCanvas, PaintGrid, type Kind } from './Crowd'
 import { baseToSlider, breakEven, CARD, exact, pct, piles, POP, ppv, REMATCH, seededOrder, sliderToBase, type Test } from './math'
@@ -434,7 +434,8 @@ type CardProps = {
 
 function CardStep({ guess, conf, truth, test, round, item, onNext }: CardProps) {
   const answer = toAnswer(guess, conf)
-  const v = verdictFor(item, answer, truth * 100) // truth in the slider's units (%)
+  // truth in the slider's units (%); this session keeps its 15%-of-the-slider "close" rule
+  const v = verdictFor(item, answer, truth * 100, 15)
   const mid = misconceptionFor(item, answer)
   const m = round.misconceptions.find((x) => x.id === mid)
   const c = piles(test)
@@ -442,7 +443,7 @@ function CardStep({ guess, conf, truth, test, round, item, onNext }: CardProps) 
   return (
     <section>
       <div className="pt-stamprow">
-        <span className={`pt-stamp ${v}`}>{verdictText[v]}</span>
+        <span className={`pt-stamp ${v}`}>{verdictLabel[v]}</span>
         <p className="pt-said">
           You said <b className="pt-pencil-c pt-num">{guess}%</b>{conf && <> ({conf})</>}. It's
         </p>
@@ -532,7 +533,7 @@ function RematchStep({ onReveal, caught, onDone }: { onReveal: (g: number) => vo
       {shown && (
         <>
           <div className="pt-stamprow pt-mt">
-            <span className={`pt-stamp ${v}`}>{verdictText[v]}</span>
+            <span className={`pt-stamp ${v}`}>{verdictLabel[v]}</span>
             <p className="pt-said">You said <b className="pt-pencil-c pt-num">{g}%</b>. It's</p>
             <span className="pt-reality pt-num">{exact(truth)}</span>
           </div>

@@ -1,4 +1,4 @@
-import { compile } from 'mathjs'
+import { compile, evaluate } from 'mathjs'
 import type { CurveTruth, DistributionTruth, Item, SamplerParams } from './types'
 
 // The truth is computed here, after lock-in, never taken from the model.
@@ -120,11 +120,85 @@ export function firstReaching(f: (x: number) => number, y: number, lo: number, h
   return null
 }
 
+// The true value the round states: answer_expr computed here (numbers only), else answer_claimed.
+export function answerValue(item: Item): number | null {
+  if (item.answer_expr) {
+    try {
+      const v = Number(evaluate(item.answer_expr))
+      if (Number.isFinite(v)) return v
+    } catch {
+      // fall through to the claimed number
+    }
+  }
+  const c = item.answer_claimed
+  return c != null && Number.isFinite(c) ? c : null
+}
+
+// First x in [lo, hi] where f reaches y (scan, then bisect).
+export function crossing(f: (x: number) => number, y: number, lo: number, hi: number): number | null {
+  const n = 400
+  let x0 = lo
+  let g0 = f(lo) - y
+  if (g0 === 0) return lo
+  for (let i = 1; i <= n; i++) {
+    const x1 = lo + ((hi - lo) * i) / n
+    const g1 = f(x1) - y
+    if (g1 === 0) return x1
+    if (g0 * g1 < 0) {
+      let a = x0
+      let b = x1
+      let ga = g0
+      for (let k = 0; k < 50; k++) {
+        const m = (a + b) / 2
+        const gm = f(m) - y
+        if (ga * gm <= 0) b = m
+        else [a, ga] = [m, gm]
+      }
+      return (a + b) / 2
+    }
+    x0 = x1
+    g0 = g1
+  }
+  return null
+}
+
+const near = (a: number, b: number) => Math.abs(a - b) <= Math.max(0.02 * Math.abs(b), 1e-6)
+
+// axis: which coordinate the answer is ('y' = a value on the curve, 'x' = where it gets there).
+export type CurvePoint = { x: number; y: number; axis: 'x' | 'y' }
+
+// Where the answer sits on the curve. ask_x / ask_y say it outright; otherwise the answer is a y
+// the curve reaches or an x in range, and the slider's unit breaks a tie (88.5 "% of ground
+// gravity" is a y; day 47 is an x).
+export function curvePoint(item: Item, t: CurveTruth, f: (x: number) => number, value: number | null): CurvePoint | null {
+  const at = (x: number, axis: 'x' | 'y'): CurvePoint | null => {
+    const y = f(x)
+    return Number.isFinite(y) ? { x, y, axis } : null
+  }
+  if (t.ask_x != null) return at(t.ask_x, 'y')
+  if (t.ask_y != null) {
+    const x = value != null && near(f(value), t.ask_y) ? value : crossing(f, t.ask_y, t.x_min, t.x_max)
+    return x == null ? null : { x, y: t.ask_y, axis: 'x' }
+  }
+  if (value == null) return null
+  const yHit = crossing(f, value, t.x_min, t.x_max)
+  const xHit = value >= t.x_min && value <= t.x_max
+  if (yHit != null && xHit) {
+    const unit = (item.slider?.unit ?? '').toLowerCase().trim()
+    const inY = unit !== '' && t.y_label.toLowerCase().includes(unit)
+    const inX = unit !== '' && t.x_label.toLowerCase().includes(unit)
+    return inY && !inX ? { x: yHit, y: value, axis: 'y' } : at(value, 'x')
+  }
+  if (yHit != null) return { x: yHit, y: value, axis: 'y' }
+  return xHit ? at(value, 'x') : null
+}
+
 export type Computed =
   | { kind: 'distribution'; hist: Histogram; value: number }
   | { kind: 'icons'; counts: ReturnType<typeof baseRate>; value: number }
-  | { kind: 'curve'; f: (x: number) => number; value: number | null }
-  | { kind: 'none'; value: null }
+  | { kind: 'curve'; f: (x: number) => number; value: number | null; point: CurvePoint | null }
+  | { kind: 'estimate'; value: number | null }
+  | { kind: 'none'; value: number | null }
 
 // The number the guess is compared against, in the guess's own units.
 export function computeTruth(item: Item): Computed {
@@ -135,12 +209,21 @@ export function computeTruth(item: Item): Computed {
       return { kind: 'icons', counts, value: counts.truth * 100 }
     }
     const hist = simulate(t)
-    return { kind: 'distribution', hist, value: hist.mean }
+    // A stated answer (P(9+ boys) = 15.1%) beats the average, which answers a different question.
+    const stated = item.answer_expr ? answerValue(item) : null
+    return { kind: 'distribution', hist, value: stated ?? hist.mean }
   }
   if (t.widget === 'curve') {
     const f = curveFn(t, knobsFor(item))
-    const half = t.preset === 'birthday_match_probability' ? firstReaching(f, 0.5, t.x_min, 366) : null
-    return { kind: 'curve', f, value: half }
+    if (t.preset === 'birthday_match_probability') {
+      const half = firstReaching(f, 0.5, t.x_min, 366)
+      return { kind: 'curve', f, value: half, point: half == null ? null : { x: half, y: f(half), axis: 'x' } }
+    }
+    const value = answerValue(item)
+    const point = curvePoint(item, t, f, value)
+    // With ask_x the truth is the curve's own y there.
+    return { kind: 'curve', f, value: t.ask_x != null && point ? point.y : value, point }
   }
-  return { kind: 'none', value: null }
+  if (t.widget === 'estimate') return { kind: 'estimate', value: answerValue(item) }
+  return { kind: 'none', value: answerValue(item) }
 }
