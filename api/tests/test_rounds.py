@@ -88,3 +88,46 @@ def test_bad_reference_is_rejected() -> None:
     raw["items"][0]["bands"][1]["misconception_id"] = "not-a-real-id"
     with pytest.raises(ValueError):
         Round.model_validate(raw)
+
+
+def test_generation_falls_back_when_offline(monkeypatch) -> None:
+    monkeypatch.setenv("MM_OFFLINE", "1")
+    res = client.post("/api/rounds", json={"topic": "a topic nobody cached xyz"})
+    assert res.status_code == 200
+    assert res.json()["status"] == "fallback"
+    assert "coin-streak" in res.json()["suggestions"]
+
+
+def test_to_round_drops_dangling_refs_and_clips() -> None:
+    from app.gen import to_round
+
+    r = to_round(
+        {
+            "slug": "Dice Sums!",
+            "topic": "dice",
+            "concept": "sums near 7 are common",
+            "misconceptions": [
+                {"id": "All Equal", "label": "x" * 200, "why_tempting": "w", "refutation": "r"}
+            ],
+            "questions": [
+                {
+                    "id": "q1",
+                    "prompt": "most likely sum of two dice?",
+                    "input_type": "slider",
+                    "slider_min": 2,
+                    "slider_max": 12,
+                    "bands": [
+                        {"min": 2, "max": 6, "misconception_id": "all-equal"},
+                        {"min": 7, "max": 7, "misconception_id": None},
+                        {"min": 8, "max": 12, "misconception_id": "ghost"},
+                    ],
+                    "widget": "distribution",
+                    "sampler": "dice_sum",
+                    "dice": 2,
+                }
+            ],
+        }
+    )
+    assert r.slug == "dice-sums"
+    assert len(r.misconceptions[0].label) <= 80
+    assert [b.misconception_id for b in r.items[0].bands] == ["all-equal", None]
