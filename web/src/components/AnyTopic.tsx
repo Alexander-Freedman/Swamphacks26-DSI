@@ -71,7 +71,7 @@ export function AnyTopic({ onOpen, timeoutMs }: { onOpen: (slug: string) => void
       </h2>
       <form className="anytopic-form" onSubmit={submit}>
         <label htmlFor={`${id}-in`} className="sr-only">
-          A topic you want to test your gut on
+          Type any topic you want to see
         </label>
         <input
           id={`${id}-in`}

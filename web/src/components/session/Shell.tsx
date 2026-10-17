@@ -1,13 +1,13 @@
 import type { ReactNode, Ref } from 'react'
 import { NOTEBOOK_HREF } from '../../notebook'
-import { CONFS, endLine, STAMP, type Confidence, type RematchResult } from './copy'
+import { endLine, STAMP, type RematchResult } from './copy'
 import { useReportSpot, type HelpSpot } from './helpSpot'
 import type { Verdict } from '../../verdict'
 import './shell.css'
 
 // The session shell: the parts every session shares so they read as one app (#149).
 // Modeled on the birthday session: chip + step dots + "n of N", big title, one guidance
-// line, required "how sure?", yellow lock, verdict stamp, and the "Saved to your notebook." bar.
+// line, yellow "Show me" button, verdict stamp, and the "Saved to your notebook." bar.
 
 /** The full-width session frame, same width and left edge as the birthday session. */
 export function Frame({ className = '', children }: { className?: string; children: ReactNode }) {
@@ -67,18 +67,6 @@ export function Title({ h, sub, id, headingRef }: { h: ReactNode; sub: ReactNode
   )
 }
 
-export function ConfidencePicker({ value, onPick, disabled }: { value: Confidence | null; onPick: (c: Confidence) => void; disabled?: boolean }) {
-  return (
-    <>
-      <div className="ss-tag ss-mt">how sure?</div>
-      <div className="ss-choices" role="group" aria-label="how sure are you">
-        {CONFS.map((c) => (
-          <button key={c} className="ss-choice" aria-pressed={value === c} disabled={disabled} onClick={() => onPick(c)}>{c}</button>
-        ))}
-      </div>
-    </>
-  )
-}
 
 export function LockButton({ ready, onLock, children }: { ready: boolean; onLock: () => void; children: ReactNode }) {
   return (

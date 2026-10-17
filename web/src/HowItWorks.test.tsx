@@ -46,7 +46,7 @@ describe('How it works drawer', () => {
     // spec side: the formula in readable form, not just raw JSON
     expect(within(d).getByText('2 ÷ 3 × 100')).toBeTruthy()
     // no spoiler before the guess is locked
-    expect(within(d).getByText(/Lock in your guess first/)).toBeTruthy()
+    expect(within(d).getByText(/Make your guess first/)).toBeTruthy()
     expect(within(d).queryByTestId('hiw-value')).toBeNull()
     fireEvent.click(within(d).getByRole('button', { name: /Show it anyway/ }))
     const item = (monty as unknown as Round).items[0]

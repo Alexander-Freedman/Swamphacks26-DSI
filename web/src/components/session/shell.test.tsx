@@ -34,21 +34,19 @@ describe('session shell verdict (#151)', () => {
 })
 
 describe('session shell copy', () => {
-  it('lock copy matches birthday', () => {
-    expect(lockLabel(false, null)).toBe('Move the slider first')
-    expect(lockLabel(false, 'certain')).toBe('Move the slider first')
-    expect(lockLabel(true, null)).toBe('Pick how sure you are')
-    expect(lockLabel(true, 'unsure')).toBe('Lock it in')
+  it('button copy: slider first, then "Show me" (no how-sure step, #194)', () => {
+    expect(lockLabel(false)).toBe('Move the slider first')
+    expect(lockLabel(true)).toBe('Show me')
   })
 
   it('called-it card has its own guidance line (#150)', () => {
-    expect(cardGuide(true)).toBe("You called it. Here's the idea that makes it work, so you can do it again.")
+    expect(cardGuide(true)).toBe("You were right. Here's the idea that makes it work, so you can do it again.")
     expect(cardGuide(false)).toBe('This is the mistake your guess points to, and the one idea that fixes it.')
   })
 
   it('end line covers the first guess and the rematch (#148)', () => {
-    expect(endLine(null, 'wrong')).toBe('Your first guess called it. Rematch missed; it stays in your notebook to try again.')
-    expect(endLine(null, 'right')).toBe('Your first guess called it. Rematch: right.')
+    expect(endLine(null, 'wrong')).toBe('Your first guess was right. Rematch missed; it stays in your notebook to try again.')
+    expect(endLine(null, 'right')).toBe('Your first guess was right. Rematch: right.')
     expect(endLine('X', 'right')).toBe('Caught: “X”. Rematch: right.')
     expect(endLine('X', 'close')).toBe('Caught: “X”. Rematch: close.')
     expect(endLine(null, 'right')).not.toMatch(/^Called it/)
@@ -59,7 +57,7 @@ describe('session shell parts', () => {
   it('end bar: saved, the line, the remix, open notebook, done', () => {
     const done = vi.fn()
     const { container } = render(<EndBar caught={null} rematch="wrong" remix="Come back tomorrow." onDone={done} />)
-    expect(container.textContent).toContain('Saved to your notebook. Your first guess called it. Rematch missed; it stays in your notebook to try again. Come back tomorrow.')
+    expect(container.textContent).toContain('Saved to your notebook. Your first guess was right. Rematch missed; it stays in your notebook to try again. Come back tomorrow.')
     expect(screen.getByText('Open notebook').getAttribute('href')).toContain('?notebook=1')
     fireEvent.click(screen.getByText('Done'))
     expect(done).toHaveBeenCalled()

@@ -379,7 +379,7 @@ export function HowItWorks({ round, item, locked, onClose }: { round: Round; ite
             {truth ? (
               <ComputedSide item={item} round={round} truth={truth} />
             ) : (
-              <Wait text="Lock in your guess first: the answer is only computed after that." onPeek={() => setPeek(true)} />
+              <Wait text="Make your guess first: the answer is only computed after that." onPeek={() => setPeek(true)} />
             )}
           </section>
         </div>

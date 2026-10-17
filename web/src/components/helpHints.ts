@@ -31,7 +31,7 @@ export const HINTS: Record<string, string> = {
   C5: 'Drag the flips slider from 100 to 200 to 400 and watch the dot: each doubling adds only about one to the longest run.',
   C6: 'Read the card: real randomness clumps. Evenly mixed rows are what people make up.',
   C7: 'Look at the longest run in each row. Which one looks like the real rows you flipped earlier?',
-  P1: 'Picture 1,000 people: how many are sick, and how many healthy people would the test wrongly flag? Set the slider to your gut answer.',
+  P1: 'Picture 1,000 people: how many are sick, and how many healthy people would the test wrongly flag? Set the slider to your best guess.',
   P2: 'Tap ‘Test everyone’ and count how many lit dots are ink (sick) and how many are grey (healthy).',
   P3: "Tap a handful of dots in the pile; most say ‘false alarm’. Compare the ink share with your guess.",
   P4: "Drag ‘how common’ from 1% up to 20% and watch the curve climb away from your flat line.",
