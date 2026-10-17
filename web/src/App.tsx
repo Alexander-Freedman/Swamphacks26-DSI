@@ -1,6 +1,11 @@
-import { useEffect, useRef, useState } from 'react'
+import { useCallback, useEffect, useRef, useState } from 'react'
 import { AnyTopic, BuildReady } from './components/AnyTopic'
+import { BackendDot } from './components/BackendDot'
 import { CheckedTag } from './components/CheckedTag'
+import { HowItWorks } from './components/HowItWorks'
+import { useDrawerKey } from './components/drawerKey'
+import { SessionHowItWorks } from './components/SessionHowItWorks'
+import { sessionHowItWorks } from './components/sessionSpecs'
 import { NotebookLink, NotebookScreen } from './components/Notebook'
 import { useReset } from './reset'
 import { Predict, type Answer } from './components/Predict'
@@ -80,6 +85,9 @@ function Player({ round, onDone }: { round: Round; onDone: () => void }) {
   const beat = useRef<ReturnType<typeof setTimeout> | undefined>(undefined)
   // Leaving mid-beat (logo, Done) must not fire a reveal into an unmounted round.
   useEffect(() => () => clearTimeout(beat.current), [])
+  const [drawer, setDrawer] = useState(false)
+  const closeDrawer = useCallback(() => setDrawer(false), [])
+  useDrawerKey(useCallback(() => setDrawer((o) => !o), []))
 
   const lock = (answer: Answer) => {
     setPhase({ kind: 'locked', answer })
@@ -98,7 +106,13 @@ function Player({ round, onDone }: { round: Round; onDone: () => void }) {
 
   return (
     <div className="sheet">
-      <p className="progress">{round.topic} · {idx + 1} of {round.items.length}</p>
+      <div className="player-bar">
+        <p className="progress">{round.topic} · {idx + 1} of {round.items.length}</p>
+        <button className="hiw-btn" onClick={() => setDrawer(true)} aria-haspopup="dialog">
+          How it works <kbd aria-hidden="true">D</kbd>
+        </button>
+      </div>
+      {drawer && <HowItWorks round={round} item={item} locked={phase.kind !== 'predict'} onClose={closeDrawer} />}
       {phase.kind === 'predict' && <Predict key={item.id} item={item} onLock={lock} />}
       {phase.kind !== 'predict' && <h2 className="prompt">{item.prompt}</h2>}
       {phase.kind !== 'predict' && (
@@ -113,6 +127,23 @@ function Player({ round, onDone }: { round: Round; onDone: () => void }) {
         </>
       )}
     </div>
+  )
+}
+
+// The "How it works" button + D key around a session (the session's own files don't change).
+function SessionDrawer({ slug }: { slug: string }) {
+  const [open, setOpen] = useState(false)
+  // Once shown, the numbers stay shown for this session visit.
+  const [shown, setShown] = useState(false)
+  const close = useCallback(() => setOpen(false), [])
+  useDrawerKey(useCallback(() => setOpen((o) => !o), []))
+  return (
+    <>
+      <button className="hiw-btn" onClick={() => setOpen(true)} aria-haspopup="dialog">
+        How it works <kbd aria-hidden="true">D</kbd>
+      </button>
+      {open && <SessionHowItWorks slug={slug} onClose={close} shown={shown} onShow={() => setShown(true)} />}
+    </>
   )
 }
 
@@ -152,6 +183,7 @@ export default function App() {
       <main className="app">
         <header className="topbar">
           <button className="logo" style={{ border: 0, background: 'none', padding: 0 }} onClick={home}>Onionskin</button>
+          {sessionHowItWorks[session.slug] && <SessionDrawer key={session.slug} slug={session.slug} />}
         </header>
         <session.Component key={session.slug} onDone={home} />
         <BuildReady onOpen={(slug) => go({ kind: 'round', slug })} />
@@ -163,6 +195,7 @@ export default function App() {
       <header className="topbar">
         <button className="logo" style={{ border: 0, background: 'none', padding: 0 }} onClick={home}>Onionskin</button>
         {round && <CheckedTag reviewed={round.reviewed} />}
+        {screen.kind === 'home' && <BackendDot />}
       </header>
       {cleared && <p className="nb-toast" role="status">Notebook cleared</p>}
       {screen.kind !== 'home' && <BuildReady onOpen={(slug) => go({ kind: 'round', slug })} />}

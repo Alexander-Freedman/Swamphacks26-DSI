@@ -1,6 +1,6 @@
 import { useEffect, useState, useSyncExternalStore } from 'react'
 import { showcaseRound, showcaseSlugs } from './rounds'
-import type { Round } from './types'
+import type { ChecksReport, Round } from './types'
 import type { ExtraTopic } from './extraIndex'
 import bundledIndex from 'virtual:extra-index'
 
@@ -75,6 +75,38 @@ export function cachedRound(slug: string): Round | undefined {
   return loaded.get(slug)
 }
 
+// The check report that came with a round built this visit (the "How it works" drawer shows it).
+const reports = new Map<string, ChecksReport | null>()
+
+/** undefined = no build this visit gave us a report for this slug; null = the backend sent none. */
+export function checksFor(slug: string): ChecksReport | null | undefined {
+  return reports.get(slug)
+}
+
+let health: Promise<boolean> | null = null
+
+/**
+ * One GET /api/health per page load (no polling): true = the backend answered. Only called when
+ * a backend is configured; it's a free endpoint, nothing paid.
+ */
+export function backendHealth(timeoutMs = 5000): Promise<boolean> {
+  const api = apiBase()
+  if (api === null) return Promise.resolve(false)
+  health ??= (async () => {
+    const ctrl = new AbortController()
+    const timer = setTimeout(() => ctrl.abort(), timeoutMs)
+    try {
+      const res = await fetch(`${api}/api/health`, { signal: ctrl.signal })
+      return res.ok
+    } catch {
+      return false
+    } finally {
+      clearTimeout(timer)
+    }
+  })()
+  return health
+}
+
 /** An extra round by slug: static file first, then GET /api/rounds/{slug} if there's a backend. */
 export async function loadExtraRound(slug: string): Promise<Round> {
   const hit = loaded.get(slug)
@@ -105,7 +137,7 @@ export async function generateRound(topic: string, timeoutMs = GENERATE_TIMEOUT_
   const ctrl = new AbortController()
   const timer = setTimeout(() => ctrl.abort(), timeoutMs)
   try {
-    const body = await getJson<{ status: string; round?: Round; suggestions?: string[] }>(`${api}/api/rounds`, {
+    const body = await getJson<{ status: string; round?: Round; suggestions?: string[]; checks?: ChecksReport | null }>(`${api}/api/rounds`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ topic }),
@@ -113,6 +145,7 @@ export async function generateRound(topic: string, timeoutMs = GENERATE_TIMEOUT_
     })
     if (body.status === 'ok' && body.round?.slug && Array.isArray(body.round.items)) {
       loaded.set(body.round.slug, body.round)
+      reports.set(body.round.slug, body.checks ?? null)
       return { status: 'ok', slug: body.round.slug }
     }
     return { status: 'fallback', suggestions: body.suggestions ?? [] }
@@ -183,5 +216,7 @@ export function useExtraRound(slug: string | null): { round?: Round; missing: bo
 export function resetExtrasCache(): void {
   indexPromise = null
   loaded.clear()
+  reports.clear()
+  health = null
   build = { kind: 'idle' }
 }
