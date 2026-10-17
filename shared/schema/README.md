@@ -1,6 +1,61 @@
 # Round contract
 
-`round.schema.json` is generated from `api/app/schema.py` (`cd api && uv run python scripts/export_schema.py`). Don't edit it by hand.
+`round.schema.json` and `model-spec.schema.json` are generated from `api/app/schema.py` (`cd api && uv run python scripts/export_schema.py`). Don't edit them by hand.
+
+## Engine v4: topic → runnable model spec (#179, player side #184)
+
+The generator no longer writes a quiz. For a typed topic it fills a **model spec** (`ModelSpec`, `model-spec.schema.json`): it picks one of our existing widgets and fills its numbers. Code validates the spec, **computes every truth from it**, and compiles it to a normal `Round`, so the round player keeps working and only needs to learn the new optional fields below.
+
+### The spec (`ModelSpec`)
+| field | what |
+|---|---|
+| `spec_version` | `4` |
+| `slug`, `topic` | as in Round |
+| `concept` | the idea in plain words (≤ 300) |
+| `definition` | one plain sentence defining the topic; the generator must say if the topic isn't a real concept (then: no fit) |
+| `case` | the runnable case (`SpecCase`, below) |
+| `misconceptions` | 1-3 `Misconception`s (same shape as Round: `id, label, why_tempting, refutation, source_url \| null, source_note`); the **first is the main named mistake**. `source_url: null` = unverified, the UI says so |
+| `compare` | optional `{topic, prompt = "What's the same about how these work?", shared_principle, case?}`; `case` uses the **same widget** with a different surface |
+
+`SpecCase`:
+| field | what |
+|---|---|
+| `widget` | `curve` \| `sampler` \| `dial` \| `stepper` |
+| `variables` | `[{name, meaning, unit, value}]`: named numbers in plain words; exprs may use the names |
+| `curve` | `{expr, x_min, x_max, x_label, y_label, ask_x \| ask_y, knob: {param, label, min, max, step, default}}`: y = expr(x, knob, variables). The asked point is the curve's y at `ask_x`, or the first x where it reaches `ask_y` |
+| `sampler` | `{sampler, params, stat, k?, x_label}`: one of our samplers; `stat` says which number is asked (table below) |
+| `dial` | `{answer_expr, unit}`: one computed value from the variables (shown on a number line, `truth.widget = "estimate"`) |
+| `stepper` | `{steps[2-8], answer_text}`: honest fallback with **no computed truth**, labelled "worked example, not checked" |
+| `prediction` | `{prompt, input: "slider" \| "choice", slider?: {min, max, step, unit}, options?: [{id, text, value?, misconception_id}]}` |
+| `bands` | slider answers → misconception id or `null` (correct); same rules as below |
+| `extremes` | 2-3 `{param, value, watch}`: a knob / sampler param / variable value to try, with one line on what to watch |
+| `answer_claimed` | the generator's own number: only cross-checked against the computed truth (> 2% off → rejected), **never shown** |
+
+Sampler stats (all computed exactly in `api/app/truth.py`; probabilities are in **percent** 0-100):
+| sampler | stats |
+|---|---|
+| `coin_longest_run` (`n`, fair coin) | `mean_longest_run`, `p_run_at_least` (k) |
+| `base_rate_test` (`base_rate`, `sensitivity`, `false_positive_rate`) | `p_true_positive` |
+| `birthday_match` (`group_size`) | `p_match` |
+| `binomial_count` (`n`, `p`) | `mean`, `mode`, `p_at_least` (k), `p_equals` (k) |
+| `dice_sum` (`dice`) | `mean`, `mode`, `p_at_least` (k), `p_equals` (k) |
+
+### How a spec compiles to a Round (what the player reads)
+- `round.spec_version = 4`; `round.concept`, `round.misconceptions` straight from the spec.
+- `items[0]` = the main case, `items[1]` = the compare case (only if it has one and it passes checks).
+- `curve` → `truth: {widget: "curve", expr, x_min, x_max, x_label, y_label, ask_x | ask_y}` + `explore` = the knob. Variable names are substituted with their values, so `expr` only uses `x` and `explore.param` (same as today).
+- `sampler` → `truth: {widget: "distribution", sampler, params, x_label}`.
+- `dial` → `truth: {widget: "estimate", unit}`, `answer_expr` with the numbers substituted.
+- `stepper` → `truth: {widget: "stepper", steps}`, `computed: false`.
+- `prediction` → `input_type` + `slider` / `options` (option `value` is dropped; code checked that the correct option is the one nearest the truth), `bands` as is, `targets` = the misconceptions the bands/options name.
+- **New optional item fields:** `truth_value` (the computed answer; null for stepper), `computed` (true = computed by code; false = worked example, not checked; null = older rounds), `variables` (`[{name, meaning, unit, value}]`, for a "what's in the model" panel), `extremes` (`[{param, value, watch, truth_value}]`, where `truth_value` is the answer recomputed by code at that setting, or null).
+- **New optional round field:** `compare: {topic, item_id | null, prompt, shared_principle}`. `item_id` points at the compare item in `items` when there is one; otherwise show the compare screen as text only.
+- Old rounds (showcase, reviewed extras) have none of these fields; the player must treat them as absent.
+
+### POST /api/rounds with v4
+- Success: `{status: "ok", ok: true, source, seconds, round, spec, checks}`. `round` is the compiled Round above; `spec` is the validated ModelSpec (null for showcase/reviewed).
+- **Honest no fit:** if the topic isn't a real concept, no widget fits, or the spec fails validation/checks after one retry: `{status: "fallback", ok: false, reason, nearest: [{slug, topic, kind: "session" | "reviewed"}] (3, by keyword overlap with the 3 sessions + reviewed extras), suggestions: [slug…]}` (`suggestions` = the nearest slugs, kept for the current player). No quiz is made up.
+- `checks` for v4: `blind_checked` is always false (every v4 item is computed by code, or is a stepper labelled "worked example, not checked"); `unchecked` lists stepper items; `computed` lists items whose truth code computed.
 
 - `GET /api/rounds` → `[{slug, topic, reviewed}]`
 - `POST /api/rounds {topic}` → `{status: "ok", source, seconds, round, checks}` or `{status: "fallback", suggestions: [slug…]}` (any failure, offline, quota, rate limit 12/h per IP → 429)

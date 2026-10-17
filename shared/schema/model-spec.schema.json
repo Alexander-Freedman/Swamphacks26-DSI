@@ -1,0 +1,832 @@
+{
+  "$defs": {
+    "Band": {
+      "description": "A numeric range of answers that maps to one misconception (or to correct).",
+      "properties": {
+        "min": {
+          "title": "Min",
+          "type": "number"
+        },
+        "max": {
+          "title": "Max",
+          "type": "number"
+        },
+        "misconception_id": {
+          "anyOf": [
+            {
+              "maxLength": 60,
+              "pattern": "^[a-z0-9]+(-[a-z0-9]+)*$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Misconception Id"
+        }
+      },
+      "required": [
+        "min",
+        "max"
+      ],
+      "title": "Band",
+      "type": "object"
+    },
+    "Explore": {
+      "properties": {
+        "param": {
+          "maxLength": 40,
+          "title": "Param",
+          "type": "string"
+        },
+        "label": {
+          "maxLength": 60,
+          "title": "Label",
+          "type": "string"
+        },
+        "min": {
+          "title": "Min",
+          "type": "number"
+        },
+        "max": {
+          "title": "Max",
+          "type": "number"
+        },
+        "step": {
+          "default": 1,
+          "title": "Step",
+          "type": "number"
+        },
+        "default": {
+          "anyOf": [
+            {
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Value of param for the question as asked (curve exprs use it)",
+          "title": "Default"
+        }
+      },
+      "required": [
+        "param",
+        "label",
+        "min",
+        "max"
+      ],
+      "title": "Explore",
+      "type": "object"
+    },
+    "Misconception": {
+      "properties": {
+        "id": {
+          "maxLength": 60,
+          "pattern": "^[a-z0-9]+(-[a-z0-9]+)*$",
+          "title": "Id",
+          "type": "string"
+        },
+        "label": {
+          "description": "Short name, e.g. 'Random means evenly mixed'",
+          "maxLength": 80,
+          "title": "Label",
+          "type": "string"
+        },
+        "why_tempting": {
+          "maxLength": 280,
+          "title": "Why Tempting",
+          "type": "string"
+        },
+        "refutation": {
+          "description": "Right model in <=2 sentences",
+          "maxLength": 400,
+          "title": "Refutation",
+          "type": "string"
+        },
+        "source_url": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Source Url"
+        },
+        "source_note": {
+          "anyOf": [
+            {
+              "maxLength": 200,
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Source Note"
+        }
+      },
+      "required": [
+        "id",
+        "label",
+        "why_tempting",
+        "refutation"
+      ],
+      "title": "Misconception",
+      "type": "object"
+    },
+    "Prediction": {
+      "properties": {
+        "prompt": {
+          "maxLength": 300,
+          "title": "Prompt",
+          "type": "string"
+        },
+        "input": {
+          "enum": [
+            "slider",
+            "choice"
+          ],
+          "title": "Input",
+          "type": "string"
+        },
+        "slider": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/SliderSpec"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "options": {
+          "items": {
+            "$ref": "#/$defs/SpecOption"
+          },
+          "maxItems": 6,
+          "title": "Options",
+          "type": "array"
+        }
+      },
+      "required": [
+        "prompt",
+        "input"
+      ],
+      "title": "Prediction",
+      "type": "object"
+    },
+    "Sampler": {
+      "enum": [
+        "coin_longest_run",
+        "base_rate_test",
+        "birthday_match",
+        "binomial_count",
+        "dice_sum"
+      ],
+      "title": "Sampler",
+      "type": "string"
+    },
+    "SamplerParams": {
+      "properties": {
+        "n": {
+          "anyOf": [
+            {
+              "maximum": 10000,
+              "minimum": 1,
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "N"
+        },
+        "p": {
+          "anyOf": [
+            {
+              "maximum": 1,
+              "minimum": 0,
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "P"
+        },
+        "population": {
+          "anyOf": [
+            {
+              "maximum": 100000,
+              "minimum": 1,
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Population"
+        },
+        "base_rate": {
+          "anyOf": [
+            {
+              "maximum": 1,
+              "minimum": 0,
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Base Rate"
+        },
+        "sensitivity": {
+          "anyOf": [
+            {
+              "maximum": 1,
+              "minimum": 0,
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Sensitivity"
+        },
+        "false_positive_rate": {
+          "anyOf": [
+            {
+              "maximum": 1,
+              "minimum": 0,
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "False Positive Rate"
+        },
+        "group_size": {
+          "anyOf": [
+            {
+              "maximum": 366,
+              "minimum": 1,
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Group Size"
+        },
+        "dice": {
+          "anyOf": [
+            {
+              "maximum": 10,
+              "minimum": 1,
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Dice"
+        },
+        "trials": {
+          "default": 10000,
+          "maximum": 100000,
+          "minimum": 100,
+          "title": "Trials",
+          "type": "integer"
+        }
+      },
+      "title": "SamplerParams",
+      "type": "object"
+    },
+    "SamplerStat": {
+      "description": "What number the question asks about; computed exactly in app/truth.py.",
+      "enum": [
+        "mean_longest_run",
+        "p_run_at_least",
+        "p_true_positive",
+        "p_match",
+        "mean",
+        "mode",
+        "p_at_least",
+        "p_equals"
+      ],
+      "title": "SamplerStat",
+      "type": "string"
+    },
+    "SliderSpec": {
+      "properties": {
+        "min": {
+          "title": "Min",
+          "type": "number"
+        },
+        "max": {
+          "title": "Max",
+          "type": "number"
+        },
+        "step": {
+          "default": 1,
+          "title": "Step",
+          "type": "number"
+        },
+        "unit": {
+          "default": "",
+          "title": "Unit",
+          "type": "string"
+        }
+      },
+      "required": [
+        "min",
+        "max"
+      ],
+      "title": "SliderSpec",
+      "type": "object"
+    },
+    "SpecCase": {
+      "description": "One runnable case: a widget, its numbers, a prediction and how to read it.",
+      "properties": {
+        "widget": {
+          "$ref": "#/$defs/SpecWidget"
+        },
+        "variables": {
+          "items": {
+            "$ref": "#/$defs/Variable"
+          },
+          "maxItems": 8,
+          "title": "Variables",
+          "type": "array"
+        },
+        "curve": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/SpecCurve"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "sampler": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/SpecSampler"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "dial": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/SpecDial"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "stepper": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/SpecStepper"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "prediction": {
+          "$ref": "#/$defs/Prediction"
+        },
+        "bands": {
+          "items": {
+            "$ref": "#/$defs/Band"
+          },
+          "maxItems": 8,
+          "title": "Bands",
+          "type": "array"
+        },
+        "extremes": {
+          "items": {
+            "$ref": "#/$defs/SpecExtreme"
+          },
+          "maxItems": 3,
+          "title": "Extremes",
+          "type": "array"
+        },
+        "answer_claimed": {
+          "anyOf": [
+            {
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "The generator's own number: cross-checked, never shown",
+          "title": "Answer Claimed"
+        }
+      },
+      "required": [
+        "widget",
+        "prediction"
+      ],
+      "title": "SpecCase",
+      "type": "object"
+    },
+    "SpecCompare": {
+      "properties": {
+        "topic": {
+          "maxLength": 120,
+          "title": "Topic",
+          "type": "string"
+        },
+        "prompt": {
+          "default": "What's the same about how these work?",
+          "maxLength": 200,
+          "title": "Prompt",
+          "type": "string"
+        },
+        "shared_principle": {
+          "maxLength": 300,
+          "title": "Shared Principle",
+          "type": "string"
+        },
+        "case": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/SpecCase"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Same widget kind as the main case, different surface"
+        }
+      },
+      "required": [
+        "topic",
+        "shared_principle"
+      ],
+      "title": "SpecCompare",
+      "type": "object"
+    },
+    "SpecCurve": {
+      "properties": {
+        "expr": {
+          "description": "y in x, the knob param and variable names",
+          "maxLength": 200,
+          "title": "Expr",
+          "type": "string"
+        },
+        "x_min": {
+          "title": "X Min",
+          "type": "number"
+        },
+        "x_max": {
+          "title": "X Max",
+          "type": "number"
+        },
+        "x_label": {
+          "default": "",
+          "maxLength": 60,
+          "title": "X Label",
+          "type": "string"
+        },
+        "y_label": {
+          "default": "",
+          "maxLength": 60,
+          "title": "Y Label",
+          "type": "string"
+        },
+        "ask_x": {
+          "anyOf": [
+            {
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Ask X"
+        },
+        "ask_y": {
+          "anyOf": [
+            {
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Ask Y"
+        },
+        "knob": {
+          "$ref": "#/$defs/Explore"
+        }
+      },
+      "required": [
+        "expr",
+        "x_min",
+        "x_max",
+        "knob"
+      ],
+      "title": "SpecCurve",
+      "type": "object"
+    },
+    "SpecDial": {
+      "properties": {
+        "answer_expr": {
+          "description": "In variable names and numbers",
+          "maxLength": 200,
+          "title": "Answer Expr",
+          "type": "string"
+        },
+        "unit": {
+          "default": "",
+          "maxLength": 30,
+          "title": "Unit",
+          "type": "string"
+        }
+      },
+      "required": [
+        "answer_expr"
+      ],
+      "title": "SpecDial",
+      "type": "object"
+    },
+    "SpecExtreme": {
+      "properties": {
+        "param": {
+          "pattern": "^[A-Za-z][A-Za-z0-9_]{0,23}$",
+          "title": "Param",
+          "type": "string"
+        },
+        "value": {
+          "title": "Value",
+          "type": "number"
+        },
+        "watch": {
+          "maxLength": 160,
+          "title": "Watch",
+          "type": "string"
+        }
+      },
+      "required": [
+        "param",
+        "value",
+        "watch"
+      ],
+      "title": "SpecExtreme",
+      "type": "object"
+    },
+    "SpecOption": {
+      "properties": {
+        "id": {
+          "maxLength": 60,
+          "pattern": "^[a-z0-9]+(-[a-z0-9]+)*$",
+          "title": "Id",
+          "type": "string"
+        },
+        "text": {
+          "maxLength": 200,
+          "title": "Text",
+          "type": "string"
+        },
+        "value": {
+          "anyOf": [
+            {
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "The number this option stands for (needed on the correct one)",
+          "title": "Value"
+        },
+        "misconception_id": {
+          "anyOf": [
+            {
+              "maxLength": 60,
+              "pattern": "^[a-z0-9]+(-[a-z0-9]+)*$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Misconception Id"
+        }
+      },
+      "required": [
+        "id",
+        "text"
+      ],
+      "title": "SpecOption",
+      "type": "object"
+    },
+    "SpecSampler": {
+      "properties": {
+        "sampler": {
+          "$ref": "#/$defs/Sampler"
+        },
+        "params": {
+          "$ref": "#/$defs/SamplerParams"
+        },
+        "stat": {
+          "$ref": "#/$defs/SamplerStat"
+        },
+        "k": {
+          "anyOf": [
+            {
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Threshold for p_* stats",
+          "title": "K"
+        },
+        "x_label": {
+          "default": "",
+          "maxLength": 60,
+          "title": "X Label",
+          "type": "string"
+        }
+      },
+      "required": [
+        "sampler",
+        "params",
+        "stat"
+      ],
+      "title": "SpecSampler",
+      "type": "object"
+    },
+    "SpecStepper": {
+      "properties": {
+        "steps": {
+          "items": {
+            "type": "string"
+          },
+          "maxItems": 8,
+          "minItems": 2,
+          "title": "Steps",
+          "type": "array"
+        },
+        "answer_text": {
+          "maxLength": 200,
+          "title": "Answer Text",
+          "type": "string"
+        }
+      },
+      "required": [
+        "steps",
+        "answer_text"
+      ],
+      "title": "SpecStepper",
+      "type": "object"
+    },
+    "SpecWidget": {
+      "enum": [
+        "curve",
+        "sampler",
+        "dial",
+        "stepper"
+      ],
+      "title": "SpecWidget",
+      "type": "string"
+    },
+    "Variable": {
+      "description": "A named number in a model spec, shown with its plain meaning and unit.",
+      "properties": {
+        "name": {
+          "pattern": "^[A-Za-z][A-Za-z0-9_]{0,23}$",
+          "title": "Name",
+          "type": "string"
+        },
+        "meaning": {
+          "maxLength": 120,
+          "title": "Meaning",
+          "type": "string"
+        },
+        "unit": {
+          "default": "",
+          "maxLength": 30,
+          "title": "Unit",
+          "type": "string"
+        },
+        "value": {
+          "title": "Value",
+          "type": "number"
+        }
+      },
+      "required": [
+        "name",
+        "meaning",
+        "value"
+      ],
+      "title": "Variable",
+      "type": "object"
+    }
+  },
+  "description": "Engine v4: what the generator writes for a typed topic.",
+  "properties": {
+    "spec_version": {
+      "const": 4,
+      "default": 4,
+      "title": "Spec Version",
+      "type": "integer"
+    },
+    "slug": {
+      "maxLength": 60,
+      "pattern": "^[a-z0-9]+(-[a-z0-9]+)*$",
+      "title": "Slug",
+      "type": "string"
+    },
+    "topic": {
+      "maxLength": 120,
+      "title": "Topic",
+      "type": "string"
+    },
+    "concept": {
+      "description": "The idea in plain words",
+      "maxLength": 300,
+      "title": "Concept",
+      "type": "string"
+    },
+    "definition": {
+      "description": "One plain sentence defining the topic (real concepts only)",
+      "maxLength": 300,
+      "title": "Definition",
+      "type": "string"
+    },
+    "case": {
+      "$ref": "#/$defs/SpecCase"
+    },
+    "misconceptions": {
+      "description": "The first one is the main named mistake",
+      "items": {
+        "$ref": "#/$defs/Misconception"
+      },
+      "maxItems": 3,
+      "minItems": 1,
+      "title": "Misconceptions",
+      "type": "array"
+    },
+    "compare": {
+      "anyOf": [
+        {
+          "$ref": "#/$defs/SpecCompare"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null
+    }
+  },
+  "required": [
+    "slug",
+    "topic",
+    "concept",
+    "definition",
+    "case",
+    "misconceptions"
+  ],
+  "title": "ModelSpec",
+  "type": "object"
+}
