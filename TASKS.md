@@ -12,9 +12,9 @@ Shared board. Every task is a GitHub issue; assign yourself + comment "on it" be
 |---|---|---|---|
 | — | docs/experience.md storyboard | @Alexander-Freedman | in progress |
 | #75 | Look + interactive mockups for all 3 showcases (docs/experience-look.md, docs/mockups/) | @luanamaldaner | merged (#79) |
-| #81 | Coin streak session (`web/src/sessions/coin/`) | @luanamaldaner | building |
-| #78 | Birthday session (`web/src/sessions/birthday/`) | @Alexander-Freedman | building |
-| #82 | Positive test session (`web/src/sessions/positive/`) | @luanamaldaner | building |
+| #81 | Coin streak session (`web/src/sessions/coin/`) | @luanamaldaner | PR #107 (review) |
+| #78 | Birthday session (`web/src/sessions/birthday/`) | @Alexander-Freedman | PR #101 |
+| #82 | Positive test session (`web/src/sessions/positive/`) | @luanamaldaner | PR #99 (review) |
 
 ## Build (B1-B3)
 
@@ -54,6 +54,6 @@ Shared board. Every task is a GitHub issue; assign yourself + comment "on it" be
 | #83 | Positive test reveal: NaN, wrong units, 9.2% not shown | @luanamaldaner | replaced by the #82 session |
 | #87 | Which-is-real coin item reveal | @luanamaldaner | replaced by the #81 session |
 | #89 | Distribution labels tiny on phone, truth line color | @luanamaldaner | sessions + #64 |
-| #88 | Round URL / back button | @luanamaldaner | after #81/#82 |
+| #88 | Round URL / back button | @luanamaldaner | PR #106 (also hides the old coin/positive rounds → closes #83/#87) |
 | #85 | Birthday reveal text-only | @luanamaldaner | covered by the birthday session (#78, other side) |
 | #86 | Bands too wide | @Alexander-Freedman | |
