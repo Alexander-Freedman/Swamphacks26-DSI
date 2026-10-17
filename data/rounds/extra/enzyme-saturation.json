@@ -1,0 +1,121 @@
+{
+  "schema_version": 1,
+  "slug": "enzyme-saturation",
+  "topic": "Enzyme saturation",
+  "concept": "Michaelis-Menten kinetics",
+  "reviewed": true,
+  "misconceptions": [
+    {
+      "id": "linear-forever",
+      "label": "Speed rises in step with substrate",
+      "why_tempting": "More fuel usually means proportionally more output.",
+      "refutation": "Each enzyme can only work so fast, so speed levels off toward the maximum: 100 x 15/(5+15) = 75.",
+      "source_url": "https://en.wikipedia.org/wiki/Michaelis%E2%80%93Menten_kinetics",
+      "source_note": "Page states the correct model; that this mistake is common is unverified"
+    },
+    {
+      "id": "too-fast-saturation",
+      "label": "Barely any gain past half speed",
+      "why_tempting": "Saturation sounds like it kicks in right away.",
+      "refutation": "Tripling the substrate still adds a lot: 50 goes to 75 before the curve flattens.",
+      "source_url": "https://en.wikipedia.org/wiki/Michaelis%E2%80%93Menten_kinetics",
+      "source_note": "Page states the correct model; that this mistake is common is unverified"
+    }
+  ],
+  "items": [
+    {
+      "id": "model",
+      "prompt": "An enzyme's top speed is 100 (mmol/min), and it runs at half speed (50) when there is 5 mM of substrate. How fast does it run with 15 mM of substrate?",
+      "input_type": "slider",
+      "slider": {
+        "min": 0.0,
+        "max": 100.0,
+        "step": 1.0,
+        "unit": "mmol/min"
+      },
+      "options": [],
+      "bands": [
+        {
+          "min": 0.0,
+          "max": 60.0,
+          "misconception_id": "too-fast-saturation"
+        },
+        {
+          "min": 61.0,
+          "max": 83.0,
+          "misconception_id": null
+        },
+        {
+          "min": 84.0,
+          "max": 100.0,
+          "misconception_id": "linear-forever"
+        }
+      ],
+      "sketch_rules": [],
+      "truth": {
+        "widget": "curve",
+        "expr": "((100.0) * x) / (Km + x)",
+        "preset": null,
+        "x_min": 0.0,
+        "x_max": 30.0,
+        "x_label": "substrate concentration (mM)",
+        "y_label": "reaction velocity (mmol/min)",
+        "ask_x": 15.0,
+        "ask_y": null,
+        "show": null,
+        "area_from": null,
+        "area_to": null
+      },
+      "answer_expr": "75.0",
+      "answer_claimed": 75.0,
+      "explore": {
+        "param": "Km",
+        "label": "Km (mM)",
+        "min": 1.0,
+        "max": 15.0,
+        "step": 1.0,
+        "default": 5.0
+      },
+      "targets": [
+        "linear-forever",
+        "too-fast-saturation"
+      ],
+      "variables": [
+        {
+          "name": "Vmax",
+          "meaning": "maximum velocity",
+          "unit": "mmol/min",
+          "value": 100.0
+        }
+      ],
+      "extremes": [
+        {
+          "param": "Km",
+          "value": 1.0,
+          "watch": "Lower Km means the enzyme reaches half-speed at very low substrate concentrations.",
+          "truth_value": 93.75
+        },
+        {
+          "param": "Km",
+          "value": 15.0,
+          "watch": "Higher Km means the curve flattens out much more slowly.",
+          "truth_value": 50.0
+        }
+      ],
+      "truth_value": 75.0,
+      "computed": true,
+      "approximate": false
+    }
+  ],
+  "spec_version": 4,
+  "compare": null,
+  "aliases": [
+    "enzyme kinetics",
+    "enzyme saturation",
+    "michaelis menten",
+    "michaelis-menten",
+    "michaelis menten kinetics",
+    "enzymes",
+    "how enzymes work"
+  ]
+}

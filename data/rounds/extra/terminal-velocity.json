@@ -1,0 +1,127 @@
+{
+  "schema_version": 1,
+  "slug": "terminal-velocity",
+  "topic": "Terminal velocity",
+  "concept": "Free fall with air resistance leads to an asymptotic speed limit.",
+  "reviewed": true,
+  "misconceptions": [
+    {
+      "id": "constant-acceleration",
+      "label": "Speed keeps increasing forever",
+      "why_tempting": "Without air, 10 s of falling would mean 98 m/s.",
+      "refutation": "Drag grows with speed until it balances gravity, so speed levels off below 50 m/s.",
+      "source_url": "https://en.wikipedia.org/wiki/Terminal_velocity",
+      "source_note": "Page states the correct model; that this mistake is common is unverified"
+    },
+    {
+      "id": "instant-terminal",
+      "label": "Already at top speed",
+      "why_tempting": "Top speed sounds like something you hit and stay at.",
+      "refutation": "It only approaches 50 m/s: after 10 s this model gives about 43 m/s.",
+      "source_url": "https://en.wikipedia.org/wiki/Terminal_velocity",
+      "source_note": "Page states the correct model; that this mistake is common is unverified"
+    },
+    {
+      "id": "drag-holds-early",
+      "label": "Drag holds it back early",
+      "why_tempting": "Air resistance feels like it acts from the start.",
+      "refutation": "At low speed drag is tiny, so the object first speeds up at nearly g.",
+      "source_url": "https://en.wikipedia.org/wiki/Terminal_velocity",
+      "source_note": "Page states the correct model; that this mistake is common is unverified"
+    }
+  ],
+  "items": [
+    {
+      "id": "model",
+      "prompt": "A falling object's top speed in air is 50 m/s. Dropped from rest, about how fast is it going after 10 seconds?",
+      "input_type": "slider",
+      "slider": {
+        "min": 0.0,
+        "max": 100.0,
+        "step": 1.0,
+        "unit": "m/s"
+      },
+      "options": [],
+      "bands": [
+        {
+          "min": 0.0,
+          "max": 38.0,
+          "misconception_id": "drag-holds-early"
+        },
+        {
+          "min": 39.0,
+          "max": 48.0,
+          "misconception_id": null
+        },
+        {
+          "min": 49.0,
+          "max": 52.0,
+          "misconception_id": "instant-terminal"
+        },
+        {
+          "min": 53.0,
+          "max": 100.0,
+          "misconception_id": "constant-acceleration"
+        }
+      ],
+      "sketch_rules": [],
+      "truth": {
+        "widget": "curve",
+        "expr": "v_t * (1 - 2.71828^(-9.8 * x / v_t))",
+        "preset": null,
+        "x_min": 0.0,
+        "x_max": 20.0,
+        "x_label": "time (s)",
+        "y_label": "speed (m/s)",
+        "ask_x": 10.0,
+        "ask_y": null,
+        "show": null,
+        "area_from": null,
+        "area_to": null
+      },
+      "answer_expr": "42.957069668559264",
+      "answer_claimed": 43.3,
+      "explore": {
+        "param": "v_t",
+        "label": "terminal velocity (m/s)",
+        "min": 20.0,
+        "max": 100.0,
+        "step": 5.0,
+        "default": 50.0
+      },
+      "targets": [
+        "constant-acceleration",
+        "drag-holds-early",
+        "instant-terminal"
+      ],
+      "variables": [],
+      "extremes": [
+        {
+          "param": "v_t",
+          "value": 20.0,
+          "watch": "Lighter objects hit their low terminal velocity very quickly.",
+          "truth_value": 19.8510678477022
+        },
+        {
+          "param": "v_t",
+          "value": 90.0,
+          "watch": "Objects with high terminal velocity accelerate longer before leveling off.",
+          "truth_value": 59.70685304338153
+        }
+      ],
+      "truth_value": 42.957069668559264,
+      "computed": true,
+      "approximate": false
+    }
+  ],
+  "spec_version": 4,
+  "compare": null,
+  "aliases": [
+    "terminal velocity",
+    "air resistance",
+    "drag",
+    "skydiving speed",
+    "skydiver",
+    "falling with air resistance"
+  ]
+}

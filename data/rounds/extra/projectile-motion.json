@@ -1,0 +1,113 @@
+{
+  "schema_version": 1,
+  "slug": "projectile-motion",
+  "topic": "Projectile motion",
+  "concept": "Parabolic trajectories combine constant horizontal velocity with uniformly accelerated vertical motion.",
+  "reviewed": true,
+  "misconceptions": [
+    {
+      "id": "linear-path",
+      "label": "Keeps its launch speed",
+      "why_tempting": "30 m/s for 2 seconds is 60 m.",
+      "refutation": "Gravity slows it by 9.8 m/s every second, so it covers 60 - 19.6 = 40.4 m.",
+      "source_url": "https://en.wikipedia.org/wiki/Projectile_motion",
+      "source_note": "Page states the correct model; that this mistake is common is unverified"
+    },
+    {
+      "id": "gravity-too-strong",
+      "label": "Gravity wins right away",
+      "why_tempting": "It feels like a thrown ball is already slowing to a stop.",
+      "refutation": "At 2 s it's still rising at about 10 m/s; it peaks just after 3 s.",
+      "source_url": "https://en.wikipedia.org/wiki/Projectile_motion",
+      "source_note": "Page states the correct model; that this mistake is common is unverified"
+    }
+  ],
+  "items": [
+    {
+      "id": "model",
+      "prompt": "You throw a ball straight up at 30 m/s (ignore air). How high is it after 2 seconds?",
+      "input_type": "slider",
+      "slider": {
+        "min": 0.0,
+        "max": 80.0,
+        "step": 1.0,
+        "unit": "m"
+      },
+      "options": [],
+      "bands": [
+        {
+          "min": 0.0,
+          "max": 39.0,
+          "misconception_id": "gravity-too-strong"
+        },
+        {
+          "min": 40.0,
+          "max": 42.0,
+          "misconception_id": null
+        },
+        {
+          "min": 43.0,
+          "max": 80.0,
+          "misconception_id": "linear-path"
+        }
+      ],
+      "sketch_rules": [],
+      "truth": {
+        "widget": "curve",
+        "expr": "v*x - 0.5*9.8*x^2",
+        "preset": null,
+        "x_min": 0.0,
+        "x_max": 10.0,
+        "x_label": "time (s)",
+        "y_label": "height (m)",
+        "ask_x": 2.0,
+        "ask_y": null,
+        "show": null,
+        "area_from": null,
+        "area_to": null
+      },
+      "answer_expr": "40.4",
+      "answer_claimed": 40.4,
+      "explore": {
+        "param": "v",
+        "label": "initial upward velocity (m/s)",
+        "min": 10.0,
+        "max": 50.0,
+        "step": 1.0,
+        "default": 30.0
+      },
+      "targets": [
+        "gravity-too-strong",
+        "linear-path"
+      ],
+      "variables": [],
+      "extremes": [
+        {
+          "param": "v",
+          "value": 10.0,
+          "watch": "Low initial speed reaches peak quickly and falls back down.",
+          "truth_value": 0.3999999999999986
+        },
+        {
+          "param": "v",
+          "value": 50.0,
+          "watch": "High initial speed reaches much higher altitudes.",
+          "truth_value": 80.4
+        }
+      ],
+      "truth_value": 40.4,
+      "computed": true,
+      "approximate": false
+    }
+  ],
+  "spec_version": 4,
+  "compare": null,
+  "aliases": [
+    "projectile motion",
+    "projectiles",
+    "throwing a ball up",
+    "ball thrown upward",
+    "vertical motion",
+    "kinematics"
+  ]
+}

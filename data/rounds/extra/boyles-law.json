@@ -1,0 +1,119 @@
+{
+  "schema_version": 1,
+  "slug": "boyles-law",
+  "topic": "Boyle's law (gas pressure and volume)",
+  "concept": "Inverse proportionality",
+  "reviewed": true,
+  "misconceptions": [
+    {
+      "id": "linear-relationship",
+      "label": "Pressure changes by a fixed amount",
+      "why_tempting": "Squeezing feels like it should add pressure steadily, liter by liter.",
+      "refutation": "Pressure times volume stays constant: 1/5 the volume means 5 times the pressure.",
+      "source_url": "https://en.wikipedia.org/wiki/Boyle%27s_law",
+      "source_note": "Page states the correct model; that this mistake is common is unverified"
+    },
+    {
+      "id": "direct-relationship",
+      "label": "Less volume, less pressure",
+      "why_tempting": "Smaller often feels like 'less of everything'.",
+      "refutation": "Pressure and volume move in opposite directions: squeezing a gas raises its pressure.",
+      "source_url": "https://en.wikipedia.org/wiki/Boyle%27s_law",
+      "source_note": "Page states the correct model; that this mistake is common is unverified"
+    }
+  ],
+  "items": [
+    {
+      "id": "model",
+      "prompt": "A gas fills 10 liters at a pressure of 1 atm. You squeeze it into 2 liters without changing its temperature. What is the pressure now?",
+      "input_type": "slider",
+      "slider": {
+        "min": 0.0,
+        "max": 10.0,
+        "step": 0.5,
+        "unit": "atm"
+      },
+      "options": [],
+      "bands": [
+        {
+          "min": 0.0,
+          "max": 1.0,
+          "misconception_id": "direct-relationship"
+        },
+        {
+          "min": 1.5,
+          "max": 4.5,
+          "misconception_id": "linear-relationship"
+        },
+        {
+          "min": 5.0,
+          "max": 5.0,
+          "misconception_id": null
+        },
+        {
+          "min": 5.5,
+          "max": 10.0,
+          "misconception_id": "linear-relationship"
+        }
+      ],
+      "sketch_rules": [],
+      "truth": {
+        "widget": "curve",
+        "expr": "k/x",
+        "preset": null,
+        "x_min": 1.0,
+        "x_max": 10.0,
+        "x_label": "Volume (L)",
+        "y_label": "Pressure (atm)",
+        "ask_x": 2.0,
+        "ask_y": null,
+        "show": null,
+        "area_from": null,
+        "area_to": null
+      },
+      "answer_expr": "5.0",
+      "answer_claimed": 5.0,
+      "explore": {
+        "param": "k",
+        "label": "Constant (k)",
+        "min": 1.0,
+        "max": 20.0,
+        "step": 1.0,
+        "default": 10.0
+      },
+      "targets": [
+        "direct-relationship",
+        "linear-relationship"
+      ],
+      "variables": [],
+      "extremes": [
+        {
+          "param": "k",
+          "value": 1.0,
+          "watch": "Lowering the constant k shifts the entire curve downward.",
+          "truth_value": 0.5
+        },
+        {
+          "param": "k",
+          "value": 20.0,
+          "watch": "Higher constant k results in much higher pressures at small volumes.",
+          "truth_value": 10.0
+        }
+      ],
+      "truth_value": 5.0,
+      "computed": true,
+      "approximate": false
+    }
+  ],
+  "spec_version": 4,
+  "compare": null,
+  "aliases": [
+    "boyles law",
+    "boyle's law",
+    "gas law",
+    "gas laws",
+    "pressure and volume",
+    "ideal gas law",
+    "squeezing a gas"
+  ]
+}

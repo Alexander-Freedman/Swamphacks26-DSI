@@ -1,0 +1,108 @@
+{
+  "aliases": [
+    "inflation",
+    "purchasing power",
+    "what is inflation",
+    "inflation over time",
+    "value of a dollar",
+    "cost of living"
+  ],
+  "spec": {
+    "spec_version": 4,
+    "slug": "inflation",
+    "topic": "Inflation and purchasing power",
+    "concept": "Exponential decay of purchasing power",
+    "definition": "Inflation is the general increase in prices and fall in the purchasing value of money over time.",
+    "case": {
+      "widget": "curve",
+      "approximate": false,
+      "variables": [],
+      "curve": {
+        "expr": "100 / (1 + r/100)^x",
+        "mode": "value",
+        "x_min": 0.0,
+        "x_max": 40.0,
+        "x_label": "years",
+        "y_label": "purchasing power (%)",
+        "ask_x": 30.0,
+        "ask_y": null,
+        "area_from": null,
+        "area_to": null,
+        "knob": {
+          "param": "r",
+          "label": "annual inflation rate (%)",
+          "min": 1.0,
+          "max": 10.0,
+          "step": 0.5,
+          "default": 3.0
+        }
+      },
+      "sampler": null,
+      "prediction": {
+        "prompt": "Prices rise 3% every year for 30 years. What percent of today's buying power does a dollar kept in a drawer still have?",
+        "input": "slider",
+        "slider": {
+          "min": 0.0,
+          "max": 100.0,
+          "step": 1.0,
+          "unit": "%"
+        },
+        "options": []
+      },
+      "bands": [
+        {
+          "min": 0,
+          "max": 15,
+          "misconception_id": "linear-decay"
+        },
+        {
+          "min": 16,
+          "max": 38,
+          "misconception_id": "linear-decay"
+        },
+        {
+          "min": 39,
+          "max": 45,
+          "misconception_id": null
+        },
+        {
+          "min": 46,
+          "max": 100,
+          "misconception_id": "underestimate-long-term"
+        }
+      ],
+      "extremes": [
+        {
+          "param": "r",
+          "value": 1.0,
+          "watch": "At 1% inflation, purchasing power stays much higher after 30 years."
+        },
+        {
+          "param": "r",
+          "value": 8.0,
+          "watch": "At 8% inflation, purchasing power is nearly wiped out within 30 years."
+        }
+      ],
+      "answer_claimed": 41.2
+    },
+    "misconceptions": [
+      {
+        "id": "linear-decay",
+        "label": "Lose 3 points a year",
+        "why_tempting": "3% a year for 30 years sounds like 90% lost.",
+        "refutation": "Each year takes 3% of what's left, so the losses shrink: 1/1.03^30 = 41%.",
+        "source_url": "https://en.wikipedia.org/wiki/Inflation",
+        "source_note": "Page states the correct model; that this mistake is common is unverified"
+      },
+      {
+        "id": "underestimate-long-term",
+        "label": "Small inflation doesn't add up",
+        "why_tempting": "3% a year feels too small to matter.",
+        "refutation": "Over 30 years 3% a year removes more than half of a dollar's buying power.",
+        "source_url": "https://en.wikipedia.org/wiki/Inflation",
+        "source_note": "Page states the correct model; that this mistake is common is unverified"
+      }
+    ],
+    "compare": null
+  }
+}

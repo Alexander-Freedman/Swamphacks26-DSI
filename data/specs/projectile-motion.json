@@ -1,0 +1,103 @@
+{
+  "aliases": [
+    "projectile motion",
+    "projectiles",
+    "throwing a ball up",
+    "ball thrown upward",
+    "vertical motion",
+    "kinematics"
+  ],
+  "spec": {
+    "spec_version": 4,
+    "slug": "projectile-motion",
+    "topic": "Projectile motion",
+    "concept": "Parabolic trajectories combine constant horizontal velocity with uniformly accelerated vertical motion.",
+    "definition": "Projectile motion is the curved path an object follows when thrown near the surface of the Earth, influenced only by gravity and initial launch speed.",
+    "case": {
+      "widget": "curve",
+      "approximate": false,
+      "variables": [],
+      "curve": {
+        "expr": "v*x - 0.5*9.8*x^2",
+        "mode": "value",
+        "x_min": 0.0,
+        "x_max": 10.0,
+        "x_label": "time (s)",
+        "y_label": "height (m)",
+        "ask_x": 2.0,
+        "ask_y": null,
+        "area_from": null,
+        "area_to": null,
+        "knob": {
+          "param": "v",
+          "label": "initial upward velocity (m/s)",
+          "min": 10.0,
+          "max": 50.0,
+          "step": 1.0,
+          "default": 30.0
+        }
+      },
+      "sampler": null,
+      "prediction": {
+        "prompt": "You throw a ball straight up at 30 m/s (ignore air). How high is it after 2 seconds?",
+        "input": "slider",
+        "slider": {
+          "min": 0.0,
+          "max": 80.0,
+          "step": 1.0,
+          "unit": "m"
+        },
+        "options": []
+      },
+      "bands": [
+        {
+          "min": 0,
+          "max": 39,
+          "misconception_id": "gravity-too-strong"
+        },
+        {
+          "min": 40,
+          "max": 42,
+          "misconception_id": null
+        },
+        {
+          "min": 43,
+          "max": 80,
+          "misconception_id": "linear-path"
+        }
+      ],
+      "extremes": [
+        {
+          "param": "v",
+          "value": 10.0,
+          "watch": "Low initial speed reaches peak quickly and falls back down."
+        },
+        {
+          "param": "v",
+          "value": 50.0,
+          "watch": "High initial speed reaches much higher altitudes."
+        }
+      ],
+      "answer_claimed": 40.4
+    },
+    "misconceptions": [
+      {
+        "id": "linear-path",
+        "label": "Keeps its launch speed",
+        "why_tempting": "30 m/s for 2 seconds is 60 m.",
+        "refutation": "Gravity slows it by 9.8 m/s every second, so it covers 60 - 19.6 = 40.4 m.",
+        "source_url": "https://en.wikipedia.org/wiki/Projectile_motion",
+        "source_note": "Page states the correct model; that this mistake is common is unverified"
+      },
+      {
+        "id": "gravity-too-strong",
+        "label": "Gravity wins right away",
+        "why_tempting": "It feels like a thrown ball is already slowing to a stop.",
+        "refutation": "At 2 s it's still rising at about 10 m/s; it peaks just after 3 s.",
+        "source_url": "https://en.wikipedia.org/wiki/Projectile_motion",
+        "source_note": "Page states the correct model; that this mistake is common is unverified"
+      }
+    ],
+    "compare": null
+  }
+}

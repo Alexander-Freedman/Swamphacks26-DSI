@@ -1,0 +1,115 @@
+{
+  "schema_version": 1,
+  "slug": "falling-objects",
+  "topic": "How far things fall",
+  "concept": "Gravity causes all falling objects near the Earth to accelerate at a constant rate regardless of their mass, neglecting air resistance.",
+  "reviewed": true,
+  "misconceptions": [
+    {
+      "id": "speed-is-distance",
+      "label": "Speed and distance mixed up",
+      "why_tempting": "Gravity adds about 9.8 m/s each second, so 4 x 9.8 = 39 feels right.",
+      "refutation": "39 m/s is its speed at 4 s; distance is 1/2 g t squared = 78 m.",
+      "source_url": "https://en.wikipedia.org/wiki/Equations_for_a_falling_body",
+      "source_note": "Page states the correct model; that this mistake is common is unverified"
+    },
+    {
+      "id": "final-speed-times-time",
+      "label": "Final speed times time",
+      "why_tempting": "Multiplying speed by time is how distance usually works.",
+      "refutation": "It started at rest, so its average speed is half the final speed: 19.6 m/s x 4 s = 78 m.",
+      "source_url": "https://en.wikipedia.org/wiki/Equations_for_a_falling_body",
+      "source_note": "Page states the correct model; that this mistake is common is unverified"
+    }
+  ],
+  "items": [
+    {
+      "id": "model",
+      "prompt": "You drop a rock off a tall cliff (ignore air). How many meters has it fallen after 4 seconds?",
+      "input_type": "slider",
+      "slider": {
+        "min": 0.0,
+        "max": 200.0,
+        "step": 5.0,
+        "unit": "m"
+      },
+      "options": [],
+      "bands": [
+        {
+          "min": 0.0,
+          "max": 40.0,
+          "misconception_id": "speed-is-distance"
+        },
+        {
+          "min": 45.0,
+          "max": 95.0,
+          "misconception_id": null
+        },
+        {
+          "min": 100.0,
+          "max": 200.0,
+          "misconception_id": "final-speed-times-time"
+        }
+      ],
+      "sketch_rules": [],
+      "truth": {
+        "widget": "curve",
+        "expr": "0.5 * g * x^2",
+        "preset": null,
+        "x_min": 0.0,
+        "x_max": 10.0,
+        "x_label": "time (s)",
+        "y_label": "distance (m)",
+        "ask_x": 4.0,
+        "ask_y": null,
+        "show": null,
+        "area_from": null,
+        "area_to": null
+      },
+      "answer_expr": "78.4532",
+      "answer_claimed": 78.5,
+      "explore": {
+        "param": "g",
+        "label": "gravity (m/s^2)",
+        "min": 1.0,
+        "max": 20.0,
+        "step": 0.5,
+        "default": 9.80665
+      },
+      "targets": [
+        "final-speed-times-time",
+        "speed-is-distance"
+      ],
+      "variables": [],
+      "extremes": [
+        {
+          "param": "g",
+          "value": 1.6,
+          "watch": "On the Moon, gravity is much weaker, so the fall distance in 4 seconds is far smaller.",
+          "truth_value": 12.8
+        },
+        {
+          "param": "g",
+          "value": 20.0,
+          "watch": "With extreme gravity, the distance grows rapidly because distance depends on the square of time.",
+          "truth_value": 160.0
+        }
+      ],
+      "truth_value": 78.4532,
+      "computed": true,
+      "approximate": false
+    }
+  ],
+  "spec_version": 4,
+  "compare": null,
+  "aliases": [
+    "falling objects",
+    "falling object",
+    "dropping a ball",
+    "how fast do things fall",
+    "gravity",
+    "acceleration due to gravity",
+    "galileo falling objects",
+    "falling bodies"
+  ]
+}

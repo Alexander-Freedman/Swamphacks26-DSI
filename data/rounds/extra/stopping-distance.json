@@ -1,0 +1,113 @@
+{
+  "schema_version": 1,
+  "slug": "stopping-distance",
+  "topic": "Car stopping distance",
+  "concept": "The total stopping distance increases quadratically with speed because the braking distance depends on the square of the velocity.",
+  "reviewed": true,
+  "misconceptions": [
+    {
+      "id": "linear-thinking",
+      "label": "Twice as fast, twice as far",
+      "why_tempting": "Doubling speed doubling distance feels fair.",
+      "refutation": "Braking distance grows with speed squared, so it is 4x; only the reaction part doubles: 22 + 41 = 63 m.",
+      "source_url": "https://en.wikipedia.org/wiki/Braking_distance",
+      "source_note": "Page states the correct model; that this mistake is common is unverified"
+    },
+    {
+      "id": "quadruple-everything",
+      "label": "Everything quadruples",
+      "why_tempting": "Once you know braking scales with speed squared, you apply it to all of it.",
+      "refutation": "The 1 s reaction distance only doubles; only the braking part quadruples.",
+      "source_url": "https://en.wikipedia.org/wiki/Braking_distance",
+      "source_note": "Page states the correct model; that this mistake is common is unverified"
+    }
+  ],
+  "items": [
+    {
+      "id": "model",
+      "prompt": "A car at 40 km/h needs about 21 m to stop (1 s to react, then braking). How many meters does it need at 80 km/h?",
+      "input_type": "slider",
+      "slider": {
+        "min": 20.0,
+        "max": 150.0,
+        "step": 1.0,
+        "unit": "m"
+      },
+      "options": [],
+      "bands": [
+        {
+          "min": 20.0,
+          "max": 50.0,
+          "misconception_id": "linear-thinking"
+        },
+        {
+          "min": 51.0,
+          "max": 75.0,
+          "misconception_id": null
+        },
+        {
+          "min": 76.0,
+          "max": 150.0,
+          "misconception_id": "quadruple-everything"
+        }
+      ],
+      "sketch_rules": [],
+      "truth": {
+        "widget": "curve",
+        "expr": "(x * 1000 / 3600) * 1 + (x * 1000 / 3600)^2 / (2 * a)",
+        "preset": null,
+        "x_min": 0.0,
+        "x_max": 120.0,
+        "x_label": "speed (km/h)",
+        "y_label": "total stopping distance (m)",
+        "ask_x": 80.0,
+        "ask_y": null,
+        "show": null,
+        "area_from": null,
+        "area_to": null
+      },
+      "answer_expr": "63.374485596707814",
+      "answer_claimed": 63.4,
+      "explore": {
+        "param": "a",
+        "label": "deceleration (m/s^2)",
+        "min": 3.0,
+        "max": 9.0,
+        "step": 0.5,
+        "default": 6.0
+      },
+      "targets": [
+        "linear-thinking",
+        "quadruple-everything"
+      ],
+      "variables": [],
+      "extremes": [
+        {
+          "param": "a",
+          "value": 3.0,
+          "watch": "Poor road conditions (low friction) drastically increase the quadratic term.",
+          "truth_value": 104.5267489711934
+        },
+        {
+          "param": "a",
+          "value": 9.0,
+          "watch": "High performance braking still cannot overcome the speed squared rule.",
+          "truth_value": 49.65706447187928
+        }
+      ],
+      "truth_value": 63.374485596707814,
+      "computed": true,
+      "approximate": false
+    }
+  ],
+  "spec_version": 4,
+  "compare": null,
+  "aliases": [
+    "stopping distance",
+    "braking distance",
+    "car stopping distance",
+    "speed and braking",
+    "stopping a car",
+    "reaction time and braking"
+  ]
+}
