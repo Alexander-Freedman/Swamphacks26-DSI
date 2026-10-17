@@ -23,11 +23,12 @@ def showcase_rounds() -> dict[str, Round]:
 
 
 @cache
-def _extras() -> tuple[dict[str, Round], dict[str, str]]:
+def _extras() -> tuple[dict[str, Round], dict[str, str], dict[str, list[str]]]:
     from app.gen import normalize_topic
 
     rounds: dict[str, Round] = {}
     keys: dict[str, str] = {}
+    aliases_by_slug: dict[str, list[str]] = {}
     for path in sorted(EXTRA_DIR.glob("*.json")):
         data = json.loads(path.read_text())
         aliases = data.pop("aliases", [])
@@ -35,9 +36,14 @@ def _extras() -> tuple[dict[str, Round], dict[str, str]]:
         if not r.reviewed:
             continue  # only fully hand-checked rounds are served as "reviewed"
         rounds[r.slug] = r
+        aliases_by_slug[r.slug] = list(aliases)
         for name in (r.topic, r.slug, *aliases):
             keys.setdefault(normalize_topic(name), r.slug)
-    return rounds, keys
+    return rounds, keys, aliases_by_slug
+
+
+def extra_aliases() -> dict[str, list[str]]:
+    return _extras()[2]
 
 
 def extra_rounds() -> dict[str, Round]:
@@ -48,6 +54,6 @@ def extra_for_topic(topic: str) -> Round | None:
     """The reviewed extra round whose topic, slug or alias matches (normalized)."""
     from app.gen import normalize_topic
 
-    rounds, keys = _extras()
+    rounds, keys, _ = _extras()
     slug = keys.get(normalize_topic(topic))
     return rounds[slug] if slug else None

@@ -3,7 +3,7 @@
 /* on a session screen the header lines up with the session frame (1040px), not the page column */
 .app:has(.ss-frame, .bday) .topbar { width: min(1040px, calc(100vw - 32px)); margin-left: calc(50% - min(520px, 50vw - 16px)); }
 .logo { font-weight: 800; font-size: 1.25rem; letter-spacing: -0.02em; }
-.chip { display: inline-flex; align-items: center; gap: 6px; padding: 3px 10px; border: 1.5px solid var(--ink); border-radius: 999px; font-size: 0.8rem; background: var(--card); }
+.chip { display: inline-flex; align-items: center; gap: 6px; padding: 3px 10px; border: 1.5px solid var(--ink); border-radius: var(--radius-ui); font-size: 0.8rem; background: var(--card); }
 .checked-tag { font-size: 0.8rem; color: var(--ink-soft); cursor: help; border-bottom: 1px dotted var(--ink-soft); }
 .progress { font-size: 0.85rem; color: var(--ink-soft); }
 
@@ -18,15 +18,15 @@ input[type='range'] { width: 100%; accent-color: var(--pencil); height: 28px; }
 .range-ends { display: flex; justify-content: space-between; font-size: 0.8rem; color: var(--ink-soft); }
 
 .options { display: grid; gap: 10px; margin-bottom: 24px; }
-.option { text-align: left; padding: 14px 16px; border: 2px solid var(--ink); border-radius: 10px; background: var(--paper); }
+.option { text-align: left; padding: 14px 16px; border: 2px solid var(--ink); border-radius: var(--radius-ui); background: var(--paper); }
 .option[aria-pressed='true'] { background: var(--marker-soft); font-family: var(--font-hand); }
 
 .confidence { display: flex; gap: 8px; margin-bottom: 24px; flex-wrap: wrap; }
 .confidence-label { width: 100%; font-size: 0.9rem; color: var(--ink-soft); margin: 0 0 4px; }
-.conf { flex: 1; min-width: 96px; padding: 10px; border: 2px solid var(--ink); border-radius: 999px; background: var(--paper); }
+.conf { flex: 1; min-width: 96px; padding: 10px; border: 2px solid var(--ink); border-radius: var(--radius-ui); background: var(--paper); }
 .conf[aria-pressed='true'] { background: var(--ink); color: var(--paper); }
 
-.lock { width: 100%; padding: 16px; font-size: 1.15rem; font-weight: 800; border: 2px solid var(--ink); border-radius: 12px; background: var(--marker); box-shadow: var(--shadow); transition: transform 120ms cubic-bezier(.3, 1.6, .5, 1); }
+.lock { width: 100%; padding: 16px; font-size: 1.15rem; font-weight: 800; border: 2px solid var(--ink); border-radius: var(--radius-ui); background: var(--marker); box-shadow: var(--shadow); transition: transform 120ms cubic-bezier(.3, 1.6, .5, 1); }
 .lock:hover:not(:disabled) { transform: translateY(-2px); }
 .lock:active:not(:disabled) { transform: translateY(2px) scale(0.98); box-shadow: none; }
 .lock:disabled { opacity: 0.45; cursor: not-allowed; }
@@ -40,7 +40,7 @@ input[type='range'] { width: 100%; accent-color: var(--pencil); height: 28px; }
 .verdict.off { color: var(--off); }
 .truth-line { font-size: 1.05rem; margin: 0 0 16px; }
 
-.next { margin-top: 20px; padding: 12px 18px; border: 2px solid var(--ink); border-radius: 10px; background: var(--card); font-weight: 600; box-shadow: var(--shadow); }
+.next { margin-top: 20px; padding: 12px 18px; border: 2px solid var(--ink); border-radius: var(--radius-ui); background: var(--card); font-weight: 600; box-shadow: var(--shadow); }
 .home h1 { font-size: 2rem; margin: 0 0 8px; }
 .showcases { display: grid; gap: 12px; margin-top: 20px; }
 .showcase { text-align: left; padding: 16px; border: 2px solid var(--ink); border-radius: var(--radius); background: var(--card); box-shadow: 3px 3px 0 var(--ink); font-weight: 600; }

@@ -20,29 +20,29 @@
 .pt-hand { font-family: var(--font-hand); font-size: 18px; margin: 6px 0 0; }
 .pt-num { font-family: var(--pt-mono); font-variant-numeric: tabular-nums; }
 .pt-hl { background: linear-gradient(transparent 55%, var(--marker) 55%); }
-.pt-tag { font: 600 12px var(--pt-mono); text-transform: uppercase; letter-spacing: .06em; border: 1.5px solid var(--ink); border-radius: 4px; padding: 0 4px; vertical-align: 2px; }
+.pt-tag { font: 600 12px var(--pt-mono); text-transform: uppercase; letter-spacing: .06em; border: 1.5px solid var(--ink); border-radius: var(--radius-ui); padding: 0 4px; vertical-align: 2px; }
 .pt-k { font: 600 12px var(--pt-mono); text-transform: uppercase; letter-spacing: .06em; color: var(--ink-soft); }
 
 .pt input[type='range'] { width: 100%; height: 32px; accent-color: var(--ink); }
 .pt #pt-guess, .pt #pt-g2 { accent-color: var(--pencil); }
 .pt-ends { display: flex; justify-content: space-between; font-size: 14px; color: var(--ink-soft); }
 .pt-guessval { font: 600 44px/1 var(--font-hand); color: var(--pencil); }
-.pt-pencil-chip { display: inline-block; font-size: 15px; font-family: var(--font-hand); color: var(--ink-soft); border: 2px dashed var(--pencil); border-radius: 8px; padding: 2px 10px; margin: 0; transform: rotate(-1.5deg); }
+.pt-pencil-chip { display: inline-block; font-size: 15px; font-family: var(--font-hand); color: var(--ink-soft); border: 2px dashed var(--pencil); border-radius: var(--radius-ui); padding: 2px 10px; margin: 0; transform: rotate(-1.5deg); }
 .pt-pencil-text { font-family: var(--font-hand); color: var(--ink-soft); border-bottom: 2px dashed var(--pencil); }
 
-.pt-btn { font: 700 16px var(--font-body); background: var(--ink); color: var(--paper); border: 2px solid var(--ink); border-radius: 999px; padding: 10px 20px; box-shadow: 0 3px 0 #000; margin-top: 14px; min-height: 44px; }
+.pt-btn { font: 700 16px var(--font-body); background: var(--ink); color: var(--paper); border: 2px solid var(--ink); border-radius: var(--radius-ui); padding: 10px 20px; box-shadow: 0 3px 0 #000; margin-top: 14px; min-height: 44px; }
 .pt-btn:active:not(:disabled) { transform: translateY(2px); box-shadow: 0 1px 0 #000; }
 .pt-btn:disabled { opacity: .45; cursor: not-allowed; }
 .pt-btn.pt-go { background: var(--marker); color: var(--ink); }
 
-.pt-seg { display: inline-flex; border: 2px solid var(--ink); border-radius: 999px; overflow: hidden; }
+.pt-seg { display: inline-flex; border: 2px solid var(--ink); border-radius: var(--radius-ui); overflow: hidden; }
 .pt-seg button { font: 700 14px var(--font-body); background: var(--card); border: 0; padding: 8px 12px; min-height: 36px; }
 .pt-seg button + button { border-left: 2px solid var(--ink); }
 .pt-seg button[aria-pressed='true'] { background: var(--ink); color: var(--paper); }
 .pt-adders { display: grid; grid-template-columns: 1fr auto; gap: 8px 12px; align-items: center; margin-top: 10px; }
 .pt-ctl, .pt-presets { display: flex; gap: 6px; flex-wrap: wrap; }
 .pt-presets { margin-top: 12px; }
-.pt-mini { font: 700 14px var(--pt-mono); min-width: 44px; height: 36px; border: 2px solid var(--ink); background: var(--card); border-radius: 8px; box-shadow: 0 2px 0 var(--ink); }
+.pt-mini { font: 700 14px var(--pt-mono); min-width: 44px; height: 36px; border: 2px solid var(--ink); background: var(--card); border-radius: var(--radius-ui); box-shadow: 0 2px 0 var(--ink); }
 .pt-mini.wide { padding: 0 10px; font-family: var(--font-body); }
 .pt-mini:active { transform: translateY(2px); box-shadow: none; }
 
@@ -74,8 +74,8 @@
 .pt-big { font: 800 clamp(44px, 11vw, 76px)/1 var(--pt-display); font-variant-numeric: tabular-nums; }
 .pt-big.pt-dim { color: var(--grid); }
 .pt-sub { color: var(--ink-soft); font-size: 1.05rem; line-height: 1.6; }
-.pt-pill { font: 600 13px var(--pt-mono); padding: 3px 8px; border-radius: 999px; border: 2px solid var(--ink); background: var(--card); color: var(--ink); }
-.pt-pill.ok { background: var(--called); border-color: var(--called); color: #fff; }
+.pt-badge { font: 600 13px var(--pt-mono); padding: 3px 8px; border-radius: var(--radius-ui); border: 2px solid var(--ink); background: var(--card); color: var(--ink); }
+.pt-badge.ok { background: var(--called); border-color: var(--called); color: #fff; }
 
 /* charts: font sizes are viewBox units; the charts are ~320px wide on a phone, so 15 → 12px */
 .pt-axis { stroke: var(--ink-soft); stroke-width: 1; }
@@ -171,3 +171,10 @@
 @media (max-width: 400px) {
   .pt-logticks { font-size: 12.5px; }
 }
+
+/* compare step: every alarm in a day */
+.pt .pt-alarms { max-width: 440px; margin: 8px 0; }
+.pt .pt-alarms .pt-dot.tp { stroke-width: 1; }
+.pt .pt-alarms .pt-dot.fp { stroke-width: 0.6; }
+.pt .cmp .pt-big { font-size: 30px; }
+.pt .cmp .pt-btn { border-radius: var(--radius-ui, 4px); }

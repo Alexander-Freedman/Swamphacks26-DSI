@@ -1,6 +1,6 @@
 // @vitest-environment jsdom
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
-import { KEY, entries, notebook, record, reset, type Entry } from './notebook'
+import { KEY, amend, entries, notebook, record, reset, type Entry } from './notebook'
 
 const e = (at: string, misconception: string | null, rematch: Entry['rematch'] = null, session = 'birthday'): Entry => ({
   session,
@@ -135,5 +135,27 @@ describe('notebook store', () => {
     expect(entries()).toEqual([])
     expect(() => record(e('15', null))).not.toThrow()
     expect(() => reset()).not.toThrow()
+  })
+})
+
+describe('amend (compare answer on the same entry)', () => {
+  beforeEach(() => localStorage.clear())
+  it('adds extra fields to the matching entry only, never the core fields', () => {
+    record(e('01', 'random-means-evenly-mixed', 'wrong', 'coin-streak'))
+    record(e('02', null, null, 'coin-streak'))
+    amend('coin-streak', '2026-10-01T12:00:00.000Z', { comparePick: 'due', compareRight: false, misconception: null, rematch: 'right', guess: 7 })
+    const all = JSON.parse(localStorage.getItem(KEY)!)
+    expect(all).toHaveLength(2)
+    expect(all[0]).toMatchObject({ misconception: 'random-means-evenly-mixed', rematch: 'wrong', guess: 100, comparePick: 'due', compareRight: false })
+    expect(all[1].comparePick).toBeUndefined()
+    // bust rules see the same thing as before
+    expect(notebook().map((c) => [c.id, c.status, c.wins])).toEqual([['random-means-evenly-mixed', 'caught', 1]])
+  })
+  it('no matching entry: nothing changes', () => {
+    record(e('01', null, null, 'coin-streak'))
+    const before = localStorage.getItem(KEY)
+    amend('coin-streak', 'nope', { comparePick: 'x' })
+    amend('positive-test', '2026-10-01T12:00:00.000Z', { comparePick: 'x' })
+    expect(localStorage.getItem(KEY)).toBe(before)
   })
 })
