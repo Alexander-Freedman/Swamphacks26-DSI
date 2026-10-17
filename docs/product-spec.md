@@ -114,12 +114,44 @@ From any-topic-engine.md, reveal-patterns.md and misconceptions.md.
 - "Right answer, wrong reason" triggers a follow-up item, not a verdict.
 
 ## 7. What Gemini does (MLH Best Use of Gemini)
-- **Generates every round** with structured JSON output (misconceptions, items, widget parameters).
-- **Blind-checks** each item with a second call.
-- **Classifies** a typed reason against a short list (optional).
-- **Writes** the misconception card text and the origin stories for the cast.
-- **It never produces the truth numbers.**
-- **Model, limits, latency and fallback:** docs/research/gemini.md. Showcase rounds are cached on disk, so the demo works even if we hit a rate limit.
+**Free tier, verified** (AI Studio rate-limit page, our project, Fri Oct 16 10:15 PM):
+
+| Model | RPM | TPM | Requests/day |
+|---|---|---|---|
+| Pro (2.5, 3.1) | 0 | | 0, **not available** |
+| Flash (3.8 / 3.7 / 3.6 / 3 / 2.5) | 5 | 250K | **20** |
+| **Flash Lite (3.5 / 3.1)** | **15** | 250K | **500** |
+| **Gemma 4 31B / 26B** | 30 | **16K** | 14.4K |
+| Embeddings | 100 | | 1K |
+
+A consumer Gemini Pro subscription doesn't change API limits.
+
+**Plan (free tier by default; billing is my call, prices in docs/research/gemini.md):**
+- **Flash Lite does all live generation.** One call returns a topic's *full package* (misconceptions, 3-5 items, widget spec, card text, cast origin story), stored forever by normalized topic.
+- **Gemma 4 31B blind-checks the items** (separate quota, 14.4K/day). Its 16K TPM fits one check at a time.
+- **Gemma is also the fallback generator** if Flash Lite returns 429.
+- **Showcase rounds are hand-made JSON on disk**, with no API call. ~30 safety-net topics are pre-generated once and cached.
+- **Typed-"why" classification is off by default** (it would cost a call per answer); choices and bands are a lookup.
+
+**Flash Lite request budget** (≤500/day; the day resets at midnight Pacific = **3 AM ET**):
+
+| Use | Calls | When |
+|---|---|---|
+| Dev/testing | ~10/h × ~16h ≈ 160 | Sat (quota day Sat 3 AM → Sun 3 AM) |
+| Pre-generate 30 safety topics | 30 | Sat |
+| User tests (2 rounds × 5 users, 1 new topic each) | 10 | Sat |
+| **Sat total** | **≈200 / 500** | |
+| Final checks + video | ~30 | Sun before 7:30 AM (new quota day from 3 AM) |
+| Expo: judges' live topics (~15-25, many hit the cache) | ≤25 | Sun 10-12 |
+| **Sun total** | **≈55 / 500** | |
+
+Every live call is logged with a counter on the dev drawer. **At 400/day, new topics switch to Gemma.**
+
+**Gemini's jobs:**
+- **Generates every round** with structured JSON output.
+- **Gemma blind-checks** each round.
+- **Writes** the misconception card text and the cast origin stories, inside the same package.
+- **It never produces the truth numbers**; code computes them.
 
 ## 8. Showcase topics (hand-checked, cached, offline)
 From demo.md; the numbers were rechecked by me.
