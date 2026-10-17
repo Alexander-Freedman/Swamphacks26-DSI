@@ -40,7 +40,8 @@ ANSWERS_PER_IP_PER_HOUR = int(os.environ.get("MM_ANSWERS_PER_IP_PER_HOUR", "600"
 _hits: dict[str, deque[float]] = defaultdict(deque)
 
 
-def _rate_limited(ip: str, limit: int = PER_IP_PER_HOUR) -> bool:
+def _rate_limited(ip: str, limit: int | None = None) -> bool:
+    limit = PER_IP_PER_HOUR if limit is None else limit
     now = time.monotonic()
     q = _hits[ip]
     while q and now - q[0] > 3600:
