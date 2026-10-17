@@ -65,8 +65,7 @@ describe('compare screen', () => {
     const C = session.Component
     render(<C onDone={() => {}} />)
     fireEvent.change(screen.getByLabelText('your guess, people in the room'), { target: { value: '180' } })
-    fireEvent.click(screen.getByText('pretty sure'))
-    fireEvent.click(screen.getByText('Lock it in'))
+    fireEvent.click(screen.getByText('Show me'))
     act(() => vi.advanceTimersByTime(400))
     for (let k = 0; k < 5; k++) fireEvent.click(screen.getByLabelText('add 5 people'))
     fireEvent.click(screen.getByText('Next: draw your curve →'))
