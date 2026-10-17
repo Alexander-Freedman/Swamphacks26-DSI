@@ -1,6 +1,6 @@
 # Session card art
 
-Generated at build time, saved as files, served static from `/art/`. The site never calls the image service.
+Generated at build time, saved as files, served static from `web/public/art/` (at `<base>art/`). The site never calls the image service. This file lives in docs/ so the prompts metadata does not ship with the site.
 
 Source: Azure gpt-image-2, 1024x1024 PNG, downscaled to WebP (quality 82) at 512px and 256px. All picks read at 120px (see `qa/mock-home/`).
 

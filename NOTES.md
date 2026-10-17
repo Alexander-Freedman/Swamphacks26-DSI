@@ -62,7 +62,7 @@ Decisions + how to run things. Keep current.
 
 - Oct 16 ~11:15 PM, **Azure image generation available (my paid account):** build-time only (a script generates, files are committed, served as static assets; the public site never calls Azure). **Hard cap 40 images** unless I say more; ≤1024x1024. Key stays in `~/.hack-app.env` / `.env` only. Use it where it helps the demo + Easy On The Eyes (brand art, showcase illustrations, share card); SVG/CSS stays the base.
   - **Budget raised to 100 images (Sat ~12:00 AM); beyond 100 needs my approval.** Same rules.
-  - **Image count: 10 / 100** (5 early tries: coin streak, positive test, birthday, 2 hero, none committed; 5 for session cards on Home: 3 first passes + 2 retries, 3 picks committed in `web/public/art/`, see manifest.md there)
+  - **Image count: 10 / 100** (5 early tries: coin streak, positive test, birthday, 2 hero, none committed; 5 for session cards on Home: 3 first passes + 2 retries, 3 picks committed in `web/public/art/`, see docs/art-manifest.md)
 
 - **Oct 16 ~11:40 PM, MOST IMPORTANT DIRECTION:** what's live feels like two slides (one guess, one text verdict). That is not the product. **The product takes someone from never having seen a concept to a mental model they can actually run, and it is inherently visual:** you manipulate things, watch them move, draw, and see your own model next to reality.
   - **Backbone:** the 10-stage concept-to-runnable-model pipeline (from my research):
