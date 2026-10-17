@@ -11,6 +11,7 @@ def test_answers_room_and_collection(tmp_path, monkeypatch) -> None:
     import app.events as events
 
     monkeypatch.setattr(events, "DB_PATH", tmp_path / "t.db")
+    monkeypatch.setattr(events, "_store", events.SqliteStore())
     from app.main import app
 
     client = TestClient(app)
@@ -32,6 +33,7 @@ def test_answers_reject_unmatched(tmp_path, monkeypatch) -> None:
     import app.events as events
 
     monkeypatch.setattr(events, "DB_PATH", tmp_path / "t.db")
+    monkeypatch.setattr(events, "_store", events.SqliteStore())
     from app.main import app
 
     client = TestClient(app)
@@ -42,3 +44,10 @@ def test_answers_reject_unmatched(tmp_path, monkeypatch) -> None:
     assert _post(client, sid, item_id="which-is-real", option_id="zzz").status_code == 422
     bad = client.post("/api/answers", json={"session_id": "x", "round_slug": "a", "item_id": "b"})
     assert bad.status_code == 422
+
+
+def test_missing_url_falls_back(monkeypatch) -> None:
+    import app.events as events
+
+    monkeypatch.setenv("TIGER_DATABASE_URL", "")
+    assert events.make_store().name == "sqlite"
