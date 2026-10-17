@@ -419,6 +419,21 @@ def _is_daily_quota(err: Exception) -> bool:
 FAILED_TTL_S = 3600
 
 
+def _slug_path(slug: str) -> Path:
+    return CACHE_DIR / "by-slug" / f"{slug}.json"
+
+
+def generated_round(slug: str) -> Round | None:
+    """A previously generated round by slug (for answers on any-topic rounds)."""
+    if not re.fullmatch(r"[a-z0-9]+(-[a-z0-9]+)*", slug or ""):
+        return None
+    path = _slug_path(slug)
+    try:
+        return Round.model_validate_json(path.read_text())
+    except (OSError, ValidationError, ValueError):
+        return None
+
+
 def _failed_path(topic: str) -> Path:
     return _cache_path(topic).with_suffix(".failed")
 
@@ -478,6 +493,7 @@ def generate_round(topic: str, usage: Usage | None = None) -> GenResult:
                 log.warning("api error from %s: %s", model, type(err).__name__)
                 break
             _atomic_write(cached, r.model_dump_json(indent=2))
+            _atomic_write(_slug_path(r.slug), r.model_dump_json(indent=2))
             return GenResult(r, model, time.monotonic() - started)
     _atomic_write(failed, "")
     raise GenerationError(f"all models failed: {type(last_err).__name__ if last_err else 'none'}")
