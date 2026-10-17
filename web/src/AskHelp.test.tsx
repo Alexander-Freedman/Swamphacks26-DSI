@@ -2,7 +2,7 @@
 import { act, cleanup, fireEvent, render, screen, waitFor } from '@testing-library/react'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { AskHelp } from './components/AskHelp'
-import { BUSY_LINE, helpBody, MAX_QUESTION, OFFLINE_LINE } from './components/askHelp'
+import { BUSY_LINE, helpBody, MAX_QUESTION, OFFLINE_LINE } from './components/askHelpApi'
 import { HINTS } from './components/helpHints'
 import { SessionHead } from './components/session/Shell'
 
