@@ -57,7 +57,7 @@ Research notes, Oct 16 2026. Builds on docs/deep-mental-models.md. Tags: [verifi
 
 ### MAP: "Charting Student Math Misunderstandings" (Kaggle, 2025) [verified]
 - **Data:** 52k+ student *explanations* of their MC answers on 15 questions. Labels say whether the explanation is correct, whether it shows a misconception (or neither), and which type ([Crossley et al., AIME-Con 2026](https://aclanthology.org/2026.aimecon-main.33/)).
-- **Results:** 1,850+ teams. Top **MAP@3 above 0.948**, and the top 1,000 were all above 0.941. Winners used shared-prefix classification, soft labels plus 80k synthetic examples, and 72B models run only on low-confidence cases ([Learning Agency case study](https://the-learning-agency.com/the-cutting-ed/article/case-study-math-misconceptions-competition)).
+- **Results** (2025 "MAP – Charting Student Math Misunderstandings", scored with MAP@3; *not* the 2024 Eedi "Mining Misconceptions" comp, which used MAP@25): 1,850+ teams. Top **MAP@3 above 0.948** (**unverified**), and the top 1,000 were all above 0.941. Winners used shared-prefix classification, soft labels plus 80k synthetic examples, and 72B models run only on low-confidence cases ([Learning Agency case study](https://the-learning-agency.com/the-cutting-ed/article/case-study-math-misconceptions-competition)).
 - **Caveat:** train and test used the **same 15 questions**, so this is closed-set, per-item classification with lots of labels. That is our "per-item short list" setting, but with training data we won't have. MiRAGE (retrieval + CoT + rerank) reports MAP@1/3/5 = 0.82/0.92/0.93 on the same kind of data ([arXiv 2511.01182](https://arxiv.org/abs/2511.01182)).
 
 ## 2. Methods to detect a specific misconception from an answer
@@ -75,7 +75,7 @@ Research notes, Oct 16 2026. Builds on docs/deep-mental-models.md. Tags: [verifi
 Other numbers worth knowing:
 - **Code explanations** ([Oli et al. 2025, arXiv 2501.10365](https://arxiv.org/abs/2501.10365)): zero-shot GPT-4 beat LLaMA3 and Mistral. Its "diagnostic" rubric scores were only about 0.38-0.59. Fine-tuning helped.
 - **LLM feedback validity** ([arXiv 2403.01304](https://arxiv.org/abs/2403.01304)): GPT-4 rubric labels agreed with humans about 76% of the time. Human-human κ was only 0.29-0.53, so the ceiling is low when labels are fuzzy.
-- **Correct-answer trap** ([Imran & Bulathwela, AIED 2026](https://arxiv.org/abs/2605.23925)): 84% for fine-tuned T5 vs 57% for a frontier LLM. 71% of failures fall on item types where flawed reasoning still produces the right answer. The best model had about 4 false alarms per real catch.
+- **Correct-answer trap** ([Imran & Bulathwela, AIED 2026](https://arxiv.org/abs/2605.23925)): 84% vs 57% (from the abstract; **unverified** which model got which number). 71% of failures fall on item types where flawed reasoning still produces the right answer. The best model had about 4 false alarms per real catch.
 - **LLMs simulating a student with a given misconception** (Liu et al. 2023): GPT-4 produced the matching wrong answer only 53-68% of the time. That's relevant if we have the engine "self-check" distractors by role-playing the misconception.
 
 ## 3. Design recommendation for ANY topic
@@ -111,7 +111,7 @@ For a typed topic, the engine returns 3-5 items. Each item has:
 - Human agreement ceiling: when categories are fuzzy, human-human κ is only 0.3-0.5 (2403.01304). With crisp categories, inventories reach high agreement. So keep the misconception definitions crisp and mutually exclusive.
 
 ### Demo/pitch angle
-"Every wrong option is a known misconception, checked three ways: computed truth, a simulated student who holds that belief, and a named source." Cite Eedi's Kaggle work (1,850+ teams, MAP@3 0.948 on fixed items vs about 0.56 MAP@25 open-catalog) to explain *why* we classify against a short per-item list, not a giant catalog.
+"Every wrong option is a known misconception, checked three ways: computed truth, a simulated student who holds that belief, and a named source." Cite the Kaggle misconception competitions (2025 MAP comp: fixed items, MAP@3 above 0.948, **unverified**; 2024 Eedi comp used MAP@25 vs about 0.56 MAP@25 open-catalog) to explain *why* we classify against a short per-item list, not a giant catalog.
 
 ## Sources
 - Eedi Kaggle recap: https://www.eedi.com/news/from-wrong-answers-to-real-insights-how-we-used-a-kaggle-challenge-to-map-student-misconceptions
