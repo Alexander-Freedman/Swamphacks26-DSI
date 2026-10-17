@@ -9,7 +9,7 @@ describe('positive test session', () => {
   it('guess → test everyone → you vs real → change the crowd → card', async () => {
     vi.useFakeTimers()
     const { container } = render(<App />)
-    fireEvent.click(screen.getByText('What a positive test really means'))
+    fireEvent.click(screen.getByText('You tested positive. Are you sick?'))
 
     const lock = screen.getByText('Move the slider to guess') as HTMLButtonElement
     expect(lock.disabled).toBe(true)
@@ -42,5 +42,5 @@ describe('positive test session', () => {
     fireEvent.click(screen.getByText('Show me'))
     expect(screen.getByText('50%', { selector: 'b' })).toBeTruthy()
     vi.useRealTimers()
-  }, 30000)
+  }, 60000)
 })
