@@ -1,17 +1,19 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
-import { record as save } from '../../notebook'
+import { labelFor } from '../../notebook'
 import { showcaseRound } from '../../rounds'
 import { misconceptionFor } from '../../verdict'
 import { ConfidencePicker, EndBar, Frame, LockButton, SessionHead, StampRow, Title } from '../../components/session/Shell'
+import { Compare, type CompareAnswer, type CompareOption } from '../../components/session/Compare'
 import { cardGuide, lockLabel, type Confidence } from '../../components/session/copy'
 import { rematchVerdict, shellVerdict } from '../../components/session/verdict'
-import { CrowdCurve, GuessBar, MiniPile, PileCompare } from './Charts'
+import { useNotebookEntry } from '../../components/session/entry'
+import { AlarmArray, CrowdCurve, GuessBar, MiniPile, PileCompare } from './Charts'
 import { DotCanvas, PaintGrid, type Kind } from './Crowd'
-import { baseToSlider, breakEven, CARD, exact, pct, piles, POP, ppv, REMATCH, seededOrder, sliderToBase, type Test } from './math'
+import { BAG_DAY, BAGS, baseToSlider, breakEven, CARD, exact, pct, piles, POP, ppv, REMATCH, seededOrder, sliderToBase, type Test } from './math'
 import './positive.css'
 
 const ORDER = seededOrder()
-const STEPS = ['Your guess', 'Test all 1,000', 'Your pile vs real', 'Change the crowd', 'Your mistake', 'Rematch'] as const
+const STEPS = ['Your guess', 'Test all 1,000', 'Your pile vs real', 'Change the crowd', 'Your mistake', 'Same idea, new case', 'Rematch'] as const
 const reducedMotion = () => typeof matchMedia === 'function' && matchMedia('(prefers-reduced-motion: reduce)').matches
 
 /** The verdict's "close" window: 15% of the 0-100 slider, in points. */
@@ -36,6 +38,7 @@ export function PositiveSession({ onDone }: { onDone: () => void }) {
   const test = useMemo(() => cardTest(), [])
   const truth = ppv(test)
 
+  const entry = useNotebookEntry('positive-test')
   const [step, setStep] = useState(1)
   const [reached, setReached] = useState(1)
   const go = (n: number) => {
@@ -63,14 +66,18 @@ export function PositiveSession({ onDone }: { onDone: () => void }) {
     ['Your pile vs the real pile.', 'These are all the positives. Tap a few: how many are actually sick?'],
     ['Same test. Change the crowd.', 'Drag how common the condition is. Watch what a positive result really means change.'],
     ['What happened in your head', cardGuide(misconceptionId(item, guess) === null)],
-    ['Rematch', 'Same test, new numbers: does the idea stick?'],
+    ['One more case: airport bags', "A bag scanner next to your test. Look at both: what's the same about how they work?"],
+    ['Rematch', 'New test, new crowd: does the idea stick?'],
   ]
   const [h, sub] = TITLES[step - 1]
 
   return (
     <Frame className="pt">
       {/* step dots navigate like coin's: any step you've reached, never back to the locked guess */}
-      <SessionHead chip="Positive test" step={step} total={TITLES.length} labels={STEPS} canGo={(i) => i > 0 && i < reached} onGo={(i) => go(i + 1)}>
+      <SessionHead chip="Positive test" step={step} total={TITLES.length} labels={STEPS} canGo={(i) => i > 0 && i < reached} onGo={(i) => go(i + 1)}
+        // Ask panel: P1 is before lock-in; compare reports the card (P5); the rematch (step 7, storyboard P6) has its own guess, so it stays hint-only.
+        help={{ screen: step === 7 ? 'P6' : step === 6 ? 'P5' : `P${step}`, locked: step > 1 && step < 7, guess: step < 7 && touched ? guess : null }}
+      >
         {step > 1 && (
           <span className="pt-pencil-chip">
             your guess: <b>{guess}%</b>
@@ -97,10 +104,30 @@ export function PositiveSession({ onDone }: { onDone: () => void }) {
       {step === 2 && <RunStep test={test} guess={guess} onNext={() => go(3)} />}
       {step === 3 && <CompareStep guess={guess} truth={truth} painted={painted} test={test} onNext={() => go(4)} />}
       {step === 4 && <CrowdStep card={test} guess={guess} onNext={() => go(5)} />}
-      {step === 5 && <CardStep guess={guess} conf={conf ?? 'pretty sure'} truth={truth} test={test} round={round} item={item} onNext={() => go(6)} />}
+      {step === 5 && (
+        <CardStep
+          guess={guess}
+          conf={conf ?? 'pretty sure'}
+          truth={truth}
+          test={test}
+          round={round}
+          item={item}
+          onShown={() => entry.atCard({ guess, confidence: conf ?? undefined, misconception: misconceptionId(item, guess) })}
+          onNext={() => go(6)}
+        />
+      )}
       {step === 6 && (
+        <BagsCompare
+          test={test}
+          onAnswer={(a) => entry.extend({ comparePick: a.pick, compareRight: a.right, ...(a.text ? { compareText: a.text } : {}) })}
+          onNext={() => go(7)}
+        />
+      )}
+      {step === 7 && (
         <RematchStep
-          onReveal={(g2) => save({ session: 'positive-test', at: new Date().toISOString(), guess, confidence: conf ?? undefined, misconception: misconceptionId(item, guess), rematch: rematchOf(g2) === 'off' ? 'wrong' : 'right', rematchGuess: g2, rematchTruth: Math.round(ppv(REMATCH) * 1000) / 10 })}
+          onReveal={(g2) =>
+            entry.rematch(rematchOf(g2) === 'off' ? 'wrong' : 'right', rematchMisconception(g2), { rematchGuess: g2, rematchTruth: Math.round(ppv(REMATCH) * 1000) / 10 })
+          }
           caught={round.misconceptions.find((x) => x.id === misconceptionId(item, guess))?.label ?? null}
           onDone={onDone}
         />
@@ -376,7 +403,7 @@ function CrowdStep({ card, guess, onNext }: { card: Test; guess: number; onNext:
             <span className="pt-sub">
               positives are sick · <b className="pt-truthnum">{exact(p)}</b> <span className="pt-tag">exact</span>
               <br />
-              <span className={`pt-pill ${p >= 0.5 ? 'ok' : ''}`}>{p >= 0.5 ? 'positive = probably sick' : "don't trust it yet"}</span>
+              <span className={`pt-badge ${p >= 0.5 ? 'ok' : ''}`}>{p >= 0.5 ? 'positive = probably sick' : "don't trust it yet"}</span>
             </span>
           </div>
         </div>
@@ -409,10 +436,14 @@ type CardProps = {
   test: Test
   round: NonNullable<ReturnType<typeof showcaseRound>>
   item: ItemT
+  onShown: () => void
   onNext: () => void
 }
 
-function CardStep({ guess, conf, truth, test, round, item, onNext }: CardProps) {
+function CardStep({ guess, conf, truth, test, round, item, onShown, onNext }: CardProps) {
+  // Saved when the card shows (#159); the rematch updates this same entry. The hook saves once per play.
+  const shown = useRef(onShown)
+  useEffect(() => shown.current(), [])
   const mid = misconceptionId(item, guess)
   const v = shellVerdict(mid, guess, truth * 100, WINDOW) // truth in the slider's units (%)
   const m = round.misconceptions.find((x) => x.id === mid)
@@ -462,13 +493,24 @@ function CardStep({ guess, conf, truth, test, round, item, onNext }: CardProps) 
           </>
         )}
       </div>
-      <button className="pt-btn pt-go" onClick={onNext}>One more, new numbers →</button>
+      <button className="pt-btn pt-go" onClick={onNext}>One more case →</button>
     </section>
   )
 }
 
 /** Stamp for the rematch: "called it" within 5 points, then the same close rule as the first guess (#151). */
 const rematchOf = (g: number) => rematchVerdict(g, ppv(REMATCH) * 100, 5, WINDOW)
+
+/**
+ * The mistake a missed rematch points to (#162), read the way the card's bands read the first guess:
+ * 60%+ is the test's accuracy taken as your chance, above the truth is false alarms shrunk,
+ * below it is the positive read as barely mattering. Only a miss ("way off") names one.
+ */
+function rematchMisconception(g: number): string | null {
+  if (rematchOf(g) !== 'off') return null
+  if (g >= 60) return 'accuracy-is-my-chance'
+  return g > ppv(REMATCH) * 100 ? 'ignores-false-alarms' : 'positive-barely-matters'
+}
 
 function RematchStep({ onReveal, caught, onDone }: { onReveal: (g: number) => void; caught: string | null; onDone: () => void }) {
   const t = REMATCH
@@ -482,7 +524,7 @@ function RematchStep({ onReveal, caught, onDone }: { onReveal: (g: number) => vo
     <section>
       <div className="pt-card pt-guess">
         <p className="pt-lede">
-          New numbers. <b>{pct(t.baseRate)}</b> of people have it. The test catches <b>{pct(t.sensitivity)}</b> of real cases and wrongly says yes to <b>{pct(t.falseAlarm)}</b> of healthy people. You test positive.
+          New test, new crowd. <b>{pct(t.baseRate)}</b> of people have it. The test catches <b>{pct(t.sensitivity)}</b> of real cases and wrongly says yes to <b>{pct(t.falseAlarm)}</b> of healthy people. You test positive.
         </p>
         <label className="pt-lab" htmlFor="pt-g2">Chance you're actually sick?</label>
         <div className="pt-row">
@@ -518,9 +560,96 @@ function RematchStep({ onReveal, caught, onDone }: { onReveal: (g: number) => vo
               <MiniPile truePos={c.truePos} positives={c.positives} />
             </div>
           </div>
-          <EndBar caught={caught} rematch={v === 'called' ? 'right' : v === 'close' ? 'close' : 'wrong'} remix="Come back tomorrow for a remix: same idea, a different crowd." onDone={onDone} />
+          <EndBar
+            caught={caught}
+            rematch={v === 'called' ? 'right' : v === 'close' ? 'close' : 'wrong'}
+            rematchCaught={(() => {
+              const id = rematchMisconception(g)
+              return id ? labelFor('positive-test', id) : null
+            })()}
+            remix="Come back tomorrow for a remix: same idea, a different crowd." onDone={onDone} />
         </>
       )}
+    </section>
+  )
+}
+
+const bagDay = piles(BAGS, BAG_DAY)
+const BAG_OPTIONS: CompareOption[] = [
+  {
+    id: 'accuracy',
+    text: '99% accurate, so an alarm is 99% real',
+    why: `99% is how many bags with something it catches. Of all ${bagDay.positives.toLocaleString('en-US')} alarms, only ${exact(ppv(BAGS))} are real.`,
+  },
+  {
+    id: 'too-rare',
+    text: 'False alarms are too rare to matter',
+    why: `2% of ${bagDay.healthy.toLocaleString('en-US')} clean bags is ${bagDay.falsePos.toLocaleString('en-US')} false alarms, about ${Math.round(bagDay.falsePos / bagDay.truePos)} times the ${bagDay.truePos} real ones.`,
+  },
+  { id: 'rare-swamps', text: 'Rare thing + small false-alarm rate = mostly false alarms', right: true },
+  {
+    id: 'bad-test',
+    text: 'Both tests are just bad',
+    why: 'Both catch nearly every real case. Make the thing common and the same test works fine (step 4).',
+  },
+]
+
+function BagsCompare({ test, onAnswer, onNext }: { test: Test; onAnswer: (a: CompareAnswer) => void; onNext: () => void }) {
+  const c = piles(test)
+  const b = bagDay
+  const n = (x: number) => x.toLocaleString('en-US')
+  return (
+    <section>
+      <Compare
+        cases={[
+          {
+            tag: 'case 1: your test',
+            title: `${n(POP)} people, ${pct(test.baseRate)} sick`,
+            body: (
+              <>
+                <MiniPile truePos={c.truePos} positives={c.positives} />
+                <p>
+                  <span className="pt-big pt-num">{c.truePos} / {c.positives}</span>{' '}
+                  <span className="pt-note">positives are sick: {exact(ppv(test))}</span>
+                </p>
+                <p className="pt-small">{pct(test.falseAlarm)} false alarms on {n(c.healthy)} healthy people = <b>{c.falsePos}</b>.</p>
+              </>
+            ),
+          },
+          {
+            tag: 'case 2: an airport bag scanner',
+            title: `${n(BAG_DAY)} bags, 1 in ${n(Math.round(1 / BAGS.baseRate))} has something`,
+            body: (
+              <>
+                <AlarmArray real={b.truePos} falseAlarms={b.falsePos} />
+                <div className="pt-legend pt-top0">
+                  <span><i className="pt-sw tp" />alarm, something there</span>
+                  <span><i className="pt-sw fp" />false alarm</span>
+                </div>
+                <p>
+                  <span className="pt-big pt-num">{b.truePos} / {n(b.positives)}</span>{' '}
+                  <span className="pt-note">alarms are real: {exact(ppv(BAGS))}</span>
+                </p>
+                <p className="pt-small">
+                  It flags {pct(BAGS.sensitivity)} of bags with something; {pct(BAGS.falseAlarm)} of {n(b.healthy)} clean bags = <b>{n(b.falsePos)}</b> false alarms.
+                </p>
+                <p className="cmp-fine">Every dot is one alarm. Illustrative numbers, not real airport data; counts and % computed exactly.</p>
+              </>
+            ),
+          },
+        ]}
+        options={BAG_OPTIONS}
+        principle="When the thing is rare, even a small false-alarm rate makes most alarms false."
+        detail={
+          <>
+            Your test: {c.falsePos} false alarms next to {c.truePos} real cases. The scanner: {n(b.falsePos)} next to {b.truePos}. A rare thing means a huge
+            crowd of the clean or healthy, and a small slice of a huge crowd outnumbers the real hits.
+          </>
+        }
+        onAnswer={onAnswer}
+      >
+        <button className="pt-btn pt-go" onClick={onNext}>Rematch: new numbers →</button>
+      </Compare>
     </section>
   )
 }

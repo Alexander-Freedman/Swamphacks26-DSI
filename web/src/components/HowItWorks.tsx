@@ -40,7 +40,8 @@ function Row({ k, children }: { k: string; children: ReactNode }) {
   )
 }
 
-function SpecSide({ item }: { item: Item }) {
+/** `show` false (guess not locked, no peek): the answer formula and the round's claim stay hidden (#171). */
+function SpecSide({ item, show }: { item: Item; show: boolean }) {
   const t = item.truth
   return (
     <dl className="hiw-spec">
@@ -91,12 +92,17 @@ function SpecSide({ item }: { item: Item }) {
       )}
       {t.widget === 'estimate' && <Row k="Shown as">one number on a number line{t.unit ? ` (${t.unit})` : ''}</Row>}
       {t.widget === 'stepper' && <Row k="Shown as">a worked example in {t.steps.length} steps</Row>}
-      {item.answer_expr && (
+      {!show && (item.answer_expr || item.answer_claimed != null) && (
+        <Row k="Answer">
+          <span className="hiw-held" data-testid="hiw-held-spec">held back until you lock in</span>
+        </Row>
+      )}
+      {show && item.answer_expr && (
         <Row k="Answer formula">
           <span className="hiw-mono">{prettyFormula(item.answer_expr)}</span>
         </Row>
       )}
-      {item.answer_claimed != null && (
+      {show && item.answer_claimed != null && (
         <Row k="Round claims">
           <span className="hiw-mono">{n(item.answer_claimed)}</span>
         </Row>
@@ -251,7 +257,8 @@ function GeneratedChecks({ item, report }: { item: Item; report: ChecksReport | 
   )
 }
 
-function HandChecked({ item, round }: { item: Item; round: Round }) {
+/** `show` false: the source titles name the wrong ideas, so they wait for lock-in like the answer (#171). */
+function HandChecked({ item, round, show }: { item: Item; round: Round; show: boolean }) {
   const ids = new Set<string>([
     ...(item.targets ?? []),
     ...(item.bands ?? []).map((b) => b.misconception_id ?? ''),
@@ -264,9 +271,15 @@ function HandChecked({ item, round }: { item: Item; round: Round }) {
   return (
     <>
       <p>
-        <strong>Hand-checked:</strong> our code evaluates the stated formula (or runs the simulation), and a person checked the numbers and sources. Sources:
+        <strong>Hand-checked:</strong> our code evaluates the stated formula (or runs the simulation), and a person checked the numbers and sources.
+        {show ? ' Sources:' : ''}
       </p>
-      <ul className="hiw-sources">
+      {!show && (
+        <p className="hiw-held" data-testid="hiw-held-sources">
+          The sources are listed after you lock in: their titles name the wrong ideas.
+        </p>
+      )}
+      {show && <ul className="hiw-sources">
         {truthSource && (
           <li>
             Answer: <a href={truthSource} target="_blank" rel="noreferrer">{truthSource}</a>
@@ -286,7 +299,7 @@ function HandChecked({ item, round }: { item: Item; round: Round }) {
             {m.source_note && <span className="hiw-means"> {m.source_note}</span>}
           </li>
         ))}
-      </ul>
+      </ul>}
     </>
   )
 }
@@ -368,11 +381,14 @@ export function HowItWorks({ round, item, locked, onClose }: { round: Round; ite
         <div className="hiw-cols">
           <section aria-labelledby="hiw-spec-h">
             <h3 id="hiw-spec-h">What the round says</h3>
-            <SpecSide item={item} />
-            <details className="hiw-raw">
-              <summary>Raw JSON for this question</summary>
-              <pre>{JSON.stringify(item, null, 2)}</pre>
-            </details>
+            <SpecSide item={item} show={show} />
+            {/* The raw JSON holds the bands, options' mistakes and the claimed answer: same gate (#171). */}
+            {show && (
+              <details className="hiw-raw">
+                <summary>Raw JSON for this question</summary>
+                <pre>{JSON.stringify(item, null, 2)}</pre>
+              </details>
+            )}
           </section>
           <section aria-labelledby="hiw-comp-h">
             <h3 id="hiw-comp-h">What our code computed</h3>
@@ -385,7 +401,7 @@ export function HowItWorks({ round, item, locked, onClose }: { round: Round; ite
         </div>
         <section className="hiw-checks-box" aria-labelledby="hiw-checks-h">
           <h3 id="hiw-checks-h">Checks</h3>
-          {round.reviewed ? <HandChecked item={item} round={round} /> : <GeneratedChecks item={item} report={checksFor(round.slug)} />}
+          {round.reviewed ? <HandChecked item={item} round={round} show={show} /> : <GeneratedChecks item={item} report={checksFor(round.slug)} />}
         </section>
     </DrawerShell>
   )

@@ -1,7 +1,10 @@
 // @vitest-environment jsdom
-import { cleanup, fireEvent, render, screen } from '@testing-library/react'
+import { cleanup, fireEvent, render, renderHook, screen } from '@testing-library/react'
 import { afterEach, describe, expect, it, vi } from 'vitest'
+import { KEY, notebook } from '../../notebook'
 import { cardGuide, endLine, lockLabel } from './copy'
+import { useNotebookEntry } from './entry'
+import { percent } from './percent'
 import { EndBar, SessionHead } from './Shell'
 import { isClose, rematchVerdict, shellVerdict } from './verdict'
 
@@ -47,7 +50,11 @@ describe('session shell copy', () => {
   })
 
   it('end line covers the first guess and the rematch (#148)', () => {
-    expect(endLine(null, 'wrong')).toBe('Your first guess called it. Rematch missed; it stays in your notebook to try again.')
+    // only promises the notebook when something is in it (#162)
+    expect(endLine(null, 'wrong')).toBe('Your first guess called it. Rematch missed; try it again tomorrow.')
+    expect(endLine(null, 'wrong', 'Y')).toBe('Your first guess called it. Rematch missed: “Y” is in your notebook to try again.')
+    expect(endLine('X', 'wrong')).toBe('Caught: “X”. Rematch missed; it stays in your notebook to try again.')
+    expect(endLine('X', 'wrong', 'Y')).toBe('Caught: “X”. Rematch missed; it stays in your notebook to try again.')
     expect(endLine(null, 'right')).toBe('Your first guess called it. Rematch: right.')
     expect(endLine('X', 'right')).toBe('Caught: “X”. Rematch: right.')
     expect(endLine('X', 'close')).toBe('Caught: “X”. Rematch: close.')
@@ -55,11 +62,26 @@ describe('session shell copy', () => {
   })
 })
 
+describe('percent (#161)', () => {
+  it('never rounds a chance below 1 up to 100%, or one above 0 down to 0%', () => {
+    expect(percent(0.99972)).toBe('>99.9%')
+    expect(percent(0.9994)).toBe('99.9%')
+    expect(percent(0.996, 0)).toBe('>99%')
+    expect(percent(0.972)).toBe('97.2%')
+    expect(percent(0.5, 0)).toBe('50%')
+    expect(percent(0.00004)).toBe('<0.1%')
+    expect(percent(0.004, 0)).toBe('<1%')
+    expect(percent(1)).toBe('100%')
+    expect(percent(0)).toBe('0%')
+    expect(percent(Number.NaN)).toBe('-')
+  })
+})
+
 describe('session shell parts', () => {
   it('end bar: saved, the line, the remix, open notebook, done', () => {
     const done = vi.fn()
     const { container } = render(<EndBar caught={null} rematch="wrong" remix="Come back tomorrow." onDone={done} />)
-    expect(container.textContent).toContain('Saved to your notebook. Your first guess called it. Rematch missed; it stays in your notebook to try again. Come back tomorrow.')
+    expect(container.textContent).toContain('Saved to your notebook. Your first guess called it. Rematch missed; try it again tomorrow. Come back tomorrow.')
     expect(screen.getByText('Open notebook').getAttribute('href')).toContain('?notebook=1')
     fireEvent.click(screen.getByText('Done'))
     expect(done).toHaveBeenCalled()
@@ -76,5 +98,21 @@ describe('session shell parts', () => {
     expect((screen.getByRole('button', { name: '3 Your mistake' }) as HTMLButtonElement).disabled).toBe(true)
     fireEvent.click(screen.getByRole('button', { name: '1 Be a coin' }))
     expect(go).toHaveBeenCalledWith(0)
+  })
+})
+
+describe('useNotebookEntry extend (compare answer on the same entry)', () => {
+  it('adds extra fields to the card entry, never the core fields, and the rematch keeps them', () => {
+    localStorage.clear()
+    const { result } = renderHook(() => useNotebookEntry('coin-streak'))
+    result.current.extend({ comparePick: 'x' }) // nothing saved yet: no-op
+    expect(localStorage.getItem(KEY)).toBeNull()
+    result.current.atCard({ guess: 3, confidence: 'certain', misconception: 'random-means-evenly-mixed' })
+    result.current.extend({ comparePick: 'due', compareRight: false, misconception: null, rematch: 'right', guess: 7 })
+    result.current.rematch('right', null)
+    const all = JSON.parse(localStorage.getItem(KEY)!)
+    expect(all).toHaveLength(1)
+    expect(all[0]).toMatchObject({ guess: 3, misconception: 'random-means-evenly-mixed', rematch: 'right', comparePick: 'due', compareRight: false })
+    expect(notebook().map((c) => c.id)).toEqual(['random-means-evenly-mixed'])
   })
 })

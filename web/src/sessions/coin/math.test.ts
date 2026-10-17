@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest'
 import {
   expectedLongest,
+  flipSeq,
   expectedLongestSlow,
   longestOfFlips,
   longestRun,
@@ -89,5 +90,17 @@ describe('sequence helpers', () => {
   it('the which-is-real pair: A tops out at 2, B at 4', () => {
     expect(longestRun(toSides('HTHHTHTTHTHHTHTTHTHT'))).toBe(2)
     expect(longestRun(toSides('HTTTTHHTHHHHTTHTHHHT'))).toBe(4)
+  })
+})
+
+describe('compare step: a 50% shooter (#182) uses the same math', () => {
+  it('seed 5 gives 100 shots with 49 made and a longest streak of 7', () => {
+    const shots = flipSeq(100, rng(5))
+    expect(shots.filter((x) => x === 'H').length).toBe(49)
+    expect(longestRun(shots)).toBe(7)
+  })
+  it('the detail line numbers: average longest 6.98, a run of 5+ 97.2%', () => {
+    expect(expectedLongest(100).toFixed(2)).toBe('6.98')
+    expect((pLongestAtLeast(100, 5) * 100).toFixed(1)).toBe('97.2')
   })
 })

@@ -4,9 +4,10 @@ import { afterEach, describe, expect, it, vi } from 'vitest'
 import { shellVerdict } from '../../components/session/verdict'
 import { showcaseRound } from '../../rounds'
 import { misconceptionFor } from '../../verdict'
+import { notebook } from '../../notebook'
 import { CoinSession } from './CoinSession'
 import { sampleLabel } from './hooks'
-import { expectedLongest } from './math'
+import { expectedLongest, pLongestAtMost } from './math'
 
 afterEach(cleanup)
 
@@ -18,6 +19,7 @@ describe('coin streak session', () => {
     // reduced motion: "run 1,000" lands at once
     vi.stubGlobal('matchMedia', (q: string) => ({ matches: q.includes('reduce'), media: q }))
     const done = vi.fn()
+    localStorage.clear()
     render(<CoinSession onDone={done} />)
     expect(screen.getByText(/^Make up 20 coin flips/)).toBeTruthy()
     expect(screen.queryByText(/sample human row/)).toBeNull() // no fill-for-me: the point is your own pattern
@@ -52,7 +54,9 @@ describe('coin streak session', () => {
     expect(screen.getByText('Now a real coin. Flip it.')).toBeTruthy()
     expect(screen.getByText(/^Each dot is one real round of 100 flips/)).toBeTruthy() // guidance line
     expect(screen.getByText('6.98')).toBeTruthy() // exact mean in ink
-    expect(screen.getByText('97.2%')).toBeTruthy() // exact P(run of 5+)
+    // #174: the exact line is about your guess, like the simulated % next to it; never "100.0%"
+    expect(document.querySelector('.simnote')!.textContent).toContain('Exact: a run longer than your 3 shows up >99.9% of the time.')
+    expect(document.body.textContent).not.toMatch(/100\.0%|run of 5\+ shows up/)
     expect(screen.getByText(/real average 6\.98 \(exact\)/)).toBeTruthy() // truth line is labeled
     expect(screen.getByText(/you guessed/).textContent).toBe('you guessed 3 in a row (certain)')
     expect(screen.getByText(/^Flipped here: 1 run of 100 flips/)).toBeTruthy()
@@ -85,19 +89,46 @@ describe('coin streak session', () => {
     expect(screen.getByText(/A real coin goes past 3 in/)).toBeTruthy()
     expect(screen.getByText(/You said/).textContent).toBe('You said 3 (certain). A real 100 averages 6.98.')
 
-    localStorage.clear()
+    // saved when the card shows, before any rematch (#159)
+    const atCard = JSON.parse(localStorage.getItem('mm.sessions') ?? '[]')
+    expect(atCard).toHaveLength(1)
+    expect(atCard[0]).toMatchObject({ session: 'coin-streak', guess: 3, misconception: 'random-means-evenly-mixed', rematch: null })
     fireEvent.click(screen.getByRole('button', { name: /^A: / }))
     expect(screen.getByText(/B was the real coin/)).toBeTruthy()
     expect(screen.getByText(/In 20 real flips/)).toBeTruthy()
     // both rematch rows stay plain ink: pencil only ever means "you"
     expect(document.querySelectorAll('.tryit .mine').length).toBe(0)
-    // saved to the same notebook as the birthday session, once
+    // the pick updates the card's entry; the end bar waits for the compare step
+    expect(screen.queryByText('Saved to your notebook.')).toBeNull()
+    expect(JSON.parse(localStorage.getItem('mm.sessions') ?? '[]')).toHaveLength(1)
+
+    // compare (#182): a 50% shooter next to the real coin, then name what's the same
+    next(/one more case/)
+    expect(screen.getByText('One more case: a 50% shooter')).toBeTruthy()
+    expect(screen.getByText(/^A made-up shooter who makes exactly half her shots/)).toBeTruthy()
+    expect(screen.getByRole('button', { name: '6 Same idea, new case' }).getAttribute('aria-current')).toBe('step')
+    expect(screen.getByText('6 of 6')).toBeTruthy()
+    // seeded: the first 100 shots have 49 made and a 7-shot streak, marked
+    expect(screen.getByRole('img', { name: '100 shots, 49 made, longest streak 7 marked' })).toBeTruthy()
+    expect(document.querySelectorAll('.shots .shot').length).toBe(100)
+    expect(document.querySelectorAll('.shots .shot-run').length).toBeGreaterThan(0)
+    expect(screen.getByText(/illustrative, not data on real players/)).toBeTruthy()
+    fireEvent.click(screen.getByText('Shoot 100 again'))
+    expect(screen.getByText(/^longest so far: 7, \d+$/)).toBeTruthy()
+    expect(screen.queryByText('the shared idea')).toBeNull()
+    fireEvent.click(screen.getByRole('button', { name: /After a run, the other side is due/ }))
+    expect(screen.getByText('Not quite.')).toBeTruthy()
+    expect(screen.getByText('Each flip or shot ignores the last, so long runs are normal, not a sign of anything.')).toBeTruthy()
+    expect(document.querySelector('.cmp-detail')!.textContent).toContain('averages 6.98, and a run of 5+ shows up 97.2% of the time')
+    expect(screen.getByRole('button', { name: /Each try ignores the last one/ }).className).toContain('right')
+
+    // the rematch and the compare answer update that same entry: same notebook as the birthday session, once
     expect(screen.getByText('Saved to your notebook.')).toBeTruthy()
     expect(document.querySelector('.ss-end')!.textContent).toContain('Caught: “Random means evenly mixed”. Rematch missed; it stays in your notebook to try again.')
     expect(screen.getByText('Open notebook').getAttribute('href')).toContain('?notebook=1')
     const saved = JSON.parse(localStorage.getItem('mm.sessions') ?? '[]')
     expect(saved).toHaveLength(1)
-    expect(saved[0]).toMatchObject({ session: 'coin-streak', guess: 3, confidence: 'certain', misconception: 'random-means-evenly-mixed', rematch: 'wrong' })
+    expect(saved[0]).toMatchObject({ session: 'coin-streak', guess: 3, confidence: 'certain', misconception: 'random-means-evenly-mixed', rematch: 'wrong', at: atCard[0].at, comparePick: 'due', compareRight: false })
     expect(document.body.textContent).not.toMatch(/NaN/)
 
     fireEvent.click(screen.getByText('Done'))
@@ -187,9 +218,44 @@ describe('coin card and end bar (same shell as birthday)', () => {
     expect(screen.getByText('the right model')).toBeTruthy()
     // the made-up row: the bar says both parts, never a bare "Called it."
     fireEvent.click(screen.getByRole('button', { name: /^A: / }))
+    throughCompare()
     const bar = document.querySelector('.ss-end')!.textContent!
-    expect(bar).toContain('Saved to your notebook. Your first guess called it. Rematch missed; it stays in your notebook to try again.')
+    // the made-up row maps to a mistake, so the notebook really has it (#162)
+    expect(bar).toContain('Saved to your notebook. Your first guess called it. Rematch missed: “Random means evenly mixed” is in your notebook to try again.')
     expect(screen.getByText('Open notebook')).toBeTruthy()
+    const saved = JSON.parse(localStorage.getItem('mm.sessions') ?? '[]')
+    expect(saved).toHaveLength(1)
+    expect(saved[0]).toMatchObject({ misconception: null, rematch: 'wrong', rematchMisconception: 'random-means-evenly-mixed' })
+    expect(notebook().map((c) => [c.id, c.status])).toEqual([['random-means-evenly-mixed', 'caught']])
+    vi.useRealTimers()
+  }, 60000)
+
+  it('saves once at the card: step dots back and forth, then Done, never add a second entry (#159)', async () => {
+    vi.useFakeTimers()
+    localStorage.clear()
+    await playToCard(3)
+    fireEvent.click(screen.getByRole('button', { name: '2 Flip it' }))
+    await act(async () => vi.advanceTimersByTime(50))
+    fireEvent.click(screen.getByRole('button', { name: '5 Your mistake' }))
+    await act(async () => vi.advanceTimersByTime(50))
+    // no rematch pick: Done waits on the compare step; its answer lands on the same entry
+    throughCompare()
+    fireEvent.click(screen.getByText('Done'))
+    const saved = JSON.parse(localStorage.getItem('mm.sessions') ?? '[]')
+    expect(saved).toHaveLength(1)
+    expect(saved[0]).toMatchObject({ session: 'coin-streak', guess: 3, misconception: 'random-means-evenly-mixed', rematch: null, comparePick: 'no-memory', compareRight: true })
+    expect(notebook().map((c) => c.id)).toEqual(['random-means-evenly-mixed'])
+    vi.useRealTimers()
+  }, 60000)
+
+  it('never prints 100.0% for a chance below 1 (#161)', async () => {
+    vi.useFakeTimers()
+    await playToCard(3)
+    expect(screen.getByText(/A real coin goes past 3 in/).textContent).toContain('>99.9% of 100-flip runs')
+    expect(document.body.textContent).not.toContain('100.0%')
+    fireEvent.click(screen.getByRole('button', { name: '4 Extremes' }))
+    await act(async () => vi.advanceTimersByTime(50))
+    expect(screen.getByText(/a run longer than your 3 happens/).textContent).toContain('>99.9% of the time')
     vi.useRealTimers()
   }, 60000)
 
@@ -197,6 +263,7 @@ describe('coin card and end bar (same shell as birthday)', () => {
     vi.useFakeTimers()
     await playToCard(6)
     fireEvent.click(screen.getByRole('button', { name: /^B: / }))
+    throughCompare()
     expect(document.querySelector('.ss-end')!.textContent).toContain('Your first guess called it. Rematch: right.')
     vi.useRealTimers()
   }, 60000)
@@ -221,4 +288,59 @@ describe('coin card and end bar (same shell as birthday)', () => {
       expect(v).not.toBe('close')
     }
   })
+})
+
+// card → compare: the right option by key 2, then the end bar shows
+function throughCompare() {
+  fireEvent.click(screen.getByText('Next: one more case →'))
+  fireEvent.keyDown(window, { key: '2' })
+  expect(screen.getByText("That's it.")).toBeTruthy()
+}
+
+describe('coin qa (#174, #175)', () => {
+  it("the exact line follows the guess: a run longer than your 7", async () => {
+    vi.useFakeTimers()
+    await playToCard(7)
+    fireEvent.click(screen.getByRole('button', { name: '2 Flip it' }))
+    const p = 1 - pLongestAtMost(100, 7)
+    expect(document.querySelector('.simnote')!.textContent).toContain(`Exact: a run longer than your 7 shows up ${(p * 100).toFixed(1)}% of the time.`)
+    vi.useRealTimers()
+  }, 60000)
+
+  it('after 20 taps a cue takes you down to the guess; the keys hint can hide on touch', () => {
+    render(<CoinSession onDone={() => {}} />)
+    expect(screen.queryByText('Next: guess the big one ↓')).toBeNull()
+    for (let i = 0; i < 20; i++) fireEvent.keyDown(window, { key: i % 2 ? 'T' : 'H' })
+    const cue = screen.getByText('Next: guess the big one ↓')
+    const box = document.querySelector('.guessbox') as HTMLElement
+    const into = vi.fn()
+    box.scrollIntoView = into
+    fireEvent.click(cue)
+    expect(into).toHaveBeenCalled()
+    expect(document.activeElement?.id).toBe('coin-guess')
+    expect(document.querySelector('.keyhint')!.textContent).toBe('Keys H and T work too. ')
+  })
+
+  it('no end bar before the compare; a skipped rematch still saves once at Done', async () => {
+    vi.useFakeTimers()
+    localStorage.clear()
+    const done = vi.fn()
+    render(<CoinSession onDone={done} />)
+    for (let i = 0; i < 20; i++) fireEvent.keyDown(window, { key: i % 3 ? 'T' : 'H' })
+    fireEvent.change(screen.getByLabelText('Longest run in 100 real flips?'), { target: { value: '6' } })
+    fireEvent.click(screen.getByRole('button', { name: 'pretty sure' }))
+    fireEvent.click(screen.getByText('Lock it in'))
+    await act(async () => vi.advanceTimersByTime(50))
+    fireEvent.click(screen.getByRole('button', { name: '5 Your mistake' }))
+    fireEvent.click(screen.getByText('Next: one more case →'))
+    fireEvent.change(screen.getByLabelText(/In your own words/), { target: { value: 'no memory' } })
+    fireEvent.keyDown(window, { key: '2' })
+    expect(screen.queryByText('Saved to your notebook.')).toBeNull()
+    fireEvent.click(screen.getByText('Done'))
+    expect(done).toHaveBeenCalled()
+    const saved = JSON.parse(localStorage.getItem('mm.sessions') ?? '[]')
+    expect(saved).toHaveLength(1)
+    expect(saved[0]).toMatchObject({ session: 'coin-streak', guess: 6, misconception: null, rematch: null, comparePick: 'no-memory', compareRight: true, compareText: 'no memory' })
+    vi.useRealTimers()
+  }, 60000)
 })

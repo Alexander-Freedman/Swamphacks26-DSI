@@ -1,5 +1,7 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { AnyTopic, BuildReady } from './components/AnyTopic'
+import { AskHelp } from './components/AskHelp'
+import { ITEM_SCREENS } from './components/helpHints'
 import { BackendDot } from './components/BackendDot'
 import { CheckedTag } from './components/CheckedTag'
 import { HowItWorks } from './components/HowItWorks'
@@ -7,6 +9,7 @@ import { useDrawerKey } from './components/drawerKey'
 import { SessionHowItWorks } from './components/SessionHowItWorks'
 import { sessionHowItWorks } from './components/sessionSpecs'
 import { NotebookLink, NotebookScreen } from './components/Notebook'
+import { record, upsert } from './notebook'
 import { useReset } from './reset'
 import { Predict, type Answer } from './components/Predict'
 import { Reveal } from './components/Reveal'
@@ -67,7 +70,7 @@ function Home({ onPick, onSession, onNotebook }: { onPick: (slug: string) => voi
           ))}
         </div>
       )}
-      <AnyTopic onOpen={onPick} />
+      <AnyTopic onOpen={onPick} onSession={onSession} />
       <NotebookLink onOpen={onNotebook} />
     </div>
   )
@@ -88,18 +91,42 @@ function Player({ round, onDone }: { round: Round; onDone: () => void }) {
   const [drawer, setDrawer] = useState(false)
   const closeDrawer = useCallback(() => setDrawer(false), [])
   useDrawerKey(useCallback(() => setDrawer((o) => !o), []))
+  // Notebook (#172): this play's id and the entry time of each mistake it caught (one entry per mistake).
+  const [play] = useState(() => `${round.slug}@${new Date().toISOString()}`)
+  const caught = useRef<Record<string, string>>({})
+
+  const save = (answer: Answer, mid: string | null) => {
+    const base = { session: round.slug, kind: 'round' as const, topic: round.topic, play, rematch: null }
+    if (mid === null) return record({ ...base, at: new Date().toISOString(), guess: '', misconception: null })
+    // Distinct times per mistake (upsert keys on session + time); the same mistake twice stays one catch.
+    const at = (caught.current[mid] ??= new Date(Date.now() + Object.keys(caught.current).length).toISOString())
+    upsert({
+      ...base,
+      at,
+      guess: answer.value ?? answer.optionId ?? '',
+      confidence: answer.confidence,
+      misconception: mid,
+      label: round.misconceptions.find((m) => m.id === mid)?.label,
+    })
+  }
 
   const lock = (answer: Answer) => {
     setPhase({ kind: 'locked', answer })
     const mid = misconceptionFor(item, answer)
     if (mid) setSignals((s) => ({ ...s, [mid]: (s[mid] ?? 0) + 1 }))
+    // A miss lands in the notebook right away, so the reveal's "Keep this one." is true.
+    if (mid) save(answer, mid)
     // The truth is only computed after lock-in. The beat hides the simulation time.
     clearTimeout(beat.current)
     beat.current = setTimeout(() => setPhase({ kind: 'revealed', answer, truth: computeTruth(item) }), BEAT_MS)
   }
 
   const next = () => {
-    if (last) return onDone()
+    if (last) {
+      // A round with no miss counts as one right answer toward busting its earlier catches.
+      if (phase.kind === 'revealed' && !Object.keys(caught.current).length) save(phase.answer, null)
+      return onDone()
+    }
     setIdx(idx + 1)
     setPhase({ kind: 'predict' })
   }
@@ -108,9 +135,23 @@ function Player({ round, onDone }: { round: Round; onDone: () => void }) {
     <div className="sheet">
       <div className="player-bar">
         <p className="progress">{round.topic} · {idx + 1} of {round.items.length}</p>
-        <button className="hiw-btn" onClick={() => setDrawer(true)} aria-haspopup="dialog">
-          How it works <kbd aria-hidden="true">D</kbd>
-        </button>
+        <div className="topbar-actions">
+          <AskHelp
+            slug={round.slug}
+            kind="round"
+            spot={{
+              screen: ITEM_SCREENS[item.id],
+              locked: phase.kind !== 'predict',
+              guess: phase.kind === 'predict' ? null : (phase.answer.value ?? phase.answer.optionId),
+              step: idx + 1,
+              total: round.items.length,
+              label: round.topic,
+            }}
+          />
+          <button className="hiw-btn" onClick={() => setDrawer(true)} aria-haspopup="dialog">
+            How it works <kbd aria-hidden="true">D</kbd>
+          </button>
+        </div>
       </div>
       {drawer && <HowItWorks round={round} item={item} locked={phase.kind !== 'predict'} onClose={closeDrawer} />}
       {phase.kind === 'predict' && <Predict key={item.id} item={item} onLock={lock} />}
@@ -183,7 +224,10 @@ export default function App() {
       <main className="app">
         <header className="topbar">
           <button className="logo" style={{ border: 0, background: 'none', padding: 0 }} onClick={home}>Onionskin</button>
-          {sessionHowItWorks[session.slug] && <SessionDrawer key={session.slug} slug={session.slug} />}
+          <div className="topbar-actions">
+            <AskHelp key={session.slug} slug={session.slug} kind="session" />
+            {sessionHowItWorks[session.slug] && <SessionDrawer key={session.slug} slug={session.slug} />}
+          </div>
         </header>
         <session.Component key={session.slug} onDone={home} />
         <BuildReady onOpen={(slug) => go({ kind: 'round', slug })} />
