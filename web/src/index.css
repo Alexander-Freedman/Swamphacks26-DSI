@@ -14,6 +14,8 @@
   --shadow: 0 2px 0 var(--ink);
   --font-body: 'Atkinson Hyperlegible Next', system-ui, sans-serif;
   --font-hand: 'Shantell Sans', 'Comic Neue', cursive;
+  --font-display: 'Bricolage Grotesque', system-ui, sans-serif;
+  --font-mono: 'JetBrains Mono', ui-monospace, monospace;
   --radius: 14px;
   color-scheme: light;
 }
@@ -40,3 +42,5 @@ button:focus-visible, input:focus-visible { outline: 3px solid var(--marker); ou
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; }
 }
+
+h1, h2 { font-family: var(--font-display); }
