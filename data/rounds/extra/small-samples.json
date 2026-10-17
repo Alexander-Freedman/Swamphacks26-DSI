@@ -1,0 +1,122 @@
+{
+  "schema_version": 1,
+  "slug": "small-samples",
+  "topic": "The law of small numbers",
+  "concept": "Small samples swing more. With 15 births a day, more than 60% boys happens on about 15% of days; with 45 a day, only about 7%. Extremes, high and low, come from the small groups.",
+  "reviewed": true,
+  "misconceptions": [
+    {
+      "id": "sample-size-neglect",
+      "label": "Sample size doesn't matter",
+      "why_tempting": "Both hospitals have the same 50% chance per baby, so they feel like they should behave the same.",
+      "refutation": "One extra boy moves a 15-baby day by about 7 points but a 45-baby day by about 2. Small samples hit extreme percentages far more often.",
+      "source_url": "https://en.wikipedia.org/wiki/Insensitivity_to_sample_size",
+      "source_note": "Tversky & Kahneman hospital problem: 56% chose 'about the same', 22% each chose larger or smaller"
+    },
+    {
+      "id": "small-sample-pattern-has-a-cause",
+      "label": "An extreme small group must have a cause",
+      "why_tempting": "A story (clean rural air, a good principal) explains an extreme rate better than 'it's a small group'.",
+      "refutation": "Small groups produce extreme rates in both directions just by chance. If the same kind of place is at both the top and the bottom, size is the explanation.",
+      "source_url": "https://en.wikipedia.org/wiki/Insensitivity_to_sample_size",
+      "source_note": "Wainer & Zwerling: kidney cancer rates are lowest AND highest in mostly rural, sparsely populated counties"
+    }
+  ],
+  "items": [
+    {
+      "id": "two-hospitals",
+      "prompt": "A town has two hospitals. About 45 babies are born each day at the big one and about 15 at the small one. About half of all babies are boys. Over a year, which hospital records more days where more than 60% of the babies born were boys?",
+      "input_type": "choice",
+      "options": [
+        {
+          "id": "big",
+          "text": "The big hospital",
+          "misconception_id": "sample-size-neglect"
+        },
+        {
+          "id": "small",
+          "text": "The small hospital",
+          "misconception_id": null
+        },
+        {
+          "id": "same",
+          "text": "About the same",
+          "misconception_id": "sample-size-neglect"
+        }
+      ],
+      "truth": {
+        "widget": "distribution",
+        "sampler": "binomial_count",
+        "params": {
+          "n": 15,
+          "p": 0.5,
+          "trials": 10000
+        },
+        "x_label": "boys out of 15 births in a day"
+      },
+      "answer_expr": "(3003+1365+455+105+15+1)/2^15*100",
+      "answer_claimed": 15.09,
+      "explore": {
+        "param": "n",
+        "label": "births per day",
+        "min": 5,
+        "max": 200,
+        "step": 5
+      },
+      "targets": [
+        "sample-size-neglect"
+      ]
+    },
+    {
+      "id": "rural-counties",
+      "prompt": "US counties with the lowest kidney cancer rates are mostly rural and sparsely populated. Counties with the HIGHEST rates are... ?",
+      "input_type": "choice",
+      "options": [
+        {
+          "id": "cities",
+          "text": "Mostly big cities: pollution and stress",
+          "misconception_id": "small-sample-pattern-has-a-cause"
+        },
+        {
+          "id": "rural-too",
+          "text": "Also mostly rural and sparsely populated",
+          "misconception_id": null
+        },
+        {
+          "id": "suburbs",
+          "text": "Mostly suburbs: in between",
+          "misconception_id": "sample-size-neglect"
+        }
+      ],
+      "truth": {
+        "widget": "distribution",
+        "sampler": "binomial_count",
+        "params": {
+          "n": 20,
+          "p": 0.1,
+          "trials": 10000
+        },
+        "x_label": "cases in a county of 20 people at a 10% rate (toy model)"
+      },
+      "explore": {
+        "param": "n",
+        "label": "county size",
+        "min": 10,
+        "max": 2000,
+        "step": 10
+      },
+      "targets": [
+        "small-sample-pattern-has-a-cause"
+      ]
+    }
+  ],
+  "aliases": [
+    "law of small numbers",
+    "small samples",
+    "small sample size",
+    "sample size",
+    "insensitivity to sample size",
+    "hospital problem",
+    "small numbers"
+  ]
+}

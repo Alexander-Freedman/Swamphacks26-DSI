@@ -1,47 +1,48 @@
 # Scorecard: the current demo vs the XII rubric
 
-**Mode: BUILD.** This grades the demo **as a judge would see it right now**, not the plan. The script it's graded against is docs/demo-script.md. Re-grade after every gate and after every merge that changes what a judge sees (build-plan "Hourly").
+**Mode: BUILD.** This grades the demo **as a judge would see it right now**, not the plan. The script it's graded against is docs/demo-script.md (the three visual sessions, rewritten Sat ~12:45 AM). Re-grade after every gate in the re-plan (docs/build-plan.md, top) and after every merge that changes what a judge sees.
 
 Scores are 1-5 gut calls against the 7 official Devpost criteria. They're not data.
 
-**Last graded:** Fri Oct 16, ~11:20 PM (B1).
+**Last graded:** Sat Oct 17, ~12:45 AM (after the re-plan, before any session is built).
 
 ## What exists right now (honest)
-- **Backend (local only):** round schema + 3 hand-checked showcase rounds (`data/rounds/`, merged #54). Gemini generator + `POST /api/rounds` with a per-IP limit (PR #58, open). Generation checks: computed truth, band/claim agreement, lint, blind check, estimate widget (PR #63, open). Answer events in local SQLite, room % + collection (PR #61, open).
-- **Frontend:** predict → confidence → lock + the Distribution widget for the coin streak is **in review in PR #62** (@luanamaldaner). Not on main.
-- **Not built:** the reveal sequence (beat, ink over pencil, shaded gap, verdict stamp), the misconception card, the Curve widget (birthday), the positive-test dot array, the Estimate widget UI, the live-topic flow in the browser, the "How it works" drawer, the collection screen, the reset shortcut, the Notebook Arcade visual pass.
-- **Hosted:** only the static GitHub Pages shell. No backend is reachable from the public site. No domain yet.
-- **Not measured yet:** live generation time on our key (gemini.md §4 is still an estimate) and the generation pass rate.
+- **Live site** (https://alexander-freedman.github.io/Swamphacks26-DSI/): the old flow. Pick a showcase round, one guess (slider + confidence + lock), then a histogram / text verdict. That's the "two slides" the vision note (NOTES.md, Oct 16 ~11:40 PM) says is **not the product**.
+- **Sessions:** the scaffold is on main (`web/src/sessions/registry.ts`, `?session=` entry from Home, #91). **No session is registered yet.** Birthday (#78, me) is first; coin streak (#81) and positive test (#82) are @luanamaldaner's.
+- **Design:** storyboard (docs/experience.md) and look (docs/experience-look.md) are done, with interactive mockups for all three topics in `docs/mockups/*.html` and static PNGs in `docs/experience/`. Strong, but they're mockups, not the app.
+- **Reveal + misconception card + Curve widget:** in review, PR #64 (@luanamaldaner). Not on main.
+- **Backend (local only):** generator + `POST /api/rounds` (#58), checks + estimate widget (#63), checks on the response (#80), answer events (#72): all open PRs. No public backend.
+- **Typed topics:** measured, and not good enough to lead: median 27 s, p90 51 s, every item a plain estimate, some wrong answers slipped past the checks, and the blind check timed out while reporting a pass (NOTES.md, Sat ~12:10 AM). It's now a labelled extra from a reviewed cache, and the blind check is being fixed.
+- **Not built:** pencil overlay, run-it accumulators, extremes slider, sketch pad, notebook/collection, reset shortcut, "How it works" drawer.
 
 ## Grades
 
-| Criterion | Now | Why | What gets it to 5 |
-|---|---|---|---|
-| **Technical Understanding** | **3** | The pipeline is real and I can explain every step (spec → computed truth → checks → blind second model). But there's no measured number yet (pass rate, latency) and a judge can't see any of it. | The drawer showing JSON + computed truth + check results; one pass-rate number and one latency number from our own runs; both of us pass the drill in pitch.md. |
-| **Innovation & Creativity** | **3** | The idea is the strongest part (bet first, truth computed, the wrong idea named and tracked). On screen today it's a slider and a histogram, which looks like any quiz. | The reveal over the pencil guess + the misconception card landing on the judge's own answer, then their own topic built live. |
-| **Functionality** | **2** | Nothing plays end to end in a browser on main. The backend works locally; the coin-streak flow is in an open PR. | All 3 showcases + a typed topic playing on the public URL, with the fallback ladder and the no-network build rehearsed. |
-| **Design & Usability** | **1** | Main is a shell. No look applied yet. | Notebook Arcade applied everywhere (pencil/ink/marker, stamp, springy lock-in), one idea per screen, reduced motion, contrast checked, 5 user tests with fixes. |
-| **Purpose & Audience** | **3** | The story is clear and sourced (product-spec §1-2, pitch.md), but there's no user evidence and no screen shows who it's for. | User-test lines from B4/B6 (a line like "N of 5 guessed 4 or less", filled in from real tests), the home screen speaking to a student ("What confuses you?"). |
-| **Track & Challenge Relevance** (Entertainment & Creative Tech) | **2** | The track is judged on feel (track-entertainment.md): reveal, juice, collection, story. None of that is on screen yet. | The reveal moment with motion and a verdict stamp, the misconception "cast" in a collection, one cohesive art style. |
-| **Sponsor Challenge Criteria** | **2** | **Gemini:** real use in the backend (3.5 Flash-Lite generates, Gemma blind-checks) but invisible to a judge, so 3. **Easy On The Eyes:** 1 (no design yet). **Domain:** 1 (not registered, nothing hosted to point it at). | Gemini visible in the drawer and the live beat; the visual pass; the domain + QR on the table pointing at a hosted backend. |
-| **Track fit (prize odds)** | **2** | Right track for the product, but today we'd lose to anything with a game feel. Juice + purpose beat juice alone at XI (SignHero vs FortBox). | Same as Track Relevance; plus the "the entertainment is the learning" line (Crouch et al. 2004) in the pitch. |
+| Criterion | Now | Why now | Once the 3 sessions are live | What that needs |
+|---|---|---|---|---|
+| **Technical Understanding** | **3** | The engine is real and I can explain it, and I have honest measured numbers (27 s median, the blind-check failure). None of it is visible, and the visible app is simple. | **4** | Sessions with exact math computed in the browser and labelled "exact" vs "simulated"; the blind check fixed or removed; a drawer or one slide showing truth-from-code. 5 needs the fixed blind check with a measured pass rate. |
+| **Innovation & Creativity** | **2** | On screen it's a slider and a verdict: looks like any quiz. The idea only shows in the mockups. | **4** | Your pencil model riding along under the ink truth, drawing your own curve, the pair lines webbing up. 5 needs the "a coin like you" curve (your own sequence turned into a model) or the same trick on a typed topic. |
+| **Functionality** | **2** | One guess per round works end to end on the public URL; nothing of the new demo does. | **4** | Birthday, coin streak, positive test playing end to end on desktop + phone, seeded, with the local offline build rehearsed. 5 needs the typed-topic extra working from the cache and the notebook. |
+| **Design & Usability** | **2** | Notebook Arcade tokens are applied to main, but the screens are sparse and there's no motion. The mockups are a 4 on their own. | **4** | The look doc's components (pencil overlay, marker gap, stamp, big labelled sliders), reduced motion, phone layout. 5 needs the user-test fixes from Sat 1:30 PM. |
+| **Purpose & Audience** | **3** | The "understanding vs recall" story is clear and sourced, but no user evidence. | **4** | A session that visibly takes a judge from wrong to right in 2 minutes is the evidence. 5 needs user-test lines (filled in from real tests, not invented). |
+| **Track & Challenge Relevance** (Entertainment & Creative Tech) | **2** | The track is judged on feel (track-entertainment.md); what's live has none. | **4** | Guess → watch it move → draw → stamp is a toy you want to touch. 5 needs motion polish and the "come back tomorrow for a remix" loop working. |
+| **Sponsor Challenge Criteria** | **2** | **Gemini:** real in the backend, invisible and now demoted to an extra, so 2. **Easy On The Eyes:** 2 (mockups strong, app sparse). **Domain:** 1 (not registered). | **3** | Easy On The Eyes rises to 4 with the sessions. Gemini stays modest (the typed-topic extra); being honest about it beats overselling it. Domain needs a pointer + QR. |
+| **Track fit (prize odds)** | **2** | Today we'd lose to anything with a game feel. | **4** | Same as Track Relevance; the visual, hands-on sessions are exactly what this track rewards. |
 
-**Total now: 16 / 35** (7 criteria). Target at freeze (Sat midnight): 30+.
+**Total now: 16 / 35** (7 criteria, the prize-odds row not counted). **Once the 3 sessions are live: 27 / 35.** Target at freeze: 30+.
 
-## Biggest 5 gaps, ranked by points gained per hour
-Points = my estimate of rubric points gained across all criteria. Hours = estimate for whoever owns it.
-
-| # | Gap | Owner | Est. hours | Est. points | Points/h |
+## Biggest gaps, in order (by points per hour)
+| # | Gap | Owner | Est. hours | Est. points | Gate |
 |---|---|---|---|---|---|
-| 1 | **Coin streak plays on the public URL with the misconception card.** Review + merge #62, add the card (data is already in the round JSON), redeploy Pages. | @luanamaldaner (card), me (review, merge, deploy) | 1.5 | +3 (Func, Innov, Track) | **2.0** |
-| 2 | **"How it works" drawer.** Round JSON beside the computed truth and the check results from #63; plus one measured pass rate and latency logged in gemini.md. | me | 1.5 | +2.5 (Tech, Gemini, Innov) | **1.7** |
-| 3 | **Live topic in the browser, hosted.** Merge #58/#63/#61, host the backend (Vultr when the code arrives, Render otherwise) with HTTPS + CORS + per-IP limit + daily cap, frontend calls `POST /api/rounds` with the building chip and the 20 s fallback chips. | me (backend, host), @luanamaldaner (chip UI) | 3.5 | +3.5 (Func, Tech, Innov, Gemini) | **1.0** |
-| 4 | **The reveal sequence.** ~400 ms beat, ink truth over the frozen pencil guess, shaded gap, verdict stamp. Shared by every widget. | @luanamaldaner | 2.5 | +2 (Track, Design) | **0.8** |
-| 5 | **Notebook Arcade visual pass.** Tokens, fonts, stamp, springy lock-in, reduced motion. | @luanamaldaner (I can take the tokens/fonts if her queue is full) | 3 | +2 (Design, Easy On The Eyes) | **0.7** |
+| 1 | **Birthday session live on Pages**, B1 → B6, desktop + phone, seeded. It's the demo's hook and the template the other two copy (pencil overlay, sketch pad, extremes slider, stamp card). | me (#78) | 4 | +5 (Func, Innov, Design, Track, Purpose) | Sat 6:00 AM |
+| 2 | **Merge the reveal + card + Curve widget** (#64), so sessions reuse them instead of rebuilding. | @luanamaldaner, me reviewing | 0.5 | +1 (Design) and saves hours on #1 | now |
+| 3 | **Coin streak session** (C1-C2 at least, then C3-C6). The 30-s "can you fake randomness?" taste in the script. | @luanamaldaner (#81) | 3 | +2 (Innov, Track) | Sat 9:00 AM |
+| 4 | **Positive test session** (P1-P5). The second showcase. | @luanamaldaner (#82) | 3 | +1.5 (Purpose, Func) | Sat 9:00 AM |
+| 5 | **Honest blind check** (or remove it) + the typed-topic extra from the reviewed cache with the auto-checked label. Without it the Q&A answer on correctness is weaker. | me | 2 | +1.5 (Tech, Gemini) | Sat 9:00 AM |
+| 6 | **Session end + notebook + reset shortcut.** "Saved. Come back tomorrow for a remix", caught → busted; `Shift+R` / `?reset=1`. | both, after the sessions | 2 | +1 (Track, Func) | Sat 6:00 PM |
+| 7 | **User test round 1** (5 people on the 3 sessions) and the fixes. | both | 3 | +1.5 (Purpose, Design) | Sat 1:30 PM |
 
-Just below the line: the positive-test dot array + Curve widget for the birthday problem (~3h, +1.5, 0.5/h). The 90-second demo doesn't need them; the 3:00 one does, so they come right after #5. Also small and cheap whenever someone has 20 minutes: the reset shortcut (`Shift+R` / `?reset=1`).
-
-**Next loop:** review and merge #62, merge my open PRs (#58, #61, #63) once CI is green, redeploy Pages, then build the drawer (gap 2) while @luanamaldaner adds the misconception card (gap 1). Re-grade here after that.
+**Next loop:** build the birthday session (gap 1) on the scaffold, review #64 so it can be reused, re-grade here when birthday is on Pages.
 
 ## History
-Before the direction was picked (Fri ~9:50 PM), this file compared the candidates from docs/strategy.md against the same 7 criteria: hazard radar (A, plus a hardware variant A+), the Mental Models tool (B, plus a Sketch-to-Sim variant B+), Bridge Oracle (C), Beat the Fingerprint (E) and a scam-call interceptor (D). The hazard radar had the best expected prize count (Sperry slots), B+/A+ the most memorable Overall shot, and B the lowest build risk. I picked Mental Models, general version, on the Entertainment & Creative Technology track; the full table is in git history for this file.
+- Fri Oct 16 ~11:20 PM (B1): graded the old plan (3 showcase rounds as one-guess items + the judge's live topic as the headline): 16 / 35, biggest gaps were the coin-streak card, the "How it works" drawer and hosting the live topic. The vision note (Oct 16 ~11:40 PM) and the generation trial (Sat ~12:10 AM) replaced that plan with visual sessions; that version is in git history for this file.
+- Before the direction was picked (Fri ~9:50 PM), this file compared the candidates from docs/strategy.md; I picked Mental Models, general version, on the Entertainment & Creative Technology track. Full table in git history.

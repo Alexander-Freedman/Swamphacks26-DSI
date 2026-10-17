@@ -100,11 +100,18 @@ export function birthdayMatch365(x: number): number {
   return 1 - none
 }
 
-export function curveFn(t: CurveTruth): (x: number) => number {
+// knobs: named values the expr may use next to x (the explore knob, e.g. r in 1000*(1+r/100)^x).
+export function curveFn(t: CurveTruth, knobs: Record<string, number> = {}): (x: number) => number {
   if (t.preset === 'birthday_match_probability') return birthdayMatch365
   if (!t.expr) throw new Error('curve truth needs a preset or expr')
   const f = compile(t.expr)
-  return (x) => Number(f.evaluate({ x }))
+  return (x) => Number(f.evaluate({ ...knobs, x }))
+}
+
+// The explore knob at the value the question asks about (its default).
+export function knobsFor(item: Item): Record<string, number> {
+  const ex = item.explore
+  return ex && ex.default != null ? { [ex.param]: ex.default } : {}
 }
 
 // First integer x where the curve reaches y (the birthday problem's "how many for 50%").
@@ -131,7 +138,7 @@ export function computeTruth(item: Item): Computed {
     return { kind: 'distribution', hist, value: hist.mean }
   }
   if (t.widget === 'curve') {
-    const f = curveFn(t)
+    const f = curveFn(t, knobsFor(item))
     const half = t.preset === 'birthday_match_probability' ? firstReaching(f, 0.5, t.x_min, 366) : null
     return { kind: 'curve', f, value: half }
   }

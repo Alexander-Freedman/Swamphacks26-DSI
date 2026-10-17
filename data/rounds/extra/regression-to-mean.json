@@ -1,0 +1,103 @@
+{
+  "schema_version": 1,
+  "slug": "regression-to-mean",
+  "topic": "Regression to the mean",
+  "concept": "Any score is part skill, part luck. An extreme result usually had extra luck that won't repeat, so the next result tends to land closer to average, with no cause needed.",
+  "reviewed": true,
+  "misconceptions": [
+    {
+      "id": "extremes-repeat",
+      "label": "A top score predicts another top score",
+      "why_tempting": "If someone scored 95, it feels like 95 is what they're capable of.",
+      "refutation": "That's only true if the score had no luck in it. When luck is part of it, the best expected retest is between the first score and the average.",
+      "source_url": "https://en.wikipedia.org/wiki/Regression_toward_the_mean",
+      "source_note": "'If there were no luck... all students would be expected to score the same on the second test... and there would be no regression'"
+    },
+    {
+      "id": "intervention-caused-it",
+      "label": "The change must have a cause",
+      "why_tempting": "Praise came before a worse result and yelling before a better one, so it looks like yelling works.",
+      "refutation": "People get praised after unusually good tries and yelled at after unusually bad ones. The next try drifts back toward normal either way, so the feedback gets credit or blame it didn't earn.",
+      "source_url": "https://www.nobelprize.org/prizes/economic-sciences/2002/kahneman/biographical/",
+      "source_note": "Kahneman's flight-instructor story: 'we are statistically punished for rewarding others and rewarded for punishing them'"
+    }
+  ],
+  "items": [
+    {
+      "id": "retest-score",
+      "prompt": "A class averages 70 on a test. Scores are half skill (which stays) and half luck (which doesn't), so the correlation between first and second test is 0.5 (0 = no link, 1 = same score). A student got 95. Best guess for their retest?",
+      "input_type": "slider",
+      "slider": {
+        "min": 70,
+        "max": 100,
+        "step": 1,
+        "unit": "points"
+      },
+      "bands": [
+        {
+          "min": 70,
+          "max": 89,
+          "misconception_id": null
+        },
+        {
+          "min": 90,
+          "max": 100,
+          "misconception_id": "extremes-repeat"
+        }
+      ],
+      "truth": {
+        "widget": "estimate",
+        "unit": "points"
+      },
+      "answer_expr": "70+0.5*(95-70)",
+      "answer_claimed": 82.5,
+      "targets": [
+        "extremes-repeat"
+      ]
+    },
+    {
+      "id": "flight-instructor",
+      "prompt": "A flight instructor notices: cadets he praises for a great landing usually do worse next time; cadets he yells at for a bad one usually do better. What's the best explanation?",
+      "input_type": "choice",
+      "options": [
+        {
+          "id": "yelling-works",
+          "text": "Yelling works better than praise",
+          "misconception_id": "intervention-caused-it"
+        },
+        {
+          "id": "praise-complacent",
+          "text": "Praise makes cadets complacent",
+          "misconception_id": "intervention-caused-it"
+        },
+        {
+          "id": "regression",
+          "text": "Unusually good or bad landings are partly luck, so the next one is closer to normal anyway",
+          "misconception_id": null
+        }
+      ],
+      "truth": {
+        "widget": "stepper",
+        "steps": [
+          "A landing = the cadet's skill + luck that day.",
+          "He praises right after an unusually good landing, which likely had good luck.",
+          "Luck doesn't carry over, so the next landing is likely closer to the cadet's normal: worse.",
+          "Same in reverse after a bad landing: it's likely followed by a better one.",
+          "So the pattern appears even if praise and yelling do nothing at all."
+        ],
+        "source_url": "https://www.nobelprize.org/prizes/economic-sciences/2002/kahneman/biographical/"
+      },
+      "targets": [
+        "intervention-caused-it"
+      ]
+    }
+  ],
+  "aliases": [
+    "regression to the mean",
+    "regression toward the mean",
+    "regression towards the mean",
+    "regression to mean",
+    "mean reversion",
+    "reversion to the mean"
+  ]
+}

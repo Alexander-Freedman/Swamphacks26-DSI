@@ -48,7 +48,8 @@ export type Item = {
   bands?: Band[]
   truth: Truth
   answer_claimed?: number | null
-  explore?: { param: string; label: string; min: number; max: number; step: number } | null
+  // default: the knob's value in the question as asked; curve exprs may use param next to x.
+  explore?: { param: string; label: string; min: number; max: number; step: number; default?: number | null } | null
   targets?: string[]
 }
 

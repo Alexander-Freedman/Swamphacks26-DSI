@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest'
-import { baseRate, longestRun, simulate } from './truth'
+import { baseRate, computeTruth, curveFn, knobsFor, longestRun, simulate } from './truth'
+import type { CurveTruth, Item } from './types'
 
 describe('truth', () => {
   it('longest run', () => {
@@ -36,5 +37,23 @@ describe('curve + computeTruth', () => {
     const { computeTruth } = await import('./truth')
     const c = computeTruth({ id: 'p', prompt: '', input_type: 'slider', truth: { widget: 'distribution', sampler: 'base_rate_test', params: { population: 1000, base_rate: 0.01, sensitivity: 0.9, false_positive_rate: 0.09 }, x_label: '' } })
     expect(c.value).toBeCloseTo(9.17, 1)
+  })
+})
+
+describe('curve knob', () => {
+  it('passes the explore default into the curve expr', () => {
+    const item = {
+      id: 'k',
+      prompt: '',
+      input_type: 'slider',
+      truth: { widget: 'curve', expr: '1000*(1+r/100)^x', x_min: 0, x_max: 40, x_label: 'years', y_label: 'value ($)' },
+      explore: { param: 'r', label: 'interest rate (%)', min: 1, max: 12, step: 0.5, default: 7 },
+    } as Item
+    expect(knobsFor(item)).toEqual({ r: 7 })
+    const t = computeTruth(item)
+    expect(t.kind).toBe('curve')
+    if (t.kind === 'curve') expect(t.f(30)).toBeCloseTo(1000 * 1.07 ** 30, 6)
+    // a knob can't shadow x
+    expect(curveFn(item.truth as CurveTruth, { r: 12, x: 99 })(0)).toBe(1000)
   })
 })

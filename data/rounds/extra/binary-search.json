@@ -1,0 +1,105 @@
+{
+  "schema_version": 1,
+  "slug": "binary-search",
+  "topic": "Binary search",
+  "aliases": [
+    "binary search",
+    "binary search algorithm",
+    "bisection search",
+    "guess the number",
+    "higher or lower",
+    "log n",
+    "logarithmic time",
+    "binary chop"
+  ],
+  "concept": "Binary search finds something in a sorted list by checking the middle and throwing away the half it can't be in. Each check halves what's left, so a million items take at most 20 checks, and doubling the list adds just one.",
+  "reviewed": true,
+  "misconceptions": [
+    {
+      "id": "checks-grow-with-size",
+      "label": "Bigger list, proportionally more checks",
+      "why_tempting": "In real life we search one by one, so the work feels tied to how many things there are.",
+      "refutation": "Each check halves what's left, and 20 halvings shrink a million down to one. The count grows with the number of halvings, not with the size.",
+      "source_url": "https://en.wikipedia.org/wiki/Binary_search",
+      "source_note": "'In the worst case, binary search makes floor(log2(n)+1) iterations'; fact source, this misconception isn't separately studied there (unverified as documented)"
+    },
+    {
+      "id": "double-list-double-checks",
+      "label": "Twice the list means twice the checks",
+      "why_tempting": "For most chores, twice as much stuff means twice the work.",
+      "refutation": "Doubling the list adds one halving: the first check cuts 2 billion back to 1 billion, and the rest is the same search as before.",
+      "source_url": "https://en.wikipedia.org/wiki/Binary_search",
+      "source_note": "Worst case floor(log2(n)+1): 30 checks for 1 billion, 31 for 2 billion; misconception not separately sourced (unverified as documented)"
+    }
+  ],
+  "items": [
+    {
+      "id": "guess-a-million",
+      "prompt": "I pick a whole number from 1 to 1,000,000. After each guess I say 'higher' or 'lower'. If you always guess the middle of what's left (that's binary search), how many guesses do you need at most?",
+      "input_type": "choice",
+      "options": [
+        {
+          "id": "twenty",
+          "text": "About 20",
+          "misconception_id": null
+        },
+        {
+          "id": "thousand",
+          "text": "About 1,000",
+          "misconception_id": "checks-grow-with-size"
+        },
+        {
+          "id": "half-million",
+          "text": "About 500,000",
+          "misconception_id": "checks-grow-with-size"
+        }
+      ],
+      "truth": {
+        "widget": "curve",
+        "expr": "log(x)/log(2)+1",
+        "x_min": 1,
+        "x_max": 1000000,
+        "x_label": "numbers to search",
+        "y_label": "guesses needed (about)"
+      },
+      "targets": [
+        "checks-grow-with-size"
+      ]
+    },
+    {
+      "id": "double-the-list",
+      "prompt": "A sorted list of names grows from 1 billion to 2 billion. Using binary search (check the middle name, throw away the half yours can't be in, repeat), how many more checks does it take, at most, to find a name?",
+      "input_type": "choice",
+      "options": [
+        {
+          "id": "one-more",
+          "text": "1 more",
+          "misconception_id": null
+        },
+        {
+          "id": "twice",
+          "text": "Twice as many",
+          "misconception_id": "double-list-double-checks"
+        },
+        {
+          "id": "billion-more",
+          "text": "About a billion more",
+          "misconception_id": "checks-grow-with-size"
+        }
+      ],
+      "truth": {
+        "widget": "stepper",
+        "steps": [
+          "1 billion names: at most 30 checks, since 30 halvings shrink a billion down to one.",
+          "2 billion names: the first check throws away half, leaving 1 billion.",
+          "From there it's the same search as before: at most 30 more.",
+          "So 31 in total: doubling the list added one check."
+        ],
+        "source_url": "https://en.wikipedia.org/wiki/Binary_search"
+      },
+      "targets": [
+        "double-list-double-checks"
+      ]
+    }
+  ]
+}

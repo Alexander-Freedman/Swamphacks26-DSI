@@ -1,0 +1,144 @@
+{
+  "schema_version": 1,
+  "slug": "monty-hall",
+  "topic": "The Monty Hall problem",
+  "concept": "The host knows where the car is and never opens it, so his door carries information: switching wins whenever your first pick was wrong, which is 2 times out of 3.",
+  "reviewed": true,
+  "misconceptions": [
+    {
+      "id": "two-doors-fifty-fifty",
+      "label": "Two doors left means 50/50",
+      "why_tempting": "Two closed doors, one car: it looks like a coin flip.",
+      "refutation": "Your first pick was right only 1 time in 3, and opening a goat door doesn't change that. The host's door is never random, so the other closed door holds the remaining 2 in 3.",
+      "source_url": "https://en.wikipedia.org/wiki/Monty_Hall_problem",
+      "source_note": "'Most people conclude that switching does not matter, because there would be a 50% chance...'"
+    },
+    {
+      "id": "stick-feels-safer",
+      "label": "My first pick is safer",
+      "why_tempting": "Switching away from the car would sting more than staying and losing.",
+      "refutation": "Regret isn't probability. Staying wins only when your blind first pick was right: 1 in 3.",
+      "source_url": "https://en.wikipedia.org/wiki/Monty_Hall_problem",
+      "source_note": "Most players stay; explained by endowment effect, status quo bias, omission bias (section on psychology)"
+    },
+    {
+      "id": "host-info-always-same",
+      "label": "Any goat reveal gives the same odds",
+      "why_tempting": "Once the 2/3 trick clicks, it feels like it applies whenever a goat shows up.",
+      "refutation": "The 2/3 comes from the host knowing and avoiding the car. If he opens a door by accident and it happens to be a goat, the two closed doors really are 50/50.",
+      "source_url": "http://probability.ca/jeff/writing/montyfall.pdf",
+      "source_note": "Rosenthal, 'Monty Hall, Monty Fall, Monty Crawl', Math Horizons: in Monty Fall, stick and switch are both 1/2"
+    }
+  ],
+  "items": [
+    {
+      "id": "switch-win-chance",
+      "prompt": "Three closed doors: a car behind one, goats behind the other two. You pick door 1. The host, who knows where the car is, opens door 3 to show a goat and lets you switch to door 2. If you switch, what's your chance of winning the car?",
+      "input_type": "slider",
+      "slider": {
+        "min": 0,
+        "max": 100,
+        "step": 1,
+        "unit": "%"
+      },
+      "bands": [
+        {
+          "min": 0,
+          "max": 44,
+          "misconception_id": "stick-feels-safer"
+        },
+        {
+          "min": 45,
+          "max": 58,
+          "misconception_id": "two-doors-fifty-fifty"
+        },
+        {
+          "min": 59,
+          "max": 100,
+          "misconception_id": null
+        }
+      ],
+      "truth": {
+        "widget": "estimate",
+        "unit": "%"
+      },
+      "answer_expr": "2/3*100",
+      "answer_claimed": 66.7,
+      "targets": [
+        "two-doors-fifty-fifty",
+        "stick-feels-safer"
+      ]
+    },
+    {
+      "id": "hundred-doors",
+      "prompt": "Now 100 doors, one car. You pick one. The host, who knows where the car is, opens 98 of the others, all goats. One other door stays closed. If you switch to it, how often do you win?",
+      "input_type": "choice",
+      "options": [
+        {
+          "id": "half",
+          "text": "Half the time: it's still one door vs one door",
+          "misconception_id": "two-doors-fifty-fifty"
+        },
+        {
+          "id": "stay",
+          "text": "Rarely: staying with my pick is safer",
+          "misconception_id": "stick-feels-safer"
+        },
+        {
+          "id": "ninety-nine",
+          "text": "99 times out of 100",
+          "misconception_id": null
+        }
+      ],
+      "truth": {
+        "widget": "estimate",
+        "unit": "%"
+      },
+      "answer_expr": "99/100*100",
+      "answer_claimed": 99,
+      "targets": [
+        "two-doors-fifty-fifty"
+      ]
+    },
+    {
+      "id": "monty-fall",
+      "prompt": "Back to 3 doors. This time the host doesn't know where the car is. He trips and accidentally opens door 3, and it happens to be a goat. If you switch to door 2 now, what's your chance of winning?",
+      "input_type": "choice",
+      "options": [
+        {
+          "id": "two-thirds",
+          "text": "2 in 3, same as before",
+          "misconception_id": "host-info-always-same"
+        },
+        {
+          "id": "one-half",
+          "text": "1 in 2",
+          "misconception_id": null
+        },
+        {
+          "id": "one-third",
+          "text": "1 in 3",
+          "misconception_id": "stick-feels-safer"
+        }
+      ],
+      "truth": {
+        "widget": "estimate",
+        "unit": "%"
+      },
+      "answer_expr": "1/2*100",
+      "answer_claimed": 50,
+      "targets": [
+        "host-info-always-same"
+      ]
+    }
+  ],
+  "aliases": [
+    "monty hall",
+    "monty hall problem",
+    "the monty hall problem",
+    "three doors problem",
+    "three door problem",
+    "lets make a deal",
+    "goats and a car"
+  ]
+}
