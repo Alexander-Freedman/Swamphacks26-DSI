@@ -10,6 +10,20 @@
 - `GET /api/rounds/{slug}` → a `Round`
 - Showcase rounds live in `data/rounds/*.json` (`reviewed: true`).
 
+## Help chat: `POST /api/help`
+Request: `{session_slug | round_slug, screen_id, question, locked, context: {guess?}}`
+- `session_slug` / `round_slug`: `birthday`, `coin-streak` (alias `coin`), `positive-test` (alias `ptest`). Optional; if sent it must match the screen's topic.
+- `screen_id`: a storyboard screen from docs/experience.md: `B1`-`B7`, `C1`-`C7`, `P1`-`P6`. Unknown screen or wrong topic → 404.
+- `question`: 1-300 chars (longer → 422).
+- `locked`: true once the guess for this screen's question is locked in. Screens with no guess of their own: send true once the session's guess is locked (C1-C2 and B4 are before a guess, so false there).
+- `context.guess`: the learner's own guess (number or short text), optional. Anything else in `context` (e.g. `truth`) is ignored: the server builds the topic, screen description, misconceptions and the true value from `data/rounds` + `api/app/help_context.py`.
+
+Response, always HTTP 200 for a known screen: `{answer: string, hint_only: bool}`
+- `answer`: plain text, ≤ 3 sentences, no markdown; points back at the visual on screen.
+- `hint_only: true` = a hint, not the answer: before lock-in, or a fallback. Before lock-in the answer is scanned for the true value; if it leaks, the screen's static hint is sent instead.
+- Fallbacks (still 200): no key/offline or daily cap hit → `"Help is resting for today; the screen has everything you need: <static hint>"`; per-IP limit hit → `"Lots of questions at once! Give the screen a minute: <static hint>"`. The panel can show the text as is; the session never depends on it.
+- Limits: daily cap `HELP_DAILY_CAP` (default 300, own `help` bucket in the usage file, shown under `help` in `GET /api/usage`), per IP `HELP_PER_IP` per `HELP_PER_IP_WINDOW_S` (default 10 per 600 s), separate from the round/answer limiters. Model: 3.5 Flash-Lite (minimal thinking), then 3.1 Flash-Lite.
+
 ## Truth: what the browser computes (the backend re-derives the same numbers in `api/app/truth.py` for checks)
 
 | `sampler` / `preset` | params | what to compute |
