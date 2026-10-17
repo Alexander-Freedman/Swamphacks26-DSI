@@ -248,7 +248,7 @@ export function Card({ guess, conf, curve, skipped, onAgain, onNext }: { guess: 
         <p className="bday-twist">Matching YOU takes ~{needForMe()} other people; any two takes {TRUTH_N}.</p>
         {m?.source_url && (
           <p className="bday-source">
-            Source: <a href={m.source_url} target="_blank" rel="noreferrer">{new URL(m.source_url).hostname}</a> ({m.source_note}). Numbers: exact formula, computed in code.
+            Source: <a href={m.source_url} target="_blank" rel="noreferrer">{new URL(m.source_url).hostname}</a>: {m.source_note}. Numbers: exact formula, computed in code.
           </p>
         )}
       </div>
@@ -263,7 +263,7 @@ export function Card({ guess, conf, curve, skipped, onAgain, onNext }: { guess: 
 /* ---------- B7 rematch ---------- */
 const CLASS = 30
 
-export function Rematch({ curve, onPick, picked }: { curve: number[]; onPick: (more: boolean) => void; picked: boolean | null }) {
+export function Rematch({ curve, skipped, onPick, picked }: { curve: number[]; skipped: boolean; onPick: (more: boolean) => void; picked: boolean | null }) {
   const [ref, w] = useWidth<HTMLDivElement>(700)
   const truthMore = pMatch(CLASS) > 0.5
   return (
@@ -284,7 +284,7 @@ export function Rematch({ curve, onPick, picked }: { curve: number[]; onPick: (m
             <b className="bday-num">{CLASS}</b> people · <span className="bday-hl bday-num">{pairs(CLASS)} pairs</span> · <b className="bday-num bday-truthsmall">{pct(pMatch(CLASS))}</b> <span className="bday-sub">exact</span>
           </p>
           <p className="bday-sub">
-            {picked === truthMore ? 'Right: past 23 you are already over a coin flip.' : 'Past 23 people it is already better than a coin flip; 30 people make 435 pairs.'} Your pencil said <b className="bday-pencil-c">{Math.round(curve[CLASS] * 100)}%</b> here.
+            {picked === truthMore ? 'Right: past 23 you are already over a coin flip.' : 'Past 23 people it is already better than a coin flip; 30 people make 435 pairs.'} Your {skipped ? 'line' : 'curve'} said <b className="bday-pencil-c">{Math.round(curve[CLASS] * 100)}%</b> here.
           </p>
         </div>
       )}

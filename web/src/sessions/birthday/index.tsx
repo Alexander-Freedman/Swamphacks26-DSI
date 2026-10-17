@@ -1,6 +1,8 @@
 import { useCallback, useState } from 'react'
+import { NOTEBOOK_HREF, record } from '../../notebook'
 import type { SessionDef, SessionProps } from '../registry'
 import { Room } from './Room'
+import { pMatch } from './math'
 import { verdictOf } from './round'
 import { Card, Draw, Guess, Rematch, Reveal, type Confidence } from './Screens'
 import './birthday.css'
@@ -14,16 +16,6 @@ const TITLES: [string, string][] = [
   ['What happened in your head', 'This is the mistake your guess points to, and the one idea that fixes it.'],
   ['Rematch', 'One more, with new numbers: does the idea stick?'],
 ]
-
-function save(entry: object) {
-  try {
-    const key = 'mm.sessions'
-    const all = JSON.parse(localStorage.getItem(key) ?? '[]') as object[]
-    localStorage.setItem(key, JSON.stringify([...all, entry].slice(-50)))
-  } catch {
-    // private mode or blocked storage: the session still ends fine
-  }
-}
 
 function Birthday({ onDone }: SessionProps) {
   const [step, setStep] = useState(1)
@@ -82,17 +74,20 @@ function Birthday({ onDone }: SessionProps) {
         <>
           <Rematch
             curve={curve}
+            skipped={skipped}
             picked={picked}
             onPick={(more) => {
               setPicked(more)
-              save({ session: 'birthday', at: new Date().toISOString(), guess, confidence: conf, misconception: verdictOf(guess).m?.id ?? null, rematch: more ? 'right' : 'wrong' })
+              record({ session: 'birthday', at: new Date().toISOString(), guess, confidence: conf, misconception: verdictOf(guess).m?.id ?? null, rematch: more ? 'right' : 'wrong' })
             }}
           />
           {picked != null && (
             <div className="bday-saved">
               <p>
-                <b>Saved.</b> {verdictOf(guess).m ? <>Caught: “{verdictOf(guess).m!.label}”.</> : 'Called it.'} Come back tomorrow for a remix: birth months, 12 instead of 365.
+                <b>Saved to your notebook.</b> {verdictOf(guess).m ? <>Caught: “{verdictOf(guess).m!.label}”.</> : 'Your first guess called it.'}{' '}
+                {picked === pMatch(30) > 0.5 ? 'Rematch: right.' : 'Rematch missed; it stays in your notebook to try again.'} Come back tomorrow for a remix: birth months, 12 instead of 365.
               </p>
+              <a className="nb-link-inline" href={NOTEBOOK_HREF}>Open notebook</a>
               <button className="bday-btn" onClick={onDone}>Done</button>
             </div>
           )}
