@@ -1,6 +1,7 @@
 import { useMemo, useState } from 'react'
 import { Distribution } from './components/Distribution'
 import { Predict, type Answer } from './components/Predict'
+import { PositiveSession } from './sessions/positive/PositiveSession'
 import { showcaseRound, showcaseSlugs } from './rounds'
 import { simulate, shareAtLeast, type Histogram } from './truth'
 import type { Item, Round } from './types'
@@ -109,7 +110,13 @@ export default function App() {
         <button className="logo" style={{ border: 0, background: 'none', padding: 0 }} onClick={() => setSlug(null)}>mm</button>
         {round && <span className={`chip ${round.reviewed ? 'reviewed' : ''}`}>{round.reviewed ? 'reviewed' : 'auto-checked'}</span>}
       </header>
-      {round ? <Player key={round.slug} round={round} onDone={() => setSlug(null)} /> : <Home onPick={setSlug} />}
+      {slug === 'positive-test' ? (
+        <PositiveSession onDone={() => setSlug(null)} />
+      ) : round ? (
+        <Player key={round.slug} round={round} onDone={() => setSlug(null)} />
+      ) : (
+        <Home onPick={setSlug} />
+      )}
     </main>
   )
 }
