@@ -35,7 +35,7 @@ describe('coin streak session', () => {
     expect(screen.getByText('97.2%')).toBeTruthy() // exact P(run of 5+)
     expect(screen.getByText(/real average 6\.98 \(exact\)/)).toBeTruthy() // truth line is labeled
     fireEvent.click(screen.getByText('Run 1,000 times'))
-    expect(screen.getByText('1,001')).toBeTruthy() // the first flip + 1,000 simulated
+    expect(screen.getByText('1,000')).toBeTruthy() // a fresh sample of exactly 1,000
 
     next(/your coin vs the real one/)
     expect(screen.getByText('Your coin vs the real coin')).toBeTruthy()

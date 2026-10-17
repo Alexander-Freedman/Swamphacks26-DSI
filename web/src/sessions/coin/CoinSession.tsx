@@ -103,7 +103,10 @@ export function CoinSession({ onDone }: { onDone: () => void }) {
     addTrials([longestRun(s)])
   }
 
+  // A fresh sample of exactly 1,000, so the count reads 1,000 (not 1,000 plus the strips flipped so far).
   const run1k = () => {
+    setHist(new Array(KMAX + 1).fill(0))
+    setTotal(0)
     if (reducedMotion()) {
       addTrials(Array.from({ length: 1000 }, () => longestOfFlips(N, rand.current)))
       return
