@@ -36,6 +36,18 @@
 | **B8 Submit** | Sun 4:30-7:30 AM | Ship with a buffer | **Submit by 7:30 AM.** Check repo/video/challenge boxes in a private window | (back at 6:30) | "Submitted" tag on Devpost |
 | **B9 Rehearse** | Sun 7:30-10:00 AM | Win the table | Pre-warm the cache, set up the table (expo-video.md), breakfast 8:45 | Rehearse 3:00 + 1:30 pitches 3× each; "why did we do X" drill | Both of us can give both pitches solo |
 
+## Integrations: keys, jobs, when, fallback
+**Rule for all of them:** secrets live only in the app's git-ignored `.env` (`.env.example` lists the names with empty values). Never printed, logged or committed. Public config (the Auth0 domain + client ID) can go in repo config.
+
+| Integration | Key / config | What it's for | Wired in | If it's missing |
+|---|---|---|---|---|
+| **Gemini** (MLH) | `GEMINI_API_KEY` | Generates each topic's full package; Gemma blind-checks it (product-spec §7) | B1 client, B2 pipeline | Mock client serving the cached/hand-made rounds; the demo still works on showcase + cached topics |
+| **OpenAI image generation** | `OPENAI_API_KEY` | Visuals only: brand art, the cast card icons, topic illustrations. Generated **once**, saved as files in the repo (no live calls in the demo) | B5 (visual pass); brand art earlier if the name is set | Hand-drawn SVG/emoji-free icon set and a plain illustration slot. It's a paid API, so the number of images is kept small; spending is my call. These images get disclosed in the AI-tools section |
+| **Tiger Data** (MLH) | `TIGER_DATABASE_URL` (from @luanamaldaner by DM) | Answer events (hypertable) → "the room" %, streak and review queue (continuous aggregates) | B3 | Local SQLite with the same schema; drop the Tiger prize if it never arrives |
+| **Auth0** (MLH) | Domain + Client ID (public, posted in #hack-chat by @luanamaldaner) | "Sign in to keep your streak" (Google login); guest play first | B5 (cut line 2) | Guest only; streak + collection in localStorage |
+| **Domain** (MLH GoDaddy) | Registered by @luanamaldaner via the MLH link | The demo URL + QR on the table | DNS as soon as it's registered; HTTPS on `<ip>.sslip.io` meanwhile | The host's default URL (sslip.io / Render) on the QR |
+| **Hosting** | Vultr (MLH code, if no card) or Render | API + built frontend | B1 first deploy | Render free tier; local laptop + phone hotspot as the last resort |
+
 ## Never cut
 - predict → lock → reveal on the coin streak
 - the misconception card
