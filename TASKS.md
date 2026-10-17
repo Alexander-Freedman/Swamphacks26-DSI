@@ -18,15 +18,15 @@ Shared board. Every task is a GitHub issue; assign yourself + comment "on it" be
 | — | Answer events, "the room" %, collection API | @Alexander-Freedman | PR #61 |
 | #49 | Predict → confidence → lock + Distribution | @luanamaldaner | merged (#62) |
 | #51 | Reveal sequence + misconception card + Curve + icon array | @luanamaldaner | PR #64 |
-| #66 | Home (topic box) + Building screen | @luanamaldaner | in progress |
-| #67 | Round summary + Collection | @luanamaldaner | in progress |
-| #68 | Play with it: extremes slider | @luanamaldaner | in progress |
-| #11 | Sketch input + shape rules | @luanamaldaner | in progress |
+| #66 | Home (topic box) + Building screen | @luanamaldaner | in progress (branch home-building) |
+| #67 | Round summary + Collection | @luanamaldaner | in progress (with #66) |
+| #68 | Play with it: extremes slider | @luanamaldaner | in progress (branch extremes) |
+| #71 | How it works drawer (D), reset (Shift+R), status dot | @luanamaldaner | in progress (branch demo-controls) |
+| #11 | Sketch input + shape rules | @luanamaldaner | parked: not in the demo script; after B5 if time |
 | #29 | Name, one-liner, pitch, Devpost, video script | @Alexander-Freedman | |
 
 ## Next (my side)
 - B5 visual pass (Notebook Arcade), share card, motion polish, reduced motion
-- "How it works" drawer (generated JSON + computed truth side by side)
 - B6 backup demo video (≤2 min)
 
 ## Phase 1: research (done)
