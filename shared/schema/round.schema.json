@@ -126,6 +126,36 @@
       "title": "DistributionTruth",
       "type": "object"
     },
+    "EstimateTruth": {
+      "description": "A single computed number shown on a number line against the guess.",
+      "properties": {
+        "widget": {
+          "const": "estimate",
+          "default": "estimate",
+          "title": "Widget",
+          "type": "string"
+        },
+        "unit": {
+          "default": "",
+          "title": "Unit",
+          "type": "string"
+        },
+        "source_url": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Source Url"
+        }
+      },
+      "title": "EstimateTruth",
+      "type": "object"
+    },
     "Explore": {
       "properties": {
         "param": {
@@ -227,6 +257,7 @@
             "mapping": {
               "curve": "#/$defs/CurveTruth",
               "distribution": "#/$defs/DistributionTruth",
+              "estimate": "#/$defs/EstimateTruth",
               "stepper": "#/$defs/StepperTruth"
             },
             "propertyName": "widget"
@@ -237,6 +268,9 @@
             },
             {
               "$ref": "#/$defs/CurveTruth"
+            },
+            {
+              "$ref": "#/$defs/EstimateTruth"
             },
             {
               "$ref": "#/$defs/StepperTruth"

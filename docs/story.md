@@ -2,6 +2,28 @@
 
 Marketing is a full workstream (a product nobody gets in 30 seconds loses). This file grows through the night. **The name is @luanamaldaner's call** (asked on #1). Until they pick, the code uses the neutral working name `mm`.
 
+## 0. Pitch for the visual sessions (current, Sat)
+The product is now three short visual sessions (docs/experience.md): birthday, coin streak, positive test. This section wins over the older round-based one-liners further down (kept for the name work). Working name **mm** until the name is picked.
+
+**One-line pitch:** "Quizlet tests what you remember. mm shows you what you actually believe, next to what's true." (same line as the demo script, docs/demo-script.md)
+
+**Alt (more visual):** "Guess in pencil, watch reality play out in ink over your guess, and see the exact spot your mental model breaks."
+
+**30-second explanation (said out loud, ~80 words):**
+> Flashcards check if you can recall an answer, not if you can run the idea in your head. So each mm session is two or three minutes on one concept. You guess first, in pencil. You watch a real example play out: fill a room and watch the birthday pairs pile up. You push it to the extremes with one slider. Your guess stays on screen next to the real curve, the gap shaded. Then it names your exact mistake, and it comes back tomorrow with new numbers.
+
+**Numbers we can say with it** (only these; same table as docs/demo-script.md):
+| Claim | Value | Source |
+|---|---|---|
+| Birthday, 50% chance of a shared birthday | 23 people → 50.7% | computed: 1 − ∏(365−i)/365, i = 0..22 = 0.5073 |
+| Birthday, 57 people | 99.0% | computed: same formula, n = 57 → 0.9901 |
+| Positive test (1% have it, 90% caught, 9% false alarms) | 9.2% | computed: 0.009 / (0.009 + 0.99 × 0.09) = 0.0917 |
+| Coin streak, 100 fair flips | longest run averages 6.98; a run of 5+ in 97% | exact DP, [showcase-facts.md](research/showcase-facts.md) |
+| "2-3 minutes per session" | design target | docs/experience.md; **unverified** as a measured time until user tests |
+| Typed topics (labelled extra) | 24/25 delivered, median 27 s | our own 25-topic trial, NOTES.md Sat ~12:10 AM (small sample) |
+
+Don't say "proven to make you learn faster" or that a typed topic is "built live in seconds".
+
 ## 1. Name: options for @luanamaldaner to choose from
 - **Hunch & Ink** (research's top pick): your hunch goes down in pencil, the truth lands in ink. That matches the predict-then-reveal moment and the Notebook Arcade look. All of .com/.app/.tech/.space/.study were unregistered on Oct 16 (registry RDAP). No product with that name was found. Trademark: a snippet-level scan only (USPTO blocks scripts), with low risk noted; **not a clearance**.
 - **"Your Wrongdex"** names the collection screen.

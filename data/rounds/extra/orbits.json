@@ -1,0 +1,167 @@
+{
+  "schema_version": 1,
+  "slug": "orbits",
+  "topic": "Why astronauts float",
+  "aliases": [
+    "orbits",
+    "orbit",
+    "orbits and why astronauts float",
+    "why do astronauts float",
+    "weightlessness",
+    "microgravity",
+    "zero gravity",
+    "gravity in space",
+    "free fall",
+    "freefall",
+    "how orbits work",
+    "space station"
+  ],
+  "concept": "On the space station gravity is still about 90% as strong as on the ground. Astronauts float because they and the station are falling together, moving sideways so fast (about 28,000 km/h) that they keep missing Earth.",
+  "reviewed": true,
+  "misconceptions": [
+    {
+      "id": "no-gravity-in-space",
+      "label": "There's (almost) no gravity up there",
+      "why_tempting": "Floating astronauts look exactly like gravity has been switched off.",
+      "refutation": "About 400 km up, Earth's gravity is still about 90% as strong as on the ground. That pull is what keeps the station going around Earth instead of flying off.",
+      "source_url": "https://www.nasa.gov/learning-resources/for-kids-and-students/what-is-microgravity-grades-5-8/",
+      "source_note": "NASA: 'Some people think that there is no gravity in space' ... at the station's altitude 'Earth's gravity is about 90 percent of what it is on the planet's surface'"
+    },
+    {
+      "id": "gravity-doesnt-fade",
+      "label": "Gravity doesn't weaken with height",
+      "why_tempting": "We never feel gravity change in daily life, so it seems the same everywhere.",
+      "refutation": "Gravity weakens with distance from Earth's center. 400 km up you're about 6% farther from the center, so the pull is about 89% of ground level.",
+      "source_url": "https://en.wikipedia.org/wiki/Gravity_of_Earth",
+      "source_note": "'Gravity decreases with altitude as one rises above the Earth's surface because greater altitude means greater distance from the Earth's centre'"
+    },
+    {
+      "id": "orbit-is-not-falling",
+      "label": "Orbiting isn't falling",
+      "why_tempting": "The station never gets closer to the ground, so it doesn't look like it's falling.",
+      "refutation": "An orbit is a fall that keeps missing: the station falls toward Earth nonstop but moves sideways so fast the ground curves away. You and the ball fall with it, so nothing drops to the floor.",
+      "source_url": "https://www.nasa.gov/learning-resources/for-kids-and-students/what-is-microgravity-grades-5-8/",
+      "source_note": "NASA: 'why do astronauts float there? The answer is because they are in free fall'"
+    },
+    {
+      "id": "orbit-is-about-height",
+      "label": "Staying up is about being high",
+      "why_tempting": "Space starts only about 100 km up, so it seems the hard part is climbing high enough.",
+      "refutation": "The hard part is speed: to keep missing Earth, the station has to move sideways at about 28,000 km/h, roughly 30 times as fast as an airliner.",
+      "source_url": "https://what-if.xkcd.com/58/",
+      "source_note": "Munroe, What If 'Orbital Speed': 'The reason it's hard to get to orbit isn't that space is high up. It's hard ... because you have to go so fast'"
+    }
+  ],
+  "items": [
+    {
+      "id": "gravity-at-station",
+      "prompt": "The International Space Station circles Earth about 400 km up, where astronauts float. Up there, how strong is Earth's gravity compared with on the ground?",
+      "input_type": "slider",
+      "slider": {
+        "min": 0,
+        "max": 100,
+        "step": 1,
+        "unit": "% of ground gravity"
+      },
+      "bands": [
+        {
+          "min": 0,
+          "max": 79,
+          "misconception_id": "no-gravity-in-space"
+        },
+        {
+          "min": 80,
+          "max": 95,
+          "misconception_id": null
+        },
+        {
+          "min": 96,
+          "max": 100,
+          "misconception_id": "gravity-doesnt-fade"
+        }
+      ],
+      "truth": {
+        "widget": "curve",
+        "expr": "100*(6371/(6371+x))^2",
+        "x_min": 0,
+        "x_max": 2000,
+        "x_label": "height above the ground (km)",
+        "y_label": "% of ground gravity"
+      },
+      "answer_expr": "100*(6371/(6371+400))^2",
+      "answer_claimed": 88.5,
+      "targets": [
+        "no-gravity-in-space",
+        "gravity-doesnt-fade"
+      ]
+    },
+    {
+      "id": "why-the-ball-floats",
+      "prompt": "An astronaut on the space station lets go of a ball. It hangs in the air next to her instead of dropping to the floor. Why?",
+      "input_type": "choice",
+      "options": [
+        {
+          "id": "no-gravity",
+          "text": "There's no gravity up there",
+          "misconception_id": "no-gravity-in-space"
+        },
+        {
+          "id": "too-weak",
+          "text": "Earth's pull is too weak that high up to notice",
+          "misconception_id": "no-gravity-in-space"
+        },
+        {
+          "id": "falling-together",
+          "text": "The ball, the astronaut and the station are all falling around Earth together, so the ball never gets closer to the floor",
+          "misconception_id": null
+        }
+      ],
+      "truth": {
+        "widget": "stepper",
+        "steps": [
+          "Gravity pulls the station, the astronaut and the ball toward Earth, at almost the same strength as on the ground.",
+          "All three are moving sideways at the same speed, so all three fall along the same curved path.",
+          "Falling together, nothing presses on the floor and nothing gets closer to it.",
+          "That's 'weightlessness': not missing gravity, but falling freely with your surroundings."
+        ],
+        "source_url": "https://www.nasa.gov/learning-resources/for-kids-and-students/what-is-microgravity-grades-5-8/"
+      },
+      "targets": [
+        "orbit-is-not-falling",
+        "no-gravity-in-space"
+      ]
+    },
+    {
+      "id": "orbit-speed",
+      "prompt": "To stay in orbit about 400 km up, how fast does the space station have to move sideways? (A jet airliner flies about 900 km/h.)",
+      "input_type": "choice",
+      "options": [
+        {
+          "id": "jet-speed",
+          "text": "About jet speed: once it's high enough, it just has to keep moving",
+          "misconception_id": "orbit-is-about-height"
+        },
+        {
+          "id": "no-speed",
+          "text": "It doesn't need sideways speed: it's above most of Earth's pull",
+          "misconception_id": "no-gravity-in-space"
+        },
+        {
+          "id": "thirty-x",
+          "text": "About 30 times as fast as a jet",
+          "misconception_id": null
+        }
+      ],
+      "truth": {
+        "widget": "estimate",
+        "unit": "times a jet's speed",
+        "source_url": "https://what-if.xkcd.com/58/"
+      },
+      "answer_expr": "sqrt(398600.4418/(6371+400))*3600/900",
+      "answer_claimed": 30.7,
+      "targets": [
+        "orbit-is-about-height"
+      ]
+    }
+  ]
+}
