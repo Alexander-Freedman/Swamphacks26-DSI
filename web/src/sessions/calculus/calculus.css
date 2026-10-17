@@ -142,3 +142,57 @@
 @media (max-width: 480px) {
   .calc-endact { flex: 1 1 100%; justify-content: space-between; }
 }
+
+/* chapter menu (same look as orgo's) */
+.calc-menu { display: grid; gap: 22px; max-width: 980px; }
+.calc-sec-title { font: 700 22px var(--font-display); margin: 0; }
+.calc-sec-blurb { margin: 2px 0 10px; color: var(--ink-soft); }
+.calc-topics { display: grid; grid-template-columns: repeat(auto-fill, minmax(210px, 1fr)); gap: 12px; }
+.calc-topic { display: grid; gap: 4px; text-align: left; padding: 14px 16px; background: var(--card); color: var(--ink); border: 2px solid var(--ink); border-radius: 4px; box-shadow: 0 3px 0 var(--ink); cursor: pointer; font: inherit; }
+.calc-topic:hover:not(:disabled) { background: var(--marker-soft); }
+.calc-topic:active:not(:disabled) { transform: translateY(2px); box-shadow: 0 1px 0 var(--ink); }
+.calc-topic:disabled { cursor: default; opacity: 0.55; box-shadow: none; border-style: dashed; }
+.calc-topic-title { font: 700 18px var(--font-display); }
+.calc-topic-blurb { font-size: 14px; color: var(--ink-soft); }
+.calc-soon { justify-self: start; font: 700 11px var(--font-mono); text-transform: uppercase; letter-spacing: 0.06em; color: var(--pencil); border: 1.5px dashed var(--pencil); border-radius: 4px; padding: 1px 6px; }
+.calc-back { margin: 6px 0 2px; }
+.calc-one { display: grid; max-width: 640px; }
+
+/* right / wrong on "what's the same?" */
+.calc-pick:disabled { cursor: default; }
+.calc-pick.right, .calc-pick.right[aria-pressed='true'] { background: var(--card); color: var(--ink); border: 3px solid var(--called); }
+.calc-pick.wrong { opacity: 0.55; text-decoration: line-through; border-style: dashed; }
+.calc-mark { display: inline-block; width: 1.4em; font-weight: 700; }
+.calc-pick.right .calc-mark { color: var(--called); }
+.calc-wrong { margin: 12px 0 0; font-size: 16px; }
+.calc-correct { display: flex; gap: 10px; align-items: flex-start; margin: 0 0 6px; font-size: 16px; line-height: 1.4; }
+.calc-check { flex: none; display: inline-grid; place-items: center; width: 32px; height: 32px; border-radius: 50%; background: var(--called); color: var(--paper); font-size: 18px; font-weight: 700; }
+
+/* courses on the menu */
+.calc-course { display: grid; gap: 6px; padding-top: 6px; border-top: 2px solid var(--ink); }
+.calc-course-title { font: 700 28px var(--font-display); margin: 0; }
+.calc-section { display: grid; gap: 2px; margin-top: 10px; }
+
+/* Calc 3: the surface */
+.calc-3d-wrap { align-items: start; }
+.calc-3d { display: block; width: 100%; height: auto; touch-action: none; cursor: grab; user-select: none; -webkit-user-select: none; }
+.calc-3d:active { cursor: grabbing; }
+.calc-3d:focus-visible { outline: 2px dashed var(--ink); outline-offset: 2px; }
+.calc-3d-floor { fill: var(--grid); fill-opacity: 0.35; stroke: var(--ink-soft); stroke-width: 1; }
+.calc-3d-axis { stroke: var(--ink-soft); stroke-width: 1.5; stroke-dasharray: 4 4; }
+.calc-3d-lab { font: 700 13px var(--font-mono); fill: var(--ink-soft); }
+.calc-3d-quad { fill: var(--marker); stroke: var(--ink); stroke-width: 0.6; stroke-opacity: 0.45; }
+.calc-3d-slice { fill: none; stroke-width: 4; stroke-linecap: round; stroke-linejoin: round; }
+.calc-3d-slice.sx, .calc-slice.sx .calc-slice-curve { stroke: var(--ink); }
+.calc-3d-slice.sy, .calc-slice.sy .calc-slice-curve { stroke: var(--called); }
+.calc-3d-stem { stroke: var(--ink); stroke-width: 1.5; stroke-dasharray: 3 3; }
+.calc-3d-foot { fill: var(--ink); }
+.calc-3d-pt { fill: var(--marker); stroke: var(--ink); stroke-width: 2.5; }
+.calc-slices { display: grid; gap: 12px; }
+.calc-slice { display: block; width: 100%; height: auto; }
+.calc-slice-axis { stroke: var(--ink-soft); stroke-width: 1; }
+.calc-slice-curve { fill: none; stroke-width: 3; }
+.calc-slice-tan { stroke: var(--off); stroke-width: 2.5; stroke-dasharray: 6 4; }
+.calc-ask { font: 700 17px/1.4 var(--font-body); margin: 6px 0 0; }
+.calc-picks-row { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+.calc-range { display: grid; grid-template-columns: 5.5em 1fr; align-items: center; gap: 10px; margin-top: 10px; font: 700 15px var(--font-mono); }

@@ -31,8 +31,11 @@ function draw(g: (x: number) => number) {
   fireEvent.pointerUp(pad, { pointerId: 1 })
 }
 
+const pickTopic = (name: RegExp) => fireEvent.click(screen.getByRole('button', { name }))
+
 function playThrough(g: (x: number) => number, guess: number) {
   render(<Session onDone={() => {}} />)
+  pickTopic(/^Start to finish/)
   expect(screen.getByText('Draw the slope.')).toBeTruthy()
   expect((screen.getByText('Check it with a tangent →') as HTMLButtonElement).disabled).toBe(true)
   draw(g)
@@ -83,8 +86,13 @@ describe('calculus session', () => {
     fireEvent.click(screen.getByText('One more picture →'))
     expect(screen.getByText('Same idea, twice.')).toBeTruthy()
     expect(screen.queryByText(/Saved to your notebook/)).toBeNull()
+    // a wrong pick says so and lets you try again; the rule and the end bar wait for the right one
     fireEvent.click(screen.getByText('The two curves have the same shape'))
+    expect(screen.getByText(/Not quite\./)).toBeTruthy()
     expect(screen.getByText(/position only climbs/)).toBeTruthy()
+    expect(screen.queryByText('One undoes the other.')).toBeNull()
+    fireEvent.click(screen.getByText('Each graph is the other one, read a different way'))
+    expect(screen.getByText('Correct!')).toBeTruthy()
     expect(screen.getByText('One undoes the other.')).toBeTruthy()
     expect(screen.getByText(/Saved to your notebook/)).toBeTruthy()
     expect(screen.queryByText('✓ mastered')).toBeNull()
@@ -104,6 +112,56 @@ describe('calculus session', () => {
     localStorage.clear()
     const { container } = render(<Session onDone={() => {}} />)
     const text = container.textContent!.toLowerCase()
-    for (const w of [/\bbet/, /lock it in/, /called it/, /how sure/, /\bxp\b/, /\bpoints?\b/]) expect(text).not.toMatch(w)
+    for (const w of [/\bbet(s|ting)?\b/, /lock it in/, /called it/, /how sure/, /\bxp\b/, /\d+\s*(pts|points?)\b/, /\bscore\b/]) expect(text).not.toMatch(w) // scores, not "a point on the curve"
+  })
+
+  it('opens on a course menu: Calc 1, 2 and 3, with the topics not built yet marked', () => {
+    localStorage.clear()
+    render(<Session onDone={() => {}} />)
+    expect(screen.getByText('What do you want to practice?')).toBeTruthy()
+    for (const c of ['Calc 1', 'Calc 2', 'Calc 3']) expect(screen.getByRole('heading', { name: c })).toBeTruthy()
+    expect((screen.getByRole('button', { name: /^Slices of a surface/ }) as HTMLButtonElement).disabled).toBe(false)
+    expect((screen.getByRole('button', { name: /^Taylor polynomials/ }) as HTMLButtonElement).disabled).toBe(true)
+    expect(screen.getAllByText('coming next').length).toBeGreaterThan(5)
+  })
+
+  it('Derivatives > The slope of a curve ends on its own mistake card with Finish', () => {
+    localStorage.clear()
+    render(<Session onDone={() => {}} />)
+    pickTopic(/^The slope of a curve/)
+    expect(screen.getByText('Calculus · The slope of a curve')).toBeTruthy()
+    draw(f)
+    fireEvent.click(screen.getByText('Check it with a tangent →'))
+    const chart = screen.getByLabelText('drag the point along the curve')
+    fireEvent.pointerDown(chart, { clientX: px(0.2), clientY: 100, pointerId: 2 })
+    fireEvent.pointerMove(chart, { clientX: px(4), clientY: 100, pointerId: 2 })
+    fireEvent.pointerUp(chart, { pointerId: 2 })
+    fireEvent.click(screen.getByText('What did my pencil get wrong? →'))
+    expect(screen.getByText('Slope = height of the curve')).toBeTruthy()
+    expect(screen.queryByText(/More rectangles/)).toBeNull()
+    expect(screen.getByText(/Saved to your notebook/)).toBeTruthy()
+    expect(entries()[0]).toMatchObject({ session: 'calculus', misconception: 'slope-is-height', calcTopic: 'slope' })
+    fireEvent.click(screen.getByText('← All calculus topics'))
+    expect(screen.getByText('What do you want to practice?')).toBeTruthy()
+  })
+
+  it('Calc 3 > Slices of a surface: two partial-derivative questions, then find the flat spot', () => {
+    localStorage.clear()
+    render(<Session onDone={() => {}} />)
+    pickTopic(/^Slices of a surface/)
+    expect(screen.getByRole('img', { name: /3D surface/ })).toBeTruthy()
+    // +x from (1, −1) is downhill; "uphill" is named and you try again
+    fireEvent.click(screen.getByRole('button', { name: 'uphill' }))
+    expect(screen.getByText(/Not quite/)).toBeTruthy()
+    fireEvent.click(screen.getByRole('button', { name: 'downhill' }))
+    expect(screen.getByText(/∂f\/∂x = -0\.91/)).toBeTruthy()
+    // +y from (1, −1) is uphill
+    fireEvent.click(screen.getByRole('button', { name: 'uphill' }))
+    expect(screen.getByText(/move the dot to where/)).toBeTruthy()
+    fireEvent.change(screen.getByLabelText('move the dot in x'), { target: { value: '0' } })
+    expect(screen.queryByText(/you’re on top of the hill/)).toBeNull()
+    fireEvent.change(screen.getByLabelText('move the dot in y'), { target: { value: '0' } })
+    expect(screen.getByText(/you’re on top of the hill/)).toBeTruthy()
+    expect(entries()[0]).toMatchObject({ session: 'calculus', misconception: 'partial-wrong-way', calcTopic: 'surface' })
   })
 })
