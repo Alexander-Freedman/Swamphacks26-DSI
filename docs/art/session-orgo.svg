@@ -1,0 +1,30 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512">
+  <!-- Orgo card art, hand-built SVG (no generated images). Notebook Arcade palette. -->
+  <defs>
+    <pattern id="g" width="32" height="32" patternUnits="userSpaceOnUse">
+      <path d="M32 0H0V32" fill="none" stroke="#e6e0d2" stroke-width="2"/>
+    </pattern>
+  </defs>
+  <rect width="512" height="512" fill="#fbf8f1"/>
+  <rect width="512" height="512" fill="url(#g)"/>
+  <!-- marker swash behind the arrow -->
+  <path d="M150 250 Q 210 120 262 240" fill="none" stroke="#ffd84d" stroke-width="46" stroke-linecap="round"/>
+  <!-- bonds -->
+  <line x1="40" y1="300" x2="90" y2="300" stroke="#1b2340" stroke-width="12" stroke-linecap="round"/>
+  <line x1="340" y1="300" x2="390" y2="300" stroke="#85827a" stroke-width="12" stroke-linecap="round" stroke-dasharray="18 16"/>
+  <line x1="310" y1="262" x2="326" y2="218" stroke="#1b2340" stroke-width="12" stroke-linecap="round"/>
+  <line x1="310" y1="338" x2="326" y2="382" stroke="#1b2340" stroke-width="12" stroke-linecap="round"/>
+  <!-- nucleophile: outline with a lone pair facing the carbon -->
+  <circle cx="124" cy="300" r="38" fill="#fbf8f1" stroke="#1b2340" stroke-width="12"/>
+  <circle cx="184" cy="284" r="10" fill="#1b2340"/>
+  <circle cx="184" cy="316" r="10" fill="#1b2340"/>
+  <!-- the carbon (ink) and two of its hydrogens -->
+  <circle cx="300" cy="300" r="40" fill="#1b2340"/>
+  <circle cx="334" cy="196" r="22" fill="#fbf8f1" stroke="#1b2340" stroke-width="10"/>
+  <circle cx="334" cy="404" r="22" fill="#fbf8f1" stroke="#1b2340" stroke-width="10"/>
+  <!-- leaving group, pencil -->
+  <circle cx="432" cy="300" r="40" fill="#fbf8f1" stroke="#85827a" stroke-width="12" stroke-dasharray="22 14"/>
+  <!-- the curved arrow: lone pair to the carbon -->
+  <path d="M190 262 Q 212 160 246 238" fill="none" stroke="#1b2340" stroke-width="14" stroke-linecap="round"/>
+  <path d="M262 266 L228 240 L270 226 Z" fill="#1b2340" stroke="#1b2340" stroke-width="6" stroke-linejoin="round"/>
+</svg>

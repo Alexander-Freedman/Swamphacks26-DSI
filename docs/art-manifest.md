@@ -32,3 +32,12 @@ A square grid of thirty-six large round dots in six rows of six (a crowd), drawn
 ## Generation log (this pass)
 
 5 images: one first pass per session, then one retry each for coin streak and positive test (first passes had shapes too thin to read at 120px: 6 coins in a thin row, ~80 tiny dots). Birthday first pass kept.
+
+## session-orgo (hand-built SVG, not generated)
+
+| file | size | bytes |
+|---|---|---|
+| session-orgo-256.webp | 256x256 | 4488 |
+| session-orgo-512.webp | 512x512 | 9130 |
+
+Source: `docs/art/session-orgo.svg`, drawn by hand in the Notebook Arcade palette (a nucleophile with its lone pair, an ink curved arrow onto an ink carbon, a pencil leaving group). Rasterized to WebP (quality 82) in headless Chromium via canvas. No image service involved; doesn't count toward the image budget.
