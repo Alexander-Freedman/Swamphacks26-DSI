@@ -43,5 +43,7 @@ Decisions + how to run things. Keep current.
 
 - Oct 16 10:30 PM: **spending stays $0.** Free Gemini only (key saved on the server; free tier). OpenAI has no billing, so no AI image generation: visuals are SVG/CSS. Showcase topics are written by us during the build and stored.
 
+- Oct 16 10:40 PM: **the product name is @luanamaldaner's call** (asked on #1, options in docs/story.md). Code uses the neutral working name `mm` until it's recorded here. Look / showcase #3 / label follow the auto-approval rule unless I answer first.
+
 ## How to run
 Nothing to run yet. Build box tooling (my side): Python 3.12, uv 0.13, Node 22.23 / npm 10.9 in `~/.local/bin` (DeepSpace would also need `npm i -g npm@11`). No Docker on the build box; deploys go to Vultr/Render. The box is 1 CPU, so heavy model training should be kept small or run on Vultr.
