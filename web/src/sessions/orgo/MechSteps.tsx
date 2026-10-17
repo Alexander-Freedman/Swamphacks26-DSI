@@ -31,14 +31,16 @@ export function PartsStep({ onNext, nextLabel, c = SN2_CASE }: StepProps) {
   }
   return (
     <section className="og-step og-analyze">
-      <p className="og-ask" aria-live="polite">
-        {cur ? cur.ask : 'All three found.'}
-        {cur && <span className="og-where">{found.length} of 3 found</span>}
-      </p>
+      <div className="og-size">
       <figure className="og-fig">
         <figcaption>{rx.text.reactants}</figcaption>
         <Scene scene={sceneAt(rx, 0)} label={rx.text.reactants} marks={marks} onAtom={cur ? tap : undefined} atomName={(id) => NAMES[id]} />
       </figure>
+      <div className="og-col">
+      <p className="og-ask" aria-live="polite">
+        {cur ? cur.ask : 'All three found.'}
+        {cur && <span className="og-where">{found.length} of 3 found</span>}
+      </p>
       {hint && <p className="og-hint" role="status">{hint}</p>}
       <ul className="og-found">
         {PART_ASK.map((p) => (
@@ -53,6 +55,8 @@ export function PartsStep({ onNext, nextLabel, c = SN2_CASE }: StepProps) {
           <button className="og-btn og-go" onClick={onNext}>{nextLabel}</button>
         </div>
       )}
+      </div>
+      </div>
     </section>
   )
 }
@@ -154,6 +158,8 @@ export function DecideStep({ onNext, nextLabel, onMistake, c = SN2_CASE }: StepP
   }
   return (
     <section className="og-step og-analyze">
+      <div className="og-size og-decide">
+      <div className="og-col">
       <p className="og-ask">
         Your answers: a <span className="og-hl">{c.nu.answer} nucleophile</span> on a <span className="og-hl">{CARBON_SHORT[row]} carbon</span>, with a {c.lg.answer} leaving group.
         <span className="og-where">Find your row and column on the chart. Which mechanism belongs where they meet?</span>
@@ -181,6 +187,8 @@ export function DecideStep({ onNext, nextLabel, onMistake, c = SN2_CASE }: StepP
           </div>
         ))}
       </div>
+      </div>
+      <div className="og-col">
       <div className="og-choices og-mechs">
         {MECHS.map((m) => (
           <button key={m.id} className={'og-choice' + (right && m.id === c.mech ? ' right' : '')} disabled={right || wrong.includes(m.id)} onClick={() => pick(m.id)} aria-pressed={right && m.id === c.mech}>
@@ -198,12 +206,14 @@ export function DecideStep({ onNext, nextLabel, onMistake, c = SN2_CASE }: StepP
       )}
       {right && (
         <div className="og-principle" role="status">
-          <p className="og-ink-big">{c.why}</p>
+          <p className="og-why-big">{c.why}</p>
           <div className="og-row">
             <button className="og-btn og-go" onClick={onNext}>{nextLabel}</button>
           </div>
         </div>
       )}
+      </div>
+      </div>
     </section>
   )
 }

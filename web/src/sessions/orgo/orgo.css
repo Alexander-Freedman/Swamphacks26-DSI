@@ -198,3 +198,17 @@
 .orgo .og-cell.solved { animation: og-pop 0.35s ease-out; }
 
 .orgo .og-endwrap { outline: none; scroll-margin: 24px; }
+
+/* the analysis screens fit one window: picture or chart on the left, questions on the right */
+.orgo .og-step.og-analyze { grid-template-columns: minmax(0, 1100px); }
+.orgo .og-col { display: grid; gap: 10px; align-content: start; min-width: 0; }
+.orgo .og-col .og-row { margin-top: 2px; }
+.orgo .og-decide { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); }
+@media (max-width: 720px) { .orgo .og-decide { grid-template-columns: 1fr; } }
+.orgo .og-decide .og-mechs { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+.orgo .og-decide .og-choice { min-height: 0; padding: 8px 10px; }
+.orgo .og-decide .og-choice span { font-size: 13px; }
+.orgo .og-decide .og-cell { min-height: 40px; }
+.orgo .og-why-big { font: 600 16px/1.4 var(--font-body); margin: 0; }
+.orgo .og-decide .og-principle { margin-top: 0; padding-top: 10px; }
+.orgo .og-analyze .og-scene { max-height: 46vh; }
