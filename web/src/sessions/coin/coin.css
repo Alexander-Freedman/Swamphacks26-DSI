@@ -21,7 +21,7 @@
 .coin-session .sr-only { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
 
 /* buttons */
-.coin-session .btn { font: 700 16px var(--font-body); background: var(--ink); color: var(--paper); border: 2px solid var(--ink); border-radius: 999px; padding: 10px 20px; box-shadow: 0 3px 0 #000; min-height: 44px; }
+.coin-session .btn { font: 700 16px var(--font-body); background: var(--ink); color: var(--paper); border: 2px solid var(--ink); border-radius: var(--radius-ui); padding: 10px 20px; box-shadow: 0 3px 0 #000; min-height: 44px; }
 .coin-session .btn:active:not(:disabled) { transform: translateY(2px); box-shadow: 0 1px 0 #000; }
 .coin-session .btn.ghost { background: var(--card); color: var(--ink); }
 .coin-session .btn.small { font-size: 14px; padding: 7px 14px; min-height: 40px; }
@@ -42,9 +42,9 @@
 .coin-session .coin.t b { background: var(--card); color: var(--ink); border: 2px solid var(--ink); }
 .coin-session .coin.empty b { border: 1.5px dotted var(--empty); }
 .coin-session .coin.run { background: var(--marker); }
-.coin-session .coin.run-start { border-radius: 999px 0 0 999px; }
-.coin-session .coin.run-end { border-radius: 0 999px 999px 0; }
-.coin-session .coin.run-start.run-end { border-radius: 999px; }
+.coin-session .coin.run-start { border-radius: var(--radius-ui) 0 0 var(--radius-ui); }
+.coin-session .coin.run-end { border-radius: 0 var(--radius-ui) var(--radius-ui) 0; }
+.coin-session .coin.run-start.run-end { border-radius: var(--radius-ui); }
 .coin-session .coin.fresh b { animation: coin-flip .28s cubic-bezier(.3, 1.6, .6, 1) both; animation-delay: calc(var(--i) * 13ms); }
 @keyframes coin-flip { from { transform: rotateY(90deg) scale(.5); opacity: 0; } to { transform: none; opacity: 1; } }
 .coin-session .mine .coin b { background: transparent; border: 2px dashed var(--pencil); color: var(--pencil); font-weight: 700; }
@@ -57,7 +57,7 @@
 
 /* step 1 */
 .coin-session .tapper { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin: 8px 0 4px; }
-.coin-session .tap { font: 800 34px var(--font-display); height: 76px; border-radius: 999px; border: 3px dashed var(--pencil); background: var(--card); color: var(--ink); box-shadow: 0 3px 0 var(--pencil); }
+.coin-session .tap { font: 800 34px var(--font-display); height: 76px; border-radius: var(--radius-ui); border: 3px dashed var(--pencil); background: var(--card); color: var(--ink); box-shadow: 0 3px 0 var(--pencil); }
 .coin-session .tap:active:not(:disabled) { transform: translateY(2px); box-shadow: 0 1px 0 var(--pencil); }
 .coin-session .tap:disabled { opacity: .4; cursor: default; }
 .coin-session .stats { display: flex; gap: 6px 18px; flex-wrap: wrap; font-size: 14px; color: var(--ink-soft); margin: 6px 0 4px; }
@@ -153,7 +153,7 @@
 .coin-session .tryit { margin-top: 18px; border-top: 2px dashed var(--grid); padding-top: 14px; }
 .coin-session .choice { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 10px; }
 @media (max-width: 520px) { .coin-session .choice { grid-template-columns: minmax(0, 1fr); } }
-.coin-session .choice button { min-width: 0; text-align: left; background: var(--card); border: 2px solid var(--ink); border-radius: 10px; padding: 8px 10px; color: var(--ink); }
+.coin-session .choice button { min-width: 0; text-align: left; background: var(--card); border: 2px solid var(--ink); border-radius: var(--radius-ui); padding: 8px 10px; color: var(--ink); }
 .coin-session .choice button > b { font: 800 18px var(--font-display); }
 .coin-session .choice button .coins { margin: 4px 0; }
 .coin-session .choice button.right { border-color: var(--called); box-shadow: 0 0 0 2px var(--called) inset; }
@@ -164,7 +164,7 @@
 .coin-session .tryres .hl { font-weight: 800; }
 
 /* 20-flip deal */
-.coin-session .lenpick { display: inline-flex; border: 2px solid var(--ink); border-radius: 999px; overflow: hidden; margin: 0 0 10px; }
+.coin-session .lenpick { display: inline-flex; border: 2px solid var(--ink); border-radius: var(--radius-ui); overflow: hidden; margin: 0 0 10px; }
 .coin-session .lenpick button { border: 0; background: var(--card); padding: 6px 14px; min-height: 36px; font-weight: 700; }
 .coin-session .lenpick button.on { background: var(--ink); color: var(--paper); }
 .coin-session .rowname { font: 700 15px var(--font-body); display: flex; align-items: center; margin: 12px 0 0 !important; }
