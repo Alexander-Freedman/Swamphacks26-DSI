@@ -7,7 +7,8 @@ Direction is Mental Models, any-topic (Oct 16 ~9:50 PM). Hazard/Sperry questions
 
 1. Showcase-topic facts the reveal and the pitch will quote, with sources: coin streaks (expected longest run in 100 flips, how human "fake" sequences alternate too much), Wason 2-4-6 (share who never test a negative case), Off the Edge (share who draw the wrong path). → docs/research/showcase-facts.md (@luanamaldaner, in progress)
 2. Hypercorrection + confidence: what effect size can we honestly quote for "confident wrong guesses get corrected best", and how the confidence slider should be scaled. → docs/research/engagement.md
-3. Live-topic latency budget: what's the slowest the "judge names a topic" beat can be before it hurts (and what we show while it loads). Needs #31 numbers. → docs/research/demo.md
+3. Can question 1 run as its own parallel Gemini call, and what does that cost in quota? Does partial-JSON parsing of the stream hold up with our schema? → docs/research/demo.md
+3b. Real time-to-first-token on venue wifi vs a hotspot (time 20 random topics Sat, log in NOTES.md). → NOTES.md
 4. Does the `sketch` item fit in the #20 schema, and which misconception signal does it give per showcase topic? → docs/research/frontend-plan.md
 5. Which UF courses/clubs could we user-test with Saturday (5 people, 2 rounds), and what's on the task card? → plan-extras.md
 8. Which judging sheet do judges actually get: Devpost's 7 criteria or the rules page's 5? (Ask at the help desk.) → strategy.md.
@@ -20,6 +21,7 @@ Direction is Mental Models, any-topic (Oct 16 ~9:50 PM). Hazard/Sperry questions
 17, 26, 27, 29 (Sperry/sensor questions); keep for reference only.
 
 ## Done
+- Live-topic latency budget: first question ≤5 s target, 15 s OK, 20 s cutoff to cached chips → docs/research/demo.md
 - What one person can start alone at 8:30 → kickoff.md
 - First 30-60 min setup steps at 8:30 → kickoff.md
 - What DSI judges check in a repo → ai-ml-track.md
