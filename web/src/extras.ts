@@ -56,16 +56,76 @@ export function loadExtraIndex(): Promise<ExtraTopic[]> {
   return indexPromise
 }
 
-/** Slug of a showcase or extra topic matching typed text (topic, slug or alias), if any. */
+/**
+ * Common names for the three sessions (#167), so the topic box opens them like any extra. Session
+ * folders stay untouched: the names live here, keyed by the session's (and showcase round's) slug.
+ */
+export const SESSION_ALIASES: Record<string, string[]> = {
+  birthday: ['the birthday problem', 'birthday problem', 'birthday paradox', 'shared birthday', 'shared birthdays', 'same birthday', 'birthdays'],
+  'coin-streak': [
+    'be a coin', 'coin', 'coins', 'coin flip', 'coin flips', 'coin toss', 'flipping coins', 'streak', 'streaks',
+    "gambler's fallacy", 'hot hand', 'hot hand fallacy', 'randomness', 'random', 'heads or tails',
+  ],
+  'positive-test': [
+    'you tested positive', 'positive test', 'false positive', 'false positives', 'base rate', 'base rate fallacy',
+    'base rate neglect', 'bayes', "bayes' theorem", 'bayes theorem', 'bayes rule', 'medical test', 'screening test',
+  ],
+}
+
+// Words that don't pick a topic on their own ("monty hall paradox" = "monty hall", "dice odds" = "dice").
+const FILLER = new Set(
+  'a an the of to in on and or for is are do does what why how works work problem paradox effect theorem rule law probability odds chance chances math statistics'.split(' '),
+)
+
+/** Content words of a name: normalized, filler and 1-letter bits dropped, a plural s trimmed. */
+function words(text: string): Set<string> {
+  return new Set(
+    normalizeTopic(text)
+      .split(' ')
+      .filter((w) => w.length > 1 && !FILLER.has(w))
+      .map((w) => (w.length > 3 && w.endsWith('s') && !w.endsWith('ss') ? w.slice(0, -1) : w)),
+  )
+}
+
+// A loose hit needs every content word of one side inside the other, covering at least half of
+// the longer one ("interest" in "compound interest", "dice" in "dice odds").
+export const LOOSE_MIN = 0.5
+
+function looseScore(typed: Set<string>, name: Set<string>): number {
+  if (!typed.size || !name.size) return 0
+  const inside = (a: Set<string>, b: Set<string>) => [...a].every((w) => b.has(w))
+  if (inside(typed, name)) return typed.size / name.size
+  if (inside(name, typed)) return name.size / typed.size
+  return 0
+}
+
+/**
+ * Slug of a session, showcase or extra topic matching typed text, if any. Exact first (topic, slug,
+ * session name or alias, case and punctuation ignored); else the best loose word match at or above
+ * LOOSE_MIN, unless two different topics tie for it (then it's a miss, never a guess).
+ */
 export function matchTopic(text: string, extras: ExtraTopic[]): string | null {
   const key = normalizeTopic(text)
   if (!key) return null
-  for (const slug of showcaseSlugs) {
-    const r = showcaseRound(slug)!
-    if (key === normalizeTopic(r.topic) || key === normalizeTopic(slug)) return slug
+  const names: [string, string[]][] = [
+    ...showcaseSlugs.map((slug): [string, string[]] => [slug, [showcaseRound(slug)!.topic, slug, ...(SESSION_ALIASES[slug] ?? [])]]),
+    ...extras.map((e): [string, string[]] => [e.slug, [e.topic, e.slug, ...e.aliases]]),
+  ]
+  for (const [slug, list] of names) if (list.some((t) => normalizeTopic(t) === key)) return slug
+  const typed = words(text)
+  let best: string | null = null
+  let top = 0
+  let tie = false
+  for (const [slug, list] of names) {
+    const score = Math.max(...list.map((t) => looseScore(typed, words(t))))
+    if (score < LOOSE_MIN || score < top) continue
+    if (score > top) {
+      top = score
+      best = slug
+      tie = false
+    } else if (slug !== best) tie = true
   }
-  const hit = extras.find((e) => [e.topic, e.slug, ...e.aliases].some((t) => normalizeTopic(t) === key))
-  return hit?.slug ?? null
+  return tie ? null : best
 }
 
 // Rounds fetched or generated this visit, so opening one is instant and Back/Forward work.

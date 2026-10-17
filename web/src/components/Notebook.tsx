@@ -1,5 +1,5 @@
 import type { MouseEvent } from 'react'
-import { BUST_AFTER, NOTEBOOK_HREF, entries, notebook, type Card } from '../notebook'
+import { BUST_AFTER, NOTEBOOK_HREF, entries, notebook, plays, type Card } from '../notebook'
 import { sessionFor, sessions } from '../sessions/registry'
 import './Notebook.css'
 
@@ -51,6 +51,11 @@ function MistakeCard({ c }: { c: Card }) {
           </>
         )}
       </p>
+      {!busted && (
+        <a className="nb-again" href={c.href}>
+          Try it again →
+        </a>
+      )}
     </li>
   )
 }
@@ -58,7 +63,7 @@ function MistakeCard({ c }: { c: Card }) {
 export function NotebookScreen({ onHome }: { onHome?: () => void }) {
   const cards = notebook()
   const all = entries()
-  const played = all.length
+  const played = plays(all)
   // Empty state (#162): count missed rematches honestly and point at a session not played yet.
   const missed = all.filter((e) => e.rematch === 'wrong').length
   const next = sessions.find((s) => !all.some((e) => e.session === s.slug)) ?? sessions[0]
