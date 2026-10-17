@@ -12,9 +12,9 @@ Shared board. Every task is a GitHub issue; assign yourself + comment "on it" be
 |---|---|---|---|
 | — | docs/experience.md storyboard | @Alexander-Freedman | in progress |
 | #75 | Look + interactive mockups for all 3 showcases (docs/experience-look.md, docs/mockups/) | @luanamaldaner | merged (#79) |
-| #81 | Coin streak session (`web/src/sessions/coin/`) | @luanamaldaner | PR #107 (review) |
+| #81 | Coin streak session (`web/src/sessions/coin/`) | @luanamaldaner | merged (#107) |
 | #78 | Birthday session (`web/src/sessions/birthday/`) | @Alexander-Freedman | merged (#101) |
-| #82 | Positive test session (`web/src/sessions/positive/`) | @luanamaldaner | PR #99 (review) |
+| #82 | Positive test session (`web/src/sessions/positive/`) | @luanamaldaner | merged (#99) |
 
 ## Build (B1-B3)
 
@@ -47,6 +47,13 @@ Shared board. Every task is a GitHub issue; assign yourself + comment "on it" be
 | #5 | Research round 2 (teardowns, prizes, ideas, feasibility, ...; start at docs/README.md) | @Alexander-Freedman | merged via #7 |
 | #3 | docs/sponsor-tech.md: live setup checks of sponsor/MLH APIs (builds on prize-strategy + feasibility) | @luanamaldaner | PR up |
 
+## Up next (mine)
+- #142 Onionskin rename (PR up)
+- #136 Try any topic box (PR up)
+- #64 round-player reveal fixes + generator v3 curve knobs (PR up); then read `ask_x`/`ask_y` from #127 so generated curves have a truth to compare against
+- Wire the session card art from #124 into Home (BASE_URL paths, srcset, lazy) once #124 + #136 merge
+- #71 How it works drawer after #64/#136
+
 ## QA (fix first, CONTRIBUTING.md §4)
 
 | Issue | Problem | Owner | Plan |
@@ -54,6 +61,6 @@ Shared board. Every task is a GitHub issue; assign yourself + comment "on it" be
 | #83 | Positive test reveal: NaN, wrong units, 9.2% not shown | @luanamaldaner | replaced by the #82 session |
 | #87 | Which-is-real coin item reveal | @luanamaldaner | replaced by the #81 session |
 | #89 | Distribution labels tiny on phone, truth line color | @luanamaldaner | sessions + #64 |
-| #88 | Round URL / back button | @luanamaldaner | PR #106 (also hides the old coin/positive rounds → closes #83/#87) |
+| #88 | Round URL / back button | @luanamaldaner | merged (#106); #83, #87 closed |
 | #85 | Birthday reveal text-only | @luanamaldaner | covered by the birthday session (#78, other side) |
 | #86 | Bands too wide | @Alexander-Freedman | |
