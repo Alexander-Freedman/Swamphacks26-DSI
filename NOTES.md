@@ -99,6 +99,7 @@ Decisions + how to run things. Keep current.
   - Auth0 SPA app "Mental Models": domain `dev-vngwndh6p388zoms.us.auth0.com`, client ID `eU3gBCqk5V0yHLdq03UHCrJmOGF5ZGBb`. **Public config** (no client secret), fine in frontend config. Allowed callback/logout URLs + web origins only cover `http://localhost:5173` so far; asked @luanamaldaner on #1 to add `https://alexander-freedman.github.io` and `https://alexander-freedman.github.io/Swamphacks26-DSI/` (custom domain later). Wired per the build plan (cut line 2, Sat afternoon), **guest play first**.
   - Tiger Data service exists; `TIGER_DATABASE_URL` goes in `.env` when I paste it. SQLite until then.
   - Name: @luanamaldaner picks; working name `mm` until she posts it.
+  - **Name decided Sat ~1:35 AM (@luanamaldaner): Onionskin** (like an animator's onion skin: your guess stays as a faint layer under the truth). Domain **onionskin.study** registered; Auth0 already allows https://onionskin.study. Tagline: "See your thinking in layers."
 
 - Sat ~12:30 AM, **my decisions on the storyboard + re-plan (#94 approved):**
   - Every screen gets **one plain-language sentence: what to do and why it matters** (list in docs/experience.md). Keep the visuals, add the guidance.
