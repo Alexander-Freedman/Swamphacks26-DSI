@@ -4,7 +4,7 @@ Builds on docs/pitch.md (Candidate B script + Q&A), docs/expo-video.md (table cr
 
 ## TL;DR
 - **Open with a showcase topic the judge gets wrong, not with the live topic.** The judge names a topic first, it generates in the background, and we come back to it at ~1:40. That hides the 10-20 s generation time and means the wow moment never depends on the network.
-- **Showcase #1: the coin streak.** "In 100 fair flips, what's the longest run of the same side?" Most people guess 3-4; the real answer is usually 6-8, and ≥5 shows up 97% of the time. The truth is computed in the browser, so it's instant, correct and offline.
+- **Showcase #1: the coin streak.** "In 100 fair flips, what's the longest run of the same side?" Most people guess low (3-4 is my guess, **unverified**: no study measures it, so I log real guesses at the event); the expected longest run is 6.98 and ≥5 shows up 97% of the time (exact DP, see showcase-facts.md). The truth is computed in the browser, so it's instant, correct and offline.
 - **Showcase #2: the positive test (base rates).** Judges with a technical background still say ~90%; the truth is ~9%. The reveal is 1,000 dots sorting themselves.
 - **Showcase #3 (backup / physics people): Off the Edge** (the marble ghost race already prototyped on branch luanamaldaner/pen-input).
 - The live topic needs a 3-step fallback ladder: cached → generating with a visible build → "pick one of these" chips.

@@ -6,8 +6,8 @@ Ranked by how much the answer changes what we do. Each pass takes the top open q
 Direction is Mental Models, any-topic (Oct 16 ~9:50 PM). Hazard/Sperry questions are parked at the bottom.
 
 1. Off the Edge has no good adult error-rate source. Swap it for "ball dropped while walking" (McCloskey 1983), or drop it? Goes in the spec for review. → docs/research/demo.md
-2. Base-rate medical card ("positive test"): sourced numbers for how often people get it wrong (Casscells 1978, Gigerenzer natural frequencies). → docs/research/showcase-facts.md
-2b. Is there a sourced number for what people guess as the longest streak in 100 flips? (demo.md says 3-4, unverified.) → docs/research/showcase-facts.md
+2. Log real longest-streak guesses at the event (first 10 testers) so the pitch has our own number instead of an unverified one. → docs/research/showcase-facts.md
+2b. Natural-frequency framing doubles correct base-rate answers (16% → 46%): should every reveal for probability topics use "X out of 100" icon arrays by default? → docs/research/reveal-patterns.md
 3. Can question 1 run as its own parallel Gemini call, and what does that cost in quota? Does partial-JSON parsing of the stream hold up with our schema? → docs/research/demo.md
 3b. Real time-to-first-token on venue wifi vs a hotspot (time 20 random topics Sat, log in NOTES.md). → NOTES.md
 4. Does the `sketch` item fit in the #20 schema, and which misconception signal does it give per showcase topic? → docs/research/frontend-plan.md
@@ -22,6 +22,7 @@ Direction is Mental Models, any-topic (Oct 16 ~9:50 PM). Hazard/Sperry questions
 17, 26, 27, 29 (Sperry/sensor questions); keep for reference only.
 
 ## Done
+- Base-rate card facts (Manrai 2014 14/61 correct; Gigerenzer & Hoffrage 16% vs 46%) and no study on longest-streak guesses → docs/research/showcase-facts.md
 - Showcase facts (coin streak DP: expected longest run 6.98, P(6+)=80.7%; Falk & Konold alternation .56-.63; Wason 22/29 wrong first; hypercorrection 87% vs 61%, modest r) → docs/research/showcase-facts.md
 - Live-topic latency budget: first question ≤5 s target, 15 s OK, 20 s cutoff to cached chips → docs/research/demo.md
 - What one person can start alone at 8:30 → kickoff.md
