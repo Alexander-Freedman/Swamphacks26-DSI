@@ -12,6 +12,8 @@ Source: Azure gpt-image-2, 1024x1024 PNG, downscaled to WebP (quality 82) at 512
 | session-coin-streak-512.webp | 512x512 | 11366 |
 | session-positive-test-256.webp | 256x256 | 7962 |
 | session-positive-test-512.webp | 512x512 | 19860 |
+| session-calculus-256.webp | 256x256 | 4590 |
+| session-calculus-512.webp | 512x512 | 9934 |
 
 Use the 256px file for cards up to ~128px CSS wide, the 512px one above that. Decorative: `alt=""`.
 
@@ -32,3 +34,7 @@ A square grid of thirty-six large round dots in six rows of six (a crowd), drawn
 ## Generation log (this pass)
 
 5 images: one first pass per session, then one retry each for coin streak and positive test (first passes had shapes too thin to read at 120px: 6 coins in a thin row, ~80 tiny dots). Birthday first pass kept.
+
+### session-calculus
+
+Not generated: drawn as SVG in code (the session's own curve f(x) = (x³ − 6x² + 9x)/2 + 1 with a flat tangent at the hilltop and five dashed left-edge rectangles, marker where they miss the curve), rendered to WebP (quality 82) in a headless browser.
