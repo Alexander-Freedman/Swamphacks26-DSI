@@ -1,7 +1,10 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { record as save } from '../../notebook'
 import { showcaseRound } from '../../rounds'
-import { misconceptionFor, verdictFor, verdictText } from '../../verdict'
+import { misconceptionFor } from '../../verdict'
+import { ConfidencePicker, EndBar, Frame, LockButton, SessionHead, StampRow, Title } from '../../components/session/Shell'
+import { cardGuide, lockLabel, type Confidence } from '../../components/session/copy'
+import { rematchVerdict, shellVerdict } from '../../components/session/verdict'
 import { CrowdCurve, GuessBar, MiniPile, PileCompare } from './Charts'
 import { DotCanvas, PaintGrid, type Kind } from './Crowd'
 import { baseToSlider, breakEven, CARD, exact, pct, piles, POP, ppv, REMATCH, seededOrder, sliderToBase, type Test } from './math'
@@ -10,8 +13,8 @@ import './positive.css'
 const ORDER = seededOrder()
 const reducedMotion = () => typeof matchMedia === 'function' && matchMedia('(prefers-reduced-motion: reduce)').matches
 
-export type Confidence = 'unsure' | 'pretty sure' | 'certain'
-const CONFS: Confidence[] = ['unsure', 'pretty sure', 'certain']
+/** The verdict's "close" window: 15% of the 0-100 slider, in points. */
+const WINDOW = 15
 
 // Sketch values: 0 = not painted, 1 = you think: positive and sick, 2 = you think: positive but healthy.
 type Brush = 0 | 1 | 2
@@ -53,30 +56,22 @@ export function PositiveSession({ onDone }: { onDone: () => void }) {
     ['Test all 1,000.', 'Here are 1,000 people; 10 are sick. Test everyone and watch who comes up positive.'],
     ['Your pile vs the real pile.', 'These are all the positives. Tap a few: how many are actually sick?'],
     ['Same test. Change the crowd.', 'Drag how common the condition is. Watch what a positive result really means change.'],
-    ['What happened in your head', 'This is the mistake your guess points to, and the one idea that fixes it.'],
+    ['What happened in your head', cardGuide(misconceptionId(item, guess) === null)],
     ['Rematch', 'Same test, new numbers: does the idea stick?'],
   ]
   const [h, sub] = TITLES[step - 1]
 
   return (
-    <div className="pt">
-      <div className="pt-head">
-        <span className="pt-chip">Positive test</span>
-        <span className="pt-dots-steps" aria-label={`step ${step} of 6`}>
-          {TITLES.map((_, i) => (
-            <i key={i} className={i < step ? 'on' : ''} />
-          ))}
-        </span>
-        <span className="pt-count">{step} of 6</span>
+    <Frame className="pt">
+      <SessionHead chip="Positive test" step={step} total={TITLES.length}>
         {step > 1 && (
           <span className="pt-pencil-chip">
             your guess: <b>{guess}%</b>
             {painted.sick + painted.healthy > 0 && <> · sketch: {painted.sick} sick of {painted.sick + painted.healthy}</>}
           </span>
         )}
-      </div>
-      <h2 className="pt-title" ref={title} tabIndex={-1}>{h}</h2>
-      <p className="pt-subtitle">{sub}</p>
+      </SessionHead>
+      <Title h={h} sub={sub} headingRef={title} />
 
       {step === 1 && (
         <GuessStep
@@ -95,11 +90,11 @@ export function PositiveSession({ onDone }: { onDone: () => void }) {
       {step === 2 && <RunStep test={test} guess={guess} onNext={() => setStep(3)} />}
       {step === 3 && <CompareStep guess={guess} truth={truth} painted={painted} test={test} onNext={() => setStep(4)} />}
       {step === 4 && <CrowdStep card={test} guess={guess} onNext={() => setStep(5)} />}
-      {step === 5 && <CardStep guess={guess} conf={conf} truth={truth} test={test} round={round} item={item} onNext={() => setStep(6)} />}
+      {step === 5 && <CardStep guess={guess} conf={conf ?? 'pretty sure'} truth={truth} test={test} round={round} item={item} onNext={() => setStep(6)} />}
       {step === 6 && (
         <RematchStep
-          onReveal={(g2) => save({ session: 'positive-test', at: new Date().toISOString(), guess, confidence: conf ?? undefined, misconception: misconceptionId(item, guess, conf), rematch: rematchVerdict(g2, ppv(REMATCH)) === 'off' ? 'wrong' : 'right', rematchGuess: g2, rematchTruth: Math.round(ppv(REMATCH) * 1000) / 10 })}
-          caught={round.misconceptions.find((x) => x.id === misconceptionId(item, guess, conf))?.label ?? null}
+          onReveal={(g2) => save({ session: 'positive-test', at: new Date().toISOString(), guess, confidence: conf ?? undefined, misconception: misconceptionId(item, guess), rematch: rematchOf(g2) === 'off' ? 'wrong' : 'right', rematchGuess: g2, rematchTruth: Math.round(ppv(REMATCH) * 1000) / 10 })}
+          caught={round.misconceptions.find((x) => x.id === misconceptionId(item, guess))?.label ?? null}
           onDone={onDone}
         />
       )}
@@ -109,7 +104,7 @@ export function PositiveSession({ onDone }: { onDone: () => void }) {
           ← back
         </button>
       )}
-    </div>
+    </Frame>
   )
 }
 
@@ -161,15 +156,8 @@ function GuessStep(props: {
         </div>
         <input id="pt-guess" type="range" min={0} max={100} step={1} value={guess} onChange={(e) => setGuess(+e.target.value)} />
         <div className="pt-ends"><span>0%</span><span>50%</span><span>100%</span></div>
-        <div className="pt-k pt-mt">how sure? <span className="pt-opt">optional</span></div>
-        <div className="pt-choices" role="group" aria-label="how sure are you">
-          {CONFS.map((c) => (
-            <button key={c} className="pt-choice" aria-pressed={conf === c} onClick={() => setConf(c)}>{c}</button>
-          ))}
-        </div>
-        <button className="pt-btn pt-lock" disabled={!touched} onClick={onLock}>
-          {touched ? `Lock in ${guess}%` : 'Move the slider to guess'}
-        </button>
+        <ConfidencePicker value={conf} onPick={setConf} />
+        <LockButton ready={touched && conf != null} onLock={onLock}>{lockLabel(touched, conf)}</LockButton>
       </div>
 
       <details className="pt-card pt-sketch">
@@ -410,12 +398,12 @@ function CrowdStep({ card, guess, onNext }: { card: Test; guess: number; onNext:
 }
 
 type ItemT = NonNullable<ReturnType<typeof showcaseRound>>['items'][number]
-const toAnswer = (guess: number, conf: Confidence | null) => ({ value: guess, optionId: null, confidence: conf === 'unsure' || !conf ? ('guessing' as const) : conf })
-const misconceptionId = (item: ItemT, guess: number, conf: Confidence | null) => misconceptionFor(item, toAnswer(guess, conf))
+// The band lookup only reads the value; confidence never changes which mistake a guess names.
+const misconceptionId = (item: ItemT, guess: number) => misconceptionFor(item, { value: guess, optionId: null, confidence: 'pretty sure' })
 
 type CardProps = {
   guess: number
-  conf: Confidence | null
+  conf: Confidence
   truth: number
   test: Test
   round: NonNullable<ReturnType<typeof showcaseRound>>
@@ -424,21 +412,19 @@ type CardProps = {
 }
 
 function CardStep({ guess, conf, truth, test, round, item, onNext }: CardProps) {
-  const answer = toAnswer(guess, conf)
-  const v = verdictFor(item, answer, truth * 100) // truth in the slider's units (%)
-  const mid = misconceptionFor(item, answer)
+  const mid = misconceptionId(item, guess)
+  const v = shellVerdict(mid, guess, truth * 100, WINDOW) // truth in the slider's units (%)
   const m = round.misconceptions.find((x) => x.id === mid)
   const c = piles(test)
   const ratio = Math.round(c.falsePos / Math.max(1, c.truePos))
   return (
     <section>
-      <div className="pt-stamprow">
-        <span className={`pt-stamp ${v}`}>{verdictText[v]}</span>
-        <p className="pt-said">
-          You said <b className="pt-pencil-c pt-num">{guess}%</b>{conf && <> ({conf})</>}. It's
+      <StampRow v={v}>
+        <p>
+          You said <b className="pt-pencil-c pt-num">{guess}%</b> ({conf}). It's
         </p>
         <span className="pt-reality pt-num">{exact(truth)}</span>
-      </div>
+      </StampRow>
       <div className="pt-card pt-verdict">
         <div className={`pt-k ${m ? 'pt-red' : ''}`}>{m ? 'the mistake' : 'the right model'}</div>
         <h3 className="pt-named">{m ? <>“<span className="pt-hl">{m.label}</span>”</> : <>You counted the <span className="pt-hl">whole crowd</span>.</>}</h3>
@@ -480,11 +466,8 @@ function CardStep({ guess, conf, truth, test, round, item, onNext }: CardProps) 
   )
 }
 
-/** Stamp for the rematch: same 15-point "close" window as the round's verdict, "called it" within 5. */
-function rematchVerdict(guess: number, truth: number): 'called' | 'close' | 'off' {
-  const d = Math.abs(guess - truth * 100)
-  return d <= 5 ? 'called' : d <= 15 ? 'close' : 'off'
-}
+/** Stamp for the rematch: "called it" within 5 points, then the same close rule as the first guess (#151). */
+const rematchOf = (g: number) => rematchVerdict(g, ppv(REMATCH) * 100, 5, WINDOW)
 
 function RematchStep({ onReveal, caught, onDone }: { onReveal: (g: number) => void; caught: string | null; onDone: () => void }) {
   const t = REMATCH
@@ -493,7 +476,7 @@ function RematchStep({ onReveal, caught, onDone }: { onReveal: (g: number) => vo
   const [g, setG] = useState(50)
   const [moved, setMoved] = useState(false)
   const [shown, setShown] = useState(false)
-  const v = rematchVerdict(g, truth)
+  const v = rematchOf(g)
   return (
     <section>
       <div className="pt-card pt-guess">
@@ -508,25 +491,23 @@ function RematchStep({ onReveal, caught, onDone }: { onReveal: (g: number) => vo
         <input id="pt-g2" type="range" min={0} max={100} step={1} value={g} disabled={shown} onChange={(e) => (setG(+e.target.value), setMoved(true))} />
         <div className="pt-ends"><span>0%</span><span>50%</span><span>100%</span></div>
         {!shown && (
-          <button
-            className="pt-btn pt-lock"
-            disabled={!moved}
-            onClick={() => {
+          <LockButton
+            ready={moved}
+            onLock={() => {
               setShown(true)
               onReveal(g)
             }}
           >
-            {moved ? `Lock in ${g}% and show me` : 'Move the slider first'}
-          </button>
+            {moved ? 'Lock it in' : 'Move the slider first'}
+          </LockButton>
         )}
       </div>
       {shown && (
         <>
-          <div className="pt-stamprow pt-mt">
-            <span className={`pt-stamp ${v}`}>{verdictText[v]}</span>
-            <p className="pt-said">You said <b className="pt-pencil-c pt-num">{g}%</b>. It's</p>
+          <StampRow v={v} className="pt-mt">
+            <p>You said <b className="pt-pencil-c pt-num">{g}%</b>. It's</p>
             <span className="pt-reality pt-num">{exact(truth)}</span>
-          </div>
+          </StampRow>
           <div className="pt-two">
             <div className="pt-card">
               <GuessBar guess={g} truth={truth} />
@@ -536,12 +517,7 @@ function RematchStep({ onReveal, caught, onDone }: { onReveal: (g: number) => vo
               <MiniPile truePos={c.truePos} positives={c.positives} />
             </div>
           </div>
-          <div className="pt-saved">
-            <p>
-              <b>Saved.</b> {caught ? <>Caught: “{caught}”.</> : 'Called it.'} Come back tomorrow for a remix: same idea, a different crowd.
-            </p>
-            <button className="pt-btn pt-done" onClick={onDone}>Done</button>
-          </div>
+          <EndBar caught={caught} rematch={v === 'called' ? 'right' : v === 'close' ? 'close' : 'wrong'} remix="Come back tomorrow for a remix: same idea, a different crowd." onDone={onDone} />
         </>
       )}
     </section>
