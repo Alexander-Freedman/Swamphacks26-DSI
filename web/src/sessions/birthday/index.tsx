@@ -2,6 +2,7 @@ import { useCallback, useState } from 'react'
 import { NOTEBOOK_HREF, record } from '../../notebook'
 import type { SessionDef, SessionProps } from '../registry'
 import { Room } from './Room'
+import { pMatch } from './math'
 import { verdictOf } from './round'
 import { Card, Draw, Guess, Rematch, Reveal, type Confidence } from './Screens'
 import './birthday.css'
@@ -83,7 +84,8 @@ function Birthday({ onDone }: SessionProps) {
           {picked != null && (
             <div className="bday-saved">
               <p>
-                <b>Saved to your notebook.</b> {verdictOf(guess).m ? <>Caught: “{verdictOf(guess).m!.label}”.</> : 'Called it.'} Come back tomorrow for a remix: birth months, 12 instead of 365.
+                <b>Saved to your notebook.</b> {verdictOf(guess).m ? <>Caught: “{verdictOf(guess).m!.label}”.</> : 'Your first guess called it.'}{' '}
+                {picked === pMatch(30) > 0.5 ? 'Rematch: right.' : 'Rematch missed; it stays in your notebook to try again.'} Come back tomorrow for a remix: birth months, 12 instead of 365.
               </p>
               <a className="nb-link-inline" href={NOTEBOOK_HREF}>Open notebook</a>
               <button className="bday-btn" onClick={onDone}>Done</button>
