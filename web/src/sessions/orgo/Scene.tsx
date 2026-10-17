@@ -7,6 +7,8 @@ import { lpPos, VH, VW, type Scene as S } from './sn2'
 export function Scene(p: {
   scene: S
   label: string
+  /** viewBox height (the SN2 strip is the default) */
+  vh?: number
   ref?: Ref<SVGSVGElement>
   className?: string
   marks?: Record<string, string>
@@ -16,19 +18,19 @@ export function Scene(p: {
   over?: ReactNode
   handlers?: Partial<Record<'onPointerDown' | 'onPointerMove' | 'onPointerUp' | 'onPointerCancel', (e: PointerEvent<SVGSVGElement>) => void>>
 }) {
-  const { scene, marks = {}, onAtom, ref, label, className = '', atomName, under, over, handlers } = p
+  const { scene, marks = {}, onAtom, ref, label, className = '', atomName, under, over, handlers, vh = VH } = p
   const at = new Map<string, Pt>(scene.atoms.map((a) => [a.id, a]))
   return (
-    <svg ref={ref} className={`og-scene ${className}`} viewBox={`0 0 ${VW} ${VH}`} role="group" aria-label={label} {...handlers}>
+    <svg ref={ref} className={`og-scene ${className}`} viewBox={`0 0 ${VW} ${vh}`} role="group" aria-label={label} {...handlers}>
       {under}
       {scene.atoms.map((a) =>
         marks[a.id] ? (
           <g key={'m' + a.id} className="og-mark">
             <circle cx={a.x} cy={a.y} r={21} />
             {/* tags sit on one row under the picture, joined to their atom */}
-            <line x1={a.x} y1={a.y + 21} x2={a.x} y2={VH - 21} />
-            <rect x={a.x - 18} y={VH - 21} width={36} height={17} rx={4} />
-            <text x={a.x} y={VH - 8.5} textAnchor="middle">{marks[a.id]}</text>
+            <line x1={a.x} y1={a.y + 21} x2={a.x} y2={vh - 21} />
+            <rect x={a.x - 18} y={vh - 21} width={36} height={17} rx={4} />
+            <text x={a.x} y={vh - 8.5} textAnchor="middle">{marks[a.id]}</text>
           </g>
         ) : null,
       )}
@@ -57,10 +59,10 @@ export function Scene(p: {
               }}
             >
               <circle cx={a.x} cy={a.y} r={22} className="og-hit" />
-              <AtomDisc el={a.el} x={a.x} y={a.y} charge={a.charge} partial={a.partial} />
+              <AtomDisc el={a.el} label={a.label} x={a.x} y={a.y} charge={a.charge} partial={a.partial} />
             </g>
           ) : (
-            <AtomDisc el={a.el} x={a.x} y={a.y} charge={a.charge} partial={a.partial} />
+            <AtomDisc el={a.el} label={a.label} x={a.x} y={a.y} charge={a.charge} partial={a.partial} />
           )}
         </g>
       ))}
