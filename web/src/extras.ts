@@ -1,12 +1,14 @@
 import { useEffect, useState, useSyncExternalStore } from 'react'
 import { showcaseRound, showcaseSlugs } from './rounds'
 import type { Round } from './types'
+import type { ExtraTopic } from './extraIndex'
+import bundledIndex from 'virtual:extra-index'
 
 // "Try any topic": hand-reviewed extra rounds (data/rounds/extra/) and, only when a backend is
 // configured, freshly generated ones. On Pages there is no backend: scripts/deploy-pages.sh
 // publishes the extras as static files at <base>rounds/extra/<slug>.json + index.json.
 
-export type ExtraTopic = { slug: string; topic: string; aliases: string[] }
+export type { ExtraTopic }
 
 // Builds take a median 27 s, p90 51 s (NOTES.md, 25-topic trial), so wait up to 45 s.
 export const GENERATE_TIMEOUT_MS = 45_000
@@ -34,20 +36,10 @@ async function getJson<T>(url: string, init?: RequestInit): Promise<T> {
 
 let indexPromise: Promise<ExtraTopic[]> | null = null
 
-// The reviewed extras' names, baked in at build time (named JSON imports, so only these fields
-// ship, not the rounds). Used only when there's a backend but no static index next to the page
-// (a backend-only deploy): the backend serves the rounds themselves at GET /api/rounds/{slug}.
-// (import.meta.glob needs literal options, hence one call per field.)
-const slugs = import.meta.glob<string>('../../data/rounds/extra/*.json', { eager: true, import: 'slug' })
-const topics = import.meta.glob<string>('../../data/rounds/extra/*.json', { eager: true, import: 'topic' })
-const aliases = import.meta.glob<string[] | undefined>('../../data/rounds/extra/*.json', { eager: true, import: 'aliases' })
-const reviewed = import.meta.glob<boolean>('../../data/rounds/extra/*.json', { eager: true, import: 'reviewed' })
-function bundledIndex(): ExtraTopic[] {
-  return Object.keys(slugs)
-    .sort()
-    .filter((path) => reviewed[path] === true)
-    .map((path) => ({ slug: slugs[path], topic: topics[path], aliases: aliases[path] ?? [] }))
-}
+// bundledIndex: the hand-checked extras' names (slug/topic/aliases, not the rounds), baked in at
+// build time by the extra-rounds plugin in vite.config.ts; a file with no aliases gets []. Used
+// only when there's a backend but no static index next to the page (a backend-only deploy): the
+// backend serves those rounds at GET /api/rounds/{slug}.
 
 /**
  * The reviewed extra topics: the static index (Pages, dev) first. If it isn't there and a backend
@@ -58,7 +50,7 @@ export function loadExtraIndex(): Promise<ExtraTopic[]> {
     try {
       return await getJson<ExtraTopic[]>(`${base()}rounds/extra/index.json`)
     } catch {
-      return apiBase() === null ? [] : bundledIndex()
+      return apiBase() === null ? [] : bundledIndex
     }
   })()
   return indexPromise

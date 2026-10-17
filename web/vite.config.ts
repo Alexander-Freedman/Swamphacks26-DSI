@@ -3,23 +3,35 @@ import { readFileSync, readdirSync } from 'node:fs'
 import { resolve } from 'node:path'
 import { defineConfig, type Plugin } from 'vite'
 
-// Dev only: serve data/rounds/extra/ at <base>rounds/extra/ the way scripts/deploy-pages.sh
+import { extraIndex } from './src/extraIndex.ts'
+
+const extraDir = resolve(import.meta.dirname, '../data/rounds/extra')
+const readExtras = (): { slug?: unknown }[] =>
+  readdirSync(extraDir)
+    .filter((f) => f.endsWith('.json'))
+    .sort()
+    .map((f) => JSON.parse(readFileSync(resolve(extraDir, f), 'utf8')))
+
+// Dev: serve data/rounds/extra/ at <base>rounds/extra/ the way scripts/deploy-pages.sh
 // publishes it on Pages, so "Try any topic" works the same with no backend running.
+// Dev + build: `virtual:extra-index` is that same index baked into the bundle (names only, no
+// round bodies) for a backend-only deploy with no static index next to the page.
 function extraRounds(): Plugin {
-  const dir = resolve(import.meta.dirname, '../data/rounds/extra')
+  const id = 'virtual:extra-index'
   return {
     name: 'extra-rounds',
-    apply: 'serve',
+    resolveId: (src) => (src === id ? '\0' + id : undefined),
+    load(resolved) {
+      if (resolved !== '\0' + id) return
+      for (const f of readdirSync(extraDir)) this.addWatchFile(resolve(extraDir, f))
+      return `export default ${JSON.stringify(extraIndex(readExtras()))}`
+    },
     configureServer(server) {
       server.middlewares.use((req, res, next) => {
         const m = /\/rounds\/extra\/([a-z0-9-]+)\.json$/.exec((req.url ?? '').split('?')[0])
         if (!m) return next()
-        const files = readdirSync(dir).filter((f) => f.endsWith('.json'))
-        const rounds = files.map((f) => JSON.parse(readFileSync(resolve(dir, f), 'utf8')))
-        const body =
-          m[1] === 'index'
-            ? rounds.filter((d) => d.reviewed).map((d) => ({ slug: d.slug, topic: d.topic, aliases: d.aliases ?? [] }))
-            : rounds.find((d) => d.slug === m[1])
+        const rounds = readExtras()
+        const body = m[1] === 'index' ? extraIndex(rounds) : rounds.find((d) => d.slug === m[1])
         if (!body) return next()
         res.setHeader('Content-Type', 'application/json')
         res.end(JSON.stringify(body))
