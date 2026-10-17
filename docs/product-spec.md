@@ -127,8 +127,8 @@ From any-topic-engine.md, reveal-patterns.md and misconceptions.md.
 A consumer Gemini Pro subscription doesn't change API limits.
 
 **Plan (free tier by default; billing is my call, prices in docs/research/gemini.md):**
-- **Flash Lite does all live generation.** One call returns a topic's *full package* (misconceptions, 3-5 items, widget spec, card text, cast origin story), stored forever by normalized topic.
-- **Gemma 4 31B blind-checks the items** (separate quota, 14.4K/day). Its 16K TPM fits one check at a time.
+- **`gemini-3.5-flash-lite` (minimal thinking) does all live generation**, with `gemini-3.1-flash-lite` → Gemma 26B as the overflow chain (docs/research/gemini.md). One call returns a topic's *full package* (misconceptions, 3-5 items, widget spec, card text, cast origin story), stored forever by normalized topic.
+- **`gemma-4-31b-it` blind-checks the items** (separate quota, 14.4K/day). One worker under its 16K TPM cap fits ~5 checks a minute.
 - **Gemma is also the fallback generator** if Flash Lite returns 429.
 - **Showcase rounds are hand-made JSON on disk**, with no API call. ~30 safety-net topics are pre-generated once and cached.
 - **Typed-"why" classification is off by default** (it would cost a call per answer); choices and bands are a lookup.
@@ -145,7 +145,7 @@ A consumer Gemini Pro subscription doesn't change API limits.
 | Expo: judges' live topics (~15-25, many hit the cache) | ≤25 | Sun 10-12 |
 | **Sun total** | **≈55 / 500** | |
 
-Every live call is logged with a counter on the dev drawer. **At 400/day, new topics switch to Gemma.**
+Every live call is logged with a counter on the dev drawer. **At 480/day it switches to the next model; daily 429s are never retried.** Before judging, after the 3 AM reset: pre-warm 15-25 likely judge topics, and keep ≥400 calls for the demo. `DEMO_OFFLINE=1` serves only cache + showcase if the venue wifi dies.
 
 **Gemini's jobs:**
 - **Generates every round** with structured JSON output.
