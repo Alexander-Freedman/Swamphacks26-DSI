@@ -39,7 +39,7 @@ def test_extras_validate_pass_checks_and_are_reviewed() -> None:
         data.pop("aliases")
         r = Round.model_validate(data)
         assert r.slug == stem and r.reviewed
-        _, report = check_round(r, blind=False)
+        _, report = check_round(r)
         assert report.dropped == {}, (stem, report.dropped)
         for m in r.misconceptions:
             assert m.source_url and m.source_url.startswith("http"), (stem, m.id)

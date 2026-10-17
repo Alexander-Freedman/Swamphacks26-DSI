@@ -72,3 +72,12 @@ export function seededOrder(n = POP, seed = 7): number[] {
   }
   return order
 }
+
+/**
+ * Compare step (#183): an airport bag scanner, same structure as the test. Illustrative numbers,
+ * not real airport data: 1 in 1,000 bags has something, the scanner flags 99% of those, and
+ * 2% of clean bags set it off too. Over a day of 100,000 bags every count is a whole bag:
+ * 100 with something, 99 flagged, 1,998 false alarms, so 99 / 2,097 alarms are real (4.72%).
+ */
+export const BAGS: Test = { baseRate: 0.001, sensitivity: 0.99, falseAlarm: 0.02 }
+export const BAG_DAY = 100_000

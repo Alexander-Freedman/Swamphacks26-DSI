@@ -7,6 +7,8 @@ import { pMatch } from './math'
 import { verdictOf } from './round'
 import { Card, Draw, Guess, Rematch, Reveal } from './Screens'
 import { upsert } from './save'
+import { Compare } from './Compare'
+import type { CompareChoice } from './compareData'
 import './birthday.css'
 
 function Birthday({ onDone }: SessionProps) {
@@ -16,9 +18,10 @@ function Birthday({ onDone }: SessionProps) {
   const [curve, setCurve] = useState<number[] | null>(null)
   const [skipped, setSkipped] = useState(false)
   const [picked, setPicked] = useState<boolean | null>(null)
+  const [compare, setCompare] = useState<CompareChoice | null>(null)
   const onMatchState = useCallback((m: boolean) => setMatched(m), [])
   // Saved once when the card first shows (#159); "Show me again" and the rematch reuse it.
-  const saved = useRef<Entry | null>(null)
+  const saved = useRef<(Entry & Record<string, unknown>) | null>(null)
   useEffect(() => {
     if (step !== 6 || saved.current) return
     saved.current = { session: 'birthday', at: new Date().toISOString(), guess, misconception: verdictOf(guess).m?.id ?? null, rematch: null }
@@ -36,12 +39,12 @@ function Birthday({ onDone }: SessionProps) {
     <div className="bday">
       <div className="bday-head">
         <span className="bday-chip">Birthday problem</span>
-        <span className="bday-dots" aria-label={`step ${shown} of 7`}>
+        <span className="bday-dots" aria-label={`step ${shown} of ${TITLES.length}`}>
           {TITLES.map((_, i) => (
             <i key={i} className={i < shown ? 'on' : ''} />
           ))}
         </span>
-        <span className="bday-count">{shown} of 7</span>
+        <span className="bday-count">{shown} of {TITLES.length}</span>
       </div>
       <h2 className="bday-title">{title}</h2>
       <p className="bday-subtitle">{sub}</p>
@@ -67,7 +70,18 @@ function Birthday({ onDone }: SessionProps) {
       )}
       {step === 5 && curve && <Reveal guess={guess} curve={curve} skipped={skipped} onNext={() => go(6)} />}
       {step === 6 && curve && <Card guess={guess} curve={curve} skipped={skipped} onAgain={() => go(5)} onNext={() => go(7)} />}
-      {step === 7 && curve && (
+      {step === 7 && (
+        <Compare
+          onPick={(c) => {
+            setCompare(c)
+            if (!saved.current) return
+            saved.current = { ...saved.current, compare: c }
+            upsert(saved.current)
+          }}
+          onNext={() => go(8)}
+        />
+      )}
+      {step === 8 && curve && (
         <>
           <Rematch
             curve={curve}
@@ -76,7 +90,7 @@ function Birthday({ onDone }: SessionProps) {
             onPick={(more) => {
               setPicked(more)
               if (!saved.current) return
-              saved.current = { ...saved.current, rematch: more === pMatch(30) > 0.5 ? 'right' : 'wrong' }
+              saved.current = { ...saved.current, ...(compare ? { compare } : {}), rematch: more === pMatch(30) > 0.5 ? 'right' : 'wrong' }
               upsert(saved.current)
             }}
           />

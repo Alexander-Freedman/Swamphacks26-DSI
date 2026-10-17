@@ -7,11 +7,25 @@ export const X_MAX = 80
 
 /** Exact chance that at least two of n people share a birthday: 1 - prod_{k<n} (365-k)/365. */
 export function pMatch(n: number): number {
+  return pAnyMatch(n, DAYS)
+}
+
+/** 4-digit PINs (0000-9999): the compare screen's second case. */
+export const PINS = 10_000
+
+/** Exact chance that at least two of n things share one of `options` equally likely values: 1 - prod_{k<n} (options-k)/options. */
+export function pAnyMatch(n: number, options: number): number {
   if (n < 2) return 0
-  if (n > DAYS) return 1
+  if (n > options) return 1
   let q = 1
-  for (let k = 0; k < n; k++) q *= (DAYS - k) / DAYS
+  for (let k = 0; k < n; k++) q *= (options - k) / options
   return 1 - q
+}
+
+/** Smallest n whose exact match chance among `options` values reaches q. */
+export function sizeForChanceIn(q: number, options: number): number {
+  for (let n = 2; n <= options + 1; n++) if (pAnyMatch(n, options) >= q) return n
+  return options + 1
 }
 
 /** Number of pairs among n people. */

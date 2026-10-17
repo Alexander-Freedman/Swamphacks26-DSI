@@ -9,6 +9,14 @@ afterEach(cleanup)
 beforeEach(() => localStorage.removeItem(KEY))
 
 /** Plays guess 180 → room → skip the drawing → reveal → the mistake card (B6). */
+/** From the card (B6) through the compare screen (B7) to the rematch (B8). */
+function cardToRematch() {
+  fireEvent.click(screen.getByText(/Got it/))
+  fireEvent.click(screen.getByText('23 & 120'))
+  fireEvent.click(screen.getByText(/pairs grow much faster than people/))
+  fireEvent.click(screen.getByText('Try it on a new one →'))
+}
+
 function toCard() {
   vi.useFakeTimers()
   window.scrollTo = vi.fn() as unknown as typeof window.scrollTo
@@ -55,7 +63,7 @@ describe('birthday notebook entry (#159)', () => {
   it('the rematch updates the same entry and says spot on', () => {
     toCard()
     const at = entries()[0].at
-    fireEvent.click(screen.getByText(/Got it/))
+    cardToRematch()
     fireEvent.click(screen.getByText('More likely than not'))
     const saved = entries()
     expect(saved).toHaveLength(1)
@@ -67,7 +75,7 @@ describe('birthday notebook entry (#159)', () => {
 
   it('a wrong rematch pick is saved as wrong, still one entry', () => {
     toCard()
-    fireEvent.click(screen.getByText(/Got it/))
+    cardToRematch()
     fireEvent.click(screen.getByText('Less likely than not'))
     expect(entries()).toHaveLength(1)
     expect(entries()[0].rematch).toBe('wrong')

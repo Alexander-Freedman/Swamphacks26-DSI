@@ -208,3 +208,33 @@
 .bday-plot-narrow .bday-tick { font-size: 13px; }
 .bday-plot-narrow .bday-axlabel { font-size: 14px; }
 .bday-plot-narrow .bday-h { font-size: 15px; }
+
+/* B7 compare: two cases side by side, same picture */
+.bday-cmp-grid { display: grid; gap: 14px; grid-template-columns: 1fr; }
+@media (min-width: 760px) { .bday-cmp-grid { grid-template-columns: 1fr 1fr; } }
+.bday-cmp-grid > * { min-width: 0; }
+.bday-cmp-case { padding: 12px; }
+.bday-cmp-title { font: 800 22px/1.15 var(--bday-display); margin: 0; }
+.bday-cmp-what { margin: 2px 0 8px; }
+.bday-cmp-pic { display: flex; align-items: center; gap: 12px; }
+.bday-cmp-ring { width: 46%; max-width: 170px; aspect-ratio: 1; flex: none; display: block; }
+.bday-cmp-stats { display: grid; gap: 6px; font-size: 14px; color: var(--ink-soft); }
+.bday-cmp-stats b { color: var(--ink); }
+.bday-cmp-big { font-size: 32px; line-height: 1; }
+.bday-cmp-pairs { font-size: 17px; font-weight: 700; color: var(--ink); }
+.bday-cmp-pct { font-size: 26px; }
+.bday-cmp-curve { margin-top: 8px; }
+.bday-cmp-ask { max-width: 820px; }
+.bday-cmp-choices { display: grid; gap: 10px; }
+.bday-cmp-choice { position: relative; border-radius: 4px; text-align: left; font-size: 16px; padding: 10px 14px; min-height: 52px; }
+.bday-cmp-choice:disabled { cursor: default; }
+.bday-choice[aria-pressed='true'].bday-cmp-choice { background: var(--card); color: var(--ink); border-width: 3px; }
+.bday-cmp-choices .bday-mini { top: -14px; right: -6px; border-radius: 4px; }
+.bday-cmp-ask .bday-btn, .bday-cmp-principle .bday-btn, .bday-cmp-jump { border-radius: 4px; }
+.bday-cmp-dial { max-width: 820px; padding: 12px 16px; }
+.bday-cmp-jumps { margin-top: 4px; }
+.bday-cmp-jump[aria-pressed='true'] { background: var(--marker); }
+.bday-cmp-own { display: flex; gap: 8px; margin-top: 12px; flex-wrap: wrap; }
+.bday-cmp-input { flex: 1 1 200px; min-width: 0; font: 16px var(--font-hand); color: var(--pencil); background: var(--paper); border: 2px dashed var(--ink-soft); border-radius: 4px; padding: 8px 12px; min-height: 44px; }
+.bday-cmp-principle { max-width: 820px; border-width: 3px; }
+.bday-cmp-why { margin: 4px 0 0; font-size: 17px; }
