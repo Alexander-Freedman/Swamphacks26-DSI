@@ -23,7 +23,8 @@
 .orgo .og-pal { width: 56px; height: 56px; padding: 4px; background: var(--card); border: 2px solid var(--ink); border-radius: 4px; box-shadow: 0 3px 0 var(--ink); touch-action: none; user-select: none; -webkit-user-select: none; cursor: grab; }
 .orgo .og-pal svg { width: 100%; height: 100%; display: block; pointer-events: none; }
 .orgo .og-pal:active { transform: translateY(2px); box-shadow: 0 1px 0 var(--ink); cursor: grabbing; }
-.orgo .og-clear { margin-left: auto; min-height: 40px; padding: 6px 12px; font-size: 14px; }
+.orgo .og-undo { margin-left: auto; min-height: 40px; padding: 6px 12px; font-size: 14px; }
+.orgo .og-clear { min-height: 40px; padding: 6px 12px; font-size: 14px; }
 @media (max-width: 420px) { .orgo .og-pal { width: 50px; height: 50px; } .orgo .og-palette { gap: 6px; } }
 
 /* the paper you build on: graph grid only inside the play area */
@@ -75,7 +76,7 @@
 .orgo .og-mistake p, .orgo .og-note p { margin: 6px 0 10px; font-size: 15px; line-height: 1.4; }
 .orgo .og-hint { margin: 6px 0; font: 15px/1.4 var(--font-hand); color: var(--ink-soft); }
 .orgo .og-okay { font: 700 22px var(--font-display); display: flex; align-items: baseline; gap: 8px; flex-wrap: wrap; }
-.orgo .og-check { display: inline-grid; place-items: center; width: 34px; height: 34px; border-radius: 50%; background: var(--ink); color: var(--paper); font-size: 20px; align-self: center; }
+.orgo .og-check { display: inline-grid; place-items: center; width: 34px; height: 34px; border-radius: 50%; background: var(--called); color: var(--paper); font-size: 20px; align-self: center; }
 .orgo .og-cond { font: 500 15px var(--font-mono); color: var(--ink-soft); }
 .orgo .og-skel { width: 100%; max-width: 270px; display: block; margin-top: 4px; }
 .orgo .og-skl { stroke: currentColor; stroke-width: 3; }
@@ -131,3 +132,11 @@
 .orgo .og-principle { margin-top: 16px; border-top: 2px solid var(--ink); padding-top: 12px; }
 .orgo .og-ink-big { font: 700 clamp(19px, 3.2vw, 24px)/1.35 var(--font-display); margin: 0; max-width: 40em; }
 .orgo .og-mastered { font-weight: 700; }
+
+/* Correct build: a big green check on the paper (not just in the side panel). */
+.orgo .og-correct circle { fill: var(--called); }
+.orgo .og-correct path { fill: none; stroke: var(--paper); stroke-width: 5; stroke-linecap: round; stroke-linejoin: round; }
+.orgo .og-correct text { font: 700 20px var(--font-display); fill: var(--called); }
+.orgo .og-correct { animation: og-pop 260ms ease-out; transform-box: fill-box; }
+@keyframes og-pop { from { opacity: 0; } to { opacity: 1; } }
+@media (prefers-reduced-motion: reduce) { .orgo .og-correct { animation: none; } }

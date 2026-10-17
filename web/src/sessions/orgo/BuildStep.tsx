@@ -1,4 +1,4 @@
-import { useRef, useState, type KeyboardEvent, type PointerEvent as RPointerEvent } from 'react'
+import { useEffect, useRef, useState, type KeyboardEvent, type PointerEvent as RPointerEvent } from 'react'
 import {
   bondCount,
   charges,
@@ -69,11 +69,37 @@ export function BuildStep({ onCheck, onNext }: { onCheck: (mistakes: BuildMistak
   const f = formula(mol)
   const byId = (id: string | null) => atoms.find((a) => a.id === id)
 
+  // Every change goes through edit(), so Undo (button or Ctrl/Cmd+Z) steps back one change at a time:
+  // an added atom, a bond, a double bond, a removed bond or atom, a move, even Clear.
+  const history = useRef<{ atoms: Atom[]; bonds: Bond[] }[]>([])
   const edit = (a: Atom[], b: Bond[]) => {
+    history.current.push({ atoms, bonds })
     setAtoms(a)
     setBonds(b)
     setResult(null)
   }
+  const undo = () => {
+    const prev = history.current.pop()
+    if (!prev) return
+    setAtoms(prev.atoms)
+    setBonds(prev.bonds)
+    setResult(null)
+    setSel(null)
+    setBondFrom(null)
+    setSay('undone')
+  }
+  const undoRef = useRef(undo)
+  undoRef.current = undo
+  useEffect(() => {
+    const onKey = (e: globalThis.KeyboardEvent) => {
+      if ((e.ctrlKey || e.metaKey) && !e.shiftKey && e.key.toLowerCase() === 'z') {
+        e.preventDefault()
+        undoRef.current()
+      }
+    }
+    window.addEventListener('keydown', onKey)
+    return () => window.removeEventListener('keydown', onKey)
+  }, [])
 
   const atomAt = (p: Pt, except?: string) => {
     let best: Atom | null = null
@@ -243,6 +269,9 @@ export function BuildStep({ onCheck, onNext }: { onCheck: (mistakes: BuildMistak
               </svg>
             </button>
           ))}
+          <button className="og-btn og-ghost og-undo" onClick={undo} disabled={!history.current.length} aria-keyshortcuts="Control+Z Meta+Z" title="Undo (Ctrl+Z)">
+            ↶ Undo
+          </button>
           <button className="og-btn og-ghost og-clear" onClick={clear} disabled={!atoms.length}>
             Clear
           </button>
@@ -316,6 +345,13 @@ export function BuildStep({ onCheck, onNext }: { onCheck: (mistakes: BuildMistak
           {drag?.kind === 'new' && drag.moved && drag.p?.inside && (
             <g className="og-ghost" pointerEvents="none">
               <AtomDisc el={drag.el} x={drag.p.x} y={drag.p.y} tone="pencil" />
+            </g>
+          )}
+          {ok && (
+            <g className="og-correct" transform={`translate(${W - 20} 20)`} pointerEvents="none" aria-hidden="true">
+              <circle cx={-26} cy={26} r={22} />
+              <path d="M -37 26 l 8 8 l 15 -16" />
+              <text x={-56} y={33} textAnchor="end">Correct!</text>
             </g>
           )}
         </svg>
