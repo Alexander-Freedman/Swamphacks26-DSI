@@ -11,7 +11,7 @@ export const TITLES: [string, string][] = [
 ]
 
 
-export const CALLED_IT = "You called it. Here's why it works, so it sticks."
+export const CALLED_IT = "Spot on. Here's why it works, so it sticks."
 
 /** Title and guidance line for a step. A called-it card has no mistake to name, so it says why the guess works (#150). */
 export function guideFor(step: number, guess: number): [string, string] {

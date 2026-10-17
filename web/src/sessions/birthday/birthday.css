@@ -9,7 +9,7 @@
   color: var(--ink);
 }
 .bday-head { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
-.bday-chip { font: 700 13px var(--font-body); border: 2px solid var(--ink); border-radius: 999px; padding: 3px 12px; background: var(--card); }
+.bday-chip { font: 700 13px var(--font-body); border: 2px solid var(--ink); border-radius: 4px; padding: 3px 12px; background: var(--card); }
 .bday-dots { display: inline-flex; gap: 5px; }
 .bday-dots i { width: 10px; height: 10px; border-radius: 50%; border: 2px solid var(--ink); }
 .bday-dots i.on { background: var(--ink); }
@@ -30,7 +30,7 @@
 .bday-pencil-c { color: var(--pencil); }
 
 /* buttons */
-.bday-btn { font: 700 16px var(--font-body); background: var(--ink); color: var(--paper); border: 2px solid var(--ink); border-radius: 12px; padding: 12px 20px; min-height: 48px; box-shadow: 0 3px 0 #000; touch-action: manipulation; user-select: none; -webkit-user-select: none; }
+.bday-btn { font: 700 16px var(--font-body); background: var(--ink); color: var(--paper); border: 2px solid var(--ink); border-radius: 4px; padding: 12px 20px; min-height: 48px; box-shadow: 0 3px 0 #000; touch-action: manipulation; user-select: none; -webkit-user-select: none; }
 .bday-btn:active:not(:disabled) { transform: translateY(2px); box-shadow: 0 1px 0 #000; }
 .bday-btn:disabled { opacity: 0.45; cursor: not-allowed; }
 .bday-ghost { background: var(--card); color: var(--ink); }
@@ -53,7 +53,7 @@
 .bday-guessnum small { font: 600 18px var(--font-body); color: var(--ink-soft); }
 .bday-ends { display: flex; justify-content: space-between; font-size: 13px; color: var(--ink-soft); }
 .bday-choices { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-top: 8px; }
-.bday-choice { font: 600 15px var(--font-body); background: var(--card); border: 2px solid var(--ink); border-radius: 10px; min-height: 46px; padding: 8px; }
+.bday-choice { font: 600 15px var(--font-body); background: var(--card); border: 2px solid var(--ink); border-radius: 4px; min-height: 46px; padding: 8px; }
 .bday-choice[aria-pressed='true'] { background: var(--ink); color: var(--paper); }
 
 /* B2/B3 room */
@@ -130,10 +130,10 @@
 .bday-truthnum { font: 800 clamp(56px, 15vw, 76px)/1 var(--bday-mono); letter-spacing: -0.03em; margin: 10px 0 4px; }
 .bday-breaks { position: relative; height: 34px; margin: 2px 15px 0; font-size: 13px; color: var(--ink-soft); }
 .bday-breaks > * { position: absolute; top: 0; transform: translateX(-50%); }
-.bday-break { font: 600 15px var(--font-hand); background: var(--card); border: 1.5px dashed var(--ink-soft); border-radius: 999px; padding: 2px 10px; min-height: 30px; color: var(--ink); }
+.bday-break { font: 600 15px var(--font-hand); background: var(--card); border: 1.5px dashed var(--ink-soft); border-radius: 4px; padding: 2px 10px; min-height: 30px; color: var(--ink); }
 .bday-break::before { content: ''; position: absolute; left: 50%; top: -9px; height: 8px; border-left: 2px solid var(--ink); }
 .bday-passed { background: var(--marker); border-style: solid; border-color: var(--ink); }
-.bday-flash { font: 600 16px var(--font-hand); background: var(--marker-soft); border-radius: 6px; padding: 4px 8px; margin: 10px 0 4px; animation: bday-flash 0.6s ease-out; }
+.bday-flash { font: 600 16px var(--font-hand); background: var(--marker-soft); border-radius: 4px; padding: 4px 8px; margin: 10px 0 4px; animation: bday-flash 0.6s ease-out; }
 @keyframes bday-flash { from { background: var(--marker); } to { background: var(--marker-soft); } }
 .bday-foot { font-size: 12px; color: var(--ink-soft); margin: 0; grid-column: 1 / -1; }
 
