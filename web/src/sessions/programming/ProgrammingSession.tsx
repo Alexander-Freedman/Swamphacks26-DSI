@@ -258,7 +258,7 @@ function CallStackStep({ topic, onDone }: { topic: string; onDone: () => void })
           )}
         </div>
       )}
-      {right && (
+      {right && phase !== 'done' && (
         <p className="pg-correct" role="status">
           <span className="pg-check" aria-hidden="true">✓</span>
           <span><b>Correct!</b> {right}</span>
