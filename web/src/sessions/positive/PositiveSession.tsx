@@ -376,7 +376,7 @@ function CrowdStep({ card, guess, onNext }: { card: Test; guess: number; onNext:
             <span className="pt-sub">
               positives are sick · <b className="pt-truthnum">{exact(p)}</b> <span className="pt-tag">exact</span>
               <br />
-              <span className={`pt-pill ${p >= 0.5 ? 'ok' : ''}`}>{p >= 0.5 ? 'positive = probably sick' : "don't trust it yet"}</span>
+              <span className={`pt-badge ${p >= 0.5 ? 'ok' : ''}`}>{p >= 0.5 ? 'positive = probably sick' : "don't trust it yet"}</span>
             </span>
           </div>
         </div>
