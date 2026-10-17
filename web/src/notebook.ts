@@ -56,6 +56,10 @@ const EXTRA_LABELS: Record<string, string> = {
   'too-few': 'A handful of people is enough',
   // calculus, Calc 3 (sessions/calculus/Surface.tsx)
   'partial-wrong-way': 'Walking a slice the wrong way',
+  // programming (sessions/programming/stack.ts STACK_MISTAKES)
+  'stack-depth-off': 'Miscounting the call stack',
+  'returns-before-calls': 'The first call finishes first',
+  'base-case-optional': 'A base case is optional',
   // orgo (sessions/orgo/chem.ts MISTAKES)
   'carbon-five-bonds': 'A carbon with 5 bonds',
   'hydrogen-two-bonds': 'Hydrogen with 2 bonds',
