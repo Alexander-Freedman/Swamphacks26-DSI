@@ -6,6 +6,7 @@ from fastapi import FastAPI, HTTPException, Request
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel, Field
 
+from app import help as help_chat
 from app.events import collection, record_answer, room
 from app.gen import (
     GenerationError,
@@ -114,7 +115,12 @@ def create_round(body: TopicIn, request: Request) -> dict:
 @app.get("/api/usage")
 def usage() -> dict:
     snap = Usage().snapshot()
-    return {"offline": offline(), "day": snap["day"], "calls": snap["calls"]}
+    return {
+        "offline": offline(),
+        "day": snap["day"],
+        "calls": snap["calls"],
+        "help": snap.get("help", {}),
+    }
 
 
 class AnswerIn(BaseModel):
@@ -163,3 +169,33 @@ def post_answer(body: AnswerIn, request: Request) -> dict:
 @app.get("/api/collection/{session_id}")
 def get_collection(session_id: str) -> list[dict]:
     return collection(session_id)
+
+
+class HelpContextIn(BaseModel):
+    # Only the learner's own guess is used; anything else (e.g. "truth") is ignored.
+    guess: float | str | None = None
+
+
+class HelpIn(BaseModel):
+    session_slug: str | None = Field(default=None, max_length=60)
+    round_slug: str | None = Field(default=None, max_length=60)
+    screen_id: str = Field(min_length=2, max_length=4)
+    question: str = Field(min_length=1, max_length=300)
+    locked: bool = False
+    context: HelpContextIn | None = None
+
+
+@app.post("/api/help")
+def post_help(body: HelpIn, request: Request) -> dict:
+    """Plain-words help for the screen someone is on; a hint (never the answer) before lock-in."""
+    screen = help_chat.resolve_screen(body.session_slug or body.round_slug, body.screen_id)
+    if screen is None:
+        raise HTTPException(status_code=404, detail="unknown session or screen")
+    guess = body.context.guess if body.context else None
+    if isinstance(guess, str):
+        guess = guess.strip()[:40] or None
+    elif isinstance(guess, float):
+        guess = f"{guess:g}"
+    ip = request.client.host if request.client else "unknown"
+    reply = help_chat.answer(screen, body.question.strip(), body.locked, guess, ip)
+    return {"answer": reply.answer, "hint_only": reply.hint_only}

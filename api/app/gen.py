@@ -155,7 +155,9 @@ class Usage:
         Usage._last_good = data
 
     def total(self) -> int:
-        return sum(self._load()["calls"].values())
+        # Generation and help share the same free-tier quota, so both count here.
+        data = self._load()
+        return sum(data["calls"].values()) + sum(data.get("help", {}).values())
 
     def snapshot(self) -> dict:
         return self._load()
@@ -164,6 +166,17 @@ class Usage:
         with _USAGE_LOCK:
             data = self._load()
             data["calls"][model] = data["calls"].get(model, 0) + 1
+            self._save(data)
+
+    def help_total(self) -> int:
+        """Help-chat calls today (own bucket and cap, see app/help.py)."""
+        return sum(self._load().get("help", {}).values())
+
+    def record_help(self, model: str) -> None:
+        with _USAGE_LOCK:
+            data = self._load()
+            bucket = data.setdefault("help", {})
+            bucket[model] = bucket.get(model, 0) + 1
             self._save(data)
 
     def exhaust(self, model: str) -> None:
