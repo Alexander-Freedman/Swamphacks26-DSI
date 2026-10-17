@@ -1,0 +1,12 @@
+{
+  "label": "Sample reading",
+  "reading": {
+    "value": 7.2,
+    "prov": {
+      "source": "Fixture",
+      "id": "sample-001",
+      "url": "https://github.com/Alexander-Freedman/Swamphacks26-DSI",
+      "at": "2026-10-16T21:30:00-04:00"
+    }
+  }
+}
