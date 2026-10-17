@@ -78,6 +78,22 @@ def test_correct_band_contains_truth() -> None:
         assert len(correct) == 1 and correct[0].min <= truth <= correct[0].max
 
 
+def test_bands_cover_slider_and_stay_tight() -> None:
+    # Sorted, no gaps wider than a step, and the slider ends never land in the correct band
+    # (a guess of 2 people or 0% must not read as "Called it").
+    for slug, rnd in showcase_rounds().items():
+        for item in rnd.items:
+            if not item.bands or item.slider is None:
+                continue
+            bands, s = item.bands, item.slider
+            assert [b.min for b in bands] == sorted(b.min for b in bands), slug
+            assert bands[0].min <= s.min and bands[-1].max >= s.max, slug
+            for a, b in zip(bands, bands[1:]):
+                assert b.min - a.max <= s.step, (slug, a, b)
+            correct = next(b for b in bands if b.misconception_id is None)
+            assert correct.min > s.min and correct.max < s.max, slug
+
+
 def test_eval_expr_rejects_code() -> None:
     with pytest.raises(ValueError):
         eval_expr("__import__('os')")
