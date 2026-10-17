@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { AnyTopic } from './components/AnyTopic'
+import { AnyTopic, BuildReady } from './components/AnyTopic'
 import { Distribution } from './components/Distribution'
 import { NotebookLink, NotebookScreen } from './components/Notebook'
 import { useReset } from './reset'
@@ -156,6 +156,7 @@ export default function App() {
           <button className="logo" style={{ border: 0, background: 'none', padding: 0 }} onClick={home}>mm</button>
         </header>
         <session.Component key={session.slug} onDone={home} />
+        <BuildReady onOpen={(slug) => go({ kind: 'round', slug })} />
       </main>
     )
   }
@@ -166,6 +167,7 @@ export default function App() {
         {round && <span className={`chip ${round.reviewed ? 'reviewed' : ''}`}>{round.reviewed ? 'reviewed' : 'auto-checked'}</span>}
       </header>
       {cleared && <p className="nb-toast" role="status">Notebook cleared</p>}
+      {screen.kind !== 'home' && <BuildReady onOpen={(slug) => go({ kind: 'round', slug })} />}
       {screen.kind === 'notebook' ? (
         <NotebookScreen onHome={home} />
       ) : round ? (

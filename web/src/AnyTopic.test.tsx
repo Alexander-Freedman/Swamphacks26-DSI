@@ -3,7 +3,7 @@ import { cleanup, fireEvent, render, screen, waitFor } from '@testing-library/re
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import App from './App'
 import { AnyTopic } from './components/AnyTopic'
-import { normalizeTopic, resetExtrasCache } from './extras'
+import { GENERATE_TIMEOUT_MS, generateRound, normalizeTopic, resetExtrasCache } from './extras'
 import dice from '../../data/rounds/extra/dice-sums.json'
 import monty from '../../data/rounds/extra/monty-hall.json'
 
@@ -85,6 +85,8 @@ describe('Try any topic', () => {
     fireEvent.change(screen.getByLabelText(/topic you want/), { target: { value: 'tides' } })
     fireEvent.click(screen.getByRole('button', { name: 'Go' }))
     expect(screen.getByText(/Building your round on “tides”/)).toBeTruthy()
+    // the chips stay playable while it builds
+    expect(screen.getByRole('button', { name: 'Sums of dice' })).toBeTruthy()
     expect(await screen.findByText(/Couldn't build “tides” right now/)).toBeTruthy()
     expect(screen.getByRole('button', { name: 'Sums of dice' })).toBeTruthy()
     expect(posts()[0][0]).toBe('http://api.test/api/rounds')
@@ -118,5 +120,54 @@ describe('Try any topic', () => {
     await waitFor(() => expect(here()).toBe(`${BASE}?round=tides`))
     expect(await screen.findByText(/Tides · 1 of 3/)).toBeTruthy()
     expect(screen.getAllByText('auto-checked').some((el) => el.className.includes('chip'))).toBe(true)
+  })
+
+  it('waits 45 s for a build before falling back', async () => {
+    expect(GENERATE_TIMEOUT_MS).toBe(45_000)
+    vi.useFakeTimers()
+    try {
+      vi.stubEnv('VITE_API_BASE', 'http://api.test')
+      fetchMock.mockImplementation(
+        (_url: string, init?: RequestInit) =>
+          new Promise<Response>((_, reject) => init!.signal!.addEventListener('abort', () => reject(new DOMException('aborted', 'AbortError')))),
+      )
+      let done = false
+      const p = generateRound('tides').then((r) => ((done = true), r))
+      await vi.advanceTimersByTimeAsync(44_000)
+      expect(done).toBe(false)
+      await vi.advanceTimersByTimeAsync(1_000)
+      expect(await p).toEqual({ status: 'fallback', suggestions: [] })
+    } finally {
+      vi.useRealTimers()
+    }
+  })
+
+  it('playing a chip while it builds: the finished topic is offered, not forced', async () => {
+    vi.stubEnv('VITE_API_BASE', 'http://api.test')
+    const built = { ...dice, slug: 'tides', topic: 'Tides', reviewed: false }
+    let finish: () => void = () => {}
+    fetchMock.mockImplementation(async (url: string, init?: RequestInit) => {
+      if (init?.method === 'POST') {
+        await new Promise<void>((r) => (finish = r))
+        return json({ status: 'ok', source: 'model', seconds: 30, round: built, checks: null })
+      }
+      return url in files ? json(files[url]) : json({}, 404)
+    })
+    render(<App />)
+    await screen.findByRole('button', { name: 'Sums of dice' })
+    fireEvent.change(screen.getByLabelText(/topic you want/), { target: { value: 'tides' } })
+    fireEvent.click(screen.getByRole('button', { name: 'Go' }))
+    await screen.findByText(/Building your round on “tides”/)
+    fireEvent.click(screen.getByRole('button', { name: 'Sums of dice' }))
+    expect(await screen.findByText(/Sums of dice · 1 of 3/)).toBeTruthy()
+
+    finish()
+    expect(await screen.findByText(/Your topic's ready/)).toBeTruthy()
+    expect(here()).toBe(`${BASE}?round=dice-sums`)
+    expect(screen.getByText(/Sums of dice · 1 of 3/)).toBeTruthy()
+    fireEvent.click(screen.getByRole('button', { name: 'Open' }))
+    expect(await screen.findByText(/Tides · 1 of 3/)).toBeTruthy()
+    expect(here()).toBe(`${BASE}?round=tides`)
+    expect(screen.queryByText(/Your topic's ready/)).toBeNull()
   })
 })

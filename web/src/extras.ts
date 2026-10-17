@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useState, useSyncExternalStore } from 'react'
 import { showcaseRound, showcaseSlugs } from './rounds'
 import type { Round } from './types'
 
@@ -8,7 +8,8 @@ import type { Round } from './types'
 
 export type ExtraTopic = { slug: string; topic: string; aliases: string[] }
 
-export const GENERATE_TIMEOUT_MS = 20_000
+// Builds take a median 27 s, p90 51 s (NOTES.md, 25-topic trial), so wait up to 45 s.
+export const GENERATE_TIMEOUT_MS = 45_000
 
 const base = () => import.meta.env.BASE_URL
 // Backend origin for POST /api/rounds. Unset on Pages (no backend), so typed topics never
@@ -114,6 +115,42 @@ export async function generateRound(topic: string, timeoutMs = GENERATE_TIMEOUT_
   }
 }
 
+// One build at a time, kept outside the component: someone can play a reviewed chip while it
+// runs, and when it lands we offer it ("Your topic's ready") instead of pulling them out.
+export type Build =
+  | { kind: 'idle' }
+  | { kind: 'building'; topic: string }
+  | { kind: 'ready'; topic: string; slug: string }
+  | { kind: 'failed'; topic: string; suggestions: string[] }
+
+let build: Build = { kind: 'idle' }
+const listeners = new Set<() => void>()
+const setBuild = (b: Build) => {
+  build = b
+  listeners.forEach((l) => l())
+}
+
+export function useBuild(): Build {
+  return useSyncExternalStore(
+    (l) => {
+      listeners.add(l)
+      return () => listeners.delete(l)
+    },
+    () => build,
+  )
+}
+
+export async function startBuild(topic: string, timeoutMs?: number): Promise<void> {
+  if (build.kind === 'building') return
+  setBuild({ kind: 'building', topic })
+  const res = await generateRound(topic, timeoutMs)
+  setBuild(res.status === 'ok' ? { kind: 'ready', topic, slug: res.slug } : { kind: 'failed', topic, suggestions: res.suggestions })
+}
+
+export function clearBuild(): void {
+  if (build.kind !== 'building') setBuild({ kind: 'idle' })
+}
+
 /** Round for a ?round= slug that isn't a bundled showcase: loading, then the round or missing. */
 export function useExtraRound(slug: string | null): { round?: Round; missing: boolean } {
   const [state, setState] = useState<{ slug: string; round?: Round; missing: boolean } | null>(null)
@@ -138,4 +175,5 @@ export function useExtraRound(slug: string | null): { round?: Round; missing: bo
 export function resetExtrasCache(): void {
   indexPromise = null
   loaded.clear()
+  build = { kind: 'idle' }
 }
