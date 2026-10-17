@@ -6,6 +6,8 @@ import { Room } from './Room'
 import { pMatch } from './math'
 import { verdictOf } from './round'
 import { Card, Draw, Guess, Rematch, Reveal, type Confidence } from './Screens'
+import { Compare } from './Compare'
+import type { CompareChoice } from './compareData'
 import './birthday.css'
 
 function Birthday({ onDone }: SessionProps) {
@@ -16,6 +18,7 @@ function Birthday({ onDone }: SessionProps) {
   const [curve, setCurve] = useState<number[] | null>(null)
   const [skipped, setSkipped] = useState(false)
   const [picked, setPicked] = useState<boolean | null>(null)
+  const [compare, setCompare] = useState<CompareChoice | null>(null)
   const onMatchState = useCallback((m: boolean) => setMatched(m), [])
 
   const go = (s: number) => {
@@ -29,12 +32,12 @@ function Birthday({ onDone }: SessionProps) {
     <div className="bday">
       <div className="bday-head">
         <span className="bday-chip">Birthday problem</span>
-        <span className="bday-dots" aria-label={`step ${shown} of 7`}>
+        <span className="bday-dots" aria-label={`step ${shown} of ${TITLES.length}`}>
           {TITLES.map((_, i) => (
             <i key={i} className={i < shown ? 'on' : ''} />
           ))}
         </span>
-        <span className="bday-count">{shown} of 7</span>
+        <span className="bday-count">{shown} of {TITLES.length}</span>
       </div>
       <h2 className="bday-title">{title}</h2>
       <p className="bday-subtitle">{sub}</p>
@@ -61,7 +64,8 @@ function Birthday({ onDone }: SessionProps) {
       )}
       {step === 5 && curve && <Reveal guess={guess} curve={curve} skipped={skipped} onNext={() => go(6)} />}
       {step === 6 && curve && <Card guess={guess} conf={conf} curve={curve} skipped={skipped} onAgain={() => go(5)} onNext={() => go(7)} />}
-      {step === 7 && curve && (
+      {step === 7 && <Compare onPick={setCompare} onNext={() => go(8)} />}
+      {step === 8 && curve && (
         <>
           <Rematch
             curve={curve}
@@ -69,7 +73,7 @@ function Birthday({ onDone }: SessionProps) {
             picked={picked}
             onPick={(more) => {
               setPicked(more)
-              record({ session: 'birthday', at: new Date().toISOString(), guess, confidence: conf, misconception: verdictOf(guess).m?.id ?? null, rematch: more ? 'right' : 'wrong' })
+              record({ session: 'birthday', at: new Date().toISOString(), guess, confidence: conf, misconception: verdictOf(guess).m?.id ?? null, rematch: more ? 'right' : 'wrong', compare })
             }}
           />
           {picked != null && (
