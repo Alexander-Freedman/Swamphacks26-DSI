@@ -123,6 +123,12 @@ class CurveTruth(BaseModel):
     x_max: float
     x_label: str = ""
     y_label: str = ""
+    ask_x: float | None = Field(
+        default=None, description="x the question asks about; the answer is the curve's y there"
+    )
+    ask_y: float | None = Field(
+        default=None, description="y the question asks about; the answer is the x reaching it"
+    )
 
     @model_validator(mode="after")
     def _one_source(self) -> CurveTruth:
@@ -160,6 +166,9 @@ class Explore(BaseModel):
     min: float
     max: float
     step: float = 1
+    default: float | None = Field(
+        default=None, description="Value of param for the question as asked (curve exprs use it)"
+    )
 
 
 class Item(BaseModel):

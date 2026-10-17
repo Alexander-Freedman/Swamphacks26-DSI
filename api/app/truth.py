@@ -21,6 +21,8 @@ _FUNCS = {
     "tan": math.tan,
     "exp": math.exp,
     "log": math.log,
+    "log2": math.log2,
+    "log10": math.log10,
     "sqrt": math.sqrt,
     "abs": abs,
     "min": min,

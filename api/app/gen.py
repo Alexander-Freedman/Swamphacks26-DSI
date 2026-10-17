@@ -29,11 +29,11 @@ from zoneinfo import ZoneInfo
 from pydantic import ValidationError
 
 from app.checks import CheckFailed, check_round
-from app.schema import Round
+from app.schema import Item, Round
 
 log = logging.getLogger("mm.gen")
 
-PROMPT_VERSION = 2
+PROMPT_VERSION = 3
 MODEL_CHAIN = ["gemini-3.5-flash-lite", "gemini-3.1-flash-lite", "gemma-4-26b-a4b-it"]
 DAILY_SOFT_CAP = 480
 TIMEOUT_S = 30
@@ -42,36 +42,70 @@ PACIFIC = ZoneInfo("America/Los_Angeles")
 
 SYSTEM_PROMPT = """You write one short "predict first" learning round as JSON.
 
-Goal: a curious college student types a topic. They will make a prediction
-BEFORE seeing anything, then our code shows the true answer, then we name the
-specific wrong idea their answer reveals.
+Goal: a curious college student types a topic. They make a prediction BEFORE
+seeing anything, then our code DRAWS the truth (a curve they can scrub, or a
+histogram from thousands of simulated trials) next to their guess, then we
+name the specific wrong idea their answer reveals. The picture is the lesson.
 
 Rules:
 - misconceptions: 2-5 DOCUMENTED, well-known wrong ideas about this topic
   (things real learners believe), each with why it's tempting and a 1-2
-  sentence refutation. Prefer ones with a source; set source_url only if you
-  are sure it exists, otherwise null and say where it's known from in
-  source_note.
+  sentence refutation. set source_url only if you are sure it exists,
+  otherwise null and say where it's known from in source_note.
 - questions: exactly 3 prediction questions, each testing a DIFFERENT
-  misconception or the same one in a new setting whose intuitive answer is WRONG for many
-  people. Every wrong option or numeric band must map to exactly one
-  misconception id; the correct one has misconception_id null.
-- choice items need exactly one correct option.
-- input_type: "slider" (give slider_min/max/step/unit and numeric bands that
-  cover the whole slider) or "choice" (2-4 options).
-- the truth is shown by our code, not by you: set widget "distribution" with a
-  sampler (and its numbers: n, p, dice, group_size, base_rate, sensitivity,
-  false_positive_rate), or "curve" with expr in x using only numbers,
-  + - * / ^ and sin cos tan exp log sqrt abs min max, plus x_min/x_max, or
-  "estimate" when the answer is one number you can write as answer_expr
-  (a probability, a percentage, a count, a ratio, a time). Almost every topic
-  has a number worth predicting: prefer slider questions with "estimate",
-  "curve" or "distribution". Use "stepper" (2-6 worked steps) only for a
-  question where nothing can be computed, and at most once per round.
-- Put the true numeric value in answer_expr (same expression rules) when you
-  can, and your own number in answer_claimed.
-- slug: lowercase words joined by hyphens. reviewed: false. schema_version: 1.
-- Plain, friendly language. No markdown. Never reveal the answer in a prompt."""
+  misconception (or the same one in a new setting) whose intuitive answer is
+  WRONG for many people. Every wrong option or numeric band maps to exactly
+  one misconception id; the correct one has misconception_id null.
+- input_type "slider" (slider_min/max/step/unit, and bands that cover the
+  whole slider with exactly one correct band) or "choice" (2-4 options,
+  exactly one correct).
+- widget: how our code shows the truth. Pick in this order:
+  1. "curve": the answer is a point on a real formula y = f(x) (growth,
+     decay, probability vs group size, distance vs time, cost vs quantity).
+     expr in x, using only numbers, + - * / ^, sin cos tan exp log log2
+     log10 sqrt abs min max, and at most one knob name. x_min/x_max: a meaningful range
+     that contains the asked point with room on both sides. x_label, y_label.
+     y must be in the SAME units as the slider answer. If the question asks
+     the y at some x, set ask_x; if it asks which x reaches some y, set ask_y.
+     Knob: the one parameter a learner would want to drag (rate, half-life,
+     number of people). Give explore_param (a short name used in expr),
+     explore_label, explore_min, explore_max, explore_step, and
+     explore_default = the value in the question.
+  2. "distribution": the answer comes from chance; pick a sampler and its
+     numbers: dice_sum (dice = how many six-sided dice), binomial_count (n,
+     p), coin_longest_run (n fair flips), birthday_match (group_size),
+     base_rate_test (base_rate, sensitivity, false_positive_rate).
+  3. "estimate": one number with no honest curve or sampler.
+  4. "stepper" (2-6 worked steps): nothing can be computed; at most once.
+  If the topic involves any quantity, at least one question (ideally two)
+  MUST be "curve" or "distribution". Only use a real formula or a real chance
+  process, never invented survey numbers ("what % of people...").
+- answer_expr: the true value (same expression rules, numbers only, no knob
+  name); answer_claimed: your own number for it.
+- slug: lowercase words joined by hyphens. Plain, friendly language. No
+  markdown. Never reveal the answer in a prompt.
+
+Examples (one question each, other fields omitted):
+{"prompt": "You invest $1,000 at 7% a year, compounded yearly, and leave it for
+ 30 years. About how much is it worth?", "input_type": "slider",
+ "slider_min": 1000, "slider_max": 15000, "slider_step": 100, "slider_unit": "$",
+ "widget": "curve", "expr": "1000*(1+r/100)^x", "x_min": 0, "x_max": 40,
+ "x_label": "years", "y_label": "value ($)", "ask_x": 30, "explore_param": "r",
+ "explore_label": "interest rate (%)", "explore_min": 1, "explore_max": 12,
+ "explore_step": 0.5, "explore_default": 7, "answer_expr": "1000*1.07^30",
+ "answer_claimed": 7612}
+{"prompt": "Roll two dice and add them. Which total comes up most often?",
+ "input_type": "slider", "slider_min": 2, "slider_max": 12, "slider_step": 1,
+ "widget": "distribution", "sampler": "dice_sum", "dice": 2,
+ "x_label": "sum of two dice", "answer_expr": "7", "answer_claimed": 7}
+{"prompt": "A 400 mg dose has a half-life of 6 hours. After how many hours is
+ only 50 mg left?", "input_type": "slider", "slider_min": 0, "slider_max": 60,
+ "slider_step": 1, "slider_unit": "hours", "widget": "curve",
+ "expr": "400*0.5^(x/h)", "x_min": 0, "x_max": 36, "x_label": "hours",
+ "y_label": "mg left", "ask_y": 50, "explore_param": "h",
+ "explore_label": "half-life (hours)", "explore_min": 1, "explore_max": 24,
+ "explore_step": 1, "explore_default": 6, "answer_expr": "6*3",
+ "answer_claimed": 18}"""
 
 
 class GenerationError(Exception):
@@ -282,6 +316,14 @@ GEN_SCHEMA: dict = {
                     "x_max": _NN,
                     "x_label": _NS,
                     "y_label": _NS,
+                    "ask_x": _NN,
+                    "ask_y": _NN,
+                    "explore_param": _NS,
+                    "explore_label": _NS,
+                    "explore_min": _NN,
+                    "explore_max": _NN,
+                    "explore_step": _NN,
+                    "explore_default": _NN,
                     "steps": {"type": "array", "items": _S},
                     "answer_expr": _NS,
                     "answer_claimed": _NN,
@@ -299,8 +341,13 @@ def _int(v):
     return int(v) if isinstance(v, (int, float)) else None
 
 
-def to_round(data: dict) -> Round:
-    """Map the compact generated shape onto Round (strict validation happens there)."""
+def to_round(data: dict, dropped: dict[str, str] | None = None) -> Round:
+    """Map the compact generated shape onto Round (strict validation happens there).
+
+    With `dropped`, an item that fails validation on its own (no correct option,
+    no answer_expr, ...) is left out and its reason recorded there, instead of
+    rejecting the whole round for one bad question.
+    """
     items = []
     for q in data.get("questions", []):
         widget = q.get("widget")
@@ -329,6 +376,8 @@ def to_round(data: dict) -> Round:
                 "x_max": q.get("x_max"),
                 "x_label": q.get("x_label") or "",
                 "y_label": q.get("y_label") or "",
+                "ask_x": q.get("ask_x"),
+                "ask_y": q.get("ask_y"),
             }
         elif widget == "estimate":
             truth = {"widget": "estimate", "unit": q.get("slider_unit") or ""}
@@ -344,6 +393,7 @@ def to_round(data: dict) -> Round:
             "answer_expr": q.get("answer_expr"),
             "answer_claimed": q.get("answer_claimed"),
             "targets": q.get("targets") or [],
+            "explore": _explore(q) if widget == "curve" else None,
         }
         if q.get("input_type") == "slider":
             item["slider"] = {
@@ -361,6 +411,16 @@ def to_round(data: dict) -> Round:
         it["bands"] = [b for b in it["bands"] if b.get("misconception_id") in known | {None}]
         it["options"] = [o for o in it["options"] if o.get("misconception_id") in known | {None}]
         it["targets"] = [t for t in it["targets"] if t in known]
+    if dropped is not None:
+        good = []
+        for it in items:
+            try:
+                Item.model_validate(it)
+                good.append(it)
+            except ValidationError as err:
+                msg = err.errors()[0]["msg"].removeprefix("Value error, ")
+                dropped[it["id"]] = msg[:120]
+        items = good
     return Round.model_validate(
         {
             "schema_version": 1,
@@ -382,6 +442,26 @@ def to_round(data: dict) -> Round:
             "items": items,
         }
     )
+
+
+def _explore(q: dict) -> dict | None:
+    """The curve's knob, if usable: a plain name other than x that the expr uses."""
+    param, lo, hi = q.get("explore_param"), q.get("explore_min"), q.get("explore_max")
+    if not isinstance(param, str) or not re.fullmatch(r"[A-Za-z][A-Za-z0-9]{0,15}", param):
+        return None
+    if param == "x" or not isinstance(lo, (int, float)) or not isinstance(hi, (int, float)):
+        return None
+    if not re.search(rf"\b{param}\b", q.get("expr") or ""):
+        return None  # a knob the curve doesn't use would move nothing
+    step = q.get("explore_step")
+    return {
+        "param": param,
+        "label": _clip(q.get("explore_label") or param, 60),
+        "min": lo,
+        "max": hi,
+        "step": step if isinstance(step, (int, float)) and step > 0 else (hi - lo) / 50 or 1,
+        "default": q.get("explore_default"),
+    }
 
 
 def _clip(text, n: int):
@@ -502,7 +582,9 @@ def generate_round(topic: str, usage: Usage | None = None) -> GenResult:
             try:
                 raw = _call_model(model, topic)
                 data = json.loads(raw.strip().removeprefix("```json").removesuffix("```"))
-                r, report = check_round(to_round(data), usage=usage)
+                pre_dropped: dict[str, str] = {}
+                r, report = check_round(to_round(data, pre_dropped), usage=usage)
+                report.dropped = {**pre_dropped, **report.dropped}
                 log.info("checks for %r: %s", topic, report.as_dict())
             except (ValidationError, ValueError, GenerationError, CheckFailed) as err:
                 last_err = err
