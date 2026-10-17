@@ -51,7 +51,7 @@ export function Guess({ onLock }: { onLock: (guess: number, conf: Confidence) =>
           window.setTimeout(() => onLock(g, conf!), 260)
         }}
       >
-        {touched ? (conf ? 'Lock it in' : 'Pick how sure you are') : 'Drag the slider first'}
+        {touched ? (conf ? 'Lock it in' : 'Pick how sure you are') : 'Move the slider first'}
       </button>
     </div>
   )
@@ -94,6 +94,9 @@ export function Draw({ guess, onDone }: { guess: number; onDone: (curve: number[
             onPointerUp: () => {
               drawing.current = false
             },
+            onPointerCancel: () => {
+              drawing.current = false
+            },
           }}
         >
           {!pts.length && (
@@ -123,7 +126,7 @@ export function Reveal({ guess, curve, skipped, onNext }: { guess: number; curve
   const [n, setN] = useState(TRUTH_N)
   const [replay, setReplay] = useState(0)
   const p = pMatch(n)
-  const note = n >= 57 ? `${n} people: ${pct(p)}. Almost certain.` : n >= 23 ? `Past 23: better than a coin flip.` : n <= 3 ? 'Tiny room: hardly any pairs.' : 'Under a coin flip, for now.'
+  const note = n >= 57 ? `${n} people: ${pct(p)}. Almost certain.` : n >= 23 ? `${n} people: better than a coin flip.` : n <= 3 ? 'Tiny room: hardly any pairs.' : 'Under a coin flip, for now.'
   return (
     <div className="bday-revealgrid">
       <div ref={ref} className="bday-card bday-chartcard">
@@ -148,7 +151,7 @@ export function Reveal({ guess, curve, skipped, onNext }: { guess: number; curve
           <div className="bday-breaks">
             <span style={{ left: '0%' }}>2</span>
             {BREAKS.map((b) => (
-              <button key={b} className={'bday-break' + (n >= b ? ' bday-passed' : '')} style={{ left: `${((b - 2) / 78) * 100}%` }} onClick={() => setN(b)}>
+              <button key={b} className={'bday-break' + (n >= b ? ' bday-passed' : '')} style={{ left: `${((b - 2) / 78) * 100}%` }} aria-label={`jump to ${b} people`} onClick={() => setN(b)}>
                 {b}
               </button>
             ))}
@@ -201,7 +204,7 @@ function Web({ full }: { full: boolean }) {
   )
 }
 
-export function Card({ guess, curve, skipped, onAgain, onNext }: { guess: number; curve: number[]; skipped: boolean; onAgain: () => void; onNext: () => void }) {
+export function Card({ guess, conf, curve, skipped, onAgain, onNext }: { guess: number; conf: Confidence; curve: number[]; skipped: boolean; onAgain: () => void; onNext: () => void }) {
   const { v, m } = verdictOf(guess)
   const drewAt23 = Math.round(curve[TRUTH_N] * 100)
   return (
@@ -209,7 +212,7 @@ export function Card({ guess, curve, skipped, onAgain, onNext }: { guess: number
       <div className="bday-stamprow">
         <span className={`bday-stamp bday-stamp-${v}`}>{STAMP[v]}</span>
         <p className="bday-said">
-          You said <b className="bday-pencil-c bday-num">{guess}</b>. It's <span className="bday-hl bday-num"><b>{TRUTH_N}</b></span>.
+          You said <b className="bday-pencil-c bday-num">{guess}</b> ({conf}). It's <span className="bday-hl bday-num"><b>{TRUTH_N}</b></span>.
         </p>
       </div>
       <div className="bday-card bday-mistake">

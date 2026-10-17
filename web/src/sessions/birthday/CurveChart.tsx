@@ -28,6 +28,7 @@ type Props = {
     onPointerDown: (e: RPointerEvent<SVGSVGElement>) => void
     onPointerMove: (e: RPointerEvent<SVGSVGElement>) => void
     onPointerUp: (e: RPointerEvent<SVGSVGElement>) => void
+    onPointerCancel: (e: RPointerEvent<SVGSVGElement>) => void
   }
   children?: ReactNode
 }
