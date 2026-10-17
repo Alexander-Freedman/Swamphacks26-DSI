@@ -17,7 +17,7 @@
       "id": "simple-interest",
       "label": "Growth adds the same amount each year",
       "why_tempting": "Adding the same interest every year ($2 a year, or 8% of the start each year) feels exact: $110 after 5 years, 12.5 years to double.",
-      "refutation": "Each year's 8% is taken on a bigger balance than the year before, so doubling comes sooner (about 9 years) and long horizons end far higher than adding would give.",
+      "refutation": "Interest is figured on the current balance, which grows every year, so each year adds a bit more than the last: $100 at 2% for 5 years is $110.41, not $110, and at 8% money doubles in about 9 years, not 12.5.",
       "source_url": "https://research.cgu.edu/dpe-events-and-conferences/wp-content/uploads/sites/37/2016/12/EGB.pdf",
       "source_note": "Levy & Tasoff: exponential-growth bias is 'the tendency... to partially neglect compounding'"
     },

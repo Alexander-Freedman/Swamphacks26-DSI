@@ -224,3 +224,102 @@ quota reset: 00:00 PT = 03:00 ET
 - In the first hour, test `response_json_schema` and streaming on `gemma-4-31b-it` / `gemma-4-26b-a4b-it`.
 - In AI Studio, check whether 3.5 and 3.1 Flash-Lite have separate 500/day counters, and the same for each Flash model's 20/day.
 - Bench 3.5 Flash-Lite minimal vs low on 10 topics (quality + time) before locking the prompt.
+
+## Prompt v3 trial (2026-10-17)
+
+Why: the 25-topic v2 trial (2026-10-16) gave `estimate` on 60 of 60 kept items, so a typed
+topic was a quiz with no picture. v3 asks for a `curve` or `distribution` on at least one
+question per quantitative round, with 3 worked examples in the prompt (compound growth curve
+with a rate knob, dice-sum distribution, half-life curve asking "when does it reach 50 mg").
+Issue #117.
+
+What changed in code (PROMPT_VERSION 3):
+- Compact schema: `ask_x` / `ask_y` (the spot on the curve the question asks about) and an
+  explore knob (`explore_param/label/min/max/step/default`) for curve items. A knob is kept
+  only if it's a plain name (not `x`) that the curve's expr actually uses.
+- New checks: the curve must draw (finite and |y| < 1e12 at 81 points, no pole: a sign flip
+  is bisected and dropped if the values grow), at the asked knob value and at both ends of the
+  knob range; with `ask_x` the answer must equal the curve there (2%); with `ask_y` the curve at
+  the answer must hit that y, or the answer must be within one slider step of the exact
+  crossing ("day 16" for "when does it pass 50,000"). A correct band that no slider stop can
+  land in is dropped. Flat curves are allowed (fall time vs mass is flat: that's the lesson).
+- One invalid question (no correct option, no answer_expr) now drops that question instead of
+  rejecting the whole round. In v2 this was the top failure (7 of 10 bad rounds).
+- `log2` / `log10` allowed in exprs (mathjs has them; Big O curves need them).
+
+How: `api/scripts/trial.py` with a temp cache dir (production cache untouched), hard cap on
+generation calls. Run 1: 12 topics on the first v3 code. Run 2: 6 topics (the 3 failures plus
+3 whose curve items were dropped) after the per-question drop, flat-curve and log2 fixes.
+Raw replies of run 2 were re-checked offline with the final code.
+27 generation calls in total (19 + 8), 0 blind-check calls (every kept item had a computed
+answer, so nothing needed a second opinion). Topics: radioactive half-life, the birthday
+problem, why heavier objects don't fall faster, projectile motion, exponential growth of a
+pandemic, the law of large numbers, regression to the mean, Newton's law of cooling, Big O
+notation, the sunk cost fallacy, why the sky is blue, how vaccines work.
+
+| Metric | v2 (25 topics) | v3 run 1 (12) | v3 run 2 (6) |
+|---|---|---|---|
+| Rounds delivered | 24/25 (96%) | 9/12 (75%) | 5/6 (83%) |
+| Passed on the first call | 18/25 (72%) | 8/12 (67%) | 5/6 (83%) |
+| Kept items that are curve or distribution | 0/60 | 8/14 (57%) | 6/9 (67%) |
+| Latency of delivered rounds, median (s) | 27.6 | 6.8 | 7.2 |
+| Latency max (s) | 59.7 | 47.2 | 29.8 |
+| Items dropped by checks (in delivered rounds) | 12/72 (17%) | 13/27 (48%) | 6/15 (40%) |
+
+Latest round per topic (12 topics, the run 2 round where there is one, re-checked with final
+code): all 12 delivered in at least one run. Widget mix of the 20 kept items: curve 10,
+distribution 3, estimate 7. 9 of 12 rounds have at least one curve or distribution; the 3
+without are the sunk cost fallacy and how vaccines work (no honest formula, so estimate is the
+right fallback) and Newton's law of cooling (its two curve items were dropped because the
+answer didn't match the curve: the check working). 5 kept curves have a working knob (half-life
+x2, launch speed, cliff height, gravity); the model also sent 4 knobs its expr never used, which
+the final code drops.
+
+Latency fell from a 27.6 s to about a 7 s median mainly because no item needed the blind check
+(v2 spent up to 8 s per round on it, mostly failing). The two slow rounds (47.2 s, 29.8 s) were
+slow API replies (not measured further).
+
+Failures: all 4 failed topic attempts were content problems on the Gemini models (choice items
+with no options or no correct option, sliders without bands) followed by a 500/504 from
+gemma-4-26b on every call it got (4 of 4). The Gemma fallback isn't adding anything right now.
+
+What the new checks caught (all would have shown a wrong picture or wrong verdict):
+radioactive decay q3 ("curve at the answer x=10 is 100, not 25"), pandemic q2 ("curve at x=16
+is 65,536, not 50,000"; this one is now accepted by the one-step rule), Newton's cooling q1/q2
+(answer 42.9 vs curve 54.4 at x=20), vaccines q1 (curve 516 at x=14 vs answer 14), heavier
+objects q3 (correct band 9.80-9.82 with a 0.5 slider step: no stop could ever be right), Big O
+q2 (`log2`, now allowed).
+
+Spot-checks (I recomputed every number by hand):
+- **Radioactive half-life** (run 1). q1: 100 g, half-life 8 days, after 24 days: 100 x 0.5^3 =
+  12.5 g; key 12.5, inside the correct band 6.5-15. Curve `100*0.5^(x/h)` with a half-life
+  knob, default 8. q2: C-14, 80 g down to 10 g = 3 half-lives = 3 x 5730 = 17,190 years; curve at
+  17,190 = 10.0 (ask_y check). Both correct. Weak: the "everything decays after two half-lives"
+  tag on answers over 15.5 g doesn't match that misconception (it predicts 0).
+- **Projectile motion** (run 1). q1: straight up at 20 m/s, time to the top = 20/9.8 = 2.04 s;
+  key 2.04 in band 1.8-2.2; curve `v*x - 4.9*x^2` with a launch-speed knob. q3: horizontal throw
+  vs drop from 20 m: same time, sqrt(2 x 20/9.8) = 2.02 s; key "same time", curve `h - 4.9*x^2`
+  hits 0 at 2.02 (ask_y check). Both correct and both good pictures.
+- **Why the sky is blue** (run 2). q1: (700/400)^4 = 9.38; key 9.38 in band 3.6-12. q2: violet
+  vs blue (470/380)^4 = 2.34; key 2.33 in band 1.71-2.5. q3: much thicker atmosphere ->
+  red/orange (as at sunset), keyed correct. Numbers right; v2's invented percentages are gone.
+  The model's knobs on both curves weren't in the expr, so the final code drops them.
+
+Also read: **the law of large numbers** (run 2) is wrong in a way no check sees. "Days with
+over 60% boys: 100 vs 1,000 births a day, how many times rarer?" is keyed 50 as a bare
+literal. Exact binomial: P(X >= 61 | n=100) = 0.0176 and P(X >= 601 | n=1000) = 9.0e-11, so it's
+about 2 x 10^8 times rarer. Lesson: an answer_expr that is just a number is unverified.
+**Regression to the mean** (run 2): 9 heads in 10, expected heads in the next 10 = 5, binomial
+sampler n=10 p=0.5: correct. **Heavier objects** (run 2): fall time from 50 m in a vacuum =
+sqrt(100/9.81) = 3.19 s, plotted as a flat line against mass with a gravity knob: correct and
+exactly the lesson.
+
+Next:
+- Flag (or drop) items whose answer_expr is a bare number on topics where it should be
+  computed (the law of large numbers case); a distribution item could compute its answer from
+  the sampler (tail share, mean) instead of trusting the model.
+- Band-to-misconception tags are still often arbitrary (radioactive q1); the verdict card
+  is only as good as these tags.
+- The web Curve widget must evaluate the expr with the knob (`{x, [explore.param]:
+  value}`), and can mark `ask_x` / `ask_y` on the plot.
+- Drop or fix the Gemma fallback (0 rounds from it in 2 trials, 500/504 every time here).
