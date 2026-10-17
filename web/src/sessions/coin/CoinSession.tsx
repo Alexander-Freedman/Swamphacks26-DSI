@@ -2,9 +2,9 @@ import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { labelFor } from '../../notebook'
 import { showcaseRound } from '../../rounds'
 import { misconceptionFor } from '../../verdict'
-import { ConfidencePicker, EndBar, Frame, LockButton, SessionHead, StampRow, Title } from '../../components/session/Shell'
+import { EndBar, Frame, LockButton, SessionHead, StampRow, Title } from '../../components/session/Shell'
 import { Compare, type CompareAnswer, type CompareOption } from '../../components/session/Compare'
-import { cardGuide, lockLabel, type Confidence } from '../../components/session/copy'
+import { cardGuide, lockLabel } from '../../components/session/copy'
 import { shellVerdict } from '../../components/session/verdict'
 import { useNotebookEntry } from '../../components/session/entry'
 import { ExtremeChart, KMAX, RunHistogram } from './Charts'
@@ -46,7 +46,6 @@ export function CoinSession({ onDone }: { onDone: () => void }) {
   const [dealKey, setDealKey] = useState(0)
   const [guessSet, setGuessSet] = useState<number | null>(null) // unset until you move the slider: no anchor
   const guess = guessSet ?? 0
-  const [conf, setConf] = useState<Confidence | null>(null)
   const [locked, setLocked] = useState(false)
   const rand = useRef(rng(25)) // seed: the first real 100 tops out at 8, a typical row (avg 6.98)
   const [real, setReal] = useState<Side[]>([])
@@ -194,14 +193,14 @@ export function CoinSession({ onDone }: { onDone: () => void }) {
       <Title h={title} sub={sub} id="coin-h" headingRef={heading} />
       {locked && (
         <p className="pencil-strip" aria-label="your model">
-          <span>you guessed <b>{guess}</b> in a row{conf ? ` (${conf})` : ''}</span>
+          <span>you guessed <b>{guess}</b> in a row</span>
           <span>you switch <b>{pct(sw)}</b></span>
           <span>your longest <b>{longestRun(model)}</b></span>
         </p>
       )}
       <section className={step >= 4 ? 'coin-step' : 'coin-step card'} aria-labelledby="coin-h">
         {step === 0 && (
-          <TapStep len={len} pickLen={pickLen} deal={deal} dealKey={dealKey} onDeal={() => dealRow(len)} mine={mine} setMine={editMine} tap={tap} guess={guessSet} setGuess={setGuessSet} conf={conf} setConf={setConf} locked={locked} onLock={lock} onNext={() => go(1)} />
+          <TapStep len={len} pickLen={pickLen} deal={deal} dealKey={dealKey} onDeal={() => dealRow(len)} mine={mine} setMine={editMine} tap={tap} guess={guessSet} setGuess={setGuessSet} locked={locked} onLock={lock} onNext={() => go(1)} />
         )}
         {step === 1 && (
           <>
@@ -231,7 +230,6 @@ export function CoinSession({ onDone }: { onDone: () => void }) {
             model={model}
             guess={guess}
             round={round}
-            conf={conf ?? 'pretty sure'}
             verdict={shellVerdict(misId, guess, E100, WINDOW)}
             misId={misId}
             entry={entry}
@@ -286,10 +284,10 @@ function Next({ onClick, children }: { onClick: () => void; children: React.Reac
   )
 }
 
-function TapStep(p: { len: number; pickLen: (n: number) => void; deal: Side[]; dealKey: number; onDeal: () => void; mine: Side[]; setMine: (m: Side[]) => void; tap: (c: Side) => void; guess: number | null; setGuess: (g: number) => void; conf: Confidence | null; setConf: (c: Confidence) => void; locked: boolean; onLock: () => void; onNext: () => void }) {
-  const { mine, locked, setMine, tap, guess, setGuess, conf, setConf, onLock, onNext, len, pickLen, deal, dealKey, onDeal } = p
+function TapStep(p: { len: number; pickLen: (n: number) => void; deal: Side[]; dealKey: number; onDeal: () => void; mine: Side[]; setMine: (m: Side[]) => void; tap: (c: Side) => void; guess: number | null; setGuess: (g: number) => void; locked: boolean; onLock: () => void; onNext: () => void }) {
+  const { mine, locked, setMine, tap, guess, setGuess, onLock, onNext, len, pickLen, deal, dealKey, onDeal } = p
   const full = mine.length >= len && deal.length === len
-  const ready = mine.length >= MIN_TAPS && guess != null && conf != null
+  const ready = mine.length >= MIN_TAPS && guess != null
   // When the real row deals in (tap 20, Flip again), bring it on screen: on a 360x640 phone it lands below the fold.
   const realRef = useRef<HTMLParagraphElement>(null)
   const seenDeal = useRef(dealKey)
@@ -305,7 +303,7 @@ function TapStep(p: { len: number; pickLen: (n: number) => void; deal: Side[]; d
     guessRef.current?.querySelector<HTMLInputElement>('#coin-guess')?.focus({ preventScroll: true })
   }
   // Same lock copy as the other sessions once your 20 taps are in; before that the note under the button says why it waits.
-  const lockText = mine.length < MIN_TAPS ? 'Lock it in' : lockLabel(guess != null, conf)
+  const lockText = mine.length < MIN_TAPS ? 'Show me' : lockLabel(guess != null)
   return (
     <>
       <div className="lenpick" role="radiogroup" aria-label="row length">
@@ -371,7 +369,6 @@ function TapStep(p: { len: number; pickLen: (n: number) => void; deal: Side[]; d
           onPointerUp={(e) => guess == null && setGuess(+e.currentTarget.value)}
         />
         <div className="ticks"><span>1</span><span>5</span><span>10</span><span>15</span><span>20</span></div>
-        <ConfidencePicker value={conf} onPick={setConf} disabled={locked} />
         {locked ? (
           <div className="row">
             <button className="btn" onClick={onNext}>Back to the real coin →</button>
@@ -470,7 +467,6 @@ function ExtremeStep({ model, guess, onNext }: { model: Side[]; guess: number; o
 function CardStep(p: {
   model: Side[]
   guess: number
-  conf: Confidence
   round: NonNullable<ReturnType<typeof showcaseRound>>
   verdict: 'called' | 'close' | 'off'
   misId: string | null
@@ -480,12 +476,12 @@ function CardStep(p: {
   onRestart: () => void
   onNext: () => void
 }) {
-  const { model, guess, conf, round, verdict, misId, entry, rematch, onPick, onRestart, onNext } = p
+  const { model, guess, round, verdict, misId, entry, rematch, onPick, onRestart, onNext } = p
   const m = round.misconceptions.find((x) => x.id === misId)
   // Saved when the card shows (#159); the rematch and the compare answer update this same entry.
   useEffect(() => {
-    entry.atCard({ guess, confidence: conf, switchRate: Math.round(switchRate(model) * 100) / 100, misconception: misId })
-  }, [entry, guess, conf, model, misId])
+    entry.atCard({ guess, switchRate: Math.round(switchRate(model) * 100) / 100, misconception: misId })
+  }, [entry, guess, model, misId])
   const sw = switchRate(model)
   const pPast = 1 - pLongestAtMost(N, guess)
   const pReach = pLongestAtLeast(N, guess)
@@ -501,7 +497,7 @@ function CardStep(p: {
     <>
       <StampRow v={verdict}>
         <p className="said">
-          You said <b className="you">{guess}</b> ({conf}). A real 100 averages <span className="hl"><b className="num">{E100.toFixed(2)}</b></span>.
+          You said <b className="you">{guess}</b>. A real 100 averages <span className="hl"><b className="num">{E100.toFixed(2)}</b></span>.
         </p>
       </StampRow>
       <div className="card verdict-card">
@@ -567,7 +563,7 @@ function WhichIsReal({ round, onPick }: { round: NonNullable<ReturnType<typeof s
       <p className="tryres" aria-live="polite">
         {pick && (
           <>
-            <span className={pick === real ? 'ok' : 'hl'}>{pick === real ? 'Called it.' : "That's the made-up one."}</span>{' '}
+            <span className={pick === real ? 'ok' : 'hl'}>{pick === real ? 'Spot on.' : "That's the made-up one."}</span>{' '}
             {up(real)} was the real coin. {up(real === 'a' ? 'b' : 'a')} was made up and never goes past {longestRun(fakeSeq)} in a row. In {n} real flips the
             longest run averages {expectedLongest(n).toFixed(2)}, and a run of {L}+ shows up {pct(pLongestAtLeast(n, L), 1)} of the time (exact).
           </>

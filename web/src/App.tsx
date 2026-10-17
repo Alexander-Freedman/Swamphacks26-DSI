@@ -31,8 +31,8 @@ function Home({ onPick, onSession, onNotebook }: { onPick: (slug: string) => voi
   const rounds = showcaseSlugs.filter((slug) => !sessionFor(slug))
   return (
     <div className="home sheet">
-      <h1>Bet on your gut. Then watch reality.</h1>
-      <p className="concept">Predict first, lock it in, and see exactly where your intuition breaks.</p>
+      <h1>See your thinking in layers.</h1>
+      <p className="concept">Type any topic. Watch it come alive.</p>
       {sessions.length > 0 && (
         <div className="showcases sessions">
           {sessions.map((s, i) => {

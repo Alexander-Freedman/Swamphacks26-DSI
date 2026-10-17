@@ -116,11 +116,10 @@ describe('notebook next step (#169)', () => {
 describe('round misses in the notebook (#172)', () => {
   const lockSlider = (value: number) => {
     fireEvent.change(screen.getByLabelText('your guess'), { target: { value: String(value) } })
-    fireEvent.click(screen.getByRole('button', { name: 'certain' }))
-    fireEvent.click(screen.getByRole('button', { name: 'Lock it in' }))
+    fireEvent.click(screen.getByRole('button', { name: 'Show me' }))
   }
 
-  it('a sure-and-wrong miss is saved right away and its card links back to the round', async () => {
+  it('a big miss is saved right away and its card links back to the round', async () => {
     history.replaceState(null, '', `${BASE}?round=monty-hall`)
     render(<App />)
     await screen.findByText(/The Monty Hall problem · 1 of 3/)
@@ -128,7 +127,7 @@ describe('round misses in the notebook (#172)', () => {
     expect(await screen.findByText(/Keep this one\./)).toBeTruthy()
     const saved = entries()
     expect(saved).toHaveLength(1)
-    expect(saved[0]).toMatchObject({ session: 'monty-hall', kind: 'round', misconception: 'two-doors-fifty-fifty', rematch: null, confidence: 'certain', guess: 46 })
+    expect(saved[0]).toMatchObject({ session: 'monty-hall', kind: 'round', misconception: 'two-doors-fifty-fifty', rematch: null, guess: 46 })
     const [card] = notebook()
     expect(card).toMatchObject({ session: 'monty-hall', label: 'Two doors left means 50/50', topic: 'The Monty Hall problem', href: `${BASE}?round=monty-hall` })
     cleanup()

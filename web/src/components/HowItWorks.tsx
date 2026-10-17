@@ -94,7 +94,7 @@ function SpecSide({ item, show }: { item: Item; show: boolean }) {
       {t.widget === 'stepper' && <Row k="Shown as">a worked example in {t.steps.length} steps</Row>}
       {!show && (item.answer_expr || item.answer_claimed != null) && (
         <Row k="Answer">
-          <span className="hiw-held" data-testid="hiw-held-spec">held back until you lock in</span>
+          <span className="hiw-held" data-testid="hiw-held-spec">held back until you make your guess</span>
         </Row>
       )}
       {show && item.answer_expr && (
@@ -276,7 +276,7 @@ function HandChecked({ item, round, show }: { item: Item; round: Round; show: bo
       </p>
       {!show && (
         <p className="hiw-held" data-testid="hiw-held-sources">
-          The sources are listed after you lock in: their titles name the wrong ideas.
+          The sources are listed after you make your guess: their titles name the wrong ideas.
         </p>
       )}
       {show && <ul className="hiw-sources">
@@ -395,7 +395,7 @@ export function HowItWorks({ round, item, locked, onClose }: { round: Round; ite
             {truth ? (
               <ComputedSide item={item} round={round} truth={truth} />
             ) : (
-              <Wait text="Lock in your guess first: the answer is only computed after that." onPeek={() => setPeek(true)} />
+              <Wait text="Make your guess first: the answer is only computed after that." onPeek={() => setPeek(true)} />
             )}
           </section>
         </div>

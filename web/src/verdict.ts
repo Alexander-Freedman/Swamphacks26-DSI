@@ -23,10 +23,10 @@ export function verdictFor(item: Item, a: Answer, truth: number | null, tol?: nu
   return Math.abs(a.value - truth) <= within ? 'close' : 'off'
 }
 
-export const verdictLabel: Record<Verdict, string> = { called: 'Called it', close: 'Close', off: 'Way off' }
+export const verdictLabel: Record<Verdict, string> = { called: 'Spot on', close: 'Close', off: 'Way off' }
 
-export function verdictText(v: Verdict, confidence: Answer['confidence']): string {
-  if (v === 'off' && confidence === 'certain') return 'Sure and wrong'
+// Confidence no longer changes the label (#194: no "how sure?" step); the parameter stays for callers.
+export function verdictText(v: Verdict, _confidence?: Answer['confidence']): string {
   return verdictLabel[v]
 }
 

@@ -18,7 +18,7 @@ describe('coin streak on Home', () => {
     expect(screen.getByText(/Tap out 20 flips/)).toBeTruthy()
     fireEvent.click(screen.getByText('Be a coin'))
     expect(screen.getByText('Be a coin. Tap out 20 flips.')).toBeTruthy()
-    expect((screen.getByText('Lock it in') as HTMLButtonElement).disabled).toBe(true)
+    expect((screen.getByText('Show me') as HTMLButtonElement).disabled).toBe(true)
   })
 })
 

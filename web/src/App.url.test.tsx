@@ -35,7 +35,7 @@ describe('URL state', () => {
     expect(here()).toBe(`${BASE}?session=boxes`)
 
     act(() => history.back())
-    await waitFor(() => expect(screen.getByText('Bet on your gut. Then watch reality.')).toBeTruthy())
+    await waitFor(() => expect(screen.getByText('See your thinking in layers.')).toBeTruthy())
     expect(here()).toBe(BASE)
 
     act(() => history.forward())
@@ -53,7 +53,7 @@ describe('URL state', () => {
     fireEvent.click(screen.getByText('Boxes session'))
     fireEvent.click(screen.getByText('Done'))
     expect(here()).toBe(BASE)
-    expect(screen.getByText('Bet on your gut. Then watch reality.')).toBeTruthy()
+    expect(screen.getByText('See your thinking in layers.')).toBeTruthy()
 
     fireEvent.click(screen.getByText('Shared birthdays'))
     expect(here()).toBe(`${BASE}?round=birthday`)
@@ -65,7 +65,7 @@ describe('URL state', () => {
     history.replaceState(null, '', `${BASE}?round=nope`)
     render(<App />)
     // Not bundled, so it's looked up as an extra round first; when that fails, Home.
-    expect(await screen.findByText('Bet on your gut. Then watch reality.')).toBeTruthy()
+    expect(await screen.findByText('See your thinking in layers.')).toBeTruthy()
     await waitFor(() => expect(here()).toBe(BASE))
   })
 
