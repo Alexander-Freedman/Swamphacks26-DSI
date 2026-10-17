@@ -1,0 +1,23 @@
+# Render Blueprint: fallback host for the API (free plan, sleeps after 15 min idle).
+# Steps: deploy/README.md. Secret values are set in the dashboard (sync: false), never here.
+# No rootDir on purpose: the API reads data/rounds/ from the repo root, and Render hides
+# files outside rootDir at build and run time.
+services:
+  - type: web
+    name: mm-api
+    runtime: python
+    plan: free
+    branch: main
+    autoDeploy: false # deploy by hand; free build minutes are limited
+    buildCommand: pip install uv && cd api && uv sync --locked --no-dev
+    startCommand: cd api && uv run --no-sync uvicorn app.main:app --host 0.0.0.0 --port $PORT --proxy-headers --forwarded-allow-ips '*'
+    healthCheckPath: /api/health
+    envVars:
+      - key: GEMINI_API_KEY
+        sync: false
+      - key: TIGER_DATABASE_URL
+        sync: false
+      - key: MM_CORS_ORIGINS
+        sync: false
+      - key: HELP_DAILY_CAP
+        sync: false

@@ -15,6 +15,18 @@ if [ "$branch" != "main" ] && [ "${ALLOW_NON_MAIN:-0}" != "1" ]; then
   exit 1
 fi
 
+# Optional: VITE_API_BASE=https://<api-host> bakes the public API origin into the build
+# (Vite reads VITE_* at build time). Unset = relative /api, i.e. bundled rounds only on Pages.
+# The web app has to read import.meta.env.VITE_API_BASE for this to matter (deploy/README.md).
+if [ -n "${VITE_API_BASE:-}" ]; then
+  case "$VITE_API_BASE" in
+    https://*) ;;
+    *) echo "deploy-pages: VITE_API_BASE must start with https:// (Pages is https)" >&2; exit 1 ;;
+  esac
+  export VITE_API_BASE="${VITE_API_BASE%/}"
+  echo "deploy-pages: API base $VITE_API_BASE"
+fi
+
 (cd web && npm ci --no-audit --no-fund >/dev/null && npm run build)
 
 out="$(mktemp -d)"
