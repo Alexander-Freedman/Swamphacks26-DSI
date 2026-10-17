@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from 'react'
+import { AnyTopic, BuildReady } from './components/AnyTopic'
 import { CheckedTag } from './components/CheckedTag'
 import { NotebookLink, NotebookScreen } from './components/Notebook'
 import { useReset } from './reset'
@@ -9,6 +10,7 @@ import { sessionFor, sessions } from './sessions/registry'
 import { withUnit } from './format'
 import { computeTruth, type Computed } from './truth'
 import type { Round } from './types'
+import { useExtraRound } from './extras'
 import { misconceptionFor } from './verdict'
 import { HOME, onScreenChange, pushScreen, readScreen, replaceScreen, type Screen } from './url'
 import './App.css'
@@ -16,6 +18,8 @@ import './App.css'
 const BEAT_MS = 400
 
 function Home({ onPick, onSession, onNotebook }: { onPick: (slug: string) => void; onSession: (slug: string) => void; onNotebook: () => void }) {
+  // Showcases with a session open that instead; only ones without one get a plain round button.
+  const rounds = showcaseSlugs.filter((slug) => !sessionFor(slug))
   return (
     <div className="home sheet">
       <h1>Bet on your gut. Then watch reality.</h1>
@@ -30,13 +34,16 @@ function Home({ onPick, onSession, onNotebook }: { onPick: (slug: string) => voi
           ))}
         </div>
       )}
-      <div className="showcases">
-        {showcaseSlugs.filter((slug) => !sessionFor(slug)).map((slug) => (
-          <button key={slug} className="showcase" onClick={() => onPick(slug)}>
-            {showcaseRound(slug)!.topic}
-          </button>
-        ))}
-      </div>
+      {rounds.length > 0 && (
+        <div className="showcases">
+          {rounds.map((slug) => (
+            <button key={slug} className="showcase" onClick={() => onPick(slug)}>
+              {showcaseRound(slug)!.topic}
+            </button>
+          ))}
+        </div>
+      )}
+      <AnyTopic onOpen={onPick} />
       <NotebookLink onOpen={onNotebook} />
     </div>
   )
@@ -95,9 +102,13 @@ export default function App() {
   // An old ?round= link whose slug now has a session opens the session instead.
   const redirected = urlScreen.kind === 'round' && !!sessionFor(urlScreen.slug)
   const screen: Screen = redirected ? { kind: 'session', slug: urlScreen.slug } : urlScreen
-  const round = screen.kind === 'round' ? showcaseRound(screen.slug) : undefined
+  const showcase = screen.kind === 'round' ? showcaseRound(screen.slug) : undefined
+  // Not bundled: a reviewed extra or a just-built round, fetched (static file, then the API).
+  const extra = useExtraRound(screen.kind === 'round' && !showcase && !redirected ? screen.slug : null)
+  const round = showcase ?? extra.round
   const session = screen.kind === 'session' ? sessionFor(screen.slug) : undefined
-  const unknown = (screen.kind === 'session' || screen.kind === 'round') && !round && !session
+  const loading = screen.kind === 'round' && !round && !redirected && !extra.missing
+  const unknown = (screen.kind === 'session' || screen.kind === 'round') && !round && !session && !loading
 
   useEffect(() => onScreenChange(setScreen), [])
   // A slug that doesn't exist shows Home, so the URL should say Home too.
@@ -124,6 +135,7 @@ export default function App() {
           <button className="logo" style={{ border: 0, background: 'none', padding: 0 }} onClick={home}>Onionskin</button>
         </header>
         <session.Component key={session.slug} onDone={home} />
+        <BuildReady onOpen={(slug) => go({ kind: 'round', slug })} />
       </main>
     )
   }
@@ -134,10 +146,13 @@ export default function App() {
         {round && <CheckedTag reviewed={round.reviewed} />}
       </header>
       {cleared && <p className="nb-toast" role="status">Notebook cleared</p>}
+      {screen.kind !== 'home' && <BuildReady onOpen={(slug) => go({ kind: 'round', slug })} />}
       {screen.kind === 'notebook' ? (
         <NotebookScreen onHome={home} />
       ) : round ? (
         <Player key={round.slug} round={round} onDone={home} />
+      ) : loading ? (
+        <p className="sheet progress" role="status">Opening the round…</p>
       ) : (
         <Home
           onPick={(slug) => go({ kind: 'round', slug })}
