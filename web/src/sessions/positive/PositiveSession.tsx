@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
+import { record as save } from '../../notebook'
 import { showcaseRound } from '../../rounds'
 import { misconceptionFor, verdictFor, verdictText } from '../../verdict'
 import { CrowdCurve, GuessBar, MiniPile, PileCompare } from './Charts'
@@ -22,16 +23,6 @@ function cardTest(): Test {
     baseRate: params.base_rate ?? CARD.baseRate,
     sensitivity: params.sensitivity ?? CARD.sensitivity,
     falseAlarm: params.false_positive_rate ?? CARD.falseAlarm,
-  }
-}
-
-function save(entry: object) {
-  try {
-    const key = 'mm.sessions'
-    const all = JSON.parse(localStorage.getItem(key) ?? '[]') as object[]
-    localStorage.setItem(key, JSON.stringify([...all, entry].slice(-50)))
-  } catch {
-    // private mode or blocked storage: the session still ends fine
   }
 }
 
@@ -107,7 +98,7 @@ export function PositiveSession({ onDone }: { onDone: () => void }) {
       {step === 5 && <CardStep guess={guess} conf={conf} truth={truth} test={test} round={round} item={item} onNext={() => setStep(6)} />}
       {step === 6 && (
         <RematchStep
-          onReveal={(g2) => save({ session: 'positive-test', at: new Date().toISOString(), guess, confidence: conf, misconception: misconceptionId(item, guess, conf), rematch: { guess: g2, truth: Math.round(ppv(REMATCH) * 1000) / 10 } })}
+          onReveal={(g2) => save({ session: 'positive-test', at: new Date().toISOString(), guess, confidence: conf ?? undefined, misconception: misconceptionId(item, guess, conf), rematch: rematchVerdict(g2, ppv(REMATCH)) === 'off' ? 'wrong' : 'right', rematchGuess: g2, rematchTruth: Math.round(ppv(REMATCH) * 1000) / 10 })}
           caught={round.misconceptions.find((x) => x.id === misconceptionId(item, guess, conf))?.label ?? null}
           onDone={onDone}
         />
