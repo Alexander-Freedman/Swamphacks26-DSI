@@ -1,6 +1,6 @@
 // @vitest-environment jsdom
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
-import { KEY, amend, entries, notebook, record, reset, type Entry } from './notebook'
+import { KEY, caughtId, entries, notebook, record, reset, upsert, type Entry } from './notebook'
 
 const e = (at: string, misconception: string | null, rematch: Entry['rematch'] = null, session = 'birthday'): Entry => ({
   session,
@@ -20,6 +20,36 @@ describe('notebook store', () => {
     record(e('16', null, 'right'))
     expect(entries()).toHaveLength(2)
     expect(entries()[0].misconception).toBe('half-of-365')
+  })
+
+  it('upsert replaces the entry with the same session + time instead of adding one (#159)', () => {
+    record(e('14', null, 'right', 'coin-streak'))
+    const card = e('15', 'half-of-365')
+    upsert(card)
+    expect(entries()).toHaveLength(2)
+    upsert({ ...card, rematch: 'wrong' })
+    expect(entries()).toHaveLength(2)
+    expect(entries()[1]).toMatchObject({ misconception: 'half-of-365', rematch: 'wrong' })
+    // same time, other session: a different entry
+    upsert({ ...card, session: 'coin-streak' })
+    expect(entries()).toHaveLength(3)
+    expect(notebook()).toHaveLength(2)
+  })
+
+  it('a called-it guess with a missed rematch that names a mistake is caught (#162)', () => {
+    const miss = { ...e('15', null, 'wrong', 'coin-streak'), rematchMisconception: 'random-means-evenly-mixed' }
+    expect(caughtId(miss)).toBe('random-means-evenly-mixed')
+    // a right rematch, or a miss that names nothing, catches nothing
+    expect(caughtId({ ...miss, rematch: 'right' })).toBeNull()
+    expect(caughtId(e('15', null, 'wrong'))).toBeNull()
+    // the first guess's mistake wins when both are there
+    expect(caughtId({ ...miss, misconception: 'streak-means-not-random' })).toBe('streak-means-not-random')
+    record(miss)
+    expect(notebook()).toMatchObject([{ session: 'coin-streak', id: 'random-means-evenly-mixed', label: 'Random means evenly mixed', status: 'caught', caught: 1, wins: 0 }])
+    // and two later right answers bust it like any other catch
+    record(e('16', null, 'right', 'coin-streak'))
+    record(e('17', null, null, 'coin-streak'))
+    expect(notebook()[0].status).toBe('busted')
   })
 
   it('reads the entries birthday wrote under mm.sessions before the notebook existed', () => {
@@ -135,27 +165,5 @@ describe('notebook store', () => {
     expect(entries()).toEqual([])
     expect(() => record(e('15', null))).not.toThrow()
     expect(() => reset()).not.toThrow()
-  })
-})
-
-describe('amend (compare answer on the same entry)', () => {
-  beforeEach(() => localStorage.clear())
-  it('adds extra fields to the matching entry only, never the core fields', () => {
-    record(e('01', 'random-means-evenly-mixed', 'wrong', 'coin-streak'))
-    record(e('02', null, null, 'coin-streak'))
-    amend('coin-streak', '2026-10-01T12:00:00.000Z', { comparePick: 'due', compareRight: false, misconception: null, rematch: 'right', guess: 7 })
-    const all = JSON.parse(localStorage.getItem(KEY)!)
-    expect(all).toHaveLength(2)
-    expect(all[0]).toMatchObject({ misconception: 'random-means-evenly-mixed', rematch: 'wrong', guess: 100, comparePick: 'due', compareRight: false })
-    expect(all[1].comparePick).toBeUndefined()
-    // bust rules see the same thing as before
-    expect(notebook().map((c) => [c.id, c.status, c.wins])).toEqual([['random-means-evenly-mixed', 'caught', 1]])
-  })
-  it('no matching entry: nothing changes', () => {
-    record(e('01', null, null, 'coin-streak'))
-    const before = localStorage.getItem(KEY)
-    amend('coin-streak', 'nope', { comparePick: 'x' })
-    amend('positive-test', '2026-10-01T12:00:00.000Z', { comparePick: 'x' })
-    expect(localStorage.getItem(KEY)).toBe(before)
   })
 })

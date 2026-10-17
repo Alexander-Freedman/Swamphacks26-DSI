@@ -4,6 +4,7 @@ import { afterEach, describe, expect, it, vi } from 'vitest'
 import { shellVerdict } from '../../components/session/verdict'
 import { showcaseRound } from '../../rounds'
 import { misconceptionFor } from '../../verdict'
+import { notebook } from '../../notebook'
 import { CoinSession } from './CoinSession'
 import { sampleLabel } from './hooks'
 import { expectedLongest, pLongestAtMost } from './math'
@@ -18,6 +19,7 @@ describe('coin streak session', () => {
     // reduced motion: "run 1,000" lands at once
     vi.stubGlobal('matchMedia', (q: string) => ({ matches: q.includes('reduce'), media: q }))
     const done = vi.fn()
+    localStorage.clear()
     render(<CoinSession onDone={done} />)
     expect(screen.getByText(/^Make up 20 coin flips/)).toBeTruthy()
     expect(screen.queryByText(/sample human row/)).toBeNull() // no fill-for-me: the point is your own pattern
@@ -85,13 +87,16 @@ describe('coin streak session', () => {
     expect(screen.getByText(/A real coin goes past 3 in/)).toBeTruthy()
     expect(screen.getByText(/You said/).textContent).toBe('You said 3. A real 100 averages 6.98.')
 
-    localStorage.clear()
+    // saved when the card shows, before any rematch (#159)
+    const atCard = JSON.parse(localStorage.getItem('mm.sessions') ?? '[]')
+    expect(atCard).toHaveLength(1)
+    expect(atCard[0]).toMatchObject({ session: 'coin-streak', guess: 3, misconception: 'random-means-evenly-mixed', rematch: null })
     fireEvent.click(screen.getByRole('button', { name: /^A: / }))
     expect(screen.getByText(/B was the real coin/)).toBeTruthy()
     expect(screen.getByText(/In 20 real flips/)).toBeTruthy()
     // both rematch rows stay plain ink: pencil only ever means "you"
     expect(document.querySelectorAll('.tryit .mine').length).toBe(0)
-    // saved at the pick; the end bar waits for the compare step
+    // the pick updates the card's entry; the end bar waits for the compare step
     expect(screen.queryByText('Saved to your notebook.')).toBeNull()
     expect(JSON.parse(localStorage.getItem('mm.sessions') ?? '[]')).toHaveLength(1)
 
@@ -115,13 +120,13 @@ describe('coin streak session', () => {
     expect(document.querySelector('.cmp-detail')!.textContent).toContain('averages 6.98, and a run of 5+ shows up 97.2% of the time')
     expect(screen.getByRole('button', { name: /Each try ignores the last one/ }).className).toContain('right')
 
-    // saved to the same notebook as the birthday session, once, with the compare answer on it
+    // the rematch and the compare answer update that same entry: same notebook as the birthday session, once
     expect(screen.getByText('Saved to your notebook.')).toBeTruthy()
     expect(document.querySelector('.ss-end')!.textContent).toContain('Caught: “Random means evenly mixed”. Rematch missed; it stays in your notebook to try again.')
     expect(screen.getByText('Open notebook').getAttribute('href')).toContain('?notebook=1')
     const saved = JSON.parse(localStorage.getItem('mm.sessions') ?? '[]')
     expect(saved).toHaveLength(1)
-    expect(saved[0]).toMatchObject({ session: 'coin-streak', guess: 3, misconception: 'random-means-evenly-mixed', rematch: 'wrong', comparePick: 'due', compareRight: false })
+    expect(saved[0]).toMatchObject({ session: 'coin-streak', guess: 3, misconception: 'random-means-evenly-mixed', rematch: 'wrong', at: atCard[0].at, comparePick: 'due', compareRight: false })
     expect(document.body.textContent).not.toMatch(/NaN/)
 
     fireEvent.click(screen.getByText('Done'))
@@ -212,8 +217,42 @@ describe('coin card and end bar (same shell as birthday)', () => {
     fireEvent.click(screen.getByRole('button', { name: /^A: / }))
     throughCompare()
     const bar = document.querySelector('.ss-end')!.textContent!
-    expect(bar).toContain('Saved to your notebook. Your first guess was right. Rematch missed; it stays in your notebook to try again.')
+    // the made-up row maps to a mistake, so the notebook really has it (#162)
+    expect(bar).toContain('Saved to your notebook. Your first guess was right. Rematch missed: “Random means evenly mixed” is in your notebook to try again.')
     expect(screen.getByText('Open notebook')).toBeTruthy()
+    const saved = JSON.parse(localStorage.getItem('mm.sessions') ?? '[]')
+    expect(saved).toHaveLength(1)
+    expect(saved[0]).toMatchObject({ misconception: null, rematch: 'wrong', rematchMisconception: 'random-means-evenly-mixed' })
+    expect(notebook().map((c) => [c.id, c.status])).toEqual([['random-means-evenly-mixed', 'caught']])
+    vi.useRealTimers()
+  }, 60000)
+
+  it('saves once at the card: step dots back and forth, then Done, never add a second entry (#159)', async () => {
+    vi.useFakeTimers()
+    localStorage.clear()
+    await playToCard(3)
+    fireEvent.click(screen.getByRole('button', { name: '2 Flip it' }))
+    await act(async () => vi.advanceTimersByTime(50))
+    fireEvent.click(screen.getByRole('button', { name: '5 Your mistake' }))
+    await act(async () => vi.advanceTimersByTime(50))
+    // no rematch pick: Done waits on the compare step; its answer lands on the same entry
+    throughCompare()
+    fireEvent.click(screen.getByText('Done'))
+    const saved = JSON.parse(localStorage.getItem('mm.sessions') ?? '[]')
+    expect(saved).toHaveLength(1)
+    expect(saved[0]).toMatchObject({ session: 'coin-streak', guess: 3, misconception: 'random-means-evenly-mixed', rematch: null, comparePick: 'no-memory', compareRight: true })
+    expect(notebook().map((c) => c.id)).toEqual(['random-means-evenly-mixed'])
+    vi.useRealTimers()
+  }, 60000)
+
+  it('never prints 100.0% for a chance below 1 (#161)', async () => {
+    vi.useFakeTimers()
+    await playToCard(3)
+    expect(screen.getByText(/A real coin goes past 3 in/).textContent).toContain('>99.9% of 100-flip runs')
+    expect(document.body.textContent).not.toContain('100.0%')
+    fireEvent.click(screen.getByRole('button', { name: '4 Extremes' }))
+    await act(async () => vi.advanceTimersByTime(50))
+    expect(screen.getByText(/a run longer than your 3 happens/).textContent).toContain('>99.9% of the time')
     vi.useRealTimers()
   }, 60000)
 

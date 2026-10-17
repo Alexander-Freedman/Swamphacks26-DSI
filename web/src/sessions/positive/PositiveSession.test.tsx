@@ -5,6 +5,7 @@ import App from '../../App'
 import { shellVerdict } from '../../components/session/verdict'
 import { showcaseRound } from '../../rounds'
 import { misconceptionFor } from '../../verdict'
+import { notebook } from '../../notebook'
 import { session } from './index'
 import { CARD, ppv } from './math'
 
@@ -82,6 +83,10 @@ describe('positive test session', () => {
     expect(container.textContent).toContain('You said 21%.')
     expect(screen.getByText('False alarms are too rare to matter')).toBeTruthy()
     expect(screen.getByText('9.2%', { selector: '.pt-reality' })).toBeTruthy()
+    // saved when the card shows, before the rematch (#159)
+    const atCard = JSON.parse(localStorage.getItem('mm.sessions') ?? '[]')
+    expect(atCard).toHaveLength(1)
+    expect(atCard[0]).toMatchObject({ session: 'positive-test', guess: 21, misconception: 'ignores-false-alarms', rematch: null })
 
     // compare (#183): a bag scanner next to your test, then name what's the same
     fireEvent.click(screen.getByText('One more case →'))
@@ -107,7 +112,9 @@ describe('positive test session', () => {
 
     // P6: new numbers, nothing given away before you move the slider
     fireEvent.click(screen.getByText('Rematch: new numbers →'))
-    expect(screen.getByText('Same test, new numbers: does the idea stick?')).toBeTruthy()
+    expect(screen.getByText('New test, new crowd: does the idea stick?')).toBeTruthy()
+    expect(container.textContent).not.toContain('Same test, new numbers')
+    expect(container.querySelector('.pt-lede')!.textContent).toMatch(/^New test, new crowd\. 2% of people have it/)
     expect((screen.getByText('Move the slider first') as HTMLButtonElement).disabled).toBe(true)
     expect(container.textContent).not.toContain('27.9%')
     fireEvent.change(screen.getByLabelText("Chance you're actually sick?"), { target: { value: '60' } })
@@ -121,7 +128,9 @@ describe('positive test session', () => {
     expect(container.querySelector('.ss-end')!.textContent).toContain('Caught: “False alarms are too rare to matter”. Rematch missed; it stays in your notebook to try again.')
     expect(screen.getByText('Open notebook').getAttribute('href')).toContain('?notebook=1')
     const saved = JSON.parse(localStorage.getItem('mm.sessions') ?? '[]')
-    expect(saved.at(-1)).toMatchObject({ session: 'positive-test', guess: 21, misconception: 'ignores-false-alarms', rematch: 'wrong', rematchGuess: 60, rematchTruth: 27.9, comparePick: 'accuracy', compareRight: false, compareText: 'too many false alarms' })
+    // the rematch updated the card's entry instead of adding a second one
+    expect(saved).toHaveLength(1)
+    expect(saved[0]).toMatchObject({ session: 'positive-test', at: atCard[0].at, guess: 21, misconception: 'ignores-false-alarms', rematch: 'wrong', rematchGuess: 60, rematchTruth: 27.9, comparePick: 'accuracy', compareRight: false, compareText: 'too many false alarms' })
     fireEvent.click(screen.getByText('Done'))
     expect(screen.getByText('You tested positive. Are you sick?')).toBeTruthy()
   })
@@ -208,6 +217,7 @@ describe('positive card and end bar (same shell as birthday)', () => {
 
   it('called-it guess, missed rematch: called-it line on the card, both parts on the bar (#150, #148)', async () => {
     vi.useFakeTimers()
+    localStorage.clear()
     const { container } = render(<Session onDone={() => {}} />)
     await toCard(9)
     expect(screen.getByText('Spot on')).toBeTruthy()
@@ -216,7 +226,36 @@ describe('positive card and end bar (same shell as birthday)', () => {
     fireEvent.change(screen.getByLabelText("Chance you're actually sick?"), { target: { value: '100' } })
     fireEvent.click(screen.getByText('Show me'))
     expect(screen.getByText('Way off')).toBeTruthy()
-    expect(container.querySelector('.ss-end')!.textContent).toContain('Saved to your notebook. Your first guess was right. Rematch missed; it stays in your notebook to try again.')
+    // 100% is the test's accuracy read as your chance: that's what the notebook keeps (#162)
+    expect(container.querySelector('.ss-end')!.textContent).toContain(
+      "Saved to your notebook. Your first guess was right. Rematch missed: “The test's accuracy is my chance” is in your notebook to try again.",
+    )
+    expect(notebook().map((c) => c.id)).toEqual(['accuracy-is-my-chance'])
+  })
+
+  it('saves once at the card; revisiting it with the step dots never adds a second entry (#159)', async () => {
+    vi.useFakeTimers()
+    localStorage.clear()
+    render(<Session onDone={() => {}} />)
+    await toCard(30)
+    fireEvent.click(screen.getByRole('button', { name: '3 Your pile vs real' }))
+    fireEvent.click(screen.getByRole('button', { name: '5 Your mistake' }))
+    const saved = JSON.parse(localStorage.getItem('mm.sessions') ?? '[]')
+    expect(saved).toHaveLength(1)
+    expect(saved[0]).toMatchObject({ session: 'positive-test', guess: 30, misconception: 'ignores-false-alarms', rematch: null })
+    expect(notebook().map((c) => c.id)).toEqual(['ignores-false-alarms'])
+  })
+
+  it("a missed rematch below the truth names 'barely matters' and the bar says it's in the notebook", async () => {
+    vi.useFakeTimers()
+    localStorage.clear()
+    const { container } = render(<Session onDone={() => {}} />)
+    await toCard(9)
+    throughCompare()
+    fireEvent.change(screen.getByLabelText("Chance you're actually sick?"), { target: { value: '2' } })
+    fireEvent.click(screen.getByText('Show me'))
+    expect(JSON.parse(localStorage.getItem('mm.sessions')!)[0]).toMatchObject({ rematch: 'wrong', rematchMisconception: 'positive-barely-matters' })
+    expect(container.querySelector('.ss-end')!.textContent).toContain('is in your notebook to try again.')
   })
 
   it('stamp and caught mistake agree for every guess; close only within 15 points and 2x (#151)', () => {

@@ -46,6 +46,14 @@ describe('notebook screen', () => {
     expect(screen.getByText('Start with the birthday problem').closest('a')?.getAttribute('href')).toBe(`${BASE}?session=birthday`)
   })
 
+  it('empty state counts missed rematches and points at a session not played yet (#162)', () => {
+    record({ session: 'birthday', at: new Date().toISOString(), guess: 23, misconception: null, rematch: 'wrong' })
+    history.replaceState(null, '', `${BASE}?notebook=1`)
+    render(<App />)
+    expect(screen.getByText(/You've played 1 session and your first guess called it \(1 rematch missed\)/)).toBeTruthy()
+    expect(screen.getByText('Next: Be a coin').closest('a')?.getAttribute('href')).toBe(`${BASE}?session=coin-streak`)
+  })
+
   it('shows a caught mistake in pencil', () => {
     caught()
     history.replaceState(null, '', `${BASE}?notebook=1`)
