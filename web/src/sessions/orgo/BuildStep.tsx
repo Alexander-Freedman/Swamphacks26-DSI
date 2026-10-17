@@ -49,7 +49,7 @@ function Slots({ el, used }: { el: El; used: number }) {
   return <>{arcs}</>
 }
 
-export function BuildStep({ onCheck, onNext }: { onCheck: (mistakes: BuildMistake[]) => void; onNext: () => void }) {
+export function BuildStep({ onCheck, onNext, nextLabel = 'Push the electrons →' }: { onCheck: (mistakes: BuildMistake[]) => void; onNext: () => void; nextLabel?: string }) {
   const svg = useRef<SVGSVGElement>(null)
   const [atoms, setAtoms] = useState<Atom[]>([])
   const [bonds, setBonds] = useState<Bond[]>([])
@@ -378,7 +378,7 @@ export function BuildStep({ onCheck, onNext }: { onCheck: (mistakes: BuildMistak
         )}
         {result && <BuildVerdict r={result} />}
         {ok ? (
-          <button className="og-btn og-next" onClick={onNext}>Push the electrons →</button>
+          <button className="og-btn og-next" onClick={onNext}>{nextLabel}</button>
         ) : (
           <button className="og-btn og-go" onClick={check} disabled={!atoms.length}>Check it</button>
         )}

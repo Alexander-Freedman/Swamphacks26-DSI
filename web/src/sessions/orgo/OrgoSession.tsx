@@ -5,19 +5,68 @@ import { BuildStep } from './BuildStep'
 import { MISTAKES } from './chem'
 import { CompareStep } from './CompareStep'
 import { PushStep } from './PushStep'
+import { SECTIONS, type OrgoStep, type OrgoTopic } from './topics'
 import './orgo.css'
 
 export const SLUG = 'orgo'
-const STEPS = ['Build', 'Push', 'Compare'] as const
+const LABEL: Record<OrgoStep, string> = { build: 'Build', push: 'Push', compare: 'Compare' }
 // Short captions only: the pictures do the explaining.
-const TITLES: [string, string][] = [
-  ['Build ethanol', 'Drag atoms onto the paper and bond them until every slot is full.'],
-  ['Push the electrons', 'Draw the curved arrows for HO⁻ + CH₃Br. Then watch it happen.'],
-  ['Same pattern', 'A new reaction. Find the same three parts.'],
-]
+const TITLES: Record<OrgoStep, [string, string]> = {
+  build: ['Build ethanol', 'Drag atoms onto the paper and bond them until every slot is full.'],
+  push: ['Push the electrons', 'Draw the curved arrows for HO⁻ + CH₃Br. Then watch it happen.'],
+  compare: ['Same pattern', 'A new reaction. Find the same three parts.'],
+}
+const REMIX: Record<string, string> = {
+  'build-ethanol': 'Next: push the electrons in a real mechanism.',
+  sn2: 'Next time: a new nucleophile, a new leaving group.',
+  full: 'Next time: a new molecule, a new nucleophile.',
+}
 type M = keyof typeof MISTAKES
 
+/** Orgo opens on a menu: pick a section and a topic, so practice is on purpose, not a fixed path. */
 export function OrgoSession({ onDone }: { onDone: () => void }) {
+  const [topic, setTopic] = useState<OrgoTopic | null>(null)
+  // a new key per pick remounts the steps, so every topic starts clean
+  const [play, setPlay] = useState(0)
+  const start = (t: OrgoTopic) => {
+    setTopic(t)
+    setPlay((p) => p + 1)
+  }
+  if (!topic) return <OrgoMenu onPick={start} />
+  return <OrgoTopicRun key={play} topic={topic} onTopics={() => setTopic(null)} onDone={onDone} />
+}
+
+function OrgoMenu({ onPick }: { onPick: (t: OrgoTopic) => void }) {
+  const title = useRef<HTMLHeadingElement>(null)
+  return (
+    <Frame className="orgo">
+      <div className="ss-head">
+        <span className="ss-chip">Orgo</span>
+      </div>
+      <Title h="What do you want to practice?" sub="Pick a section, then a topic." headingRef={title} />
+      <div className="og-menu">
+        {SECTIONS.map((s) => (
+          <section key={s.id} className="og-section" aria-labelledby={`og-sec-${s.id}`}>
+            <h3 id={`og-sec-${s.id}`} className="og-sec-title">{s.title}</h3>
+            <p className="og-sec-blurb">{s.blurb}</p>
+            <div className="og-topics">
+              {s.topics.map((t) => (
+                <button key={t.id} className="og-topic" disabled={!t.ready} onClick={() => onPick(t)} aria-describedby={`og-t-${t.id}`}>
+                  <span className="og-topic-title">{t.title}</span>
+                  <span id={`og-t-${t.id}`} className="og-topic-blurb">{t.blurb}</span>
+                  {!t.ready && <span className="og-soon">coming next</span>}
+                </button>
+              ))}
+            </div>
+          </section>
+        ))}
+      </div>
+    </Frame>
+  )
+}
+
+function OrgoTopicRun({ topic, onTopics, onDone }: { topic: OrgoTopic; onTopics: () => void; onDone: () => void }) {
+  const steps = topic.steps
   const [step, setStep] = useState(1)
   const [reached, setReached] = useState(1)
   const [mistakes, setMistakes] = useState<M[]>([])
@@ -27,6 +76,7 @@ export function OrgoSession({ onDone }: { onDone: () => void }) {
     setStep(n)
     setReached((r) => Math.max(r, n))
   }
+  const at = (s: OrgoStep) => steps.indexOf(s) + 1 // 0 when this topic skips the step
   // every named mistake counts once, the first time it shows up
   const caught = useCallback((ms: M[]) => setMistakes((all) => [...all, ...ms.filter((m) => !all.includes(m))]), [])
 
@@ -42,42 +92,50 @@ export function OrgoSession({ onDone }: { onDone: () => void }) {
   useEffect(() => {
     if (!finished || saved.current) return
     saved.current = true
-    record({ session: SLUG, at: new Date().toISOString(), guess: '', misconception: mistakes[0] ?? null, rematch: null, mistakes })
-  }, [finished, mistakes])
+    record({ session: SLUG, at: new Date().toISOString(), guess: '', misconception: mistakes[0] ?? null, rematch: null, mistakes, orgoTopic: topic.id })
+  }, [finished, mistakes, topic.id])
 
-  const [h, sub] = TITLES[step - 1]
+  // after a step: the next one in this topic, or the end bar if it was the last
+  const after = (s: OrgoStep) => () => (at(s) < steps.length ? go(at(s) + 1) : finish())
+  const nextLabel = (s: OrgoStep) => (at(s) < steps.length ? `${TITLES[steps[at(s)]][0]} →` : 'Finish ✓')
+  const [h, sub] = TITLES[steps[step - 1]]
+  const last = step === steps.length
+
   return (
     <Frame className="orgo">
-      <SessionHead chip="Orgo" step={step} total={STEPS.length} labels={STEPS} canGo={(i) => i < reached} onGo={(i) => go(i + 1)} />
+      <SessionHead chip={`Orgo · ${topic.title}`} step={step} total={steps.length} labels={steps.map((s) => LABEL[s])} canGo={(i) => i < reached} onGo={(i) => go(i + 1)} />
+      <button className="og-btn og-ghost og-back" onClick={onTopics}>← All orgo topics</button>
       <Title h={h} sub={sub} headingRef={title} />
       {/* steps stay mounted so going back keeps your molecule and your arrows */}
-      <div hidden={step !== 1}>
-        <BuildStep onCheck={caught} onNext={() => go(2)} />
-      </div>
-      {reached >= 2 && (
-        <div hidden={step !== 2}>
-          <PushStep onGrade={caught} onNext={() => go(3)} />
+      {at('build') > 0 && reached >= at('build') && (
+        <div hidden={step !== at('build')}>
+          <BuildStep onCheck={caught} onNext={after('build')} nextLabel={nextLabel('build')} />
         </div>
       )}
-      {reached >= 3 && (
-        <div hidden={step !== 3}>
-          <CompareStep onMistake={(m) => caught([m])} onDone={finish} />
-          {finished && (
-            <EndBar
-              caught={null}
-              rematch="right"
-              line={
-                mistakes.length ? (
-                  <>Caught: {mistakes.map((m) => `“${MISTAKES[m].label}”`).join(', ')}.</>
-                ) : (
-                  <span className="og-mastered">✓ mastered</span>
-                )
-              }
-              remix="Next time: a new molecule, a new nucleophile."
-              onDone={onDone}
-            />
-          )}
+      {at('push') > 0 && reached >= at('push') && (
+        <div hidden={step !== at('push')}>
+          <PushStep onGrade={caught} onNext={after('push')} />
         </div>
+      )}
+      {at('compare') > 0 && reached >= at('compare') && (
+        <div hidden={step !== at('compare')}>
+          <CompareStep onMistake={(m) => caught([m])} onDone={finish} />
+        </div>
+      )}
+      {finished && last && (
+        <EndBar
+          caught={null}
+          rematch="right"
+          line={
+            mistakes.length ? (
+              <>Caught: {mistakes.map((m) => `“${MISTAKES[m].label}”`).join(', ')}.</>
+            ) : (
+              <span className="og-mastered">✓ mastered</span>
+            )
+          }
+          remix={REMIX[topic.id] ?? ''}
+          onDone={onDone}
+        />
       )}
     </Frame>
   )

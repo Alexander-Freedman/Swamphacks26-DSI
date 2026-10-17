@@ -23,6 +23,10 @@ const choose = (label: string, text: string) => {
   fireEvent.change(sel, { target: { value: String(i) } })
 }
 
+/** Orgo opens on the topic menu; most tests take the guided path through all three steps. */
+const pickTopic = (title: RegExp) => fireEvent.click(screen.getByRole('button', { name: title }))
+const guidedPath = () => pickTopic(/^Build → Push → Compare/)
+
 /** Ethanol with the keyboard-friendly path: pick an atom, press an element to add it bonded. */
 function buildEthanol() {
   add('carbon') // a0, picked
@@ -40,6 +44,7 @@ describe('orgo session', () => {
     vi.useFakeTimers()
     const C = session.Component
     render(<C onDone={() => {}} />)
+    guidedPath()
     expect(screen.getByText('Build ethanol')).toBeTruthy()
 
     // a carbon with 5 bonds is named live and on check
@@ -100,6 +105,7 @@ describe('orgo session', () => {
 
   it('names dimethyl ether: same formula, different molecule', () => {
     render(<session.Component onDone={() => {}} />)
+    guidedPath()
     add('carbon')
     add('oxygen')
     add('carbon')
@@ -115,6 +121,7 @@ describe('orgo session', () => {
   it('names the wrong arrows, and a clean run ends mastered', () => {
     vi.useFakeTimers()
     render(<session.Component onDone={() => {}} />)
+    guidedPath()
     buildEthanol()
     fireEvent.click(screen.getByText('Check it'))
     fireEvent.click(screen.getByText('Push the electrons →'))
@@ -134,6 +141,7 @@ describe('orgo session', () => {
   it('a session with no mistakes ends with a quiet mastered check', () => {
     vi.useFakeTimers()
     render(<session.Component onDone={() => {}} />)
+    guidedPath()
     buildEthanol()
     fireEvent.click(screen.getByText('Check it'))
     fireEvent.click(screen.getByText('Push the electrons →'))
@@ -153,6 +161,7 @@ describe('orgo session', () => {
 
   it('Undo steps back one change at a time (button and Ctrl+Z), and a right build shows a big check', () => {
     render(<session.Component onDone={() => {}} />)
+    guidedPath()
     const undo = screen.getByRole('button', { name: /Undo/ }) as HTMLButtonElement
     expect(undo.disabled).toBe(true)
     add('carbon')
@@ -184,6 +193,37 @@ describe('orgo session', () => {
     // changing the molecule again takes the check away until the next Check it
     fireEvent.click(undo)
     expect(document.querySelector('.og-correct')).toBeNull()
+  })
+
+  it('opens on a topic menu: sections, ready topics, and the ones coming next', () => {
+    render(<session.Component onDone={() => {}} />)
+    expect(screen.getByText('What do you want to practice?')).toBeTruthy()
+    for (const sec of ['Molecules', 'Mechanisms', 'Guided path']) expect(screen.getByRole('heading', { name: sec })).toBeTruthy()
+    expect((screen.getByRole('button', { name: /^SN2/ }) as HTMLButtonElement).disabled).toBe(false)
+    for (const t of [/^SN1/, /^E2/, /^E1/]) expect((screen.getByRole('button', { name: t }) as HTMLButtonElement).disabled).toBe(true)
+    expect(screen.getAllByText('coming next')).toHaveLength(3)
+  })
+
+  it('Molecules > Build ethanol is just the build, then Finish', () => {
+    render(<session.Component onDone={() => {}} />)
+    pickTopic(/^Build ethanol/)
+    expect(screen.getByText('Orgo · Build ethanol')).toBeTruthy()
+    expect(screen.getByText('1 of 1')).toBeTruthy()
+    buildEthanol()
+    fireEvent.click(screen.getByText('Check it'))
+    fireEvent.click(screen.getByText('Finish ✓'))
+    expect(screen.getByText('✓ mastered')).toBeTruthy()
+    expect(entries()[0]).toMatchObject({ session: 'orgo', orgoTopic: 'build-ethanol', misconception: null })
+  })
+
+  it('Mechanisms > SN2 starts at the arrows, and the topics link goes back to the menu', () => {
+    render(<session.Component onDone={() => {}} />)
+    pickTopic(/^SN2/)
+    expect(screen.getByText('Push the electrons')).toBeTruthy()
+    expect(screen.getByText('1 of 2')).toBeTruthy()
+    expect(screen.queryByText('Build ethanol')).toBeNull()
+    fireEvent.click(screen.getByText('← All orgo topics'))
+    expect(screen.getByText('What do you want to practice?')).toBeTruthy()
   })
 
   it('the notebook shows the same names as the session', () => {

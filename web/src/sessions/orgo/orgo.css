@@ -140,3 +140,17 @@
 .orgo .og-correct { animation: og-pop 260ms ease-out; transform-box: fill-box; }
 @keyframes og-pop { from { opacity: 0; } to { opacity: 1; } }
 @media (prefers-reduced-motion: reduce) { .orgo .og-correct { animation: none; } }
+
+/* Topic menu: pick a section, then a topic (no fixed path). */
+.orgo .og-menu { display: grid; gap: 22px; max-width: 980px; }
+.orgo .og-sec-title { font: 700 22px var(--font-display); margin: 0; }
+.orgo .og-sec-blurb { margin: 2px 0 10px; color: var(--ink-soft); }
+.orgo .og-topics { display: grid; grid-template-columns: repeat(auto-fill, minmax(210px, 1fr)); gap: 12px; }
+.orgo .og-topic { display: grid; gap: 4px; text-align: left; padding: 14px 16px; background: var(--card); color: var(--ink); border: 2px solid var(--ink); border-radius: var(--radius-ui); box-shadow: var(--shadow); cursor: pointer; font: inherit; }
+.orgo .og-topic:hover:not(:disabled) { background: var(--marker-soft); }
+.orgo .og-topic:active:not(:disabled) { transform: translateY(2px); box-shadow: 0 1px 0 var(--ink); }
+.orgo .og-topic:disabled { cursor: default; opacity: 0.55; box-shadow: none; border-style: dashed; }
+.orgo .og-topic-title { font: 700 18px var(--font-display); }
+.orgo .og-topic-blurb { font-size: 14px; color: var(--ink-soft); }
+.orgo .og-soon { justify-self: start; font: 700 11px var(--font-mono); text-transform: uppercase; letter-spacing: 0.06em; color: var(--pencil); border: 1.5px dashed var(--pencil); border-radius: var(--radius-ui); padding: 1px 6px; }
+.orgo .og-back { min-height: 36px; padding: 4px 10px; font-size: 14px; margin: 6px 0 2px; }
