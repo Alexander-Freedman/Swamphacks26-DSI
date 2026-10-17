@@ -1,6 +1,6 @@
 import type { MouseEvent } from 'react'
 import { BUST_AFTER, NOTEBOOK_HREF, entries, notebook, plays, type Card } from '../notebook'
-import { sessionFor, sessions } from '../sessions/registry'
+import { homeSessions, sessionFor } from '../sessions/registry'
 import './Notebook.css'
 
 const BASE = import.meta.env.BASE_URL
@@ -25,9 +25,19 @@ function when(iso: string, now = new Date()): string {
   return d.toLocaleDateString(undefined, { month: 'short', day: 'numeric' })
 }
 
+/** "Last time" line (#176): a right rematch in the catching session gets a nod but doesn't count yet. */
+const LAST: Record<string, string> = {
+  'rematch-right': 'Last time: rematch right. It counts from your next session.',
+  'rematch-missed': 'Last time: rematch missed. No credit yet.',
+  right: 'Last time: right. That one counts.',
+  missed: 'Last time: missed. No credit yet.',
+}
+
 function MistakeCard({ c }: { c: Card }) {
   const busted = c.status === 'busted'
   const left = Math.max(0, BUST_AFTER - c.wins)
+  // A missed try marks the next empty pip with a pencil x; it doesn't fill it (#176).
+  const miss = c.last === 'missed' || c.last === 'rematch-missed'
   return (
     <li className={`nb-card ${c.status}`}>
       <span className="nb-stamp" aria-hidden="true">{busted ? 'busted' : 'caught'}</span>
@@ -37,6 +47,12 @@ function MistakeCard({ c }: { c: Card }) {
         <span className="sr-only">{busted ? 'Busted. ' : 'Caught. '}</span>
         Fell for it {c.caught === 1 ? 'once' : `${c.caught} times`} · last seen {when(c.lastSeen)}
       </p>
+      {!busted && LAST[c.last ?? ''] && (
+        <p className={`nb-last ${c.last}`}>
+          <span className="nb-last-mark" aria-hidden="true">{c.last === 'right' || c.last === 'rematch-right' ? '✓' : '✗'}</span>
+          {LAST[c.last ?? '']}
+        </p>
+      )}
       <p className="nb-progress">
         {busted ? (
           'Right twice since. This one is busted.'
@@ -44,10 +60,12 @@ function MistakeCard({ c }: { c: Card }) {
           <>
             <span className="nb-pips" aria-hidden="true">
               {Array.from({ length: BUST_AFTER }, (_, i) => (
-                <i key={i} className={i < c.wins ? 'on' : ''} />
+                <i key={i} className={i < c.wins ? 'on' : i === c.wins && miss ? 'x' : ''} />
               ))}
             </span>
-            {left === BUST_AFTER ? `Get it right ${BUST_AFTER} times to bust it.` : `${left} more right answer to bust it.`}
+            {left === BUST_AFTER
+              ? `Get it right ${BUST_AFTER} times to bust it.`
+              : `${left} more right ${left === 1 ? 'answer' : 'answers'} to bust it.`}
           </>
         )}
       </p>
@@ -66,7 +84,7 @@ export function NotebookScreen({ onHome }: { onHome?: () => void }) {
   const played = plays(all)
   // Empty state (#162): count missed rematches honestly and point at a session not played yet.
   const missed = all.filter((e) => e.rematch === 'wrong').length
-  const next = sessions.find((s) => !all.some((e) => e.session === s.slug)) ?? sessions[0]
+  const next = homeSessions.find((s) => !all.some((e) => e.session === s.slug)) ?? homeSessions[0]
   const caught = cards.filter((c) => c.status === 'caught')
   const busted = cards.filter((c) => c.status === 'busted')
   return (
@@ -85,7 +103,7 @@ export function NotebookScreen({ onHome }: { onHome?: () => void }) {
           </p>
           {next && (
             <a className="nb-btn" href={`${BASE}?session=${next.slug}`}>
-              {played > 0 ? `Next: ${next.title}` : 'Start with the birthday problem'}
+              {played > 0 ? `Next: ${next.title}` : `Start with ${next.title.toLowerCase()}`}
             </a>
           )}
         </div>

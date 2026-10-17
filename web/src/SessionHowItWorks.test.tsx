@@ -35,7 +35,7 @@ describe('How it works on the sessions', () => {
       expect(within(d).getByText(sessionHowItWorks[slug].formula)).toBeTruthy()
       // no spoiler until asked
       expect(within(d).queryByTestId('hiw-session-results')).toBeNull()
-      expect(within(d).getByText(/The number shows after you lock in/)).toBeTruthy()
+      expect(within(d).getByText(/The number shows after you make your guess/)).toBeTruthy()
       expect(within(d).getByText(/a person checked the numbers and sources/)).toBeTruthy()
       expect(within(d).getAllByRole('link').length).toBeGreaterThan(0)
       expect(document.body.style.overflow).toBe('hidden')

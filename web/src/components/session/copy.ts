@@ -2,22 +2,20 @@ import type { Verdict } from '../../verdict'
 
 // Words the session shell uses everywhere, so every session says the same thing (#149).
 
-export type Confidence = 'unsure' | 'pretty sure' | 'certain'
-export const CONFS: Confidence[] = ['unsure', 'pretty sure', 'certain']
-
-/** Same lock copy in every session: "Move the slider first" → "Pick how sure you are" → "Lock it in". */
-export function lockLabel(moved: boolean, conf: Confidence | null): string {
-  return !moved ? 'Move the slider first' : conf ? 'Lock it in' : 'Pick how sure you are'
+/** Same button copy in every session: "Move the slider first" → "Show me" (#194: no betting words, no confidence step). */
+export function lockLabel(moved: boolean): string {
+  return moved ? 'Show me' : 'Move the slider first'
 }
 
-/** The guidance line on the card: a called-it guess gets its own line (#150). */
+/** The guidance line on the card: a right guess gets its own line (#150). */
 export function cardGuide(called: boolean): string {
   return called
-    ? "You called it. Here's the idea that makes it work, so you can do it again."
+    ? "You were right. Here's the idea that makes it work, so you can do it again."
     : 'This is the mistake your guess points to, and the one idea that fixes it.'
 }
 
-export const STAMP: Record<Verdict, string> = { called: 'Called it', close: 'Close', off: 'Way off' }
+/** Same stamps as birthday (#199). */
+export const STAMP: Record<Verdict, string> = { called: 'Spot on', close: 'Close', off: 'Way off' }
 
 export type RematchResult = 'right' | 'close' | 'wrong'
 
@@ -26,7 +24,7 @@ export type RematchResult = 'right' | 'close' | 'wrong'
  * a caught first guess, or a missed rematch that names a mistake (`rematchCaught`, saved as `rematchMisconception`).
  */
 export function endLine(caught: string | null, rematch: RematchResult, rematchCaught: string | null = null): string {
-  const first = caught ? `Caught: “${caught}”.` : 'Your first guess called it.'
+  const first = caught ? `Caught: “${caught}”.` : 'Your first guess was right.'
   const second =
     rematch === 'right'
       ? 'Rematch: right.'

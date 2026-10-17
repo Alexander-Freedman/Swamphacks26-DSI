@@ -3,21 +3,21 @@ import type { Confidence, Item } from '../types'
 
 export type Answer = { value: number | null; optionId: string | null; confidence: Confidence }
 
-const LEVELS: Confidence[] = ['guessing', 'pretty sure', 'certain']
+// No "how sure are you?" step any more (#194); answers keep a neutral confidence for old notebook entries.
+const NEUTRAL: Confidence = 'pretty sure'
 
 export function Predict({ item, onLock }: { item: Item; onLock: (a: Answer) => void }) {
   const s = item.slider
   const [value, setValue] = useState<number | null>(s ? Math.round((s.min + s.max) / 2 / s.step) * s.step : null)
   const [touched, setTouched] = useState(false)
   const [optionId, setOptionId] = useState<string | null>(null)
-  const [confidence, setConfidence] = useState<Confidence | null>(null)
 
   const promptRef = useRef<HTMLHeadingElement>(null)
   // A new item takes focus (and scroll) back to its question.
   useEffect(() => promptRef.current?.focus(), [])
 
   const answered = item.input_type === 'slider' ? touched : optionId !== null
-  const ready = answered && confidence !== null
+  const ready = answered
 
   return (
     <div>
@@ -54,17 +54,8 @@ export function Predict({ item, onLock }: { item: Item; onLock: (a: Answer) => v
         </div>
       )}
 
-      <div className="confidence" role="group" aria-label="how sure are you">
-        <p className="confidence-label">How sure are you?</p>
-        {LEVELS.map((c) => (
-          <button key={c} className="conf" aria-pressed={confidence === c} onClick={() => setConfidence(c)}>
-            {c}
-          </button>
-        ))}
-      </div>
-
-      <button className="lock" disabled={!ready} onClick={() => ready && onLock({ value, optionId, confidence })}>
-        Lock it in
+      <button className="lock" disabled={!ready} onClick={() => ready && onLock({ value, optionId, confidence: NEUTRAL })}>
+        Show me
       </button>
     </div>
   )

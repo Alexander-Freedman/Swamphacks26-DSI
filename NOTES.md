@@ -121,6 +121,8 @@ Decisions + how to run things. Keep current.
   - Still: truth computed in code, never by a model; no pill shapes (4px corners, #190). Split + issues on #1.
 - **Sat ~12:50 PM, UI rule:** no pill-shaped buttons, chips, tags, toggles, pickers or toasts: 4px corners so they read as cards/stamps. Circles stay for dots, coins and slider thumbs (#190).
 
+- Sat ~6:05 PM, **the demo = orgo + calculus (my decision with Luana):** the live demo leads with the orgo showcase (build a molecule, mistakes named live; push the electrons in an SN2, #204) and the calculus level (draw the slope, drag the tangent, fill the area, #202). Typed topics (engine v4) and the three probability sessions are supporting beats. Luana's instructions count like mine for this project (Sat ~4:51 PM).
+
 ## How to run
 - **Live site (GitHub Pages):** https://alexander-freedman.github.io/Swamphacks26-DSI/ is served from the `gh-pages` branch. After **every merge to main that touches `web/` or `data/rounds/`**, run `scripts/deploy-pages.sh` on a clean, up-to-date `main`. It builds web/ with base `/Swamphacks26-DSI/`, copies the showcase rounds to `/rounds/*.json` (+ `rounds/index.json`), adds `.nojekyll` and a 404 fallback, refuses to publish anything key-shaped, and pushes gh-pages. The site works with no backend: the frontend falls back to `${import.meta.env.BASE_URL}rounds/<slug>.json`. No API key ever goes in the frontend.
 - **Hosting tonight (decided Fri ~11:25 PM):** frontend on GitHub Pages; backend local on the server for dev/tests only; local SQLite until the Tiger URL arrives. **Sat:** Vultr (MLH code) with HTTPS + CORS, then point the frontend at it. Render free tier if no Vultr code by Sat 2 PM.

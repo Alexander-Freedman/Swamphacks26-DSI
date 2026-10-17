@@ -10,6 +10,8 @@ export type SessionDef = {
   title: string
   blurb: string
   order: number
+  /** false keeps a session off Home (and out of "next" suggestions); its URL still opens it. */
+  home?: boolean
   Component: ComponentType<SessionProps>
 }
 
@@ -18,5 +20,8 @@ const modules = import.meta.glob<{ session: SessionDef }>('./*/index.tsx', { eag
 export const sessions: SessionDef[] = Object.values(modules)
   .map((m) => m.session)
   .sort((a, b) => a.order - b.order)
+
+/** The sessions Home shows, in order: the subject ones lead (orgo, calculus). */
+export const homeSessions = sessions.filter((s) => s.home !== false)
 
 export const sessionFor = (slug: string | null) => sessions.find((s) => s.slug === slug)
