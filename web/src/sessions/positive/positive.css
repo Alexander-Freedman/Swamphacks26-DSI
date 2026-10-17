@@ -171,3 +171,10 @@
 @media (max-width: 400px) {
   .pt-logticks { font-size: 12.5px; }
 }
+
+/* compare step: every alarm in a day */
+.pt .pt-alarms { max-width: 440px; margin: 8px 0; }
+.pt .pt-alarms .pt-dot.tp { stroke-width: 1; }
+.pt .pt-alarms .pt-dot.fp { stroke-width: 0.6; }
+.pt .cmp .pt-big { font-size: 30px; }
+.pt .cmp .pt-btn { border-radius: var(--radius-ui, 4px); }

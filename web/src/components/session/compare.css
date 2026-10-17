@@ -1,0 +1,42 @@
+/* Compare step (pull out the structure): two cases side by side, then "what's the same?", then the shared idea in ink. */
+.cmp { color: var(--ink); }
+.cmp-cases { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 14px; }
+@media (max-width: 720px) { .cmp-cases { grid-template-columns: minmax(0, 1fr); } }
+.cmp-case { min-width: 0; background: var(--card); border: 2px solid var(--ink); border-radius: var(--radius); box-shadow: 0 3px 0 var(--ink); padding: 14px 16px; }
+.cmp-title { font: 800 20px/1.2 var(--font-display); margin: 4px 0 8px !important; }
+.cmp-case p { margin: 6px 0; font-size: 15px; line-height: 1.45; }
+.cmp-case .cmp-big { font: 800 34px/1 var(--font-display); }
+.cmp-case .cmp-lbl { font-size: 13px; color: var(--ink-soft); }
+.cmp-case .cmp-hand { font: 600 17px/1.35 var(--font-hand); }
+.cmp-case .cmp-fine { font-size: 12px; color: var(--ink-soft); }
+
+.cmp-ask { border: 0; padding: 0; margin: 20px 0 0; min-width: 0; }
+.cmp-q { font: 800 clamp(22px, 5vw, 28px)/1.15 var(--font-display); padding: 0; margin: 0 0 10px; }
+.cmp-say { display: block; font-weight: 700; font-size: 15px; margin: 0 0 4px; }
+.cmp-say span { font-weight: 400; color: var(--ink-soft); }
+.cmp-text { width: 100%; max-width: 560px; font: 18px var(--font-hand); color: var(--ink); background: var(--card); border: 2px dashed var(--pencil); border-radius: var(--radius-ui, 4px); padding: 10px 12px; min-height: 46px; box-sizing: border-box; }
+.cmp-text:focus { outline: 3px solid var(--marker); outline-offset: 1px; }
+.cmp-then { font-size: 14px; color: var(--ink-soft); margin: 12px 0 6px; }
+.cmp-opts { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 8px; }
+@media (max-width: 600px) { .cmp-opts { grid-template-columns: minmax(0, 1fr); } }
+.cmp-opt { display: flex; gap: 10px; align-items: flex-start; text-align: left; font: 600 16px/1.35 var(--font-body); color: var(--ink); background: var(--card); border: 2px solid var(--ink); border-radius: var(--radius-ui, 4px); padding: 10px 12px; min-height: 52px; touch-action: manipulation; }
+.cmp-opt:not(:disabled):hover { background: var(--paper); }
+.cmp-opt:focus-visible { outline: 3px solid var(--marker); outline-offset: 2px; }
+.cmp-opt:disabled { cursor: default; }
+.cmp-opt:disabled:not(.right):not(.wrong) { opacity: 0.5; }
+.cmp-key { flex: none; display: inline-grid; place-items: center; width: 24px; height: 24px; border: 1.5px solid var(--ink-soft); border-radius: var(--radius-ui, 4px); font: 600 13px var(--font-mono); color: var(--ink-soft); }
+.cmp-opt.right { border-color: var(--called); box-shadow: 0 0 0 2px var(--called) inset; }
+.cmp-opt.right .cmp-key { border-color: var(--called); color: var(--called); }
+.cmp-opt.wrong { border-style: dashed; border-color: var(--pencil); color: var(--ink-soft); }
+@media (hover: none) and (pointer: coarse) { .cmp-key { display: none; } }
+
+.cmp-shared { margin-top: 14px; }
+.cmp-res { font-size: 17px; line-height: 1.45; margin: 0 0 8px; }
+.cmp-ok { color: var(--called); font-weight: 800; }
+.cmp-miss { font-weight: 800; background: linear-gradient(transparent 55%, var(--marker) 55%); }
+.cmp-yours { font: 17px var(--font-hand); color: var(--ink-soft); margin: 0 0 8px; }
+.cmp-ink { border-left: 6px solid var(--ink); background: var(--card); border-radius: 0 var(--radius) var(--radius) 0; padding: 12px 16px; box-shadow: 0 2px 0 var(--ink); animation: cmp-in 260ms ease-out both; }
+.cmp-principle { font: 800 clamp(20px, 4.6vw, 26px)/1.25 var(--font-display); margin: 6px 0 4px; }
+.cmp-detail { font-size: 15px; line-height: 1.45; color: var(--ink-soft); margin: 6px 0 0; }
+@keyframes cmp-in { from { opacity: 0; transform: translateY(6px); } }
+@media (prefers-reduced-motion: reduce) { .cmp-ink { animation: none; } }

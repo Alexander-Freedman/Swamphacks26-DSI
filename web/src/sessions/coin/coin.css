@@ -191,3 +191,24 @@
   .coin-session .stamp, .coin-session .coin.fresh b { animation: none; }
   .coin-session .btn:active:not(:disabled), .coin-session .tap:active:not(:disabled) { transform: none; transition: none; }
 }
+
+/* #175: the cue to the guess after the deal; the keys hint only where there are keys */
+.coin-session .to-guess { background: var(--marker); color: var(--ink); }
+/* buttons new in this change: square-ish corners, no pills */
+.coin-session .to-guess, .coin-session .card-next .btn, .coin-session .cmp .btn { border-radius: var(--radius-ui, 4px); }
+@media (hover: none) and (pointer: coarse) { .coin-session .keyhint { display: none; } }
+.coin-session .card-next { justify-content: flex-end; margin-top: 18px; }
+
+/* compare step: a 50% shooter */
+.coin-session .shots { display: block; width: 100%; max-width: 440px; height: auto; margin: 10px 0 4px; }
+.coin-session .shots .shot-run { fill: var(--marker); }
+.coin-session .shots .made circle { fill: var(--ink); }
+.coin-session .shots .made path { stroke: var(--paper); stroke-width: 1.2; fill: none; }
+.coin-session .shots .missed circle { fill: var(--card); stroke: var(--ink); stroke-width: 1.6; }
+.coin-session .shots-legend { margin: 2px 0; }
+.coin-session .shots-legend i { width: 12px !important; height: 12px !important; border-radius: 50%; }
+.coin-session .sw-made { background: var(--ink); }
+.coin-session .sw-missed { border: 1.6px solid var(--ink); background: var(--card); }
+.coin-session .shots-legend .l-gap { width: 22px !important; border-radius: 4px; }
+.coin-session .cmp .coins { max-width: 440px; }
+@media (max-width: 600px) { .coin-session .cmp .coins { max-width: 260px; } }

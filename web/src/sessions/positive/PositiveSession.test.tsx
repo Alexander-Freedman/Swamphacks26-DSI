@@ -87,8 +87,30 @@ describe('positive test session', () => {
     expect(screen.getByText('False alarms are too rare to matter')).toBeTruthy()
     expect(screen.getByText('9.2%', { selector: '.pt-reality' })).toBeTruthy()
 
+    // compare (#183): a bag scanner next to your test, then name what's the same
+    fireEvent.click(screen.getByText('One more case →'))
+    expect(screen.getByText('One more case: airport bags')).toBeTruthy()
+    expect(screen.getByText("A bag scanner next to your test. Look at both: what's the same about how they work?")).toBeTruthy()
+    expect(screen.getByRole('button', { name: '6 Same idea, new case' }).getAttribute('aria-current')).toBe('step')
+    expect(container.textContent).toContain('99 / 2,097')
+    expect(container.textContent).toContain('4.7%')
+    expect(container.textContent).toContain('Illustrative numbers, not real airport data')
+    expect(screen.getByRole('img', { name: '2097 alarms: 99 real, 1998 false' })).toBeTruthy()
+    // the principle stays hidden until you answer, and so does the way on
+    expect(container.textContent).not.toContain('the shared idea')
+    expect(screen.queryByText('Rematch: new numbers →')).toBeNull()
+    fireEvent.change(screen.getByLabelText(/In your own words/), { target: { value: 'too many false alarms' } })
+    fireEvent.click(screen.getByRole('button', { name: /99% accurate, so an alarm is 99% real/ }))
+    expect(screen.getByText('Not quite.')).toBeTruthy()
+    expect(container.textContent).toContain('only 4.7% are real')
+    expect(screen.getByText('When the thing is rare, even a small false-alarm rate makes most alarms false.')).toBeTruthy()
+    expect(screen.getByText('You wrote: “too many false alarms”')).toBeTruthy()
+    // the right option is marked, the options are done
+    expect(screen.getByRole('button', { name: /Rare thing \+ small false-alarm rate/ }).className).toContain('right')
+    expect((screen.getByRole('button', { name: /Both tests are just bad/ }) as HTMLButtonElement).disabled).toBe(true)
+
     // P6: new numbers, nothing given away before you move the slider
-    fireEvent.click(screen.getByText('One more, new numbers →'))
+    fireEvent.click(screen.getByText('Rematch: new numbers →'))
     expect(screen.getByText('Same test, new numbers: does the idea stick?')).toBeTruthy()
     expect((screen.getByText('Move the slider first') as HTMLButtonElement).disabled).toBe(true)
     expect(container.textContent).not.toContain('27.9%')
@@ -103,7 +125,7 @@ describe('positive test session', () => {
     expect(container.querySelector('.ss-end')!.textContent).toContain('Caught: “False alarms are too rare to matter”. Rematch missed; it stays in your notebook to try again.')
     expect(screen.getByText('Open notebook').getAttribute('href')).toContain('?notebook=1')
     const saved = JSON.parse(localStorage.getItem('mm.sessions') ?? '[]')
-    expect(saved.at(-1)).toMatchObject({ session: 'positive-test', guess: 21, confidence: 'certain', misconception: 'ignores-false-alarms', rematch: 'wrong', rematchGuess: 60, rematchTruth: 27.9 })
+    expect(saved.at(-1)).toMatchObject({ session: 'positive-test', guess: 21, confidence: 'certain', misconception: 'ignores-false-alarms', rematch: 'wrong', rematchGuess: 60, rematchTruth: 27.9, comparePick: 'accuracy', compareRight: false, compareText: 'too many false alarms' })
     fireEvent.click(screen.getByText('Done'))
     expect(screen.getByText('You tested positive. Are you sick?')).toBeTruthy()
   })
@@ -196,7 +218,7 @@ describe('positive card and end bar (same shell as birthday)', () => {
     await toCard(9)
     expect(screen.getByText('Called it')).toBeTruthy()
     expect(screen.getByText("You called it. Here's the idea that makes it work, so you can do it again.")).toBeTruthy()
-    fireEvent.click(screen.getByText('One more, new numbers →'))
+    throughCompare()
     fireEvent.change(screen.getByLabelText("Chance you're actually sick?"), { target: { value: '100' } })
     fireEvent.click(screen.getByText('Lock it in'))
     expect(screen.getByText('Way off')).toBeTruthy()
@@ -221,7 +243,7 @@ describe('positive card and end bar (same shell as birthday)', () => {
     await toCard(30)
     expect(screen.queryByText('← back')).toBeNull()
     expect((screen.getByRole('button', { name: '1 Your guess' }) as HTMLButtonElement).disabled).toBe(true)
-    expect((screen.getByRole('button', { name: '6 Rematch' }) as HTMLButtonElement).disabled).toBe(true)
+    expect((screen.getByRole('button', { name: '7 Rematch' }) as HTMLButtonElement).disabled).toBe(true)
     expect(screen.getByRole('button', { name: '5 Your mistake' }).getAttribute('aria-current')).toBe('step')
     fireEvent.click(screen.getByRole('button', { name: '3 Your pile vs real' }))
     expect(screen.getByText('Your pile vs the real pile.')).toBeTruthy()
@@ -234,10 +256,18 @@ describe('positive card and end bar (same shell as birthday)', () => {
     vi.useFakeTimers()
     render(<Session onDone={() => {}} />)
     await toCard(9)
-    fireEvent.click(screen.getByText('One more, new numbers →'))
+    throughCompare()
     fireEvent.change(screen.getByLabelText("Chance you're actually sick?"), { target: { value: '13' } })
     fireEvent.click(screen.getByText('Lock it in'))
     // 13% is 14.9 points from 27.9%, inside the old window, but under half of it
     expect(screen.getByText('Way off')).toBeTruthy()
   })
 })
+
+// card → compare (pick the right option with key 3) → rematch
+function throughCompare() {
+  fireEvent.click(screen.getByText('One more case →'))
+  fireEvent.keyDown(window, { key: '3' })
+  expect(screen.getByText("That's it.")).toBeTruthy()
+  fireEvent.click(screen.getByText('Rematch: new numbers →'))
+}
