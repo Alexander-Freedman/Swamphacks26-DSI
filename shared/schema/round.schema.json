@@ -90,6 +90,32 @@
           "default": "",
           "title": "Y Label",
           "type": "string"
+        },
+        "ask_x": {
+          "anyOf": [
+            {
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "x the question asks about; the answer is the curve's y there",
+          "title": "Ask X"
+        },
+        "ask_y": {
+          "anyOf": [
+            {
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "y the question asks about; the answer is the x reaching it",
+          "title": "Ask Y"
         }
       },
       "required": [
@@ -180,6 +206,19 @@
           "default": 1,
           "title": "Step",
           "type": "number"
+        },
+        "default": {
+          "anyOf": [
+            {
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Value of param for the question as asked (curve exprs use it)",
+          "title": "Default"
         }
       },
       "required": [

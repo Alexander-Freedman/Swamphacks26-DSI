@@ -35,7 +35,7 @@ function MistakeCard({ c }: { c: Card }) {
       <h3 className="nb-label">“{c.label}”</h3>
       <p className="nb-meta">
         <span className="sr-only">{busted ? 'Busted. ' : 'Caught. '}</span>
-        Caught {c.caught === 1 ? 'once' : `${c.caught} times`} · last seen {when(c.lastSeen)}
+        Fell for it {c.caught === 1 ? 'once' : `${c.caught} times`} · last seen {when(c.lastSeen)}
       </p>
       <p className="nb-progress">
         {busted ? (

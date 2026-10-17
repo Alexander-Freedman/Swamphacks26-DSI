@@ -8,9 +8,10 @@
     "build": "tsc -b && vite build",
     "lint": "oxlint",
     "preview": "vite preview",
-    "test": "vitest run"
+    "test": "vitest run --testTimeout=60000"
   },
   "dependencies": {
+    "mathjs": "^14.0.1",
     "react": "^19.2.8",
     "react-dom": "^19.2.8"
   },

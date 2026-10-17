@@ -183,7 +183,7 @@ describe('Try any topic', () => {
     fireEvent.click(screen.getByRole('button', { name: 'Go' }))
     await waitFor(() => expect(here()).toBe(`${BASE}?round=tides`))
     expect(await screen.findByText(/Tides · 1 of 3/)).toBeTruthy()
-    expect(screen.getAllByText('auto-checked').some((el) => el.className.includes('chip'))).toBe(true)
+    expect(screen.getAllByText('auto-checked').some((el) => el.className.includes('checked-tag'))).toBe(true)
   })
 
   it('waits 45 s for a build before falling back', async () => {

@@ -57,7 +57,7 @@ describe('URL state', () => {
 
     fireEvent.click(screen.getByText('Shared birthdays'))
     expect(here()).toBe(`${BASE}?round=birthday`)
-    fireEvent.click(screen.getByText('mm'))
+    fireEvent.click(screen.getByText('Onionskin'))
     expect(here()).toBe(BASE)
   })
 
