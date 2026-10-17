@@ -117,8 +117,8 @@ export function SurfaceView({ view, setView, x0, y0, showX, showY }: { view: Vie
 
 /** One slice as a flat 2D curve, with the tangent at the point: its slope is the partial derivative. */
 export function SliceChart({ along, x0, y0 }: { along: 'x' | 'y'; x0: number; y0: number }) {
-  const w = 260
-  const h = 150
+  const w = 300
+  const h = 130
   const l = 28
   const sx = (u: number) => l + ((u + R) / (2 * R)) * (w - l - 10)
   const sy = (z: number) => h - 22 - (z / 3.2) * (h - 36)
@@ -182,15 +182,71 @@ export function SurfaceStep({ onDone, topic }: { onDone: () => void; topic: stri
 
   return (
     <section className="calc-surface">
-      <div className="calc-two calc-3d-wrap">
-        <div className="calc-card calc-tight">
+      <div className="calc-3d-layout">
+        <div className="calc-card calc-tight calc-3d-main">
           <div className="calc-k calc-pad">z = f(x, y) · drag to turn it</div>
           <SurfaceView view={view} setView={setView} x0={x0} y0={y0} showX={q >= 1} showY={q >= 2} />
           <p className="calc-pair">
             dot at x = <b className="calc-num">{x0.toFixed(1)}</b>, y = <b className="calc-num">{y0.toFixed(1)}</b> · height <b className="calc-box calc-num">{fz(x0, y0).toFixed(2)}</b>
           </p>
         </div>
-        <div className="calc-side calc-slices">
+        <div className="calc-3d-side">
+          {q < 2 && (
+            <div className="calc-card">
+              <div className="calc-k">question {q + 1} of 2</div>
+              <p className="calc-ask">{QS[q].ask}</p>
+              <div className="calc-picks calc-picks-row" role="group" aria-label="uphill, downhill or flat">
+                {DIRS.map((d) => (
+                  <button key={d} className={'calc-pick' + (wrong.includes(d) ? ' wrong' : '')} disabled={wrong.includes(d)} onClick={() => answer(d)}>
+                    {wrong.includes(d) && <span className="calc-mark" aria-hidden="true">✗</span>}
+                    {d}
+                  </button>
+                ))}
+              </div>
+              {note && <p className="calc-wrong" role="status"><b>✗</b> {note}</p>}
+              {q === 1 && !note && (
+                <p className="calc-correct" role="status">
+                  <span className="calc-check" aria-hidden="true">✓</span>
+                  <span><b>Correct!</b> The slice along x is just a 2D curve. Its slope at the dot is the partial derivative ∂f/∂x = {fx(START.x, START.y).toFixed(2)}: negative, so downhill.</span>
+                </p>
+              )}
+            </div>
+          )}
+
+          {q === 2 && (
+            <div className="calc-card">
+              {!flat ? (
+                <>
+                  <p className="calc-correct" role="status">
+                    <span className="calc-check" aria-hidden="true">✓</span>
+                    <span><b>Correct!</b> Along y the slope is ∂f/∂y = {fy(START.x, START.y).toFixed(2)}: positive, so uphill. Same point, two directions, two different slopes.</span>
+                  </p>
+                  <p className="calc-ask">Last one: move the dot to where <b>both</b> slices are flat.</p>
+                  <label className="calc-range">
+                    <span>x = {pt.x.toFixed(1)}</span>
+                    <input type="range" min={-R} max={R} step={0.1} value={pt.x} onChange={(e) => setPt((p) => ({ ...p, x: +e.target.value }))} aria-label="move the dot in x" />
+                  </label>
+                  <label className="calc-range">
+                    <span>y = {pt.y.toFixed(1)}</span>
+                    <input type="range" min={-R} max={R} step={0.1} value={pt.y} onChange={(e) => setPt((p) => ({ ...p, y: +e.target.value }))} aria-label="move the dot in y" />
+                  </label>
+                </>
+              ) : (
+                <>
+                  <p className="calc-correct" role="status">
+                    <span className="calc-check" aria-hidden="true">✓</span>
+                    <span><b>Correct!</b> Both partial derivatives are 0, so every direction is flat: you’re on top of the hill. That’s how you hunt for highest and lowest points in 3D.</span>
+                  </p>
+                  <p className="calc-rule">
+                    <span><span className="calc-hl">∂f/∂x</span> = slope of the slice along x.</span>
+                    <span><span className="calc-hl">∂f/∂y</span> = slope of the slice along y.</span>
+                    <span>Both 0 = a flat spot.</span>
+                  </p>
+                </>
+              )}
+            </div>
+          )}
+          <div className="calc-slices">
           {q >= 1 ? (
             <div className="calc-card calc-tight">
               <div className="calc-k calc-pad">slice along x (y = {y0.toFixed(1)})</div>
@@ -207,64 +263,9 @@ export function SurfaceStep({ onDone, topic }: { onDone: () => void; topic: stri
               <p className="calc-pair">∂f/∂y = <b className="calc-hl calc-num">{fy(x0, y0).toFixed(2)}</b> · {dirOf(fy(x0, y0))}</p>
             </div>
           )}
+          </div>
         </div>
       </div>
-
-      {q < 2 && (
-        <div className="calc-card">
-          <div className="calc-k">question {q + 1} of 2</div>
-          <p className="calc-ask">{QS[q].ask}</p>
-          <div className="calc-picks calc-picks-row" role="group" aria-label="uphill, downhill or flat">
-            {DIRS.map((d) => (
-              <button key={d} className={'calc-pick' + (wrong.includes(d) ? ' wrong' : '')} disabled={wrong.includes(d)} onClick={() => answer(d)}>
-                {wrong.includes(d) && <span className="calc-mark" aria-hidden="true">✗</span>}
-                {d}
-              </button>
-            ))}
-          </div>
-          {note && <p className="calc-wrong" role="status"><b>✗</b> {note}</p>}
-          {q === 1 && !note && (
-            <p className="calc-correct" role="status">
-              <span className="calc-check" aria-hidden="true">✓</span>
-              <span><b>Correct!</b> The slice along x is just a 2D curve. Its slope at the dot is the partial derivative ∂f/∂x = {fx(START.x, START.y).toFixed(2)}: negative, so downhill.</span>
-            </p>
-          )}
-        </div>
-      )}
-
-      {q === 2 && (
-        <div className="calc-card">
-          {!flat ? (
-            <>
-              <p className="calc-correct" role="status">
-                <span className="calc-check" aria-hidden="true">✓</span>
-                <span><b>Correct!</b> Along y the slope is ∂f/∂y = {fy(START.x, START.y).toFixed(2)}: positive, so uphill. Same point, two directions, two different slopes.</span>
-              </p>
-              <p className="calc-ask">Last one: move the dot to where <b>both</b> slices are flat.</p>
-              <label className="calc-range">
-                <span>x = {pt.x.toFixed(1)}</span>
-                <input type="range" min={-R} max={R} step={0.1} value={pt.x} onChange={(e) => setPt((p) => ({ ...p, x: +e.target.value }))} aria-label="move the dot in x" />
-              </label>
-              <label className="calc-range">
-                <span>y = {pt.y.toFixed(1)}</span>
-                <input type="range" min={-R} max={R} step={0.1} value={pt.y} onChange={(e) => setPt((p) => ({ ...p, y: +e.target.value }))} aria-label="move the dot in y" />
-              </label>
-            </>
-          ) : (
-            <>
-              <p className="calc-correct" role="status">
-                <span className="calc-check" aria-hidden="true">✓</span>
-                <span><b>Correct!</b> Both partial derivatives are 0, so every direction is flat: you’re on top of the hill. That’s how you hunt for highest and lowest points in 3D.</span>
-              </p>
-              <p className="calc-rule">
-                <span><span className="calc-hl">∂f/∂x</span> = slope of the slice along x.</span>
-                <span><span className="calc-hl">∂f/∂y</span> = slope of the slice along y.</span>
-                <span>Both 0 = a flat spot.</span>
-              </p>
-            </>
-          )}
-        </div>
-      )}
       {flat && (
         <div className="calc-end" role="status">
           <p>
