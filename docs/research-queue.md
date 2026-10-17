@@ -11,7 +11,7 @@ Direction is Mental Models, any-topic (Oct 16 ~9:50 PM). Hazard/Sperry questions
 3. Can question 1 run as its own parallel Gemini call, and what does that cost in quota? Does partial-JSON parsing of the stream hold up with our schema? → docs/research/demo.md
 3b. Real time-to-first-token on venue wifi vs a hotspot (time 20 random topics Sat, log in NOTES.md). → NOTES.md
 4. Does the `sketch` item fit in the #20 schema, and which misconception signal does it give per showcase topic? → docs/research/frontend-plan.md
-5. Which UF courses/clubs could we user-test with Saturday (5 people, 2 rounds), and what's on the task card? → plan-extras.md
+5. Who runs each test round (the driver can't also take notes), and does round 2 use the same task card or one changed from round 1's issues? → docs/plan-extras.md
 8. Which judging sheet do judges actually get: Devpost's 7 criteria or the rules page's 5? (Ask at the help desk.) → strategy.md.
 9. Cash split: the guide says among team members, the rules say four ways regardless of size. (Ask at the help desk.) → strategy.md, prizes.md.
 19. What goes on the table tent card and the 10-20 s attract loop? → expo-video.md
@@ -22,6 +22,7 @@ Direction is Mental Models, any-topic (Oct 16 ~9:50 PM). Hazard/Sperry questions
 17, 26, 27, 29 (Sperry/sensor questions); keep for reference only.
 
 ## Done
+- Saturday user testing plan: round 1 Sat lunch 1:30pm, round 2 dinner 8pm, WERT Lab Lobby; task card + log table → docs/plan-extras.md (also fixed meal times and nap slots there)
 - Base-rate card facts (Manrai 2014 14/61 correct; Gigerenzer & Hoffrage 16% vs 46%) and no study on longest-streak guesses → docs/research/showcase-facts.md
 - Showcase facts (coin streak DP: expected longest run 6.98, P(6+)=80.7%; Falk & Konold alternation .56-.63; Wason 22/29 wrong first; hypercorrection 87% vs 61%, modest r) → docs/research/showcase-facts.md
 - Live-topic latency budget: first question ≤5 s target, 15 s OK, 20 s cutoff to cached chips → docs/research/demo.md
