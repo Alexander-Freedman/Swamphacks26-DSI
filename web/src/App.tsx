@@ -1,5 +1,8 @@
 import { useMemo, useState } from 'react'
 import { Distribution } from './components/Distribution'
+import { NotebookLink, NotebookScreen } from './components/Notebook'
+import { wantsNotebook } from './notebook'
+import { useReset } from './reset'
 import { Predict, type Answer } from './components/Predict'
 import { showcaseRound, showcaseSlugs } from './rounds'
 import { sessionFor, sessions } from './sessions/registry'
@@ -32,6 +35,7 @@ function Home({ onPick, onSession }: { onPick: (slug: string) => void; onSession
           </button>
         ))}
       </div>
+      <NotebookLink />
     </div>
   )
 }
@@ -116,10 +120,16 @@ export default function App() {
   const round = useMemo(() => (slug ? showcaseRound(slug) : undefined), [slug])
   const [sessionSlug, setSessionSlug] = useState<string | null>(() => new URLSearchParams(location.search).get('session'))
   const session = sessionFor(sessionSlug)
+  const [nb, setNb] = useState(() => wantsNotebook(location.search))
   const home = () => {
     setSlug(null)
     setSessionSlug(null)
+    setNb(false)
   }
+  const cleared = useReset(!session && !round, () => {
+    if (nb) history.replaceState(null, '', import.meta.env.BASE_URL)
+    home()
+  })
   if (session) {
     return (
       <main className="app">
@@ -136,7 +146,8 @@ export default function App() {
         <button className="logo" style={{ border: 0, background: 'none', padding: 0 }} onClick={home}>mm</button>
         {round && <span className={`chip ${round.reviewed ? 'reviewed' : ''}`}>{round.reviewed ? 'reviewed' : 'auto-checked'}</span>}
       </header>
-      {round ? <Player key={round.slug} round={round} onDone={() => setSlug(null)} /> : <Home onPick={setSlug} onSession={setSessionSlug} />}
+      {cleared && <p className="nb-toast" role="status">Notebook cleared</p>}
+      {nb && !round ? <NotebookScreen /> : round ? <Player key={round.slug} round={round} onDone={() => setSlug(null)} /> : <Home onPick={setSlug} onSession={setSessionSlug} />}
     </main>
   )
 }
