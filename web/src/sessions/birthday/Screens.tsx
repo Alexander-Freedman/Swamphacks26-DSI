@@ -5,16 +5,12 @@ import { CurveChart } from './CurveChart'
 import { frameFor, ix, iy, sx, sy, useWidth } from './chart'
 import { coverage, lineFromGuess, needForMe, pairs, pct, pMatch, pMine, resample, X_MAX, X_MIN, type Pt } from './math'
 
-
-export type Confidence = 'unsure' | 'pretty sure' | 'certain'
-
 /* ---------- B1 guess ---------- */
-export function Guess({ onLock }: { onLock: (guess: number, conf: Confidence) => void }) {
+export function Guess({ onLock }: { onLock: (guess: number) => void }) {
   const [g, setG] = useState(100)
   const [touched, setTouched] = useState(false)
-  const [conf, setConf] = useState<Confidence | null>(null)
   const [locking, setLocking] = useState(false)
-  const ready = touched && conf != null
+  const ready = touched
   return (
     <div className="bday-card bday-guess">
       <p className="bday-ask">{ITEM.prompt}</p>
@@ -36,22 +32,16 @@ export function Guess({ onLock }: { onLock: (guess: number, conf: Confidence) =>
         }}
       />
       <div className="bday-ends"><span>2</span><span>183 (half the year)</span><span>366</span></div>
-      <div className="bday-tag bday-mt">how sure?</div>
-      <div className="bday-choices" role="group" aria-label="how sure are you">
-        {(['unsure', 'pretty sure', 'certain'] as Confidence[]).map((c) => (
-          <button key={c} className="bday-choice" aria-pressed={conf === c} onClick={() => setConf(c)}>{c}</button>
-        ))}
-      </div>
       <button
         className={'bday-btn bday-lock' + (locking ? ' bday-squash' : '')}
         disabled={!ready}
         onClick={() => {
           if (!ready || locking) return
           setLocking(true)
-          window.setTimeout(() => onLock(g, conf!), 260)
+          window.setTimeout(() => onLock(g), 260)
         }}
       >
-        {touched ? (conf ? 'Lock it in' : 'Pick how sure you are') : 'Move the slider first'}
+        {touched ? 'Show me' : 'Move the slider first'}
       </button>
     </div>
   )
@@ -175,7 +165,7 @@ export function Reveal({ guess, curve, skipped, onNext }: { guess: number; curve
 }
 
 /* ---------- B6 stamp + mistake card ---------- */
-const STAMP: Record<Verdict, string> = { called: 'Called it', close: 'Close', off: 'Way off' }
+const STAMP: Record<Verdict, string> = { called: 'Spot on', close: 'Close', off: 'Way off' }
 
 function Web({ full }: { full: boolean }) {
   const n = 23
@@ -204,7 +194,7 @@ function Web({ full }: { full: boolean }) {
   )
 }
 
-export function Card({ guess, conf, curve, skipped, onAgain, onNext }: { guess: number; conf: Confidence; curve: number[]; skipped: boolean; onAgain: () => void; onNext: () => void }) {
+export function Card({ guess, curve, skipped, onAgain, onNext }: { guess: number; curve: number[]; skipped: boolean; onAgain: () => void; onNext: () => void }) {
   const { v, m } = verdictOf(guess)
   const drewAt23 = Math.round(curve[TRUTH_N] * 100)
   return (
@@ -212,7 +202,7 @@ export function Card({ guess, conf, curve, skipped, onAgain, onNext }: { guess: 
       <div className="bday-stamprow">
         <span className={`bday-stamp bday-stamp-${v}`}>{STAMP[v]}</span>
         <p className="bday-said">
-          You said <b className="bday-pencil-c bday-num">{guess}</b> ({conf}). It's <span className="bday-hl bday-num"><b>{TRUTH_N}</b></span>.
+          You said <b className="bday-pencil-c bday-num">{guess}</b>. It's <span className="bday-hl bday-num"><b>{TRUTH_N}</b></span>.
         </p>
       </div>
       <div className="bday-card bday-mistake">
@@ -273,7 +263,7 @@ export function Rematch({ curve, skipped, onPick, picked }: { curve: number[]; s
         {[true, false].map((more) => (
           <button key={String(more)} className="bday-choice bday-bigchoice" aria-pressed={picked === more} disabled={picked != null} onClick={() => onPick(more)}>
             {more ? 'More likely than not' : 'Less likely than not'}
-            {picked === more && <span className={'bday-stamp bday-mini ' + (more === truthMore ? 'bday-stamp-called' : 'bday-stamp-off')}>{more === truthMore ? 'called it' : 'not quite'}</span>}
+            {picked === more && <span className={'bday-stamp bday-mini ' + (more === truthMore ? 'bday-stamp-called' : 'bday-stamp-off')}>{more === truthMore ? 'spot on' : 'not quite'}</span>}
           </button>
         ))}
       </div>

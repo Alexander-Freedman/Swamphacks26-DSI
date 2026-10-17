@@ -7,6 +7,16 @@ We help people understand concepts faster through **short, inherently visual ses
 
 The 10-stage concept-to-model pipeline is our inspiration, not a checklist. **Every change must serve this goal.** The session design is in [docs/experience.md](docs/experience.md).
 
+**Product rules (Sat ~1:05 PM, NOTES.md):**
+- Anyone types any topic (incl. orgo, calculus) and learns it **visually**. Every step is a visual you interact with (drag, draw, slide, build, watch it move); text is only short labels and captions. No step is a question plus a number box.
+- Typed topics always come back as an interactive visual; if the engine can't build one for a topic, show a visual it can make, never plain text.
+- No betting language (bet, "lock it in", "called it", confidence pickers) and no XP or points. At most a quiet "mastered" check per topic; keep the notebook of mistakes.
+- Truth is computed in code, never by a model.
+- Headline "See your thinking in layers.", subline "Type any topic. Watch it come alive."
+
+## UI
+- **No pill shapes:** buttons, chips, tags, toggles, pickers and toasts use a small 4px corner so they read as cards/stamps. Circles are fine for dots, coins and slider thumbs.
+
 ## 2. Plan every task before starting
 In the issue or PR, write:
 - **How it serves the goal:** how it helps someone understand a concept faster, visually. If you can't say how, skip the task.

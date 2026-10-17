@@ -138,3 +138,27 @@ export function CrowdCurve({ test, guess, cardBase }: { test: Test; guess: numbe
     </svg>
   )
 }
+
+/** Every alarm in a day as one dot: the real ones first in ink, then the false alarms in marker (compare step, #183). */
+export function AlarmArray({ real, falseAlarms }: { real: number; falseAlarms: number }) {
+  const total = real + falseAlarms
+  const cols = 70
+  const cell = 8
+  const r = 2.9
+  const rows = Math.ceil(total / cols)
+  let tp = ''
+  let fp = ''
+  for (let k = 0; k < total; k++) {
+    const cx = (k % cols) * cell + cell / 2
+    const cy = Math.floor(k / cols) * cell + cell / 2
+    const d = `M${cx - r} ${cy}a${r} ${r} 0 1 0 ${2 * r} 0a${r} ${r} 0 1 0 ${-2 * r} 0`
+    if (k < real) tp += d
+    else fp += d
+  }
+  return (
+    <svg className="pt-chart pt-alarms" viewBox={`0 0 ${cols * cell} ${rows * cell}`} role="img" aria-label={`${total} alarms: ${real} real, ${falseAlarms} false`}>
+      <path className="pt-dot fp" d={fp} />
+      <path className="pt-dot tp" d={tp} />
+    </svg>
+  )
+}
