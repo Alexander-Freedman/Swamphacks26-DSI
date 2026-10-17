@@ -1,0 +1,7 @@
+.cal { margin: 16px 0 0; }
+.cal svg { width: 100%; height: auto; display: block; }
+.cal-month { font-size: 11px; fill: var(--ink-soft); }
+.cal-empty { fill: var(--grid); }
+.cal-one { fill: var(--ink); }
+.cal-shared { fill: var(--marker); stroke: var(--ink); stroke-width: 2; animation: pop 300ms cubic-bezier(.3, 1.6, .5, 1) both; transform-box: fill-box; transform-origin: center; }
+.cal figcaption { margin-top: 8px; font-size: 0.9rem; }

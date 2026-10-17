@@ -33,8 +33,9 @@ export type CurveTruth = {
   x_label: string
   y_label: string
 }
+export type EstimateTruth = { widget: 'estimate'; unit?: string; source_url?: string | null }
 export type StepperTruth = { widget: 'stepper'; steps: string[]; source_url?: string | null }
-export type Truth = DistributionTruth | CurveTruth | StepperTruth
+export type Truth = DistributionTruth | CurveTruth | EstimateTruth | StepperTruth
 
 export type Band = { min: number; max: number; misconception_id: string | null }
 export type Option = { id: string; text: string; misconception_id: string | null }
@@ -47,6 +48,7 @@ export type Item = {
   options?: Option[]
   bands?: Band[]
   truth: Truth
+  answer_expr?: string | null
   answer_claimed?: number | null
   explore?: { param: string; label: string; min: number; max: number; step: number } | null
   targets?: string[]
