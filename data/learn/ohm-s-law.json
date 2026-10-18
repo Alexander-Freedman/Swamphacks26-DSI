@@ -111,5 +111,74 @@
       "correctBehavior": "That prediction can be wrong because the hot filament has higher resistance than its cool value. The constant-resistance version of Ohm's law applies only if the relevant resistance remains effectively constant."
     }
   ],
-  "visual": null
+  "visual": {
+    "widget": "curve",
+    "spec": {
+      "widget": "curve",
+      "approximate": false,
+      "variables": [],
+      "curve": {
+        "expr": "x/R",
+        "mode": "value",
+        "x_min": 0,
+        "x_max": 24,
+        "x_label": "voltage (volts)",
+        "y_label": "current (amperes)",
+        "ask_x": 12,
+        "ask_y": null,
+        "area_from": null,
+        "area_to": null,
+        "knob": {
+          "param": "R",
+          "label": "resistance (ohms)",
+          "min": 1,
+          "max": 24,
+          "step": 1,
+          "default": 6
+        }
+      },
+      "sampler": null,
+      "prediction": {
+        "prompt": "A 6-ohm resistor has 12 volts across it. How much current flows through it?",
+        "input": "slider",
+        "slider": {
+          "min": 0,
+          "max": 12,
+          "step": 0.5,
+          "unit": "A"
+        },
+        "options": []
+      },
+      "bands": [
+        {
+          "min": 0,
+          "max": 1,
+          "misconception_id": "resistance-consumes-current"
+        },
+        {
+          "min": 1.5,
+          "max": 2.5,
+          "misconception_id": null
+        },
+        {
+          "min": 3,
+          "max": 12,
+          "misconception_id": "voltage-is-current"
+        }
+      ],
+      "extremes": [
+        {
+          "param": "R",
+          "value": 1,
+          "watch": "At 1 ohm, 12 volts drives 12 amperes."
+        },
+        {
+          "param": "R",
+          "value": 24,
+          "watch": "At 24 ohms, the same 12 volts drives only half an ampere."
+        }
+      ],
+      "answer_claimed": 2.0
+    }
+  }
 }
