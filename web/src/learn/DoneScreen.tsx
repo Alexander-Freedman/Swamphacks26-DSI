@@ -24,7 +24,7 @@ export function DoneScreen({ topic, state, next }: StageProps) {
       transferVerdict: state.transferResult?.verdict ?? null,
     }
     // The notebook's Entry also wants rematch; label + topic let the card name the mistake.
-    upsert({ ...entry, rematch: null, label: m?.label, topic: topic.topic })
+    upsert({ ...entry, rematch: null, label: m?.label, topic: topic.topic, fix: m?.fix })
   }, [at, topic.slug, topic.topic, m, state.guess, state.stressHistory, state.drawVerdicts, state.transferResult])
 
   return (

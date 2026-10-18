@@ -15,3 +15,5 @@
 .lcs-more { margin-top: 8px; font-size: 0.85rem; }
 .lcs-more > summary { cursor: pointer; color: var(--ink-soft); }
 .lcs-more[open] > summary { margin-bottom: 6px; }
+.lcs-detail { margin: 0; padding-left: 18px; display: grid; gap: 4px; font-size: 0.85rem; line-height: 1.35; }
+.lcs-detail strong { font-weight: 700; }

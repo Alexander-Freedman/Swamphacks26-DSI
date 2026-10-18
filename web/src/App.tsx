@@ -23,6 +23,7 @@ import { useExtraRound } from './extras'
 import { misconceptionFor } from './verdict'
 import { LearnSession } from './learn/LearnSession'
 import { LearnTopicBox } from './learn/LearnTopicBox'
+import { learnForCard } from './learn/custom/registry'
 import { HOME, onScreenChange, pushScreen, readScreen, replaceScreen, type Screen } from './url'
 import './App.css'
 
@@ -52,7 +53,14 @@ function Home({
           {homeSessions.map((s, i) => {
             const art = artFor(s.slug)
             return (
-              <button key={s.slug} className={`showcase${art ? ' has-art' : ''}`} onClick={() => onSession(s.slug)}>
+              <button
+                key={s.slug}
+                className={`showcase${art ? ' has-art' : ''}`}
+                onClick={() => {
+                  const learn = learnForCard(s.slug)
+                  return learn ? onLearn(learn) : onSession(s.slug)
+                }}
+              >
                 {art && (
                   <img
                     className="card-art"
@@ -237,6 +245,9 @@ export default function App() {
       <main className="app">
         <header className="topbar">
           <button className="logo" style={{ border: 0, background: 'none', padding: 0 }} onClick={home}>Onionskin</button>
+          <div className="topbar-actions">
+            <AskHelp key={screen.slug} slug={screen.slug} kind="session" subject={screen.slug.replace(/-/g, ' ')} docked />
+          </div>
         </header>
         <LearnSession key={screen.slug} slug={screen.slug} onDone={home} />
       </main>

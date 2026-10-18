@@ -38,20 +38,20 @@ describe('notebook screen', () => {
     expect(location.search).toBe('')
   }, 20000)
 
-  it('empty state invites a session', () => {
+  it('empty state invites you to try any topic', () => {
     history.replaceState(null, '', `${BASE}?notebook=1`)
     render(<App />)
     expect(screen.getByText('Your notebook')).toBeTruthy()
     expect(screen.getByText('Nothing caught yet.')).toBeTruthy()
-    expect(screen.getByText('Start with organic chemistry').closest('a')?.getAttribute('href')).toBe(`${BASE}?session=orgo`)
+    expect(screen.getByText('Try any topic').closest('a')?.getAttribute('href')).toBe(BASE)
   })
 
-  it('empty state counts missed rematches and points at a session not played yet (#162)', () => {
+  it('empty state counts missed rematches and points at Try any topic (#162)', () => {
     record({ session: 'birthday', at: new Date().toISOString(), guess: 23, misconception: null, rematch: 'wrong' })
     history.replaceState(null, '', `${BASE}?notebook=1`)
     render(<App />)
     expect(screen.getByText(/You've played 1 session and your first guess called it \(1 rematch missed\)/)).toBeTruthy()
-    expect(screen.getByText('Next: Organic chemistry').closest('a')?.getAttribute('href')).toBe(`${BASE}?session=orgo`)
+    expect(screen.getByText('Try any topic').closest('a')?.getAttribute('href')).toBe(BASE)
   })
 
   it('shows a caught mistake in pencil', () => {
