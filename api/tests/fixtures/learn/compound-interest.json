@@ -102,17 +102,80 @@
     {
       "dimension": "many-periods",
       "scenario": "$1 at 5% a year, left alone for 500 years.",
-      "correctBehavior": "It grows to about $39 billion; with enough periods even a small rate overwhelms any flat yearly addition."
+      "correctBehavior": "It grows to about $39 billion; with enough periods even a small rate overwhelms any flat yearly addition.",
+      "predict": {
+        "question": "After 500 years, about how much is the $1 worth?",
+        "choices": [
+          {
+            "text": "About $26, the same 5 cents added every year",
+            "correct": false,
+            "misconceptionId": "simple-interest"
+          },
+          {
+            "text": "About $39 billion",
+            "correct": true,
+            "misconceptionId": null
+          },
+          {
+            "text": "$1.05, the interest is paid only once",
+            "correct": false,
+            "misconceptionId": "interest-paid-once"
+          }
+        ],
+        "piece": "interest earns interest, so more years means faster growth"
+      }
     },
     {
       "dimension": "zero-rate",
       "scenario": "$1,000 at 0% a year, left for 40 years.",
-      "correctBehavior": "The balance stays exactly $1,000; with nothing added there is nothing to compound."
+      "correctBehavior": "The balance stays exactly $1,000; with nothing added there is nothing to compound.",
+      "predict": {
+        "question": "What is the balance after 40 years?",
+        "choices": [
+          {
+            "text": "Exactly $1,000",
+            "correct": true,
+            "misconceptionId": null
+          },
+          {
+            "text": "A bit more, because 40 years is a long time",
+            "correct": false,
+            "misconceptionId": null
+          },
+          {
+            "text": "Much more, because time alone makes money grow",
+            "correct": false,
+            "misconceptionId": "rate-is-all-that-matters"
+          }
+        ],
+        "piece": "with a zero rate nothing is added, so nothing compounds"
+      }
     },
     {
       "dimension": "tiny-principal",
       "scenario": "One cent at 10% a year for 200 years.",
-      "correctBehavior": "It becomes about $1.9 million; the principal only scales the result, the growth factor comes from rate and time."
+      "correctBehavior": "It becomes about $1.9 million; the principal only scales the result, the growth factor comes from rate and time.",
+      "predict": {
+        "question": "What does the one cent grow to in 200 years?",
+        "choices": [
+          {
+            "text": "About 21 cents, a tenth of a cent each year",
+            "correct": false,
+            "misconceptionId": "simple-interest"
+          },
+          {
+            "text": "Still under a dollar, it started too small",
+            "correct": false,
+            "misconceptionId": null
+          },
+          {
+            "text": "About $1.9 million",
+            "correct": true,
+            "misconceptionId": null
+          }
+        ],
+        "piece": "the start only scales the result; rate and time set the growth"
+      }
     }
   ],
   "visual": {
