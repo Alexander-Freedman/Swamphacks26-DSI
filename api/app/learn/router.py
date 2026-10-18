@@ -252,7 +252,7 @@ async def _author_visual(topic: Topic) -> Visual | None:
             raw = await codex.run_json(
                 prompt, task="visual", schema=schema_file(VisualReply), timeout_s=timeout
             )
-            visual = _vet_visual(topic, VisualReply.model_validate(raw))
+            visual = _vet_visual(topic, validate_clipped(VisualReply, raw))
         except codex.CodexError as err:  # timeout or bad reply: no second try, keep the text topic
             log.warning("visual %s: dropped: %s", topic.slug, str(err)[:300])
             return None
