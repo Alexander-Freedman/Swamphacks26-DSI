@@ -121,5 +121,76 @@
       "correctBehavior": "The Sun stays above the horizon for about 24 hours, giving continuous daylight. Near the December solstice, the same place has a period when the Sun does not rise, the opposite seasonal extreme."
     }
   ],
-  "visual": null
+  "visual": {
+    "widget": "curve",
+    "spec": {
+      "widget": "curve",
+      "approximate": false,
+      "variables": [
+        {
+          "name": "L",
+          "meaning": "how far north the city is",
+          "unit": "°",
+          "value": 40
+        }
+      ],
+      "curve": {
+        "expr": "90 - L + T*sin(6.2832*(x - 80)/365)",
+        "mode": "value",
+        "x_min": 0,
+        "x_max": 365,
+        "x_label": "day of the year",
+        "y_label": "noon Sun height (°)",
+        "ask_x": 172,
+        "ask_y": null,
+        "area_from": null,
+        "area_to": null,
+        "knob": {
+          "param": "T",
+          "label": "Earth's tilt (°)",
+          "min": 0,
+          "max": 40,
+          "step": 0.5,
+          "default": 23.5
+        }
+      },
+      "sampler": null,
+      "prediction": {
+        "prompt": "A city 40° north of the equator. How high above the horizon is the Sun at noon on June 21?",
+        "input": "slider",
+        "slider": {
+          "min": 0,
+          "max": 90,
+          "step": 1,
+          "unit": "°"
+        },
+        "options": []
+      },
+      "bands": [
+        {
+          "min": 0,
+          "max": 62,
+          "misconception_id": "closer-means-summer"
+        },
+        {
+          "min": 63,
+          "max": 90,
+          "misconception_id": null
+        }
+      ],
+      "extremes": [
+        {
+          "param": "T",
+          "value": 0,
+          "watch": "With no tilt the noon Sun sits at 50° every day of the year: no seasons."
+        },
+        {
+          "param": "T",
+          "value": 40,
+          "watch": "At 40° of tilt the noon Sun swings from 10° in December to 90° in June."
+        }
+      ],
+      "answer_claimed": 73.5
+    }
+  }
 }
