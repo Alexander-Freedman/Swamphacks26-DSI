@@ -130,3 +130,6 @@ export const COURSES: CalcCourse[] = [
 
 export const SECTIONS: CalcSection[] = COURSES.flatMap((c) => c.sections)
 export const TOPICS: CalcTopic[] = SECTIONS.flatMap((s) => s.topics)
+
+/** What the Calculus card on Home opens: one path, no menu (plan Sat ~9:55 PM). */
+export const GUIDED: CalcTopic = { id: 'path', title: 'Slopes and areas', blurb: 'Sketch the slope, drag the tangent, fill the area.', steps: ['draw', 'tangent', 'area', 'card'], ready: true }

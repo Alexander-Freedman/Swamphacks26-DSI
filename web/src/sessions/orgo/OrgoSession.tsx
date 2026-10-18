@@ -10,8 +10,7 @@ import { ContrastStep } from './ContrastStep'
 import { MechStep } from './MechStep'
 import { MECHS } from './mechs'
 import { PushStep } from './PushStep'
-import { Thumb } from './Thumb'
-import { SECTIONS, type OrgoStep, type OrgoTopic } from './topics'
+import { GUIDED, type OrgoStep, type OrgoTopic } from './topics'
 import { reducedMotion } from './geom'
 import { sn2Layer } from './help'
 import './orgo.css'
@@ -32,6 +31,7 @@ const REMIX: Record<string, string> = {
   'build-ethanol': 'Next: push the electrons in a real mechanism.',
   sn2: 'Next: SN1, E2 and E1, worked out the same way.',
   full: 'Next time: a new molecule, a new nucleophile.',
+  path: 'Next: SN1, E2 and E1, or try any topic from Home.',
   sn1: 'Next: E1. Same carbocation, a different ending.',
   e1: 'Next: E2. A strong base skips the carbocation.',
   e2: 'Next: SN1. Weak nucleophile, same crowded carbon.',
@@ -40,50 +40,12 @@ const REMIX: Record<string, string> = {
 type M = keyof typeof MISTAKES
 const SIZE_SUB = (nu: string) => `Three questions decide the mechanism: how strong is the ${nu}, what kind of carbon holds the leaving group, and does the leaving group leave easily?`
 
-/** Orgo opens on a menu: pick a section and a topic, so practice is on purpose, not a fixed path. */
-export function OrgoSession({ onDone }: { onDone: () => void }) {
-  const [topic, setTopic] = useState<OrgoTopic | null>(null)
-  // a new key per pick remounts the steps, so every topic starts clean
-  const [play, setPlay] = useState(0)
-  const start = (t: OrgoTopic) => {
-    setTopic(t)
-    setPlay((p) => p + 1)
-  }
-  if (!topic) return <OrgoMenu onPick={start} />
-  return <OrgoTopicRun key={play} topic={topic} onTopics={() => setTopic(null)} onDone={onDone} />
+/** Orgo is one guided path straight from Home: build ethanol, then draw the SN2 arrows and scrub the reaction. */
+export function OrgoSession({ onDone, topic = GUIDED }: { onDone: () => void; topic?: OrgoTopic }) {
+  return <OrgoTopicRun topic={topic} onDone={onDone} />
 }
 
-function OrgoMenu({ onPick }: { onPick: (t: OrgoTopic) => void }) {
-  const title = useRef<HTMLHeadingElement>(null)
-  return (
-    <Frame className="orgo">
-      <div className="ss-head">
-        <span className="ss-chip">Orgo</span>
-      </div>
-      <Title h="What do you want to practice?" sub="Pick a section, then a topic." headingRef={title} />
-      <div className="og-menu">
-        {SECTIONS.map((s) => (
-          <section key={s.id} className="og-section" aria-labelledby={`og-sec-${s.id}`}>
-            <h3 id={`og-sec-${s.id}`} className="og-sec-title">{s.title}</h3>
-            <p className="og-sec-blurb">{s.blurb}</p>
-            <div className="og-topics">
-              {s.topics.map((t) => (
-                <button key={t.id} className="og-topic" disabled={!t.ready} onClick={() => onPick(t)} aria-describedby={`og-t-${t.id}`}>
-                  <Thumb topic={t.id} />
-                  <span className="og-topic-title">{t.title}</span>
-                  <span id={`og-t-${t.id}`} className="og-topic-blurb">{t.blurb}</span>
-                  {!t.ready && <span className="og-soon">coming next</span>}
-                </button>
-              ))}
-            </div>
-          </section>
-        ))}
-      </div>
-    </Frame>
-  )
-}
-
-function OrgoTopicRun({ topic, onTopics, onDone }: { topic: OrgoTopic; onTopics: () => void; onDone: () => void }) {
+function OrgoTopicRun({ topic, onDone }: { topic: OrgoTopic; onDone: () => void }) {
   const steps = topic.steps
   const [step, setStep] = useState(1)
   const [reached, setReached] = useState(1)
@@ -134,7 +96,6 @@ function OrgoTopicRun({ topic, onTopics, onDone }: { topic: OrgoTopic; onTopics:
   return (
     <Frame className="orgo">
       <SessionHead chip={`Orgo · ${topic.title}`} step={step} total={steps.length} labels={steps.map((s) => LABEL[s])} canGo={(i) => i < reached} onGo={(i) => go(i + 1)} layer={sn2Layer(topic.id, cur, step)} />
-      <button className="og-btn og-ghost og-back" onClick={onTopics}>← All orgo topics</button>
       <Title h={h} sub={sub} headingRef={title} />
       {/* steps stay mounted so going back keeps your molecule and your arrows */}
       {at('build') > 0 && reached >= at('build') && (

@@ -12,7 +12,7 @@ import { FINE, fineXs, pencilAt } from './slopeGeo'
 import { CalcEnd } from './CalcEnd'
 import { GradientStep } from './Gradient'
 import { SurfaceStep } from './Surface'
-import { COURSES, type CalcStep, type CalcTopic } from './topics'
+import { GUIDED, type CalcStep, type CalcTopic } from './topics'
 import { VolumeStep } from './Volume'
 import { slopeLayer } from './help'
 import './calculus.css'
@@ -34,59 +34,17 @@ const REMIX: Record<string, string> = {
   slope: 'Next: the area under the same curve.',
   area: 'Next: see how slope and area undo each other.',
   ftc: 'Next: the guided path, start to finish.',
+  path: 'Next: try any topic from Home.',
 }
 
 const slopeWord = (s: number) => (Math.abs(s) < 0.05 ? 'flat' : s > 0 ? 'uphill' : 'downhill')
 
-/** Calculus opens on a chapter menu, so practice is on purpose, not a fixed path. */
-export function CalculusSession({ onDone }: { onDone: () => void }) {
-  const [topic, setTopic] = useState<CalcTopic | null>(null)
-  // a new key per pick remounts the steps, so every chapter starts clean
-  const [play, setPlay] = useState(0)
-  const start = (t: CalcTopic) => {
-    setTopic(t)
-    setPlay((p) => p + 1)
-  }
-  if (!topic) return <CalcMenu onPick={start} />
-  return <CalcRun key={play} topic={topic} onTopics={() => setTopic(null)} onDone={onDone} />
+/** Calculus is one guided path straight from Home: sketch the slope, drag the tangent, fill the area, see what your pencil got wrong. */
+export function CalculusSession({ onDone, topic = GUIDED }: { onDone: () => void; topic?: CalcTopic }) {
+  return <CalcRun topic={topic} onDone={onDone} />
 }
 
-function CalcMenu({ onPick }: { onPick: (t: CalcTopic) => void }) {
-  const title = useRef<HTMLHeadingElement>(null)
-  return (
-    <Frame className="calc">
-      <div className="ss-head">
-        <span className="ss-chip">Calculus</span>
-      </div>
-      <Title h="What do you want to practice?" sub="Pick a course and a chapter, then a topic." headingRef={title} />
-      <div className="calc-menu">
-        {COURSES.map((c) => (
-          <section key={c.id} className="calc-course" aria-labelledby={`calc-c-${c.id}`}>
-            <h2 id={`calc-c-${c.id}`} className="calc-course-title">{c.title}</h2>
-            <p className="calc-sec-blurb">{c.blurb}</p>
-            {c.sections.map((s) => (
-              <div key={s.id} className="calc-section">
-                {c.sections.length > 1 && <h3 className="calc-sec-title">{s.title}</h3>}
-                {c.sections.length > 1 && <p className="calc-sec-blurb">{s.blurb}</p>}
-                <div className="calc-topics">
-                  {s.topics.map((t) => (
-                    <button key={t.id} className="calc-topic" disabled={!t.ready} onClick={() => onPick(t)} aria-describedby={`calc-t-${t.id}`}>
-                      <span className="calc-topic-title">{t.title}</span>
-                      <span id={`calc-t-${t.id}`} className="calc-topic-blurb">{t.blurb}</span>
-                      {!t.ready && <span className="calc-soon">coming next</span>}
-                    </button>
-                  ))}
-                </div>
-              </div>
-            ))}
-          </section>
-        ))}
-      </div>
-    </Frame>
-  )
-}
-
-function CalcRun({ topic, onTopics, onDone }: { topic: CalcTopic; onTopics: () => void; onDone: () => void }) {
+function CalcRun({ topic, onDone }: { topic: CalcTopic; onDone: () => void }) {
   const steps = topic.steps
   const [step, setStep] = useState(1)
   const [reached, setReached] = useState(1)
@@ -144,8 +102,7 @@ function CalcRun({ topic, onTopics, onDone }: { topic: CalcTopic; onTopics: () =
 
   return (
     <Frame className="calc">
-      <SessionHead chip={`Calculus · ${topic.title}`} step={step} total={steps.length} labels={steps.map((s) => LABEL[s])} canGo={canGo} onGo={(i) => go(i + 1)} layer={topic.id === 'slope' ? slopeLayer(cur, step, slope) : undefined} />
-      <button className="calc-btn calc-ghost calc-sm calc-back" onClick={onTopics}>← All calculus topics</button>
+      <SessionHead chip={`Calculus · ${topic.title}`} step={step} total={steps.length} labels={steps.map((s) => LABEL[s])} canGo={canGo} onGo={(i) => go(i + 1)} layer={topic.id === 'slope' || topic.id === 'path' ? slopeLayer(cur, step, slope) : undefined} />
       <Title h={h} sub={sub} headingRef={title} />
       {cur === 'draw' && (
         <DrawStep
