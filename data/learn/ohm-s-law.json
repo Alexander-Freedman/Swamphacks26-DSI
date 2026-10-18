@@ -98,17 +98,80 @@
     {
       "dimension": "applied-voltage",
       "scenario": "A 10-ohm resistor remains near room temperature. With 0 volts across it, then with 20 volts across it, compare the charge flow.",
-      "correctBehavior": "At 0 volts, no current flows through the resistor. At 20 volts, 2 amperes flow; if the voltage were doubled again without heating the resistor appreciably, the current would double again."
+      "correctBehavior": "At 0 volts, no current flows through the resistor. At 20 volts, 2 amperes flow; if the voltage were doubled again without heating the resistor appreciably, the current would double again.",
+      "predict": {
+        "question": "What happens to the current at 0 volts and then at 20 volts?",
+        "choices": [
+          {
+            "text": "At 0 volts, no current flows. At 20 volts, 2 amperes flow.",
+            "correct": true,
+            "misconceptionId": null
+          },
+          {
+            "text": "At 20 volts, 20 amperes flows, since volts tell you the current.",
+            "correct": false,
+            "misconceptionId": "voltage-is-current"
+          },
+          {
+            "text": "At 0 volts a little current still trickles. At 20 volts, 2 amperes flow.",
+            "correct": false,
+            "misconceptionId": null
+          }
+        ],
+        "piece": "more voltage causes proportionally more current"
+      }
     },
     {
       "dimension": "resistance-value",
       "scenario": "A 12-volt source is connected first to a 1,000,000-ohm resistor and then to a 1-ohm resistor, one at a time. Assume the source can maintain 12 volts for this comparison.",
-      "correctBehavior": "The 1,000,000-ohm resistor carries only 0.000012 amperes, while the 1-ohm resistor carries 12 amperes. In a real circuit, such a low resistance may make the source voltage sag or wires heat, so their resistance can no longer be ignored."
+      "correctBehavior": "The 1,000,000-ohm resistor carries only 0.000012 amperes, while the 1-ohm resistor carries 12 amperes. In a real circuit, such a low resistance may make the source voltage sag or wires heat, so their resistance can no longer be ignored.",
+      "predict": {
+        "question": "Which resistor carries more current from the 12-volt source?",
+        "choices": [
+          {
+            "text": "Both carry 12 amperes because the source is 12 volts.",
+            "correct": false,
+            "misconceptionId": "voltage-is-current"
+          },
+          {
+            "text": "The 1,000,000-ohm resistor carries 0.000012 amperes, the 1-ohm one carries 12 amperes.",
+            "correct": true,
+            "misconceptionId": null
+          },
+          {
+            "text": "The 1,000,000-ohm resistor carries more current because it resists more.",
+            "correct": false,
+            "misconceptionId": null
+          }
+        ],
+        "piece": "more resistance causes less current at the same voltage"
+      }
     },
     {
       "dimension": "temperature-stability",
       "scenario": "A small lamp filament is connected to a battery and becomes much hotter while it glows. Its resistance is measured when cool and then assumed unchanged to predict its hot current.",
-      "correctBehavior": "That prediction can be wrong because the hot filament has higher resistance than its cool value. The constant-resistance version of Ohm's law applies only if the relevant resistance remains effectively constant."
+      "correctBehavior": "That prediction can be wrong because the hot filament has higher resistance than its cool value. The constant-resistance version of Ohm's law applies only if the relevant resistance remains effectively constant.",
+      "predict": {
+        "question": "Will the cool resistance value predict the lamp's hot current correctly?",
+        "choices": [
+          {
+            "text": "Yes, every component keeps the same resistance as it heats.",
+            "correct": false,
+            "misconceptionId": "ohms-law-always-applies"
+          },
+          {
+            "text": "It predicts too much current, because the hot filament has lower resistance.",
+            "correct": false,
+            "misconceptionId": null
+          },
+          {
+            "text": "It can be wrong, because the hot filament has higher resistance.",
+            "correct": true,
+            "misconceptionId": null
+          }
+        ],
+        "piece": "heating can change resistance, so the prediction can fail"
+      }
     }
   ],
   "visual": {
@@ -169,13 +232,18 @@
       "extremes": [
         {
           "param": "R",
-          "value": 1,
-          "watch": "At 1 ohm, 12 volts drives 12 amperes."
+          "value": 10,
+          "watch": "At 10 ohms, current = volts ÷ 10: 0 amperes at 0 volts, 1.2 at 12 volts, 2 at 20 volts. A straight line through zero."
+        },
+        {
+          "param": "R",
+          "value": 1000000,
+          "watch": "At 1,000,000 ohms, 12 volts pushes just 0.000012 amperes; at 1 ohm the same 12 volts drives 12 amperes."
         },
         {
           "param": "R",
           "value": 24,
-          "watch": "At 24 ohms, the same 12 volts drives only 0.5 amperes."
+          "watch": "Hot, the filament's resistance climbs: at 24 ohms, 12 volts drives 0.5 amperes, a quarter of the 2 amperes at a cool 6 ohms."
         }
       ],
       "answer_claimed": 2.0
