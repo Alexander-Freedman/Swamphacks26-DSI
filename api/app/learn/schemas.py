@@ -29,10 +29,19 @@ class Strict(BaseModel):
 # ---------------------------------------------------------------------------
 # Topic JSON
 # ---------------------------------------------------------------------------
+class CaseCurve(Strict):
+    """A contrast card's own tiny curve (web/src/learn/contrast-visual), drawn in code."""
+
+    expr: str | None = Field(default=None, max_length=200)
+    knobs: dict[str, float] | None = None
+    label: str | None = Field(default=None, max_length=60)
+
+
 class ContrastingCase(Strict):
     label: str = Field(max_length=80)
     detail: str = Field(max_length=1200)
     oneLine: str = Field(max_length=140)
+    curve: CaseCurve | None = None
 
 
 class ExtremeCaseDimension(Strict):
