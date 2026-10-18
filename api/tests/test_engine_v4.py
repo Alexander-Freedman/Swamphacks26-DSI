@@ -481,6 +481,9 @@ def test_api_returns_spec_round_and_caches(live_gen) -> None:
         },
     )
     assert res.status_code == 200 and res.json()["misconception_id"] is None
+    # A deep link to the generated slug loads it.
+    got = client.get(f"/api/rounds/{first['round']['slug']}")
+    assert got.status_code == 200 and got.json()["slug"] == first["round"]["slug"]
 
 
 def test_gibberish_never_gets_a_round(live_gen) -> None:
