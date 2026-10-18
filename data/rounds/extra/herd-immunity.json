@@ -1,0 +1,114 @@
+{
+  "schema_version": 1,
+  "slug": "herd-immunity",
+  "topic": "Herd immunity",
+  "concept": "A disease stops spreading once each sick person infects fewer than one new person on average, which needs a share of 1 - 1/R0 to be immune.",
+  "reviewed": true,
+  "misconceptions": [
+    {
+      "id": "half-is-enough",
+      "label": "Half the people is enough",
+      "why_tempting": "Protecting a majority sounds like it should stop an outbreak.",
+      "refutation": "With R0 = 4 each case still causes 2 new ones when half are immune; spread only stops when each case causes under 1, at 1 - 1/4 = 75% immune.",
+      "source_url": "https://en.wikipedia.org/wiki/Herd_immunity",
+      "source_note": "Page states the 1 - 1/R0 threshold; that this mistake is common is unverified"
+    },
+    {
+      "id": "everyone-needed",
+      "label": "Everyone has to be vaccinated",
+      "why_tempting": "It feels like any unprotected person keeps the disease alive.",
+      "refutation": "Once each sick person infects fewer than one other on average, outbreaks die out even though some people aren't immune: for R0 = 4 that's 75%, not 100%.",
+      "source_url": "https://en.wikipedia.org/wiki/Herd_immunity",
+      "source_note": "Page states the 1 - 1/R0 threshold; that this mistake is common is unverified"
+    }
+  ],
+  "items": [
+    {
+      "id": "model",
+      "prompt": "In a group where nobody is immune, each sick person passes a disease to 4 others (R0 = 4). With a vaccine that always works, what share of people must be vaccinated so the disease stops spreading?",
+      "input_type": "slider",
+      "slider": {
+        "min": 0.0,
+        "max": 100.0,
+        "step": 5.0,
+        "unit": "%"
+      },
+      "options": [],
+      "bands": [
+        {
+          "min": 0.0,
+          "max": 60.0,
+          "misconception_id": "half-is-enough"
+        },
+        {
+          "min": 65.0,
+          "max": 85.0,
+          "misconception_id": null
+        },
+        {
+          "min": 90.0,
+          "max": 100.0,
+          "misconception_id": "everyone-needed"
+        }
+      ],
+      "sketch_rules": [],
+      "truth": {
+        "widget": "curve",
+        "expr": "100 * (1 - 1 / x) / e",
+        "preset": null,
+        "x_min": 1.0,
+        "x_max": 18.0,
+        "x_label": "R0: people one sick person infects when nobody is immune",
+        "y_label": "% who must be vaccinated",
+        "ask_x": 4.0,
+        "ask_y": null,
+        "show": null,
+        "area_from": null,
+        "area_to": null
+      },
+      "answer_expr": "75.0",
+      "answer_claimed": 75.0,
+      "explore": {
+        "param": "e",
+        "label": "vaccine effectiveness",
+        "min": 0.8,
+        "max": 1.0,
+        "step": 0.05,
+        "default": 1.0
+      },
+      "targets": [
+        "everyone-needed",
+        "half-is-enough"
+      ],
+      "variables": [],
+      "extremes": [
+        {
+          "param": "e",
+          "value": 0.8,
+          "watch": "a vaccine that works 80% of the time: the bar goes up",
+          "truth_value": 93.75
+        },
+        {
+          "param": "e",
+          "value": 1.0,
+          "watch": "a vaccine that always works",
+          "truth_value": 75.0
+        }
+      ],
+      "truth_value": 75.0,
+      "computed": true,
+      "approximate": false
+    }
+  ],
+  "spec_version": 4,
+  "compare": null,
+  "aliases": [
+    "herd immunity",
+    "how do vaccines create herd immunity",
+    "vaccines herd immunity",
+    "herd immunity threshold",
+    "vaccination threshold",
+    "r0",
+    "basic reproduction number"
+  ]
+}

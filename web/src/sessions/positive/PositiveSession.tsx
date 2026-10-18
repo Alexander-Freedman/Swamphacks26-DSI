@@ -2,9 +2,9 @@ import { useEffect, useMemo, useRef, useState } from 'react'
 import { labelFor } from '../../notebook'
 import { showcaseRound } from '../../rounds'
 import { misconceptionFor } from '../../verdict'
-import { ConfidencePicker, EndBar, Frame, LockButton, SessionHead, StampRow, Title } from '../../components/session/Shell'
+import { EndBar, Frame, LockButton, SessionHead, StampRow, Title } from '../../components/session/Shell'
 import { Compare, type CompareAnswer, type CompareOption } from '../../components/session/Compare'
-import { cardGuide, lockLabel, type Confidence } from '../../components/session/copy'
+import { cardGuide, lockLabel } from '../../components/session/copy'
 import { rematchVerdict, shellVerdict } from '../../components/session/verdict'
 import { useNotebookEntry } from '../../components/session/entry'
 import { AlarmArray, CrowdCurve, GuessBar, MiniPile, PileCompare } from './Charts'
@@ -47,7 +47,6 @@ export function PositiveSession({ onDone }: { onDone: () => void }) {
   }
   const [guess, setGuess] = useState(50)
   const [touched, setTouched] = useState(false)
-  const [conf, setConf] = useState<Confidence | null>(null)
   const [sketch, setSketch] = useState<Brush[]>(() => Array(POP).fill(0))
   const painted = useMemo(() => ({ sick: sketch.filter((v) => v === 1).length, healthy: sketch.filter((v) => v === 2).length }), [sketch])
 
@@ -93,8 +92,6 @@ export function PositiveSession({ onDone }: { onDone: () => void }) {
           guess={guess}
           touched={touched}
           setGuess={(v) => (setGuess(v), setTouched(true))}
-          conf={conf}
-          setConf={setConf}
           sketch={sketch}
           setSketch={setSketch}
           painted={painted}
@@ -107,12 +104,11 @@ export function PositiveSession({ onDone }: { onDone: () => void }) {
       {step === 5 && (
         <CardStep
           guess={guess}
-          conf={conf ?? 'pretty sure'}
           truth={truth}
           test={test}
           round={round}
           item={item}
-          onShown={() => entry.atCard({ guess, confidence: conf ?? undefined, misconception: misconceptionId(item, guess) })}
+          onShown={() => entry.atCard({ guess, misconception: misconceptionId(item, guess) })}
           onNext={() => go(6)}
         />
       )}
@@ -141,14 +137,12 @@ function GuessStep(props: {
   guess: number
   touched: boolean
   setGuess: (v: number) => void
-  conf: Confidence | null
-  setConf: (c: Confidence) => void
   sketch: Brush[]
   setSketch: (f: (s: Brush[]) => Brush[]) => void
   painted: { sick: number; healthy: number }
   onLock: () => void
 }) {
-  const { test, guess, touched, setGuess, conf, setConf, sketch, setSketch, painted, onLock } = props
+  const { test, guess, touched, setGuess, sketch, setSketch, painted, onLock } = props
   const [brush, setBrush] = useState<Brush>(1)
   const paint = (i: number) => setSketch((s) => (s[i] === brush ? s : s.map((v, k) => (k === i ? brush : v))))
   const add = (kind: 1 | 2, n: number) =>
@@ -180,12 +174,11 @@ function GuessStep(props: {
         <label className="pt-lab" htmlFor="pt-guess">Chance you're actually sick?</label>
         <div className="pt-row">
           <span className="pt-guessval" aria-live="polite">{touched ? `${guess}%` : '?'}</span>
-          <span className="pt-note">gut call, in pencil</span>
+          <span className="pt-note">your guess, in pencil</span>
         </div>
         <input id="pt-guess" type="range" min={0} max={100} step={1} value={guess} onChange={(e) => setGuess(+e.target.value)} />
         <div className="pt-ends"><span>0%</span><span>50%</span><span>100%</span></div>
-        <ConfidencePicker value={conf} onPick={setConf} />
-        <LockButton ready={touched && conf != null} onLock={onLock}>{lockLabel(touched, conf)}</LockButton>
+        <LockButton ready={touched} onLock={onLock}>{lockLabel(touched)}</LockButton>
       </div>
 
       <details className="pt-card pt-sketch">
@@ -431,7 +424,6 @@ const misconceptionId = (item: ItemT, guess: number) => misconceptionFor(item, {
 
 type CardProps = {
   guess: number
-  conf: Confidence
   truth: number
   test: Test
   round: NonNullable<ReturnType<typeof showcaseRound>>
@@ -440,7 +432,7 @@ type CardProps = {
   onNext: () => void
 }
 
-function CardStep({ guess, conf, truth, test, round, item, onShown, onNext }: CardProps) {
+function CardStep({ guess, truth, test, round, item, onShown, onNext }: CardProps) {
   // Saved when the card shows (#159); the rematch updates this same entry. The hook saves once per play.
   const shown = useRef(onShown)
   useEffect(() => shown.current(), [])
@@ -453,7 +445,7 @@ function CardStep({ guess, conf, truth, test, round, item, onShown, onNext }: Ca
     <section>
       <StampRow v={v}>
         <p>
-          You said <b className="pt-pencil-c pt-num">{guess}%</b> ({conf}). It's
+          You said <b className="pt-pencil-c pt-num">{guess}%</b>. It's
         </p>
         <span className="pt-reality pt-num">{exact(truth)}</span>
       </StampRow>
@@ -541,7 +533,7 @@ function RematchStep({ onReveal, caught, onDone }: { onReveal: (g: number) => vo
               onReveal(g)
             }}
           >
-            {moved ? 'Lock it in' : 'Move the slider first'}
+            {lockLabel(moved)}
           </LockButton>
         )}
       </div>

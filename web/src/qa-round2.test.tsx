@@ -89,17 +89,17 @@ describe('topic matching (#167)', () => {
     await waitFor(() => expect(here()).toBe(`${BASE}?session=birthday`))
   }, 15000)
 
-  it('a miss offers the three sessions first, and a session chip opens the session', async () => {
+  it('a miss offers the subject sessions first, and a session chip opens the session', async () => {
     render(<App />)
     await screen.findByRole('button', { name: 'Sums of dice' })
     fireEvent.change(screen.getByLabelText(/topic you want/), { target: { value: 'quantum tunnelling' } })
     fireEvent.click(screen.getByRole('button', { name: 'Go' }))
     await screen.findByText(/No round on “quantum tunnelling” yet/)
     const chips = [...screen.getByRole('group', { name: 'Hand-checked topics' }).querySelectorAll('button')].map((b) => b.textContent)
-    expect(chips.slice(0, 3)).toEqual(['The birthday problem', 'Be a coin', 'You tested positive. Are you sick?'])
+    expect(chips.slice(0, 2)).toEqual(['Organic chemistry', 'Calculus'])
     expect(chips).toContain('Sums of dice')
-    fireEvent.click(screen.getByRole('button', { name: 'Be a coin' }))
-    await waitFor(() => expect(here()).toBe(`${BASE}?session=coin-streak`))
+    fireEvent.click(screen.getByRole('button', { name: 'Calculus' }))
+    await waitFor(() => expect(here()).toBe(`${BASE}?session=calculus`))
   })
 })
 
@@ -108,19 +108,18 @@ describe('notebook next step (#169)', () => {
     record({ session: 'birthday', at: new Date().toISOString(), guess: 23, confidence: 'certain', misconception: null, rematch: 'right' })
     history.replaceState(null, '', `${BASE}?notebook=1`)
     render(<App />)
-    expect(screen.queryByText('Start with the birthday problem')).toBeNull()
-    expect(screen.getByText('Next: Be a coin').closest('a')?.getAttribute('href')).toBe(`${BASE}?session=coin-streak`)
+    expect(screen.queryByText('Start with organic chemistry')).toBeNull()
+    expect(screen.getByText('Next: Organic chemistry').closest('a')?.getAttribute('href')).toBe(`${BASE}?session=orgo`)
   })
 })
 
 describe('round misses in the notebook (#172)', () => {
   const lockSlider = (value: number) => {
     fireEvent.change(screen.getByLabelText('your guess'), { target: { value: String(value) } })
-    fireEvent.click(screen.getByRole('button', { name: 'certain' }))
-    fireEvent.click(screen.getByRole('button', { name: 'Lock it in' }))
+    fireEvent.click(screen.getByRole('button', { name: 'Show me' }))
   }
 
-  it('a sure-and-wrong miss is saved right away and its card links back to the round', async () => {
+  it('a big miss is saved right away and its card links back to the round', async () => {
     history.replaceState(null, '', `${BASE}?round=monty-hall`)
     render(<App />)
     await screen.findByText(/The Monty Hall problem · 1 of 3/)
@@ -128,7 +127,7 @@ describe('round misses in the notebook (#172)', () => {
     expect(await screen.findByText(/Keep this one\./)).toBeTruthy()
     const saved = entries()
     expect(saved).toHaveLength(1)
-    expect(saved[0]).toMatchObject({ session: 'monty-hall', kind: 'round', misconception: 'two-doors-fifty-fifty', rematch: null, confidence: 'certain', guess: 46 })
+    expect(saved[0]).toMatchObject({ session: 'monty-hall', kind: 'round', misconception: 'two-doors-fifty-fifty', rematch: null, guess: 46 })
     const [card] = notebook()
     expect(card).toMatchObject({ session: 'monty-hall', label: 'Two doors left means 50/50', topic: 'The Monty Hall problem', href: `${BASE}?round=monty-hall` })
     cleanup()

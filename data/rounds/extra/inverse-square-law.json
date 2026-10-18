@@ -1,0 +1,113 @@
+{
+  "schema_version": 1,
+  "slug": "inverse-square-law",
+  "topic": "The inverse-square law",
+  "concept": "geometry of spreading",
+  "reviewed": true,
+  "misconceptions": [
+    {
+      "id": "inverse-not-square",
+      "label": "Four times farther, a quarter as bright",
+      "why_tempting": "Brightness dropping with distance sounds like a simple ratio.",
+      "refutation": "Light spreads over an area that grows with distance squared: 4 times farther is 16 times dimmer.",
+      "source_url": "https://en.wikipedia.org/wiki/Inverse-square_law",
+      "source_note": "Page states the correct model; that this mistake is common is unverified"
+    },
+    {
+      "id": "linear-falloff",
+      "label": "Drops a little each meter",
+      "why_tempting": "It feels like brightness fades by a fixed amount per meter.",
+      "refutation": "It falls off with the square of distance, so it fades fast: 16/4^2 = 1.",
+      "source_url": "https://en.wikipedia.org/wiki/Inverse-square_law",
+      "source_note": "Page states the correct model; that this mistake is common is unverified"
+    }
+  ],
+  "items": [
+    {
+      "id": "model",
+      "prompt": "A lamp measures brightness 16 at 1 meter away. How bright does it measure at 4 meters?",
+      "input_type": "slider",
+      "slider": {
+        "min": 0.0,
+        "max": 16.0,
+        "step": 0.5,
+        "unit": "units"
+      },
+      "options": [],
+      "bands": [
+        {
+          "min": 0.0,
+          "max": 1.5,
+          "misconception_id": null
+        },
+        {
+          "min": 2.0,
+          "max": 6.0,
+          "misconception_id": "inverse-not-square"
+        },
+        {
+          "min": 6.5,
+          "max": 16.0,
+          "misconception_id": "linear-falloff"
+        }
+      ],
+      "sketch_rules": [],
+      "truth": {
+        "widget": "curve",
+        "expr": "k / (x^2)",
+        "preset": null,
+        "x_min": 1.0,
+        "x_max": 10.0,
+        "x_label": "distance (m)",
+        "y_label": "intensity",
+        "ask_x": 4.0,
+        "ask_y": null,
+        "show": null,
+        "area_from": null,
+        "area_to": null
+      },
+      "answer_expr": "1.0",
+      "answer_claimed": 1.0,
+      "explore": {
+        "param": "k",
+        "label": "source strength",
+        "min": 1.0,
+        "max": 100.0,
+        "step": 1.0,
+        "default": 16.0
+      },
+      "targets": [
+        "inverse-not-square",
+        "linear-falloff"
+      ],
+      "variables": [],
+      "extremes": [
+        {
+          "param": "k",
+          "value": 100.0,
+          "watch": "At 4 m it's k/16 = 6.25.",
+          "truth_value": 6.25
+        },
+        {
+          "param": "k",
+          "value": 1.0,
+          "watch": "A weak source (k = 1) is down to 1/16 = 0.0625 at 4 m.",
+          "truth_value": 0.0625
+        }
+      ],
+      "truth_value": 1.0,
+      "computed": true,
+      "approximate": false
+    }
+  ],
+  "spec_version": 4,
+  "compare": null,
+  "aliases": [
+    "inverse square law",
+    "inverse-square law",
+    "light intensity and distance",
+    "brightness and distance",
+    "how light fades with distance",
+    "gravity and distance"
+  ]
+}

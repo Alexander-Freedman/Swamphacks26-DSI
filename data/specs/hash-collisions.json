@@ -1,0 +1,109 @@
+{
+  "aliases": [
+    "hash collisions",
+    "hash collision",
+    "birthday attack",
+    "id collisions",
+    "random id collisions",
+    "uuid collisions",
+    "collision probability"
+  ],
+  "spec": {
+    "spec_version": 4,
+    "slug": "hash-collisions",
+    "topic": "Hash collisions",
+    "concept": "With n random IDs from N choices, the chance of a repeat grows with n squared, so collisions come far sooner than n/N suggests.",
+    "definition": "A hash collision is when two different inputs get the same hash value or ID.",
+    "case": {
+      "widget": "curve",
+      "approximate": false,
+      "variables": [],
+      "curve": {
+        "expr": "100 * (1 - exp(-x^2 / (2 * N)))",
+        "mode": "value",
+        "x_min": 0,
+        "x_max": 3000,
+        "x_label": "number of random IDs",
+        "y_label": "chance of a repeat (%)",
+        "ask_x": 1000.0,
+        "ask_y": null,
+        "area_from": null,
+        "area_to": null,
+        "knob": {
+          "param": "N",
+          "label": "possible IDs",
+          "min": 100000,
+          "max": 10000000,
+          "step": 100000,
+          "default": 1000000
+        }
+      },
+      "sampler": null,
+      "prediction": {
+        "prompt": "You give 1,000 files random IDs drawn from 1,000,000 possible IDs. What is the chance at least two files share an ID?",
+        "input": "slider",
+        "slider": {
+          "min": 0,
+          "max": 100,
+          "step": 1,
+          "unit": "%"
+        },
+        "options": []
+      },
+      "bands": [
+        {
+          "min": 0,
+          "max": 5,
+          "misconception_id": "linear-guess"
+        },
+        {
+          "min": 6,
+          "max": 24,
+          "misconception_id": "linear-guess"
+        },
+        {
+          "min": 25,
+          "max": 55,
+          "misconception_id": null
+        },
+        {
+          "min": 56,
+          "max": 100,
+          "misconception_id": "certain"
+        }
+      ],
+      "extremes": [
+        {
+          "param": "N",
+          "value": 100000,
+          "watch": "With only 100,000 possible IDs, a repeat among 1,000 files is almost certain (99.3%)."
+        },
+        {
+          "param": "N",
+          "value": 10000000,
+          "watch": "With 10 million possible IDs the chance drops to about 4.9%."
+        }
+      ],
+      "answer_claimed": 39.35
+    },
+    "misconceptions": [
+      {
+        "id": "linear-guess",
+        "label": "1,000 out of a million is tiny",
+        "why_tempting": "1,000 IDs fill only 0.1% of the space, so a clash feels near impossible.",
+        "refutation": "Every pair can clash: 1,000 IDs make about 500,000 pairs, so the chance is about 39%.",
+        "source_url": "https://en.wikipedia.org/wiki/Birthday_attack",
+        "source_note": "Page states the correct model; that this mistake is common is unverified"
+      },
+      {
+        "id": "certain",
+        "label": "Collisions are basically certain",
+        "why_tempting": "After hearing about the birthday paradox, it's tempting to overshoot.",
+        "refutation": "With 1,000 IDs it's about 39%; it passes 50% around 1,180 IDs.",
+        "source_url": "https://en.wikipedia.org/wiki/Birthday_attack",
+        "source_note": "Page states the correct model; that this mistake is common is unverified"
+      }
+    ],
+    "compare": null
+  }
+}

@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from 'react'
 import { record } from '../../notebook'
+import { CalcEnd } from './CalcEnd'
 import { ARROWS, atTop, climb, GRAD_LABELS, grad, gz, len, RIDGE, START, walk, type ArrowId, type GradMistake, type Vec } from './gradientMath'
 import { FloorArrow, SliceChart, SurfaceView, type Project, type View } from './Surface'
 
@@ -206,16 +207,7 @@ export function GradientStep({ onDone, topic }: { onDone: () => void; topic: str
           )}
         </div>
       </div>
-      {top && (
-        <div className="calc-end" role="status">
-          <p>
-            <b>Saved to your notebook.</b> {caught.length ? `Caught: ${caught.map((m) => `“${GRAD_LABELS[m]}”`).join(' and ')}.` : missed ? 'No mistake named this time.' : <span className="calc-mastered" aria-label="mastered">✓ mastered</span>} Next: the volume under a surface.
-          </p>
-          <div className="calc-endact">
-            <button className="calc-btn" onClick={onDone}>Done</button>
-          </div>
-        </div>
-      )}
+      {top && <CalcEnd caught={caught.map((m) => `“${GRAD_LABELS[m]}”`)} mastered={missed === 0} remix="Next: the volume under a surface." onDone={onDone} />}
     </section>
   )
 }

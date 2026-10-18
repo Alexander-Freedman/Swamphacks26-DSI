@@ -8,9 +8,9 @@ import { RX, sceneAt, type RxId } from './sn2'
 // then run both reactions side by side on one slider.
 
 const PARTS: { part: Part; tag: string; ask: string }[] = [
-  { part: 'nucleophile', tag: 'Nu', ask: 'Tap the atom that attacks (the nucleophile), in both.' },
-  { part: 'electrophile', tag: 'C', ask: 'Tap the carbon it attacks, in both.' },
-  { part: 'leaving', tag: 'LG', ask: 'Tap the leaving group, in both.' },
+  { part: 'nucleophile', tag: 'Nu', ask: 'Find the nucleophile: the atom with a lone pair and the − charge, ready to attack.' },
+  { part: 'electrophile', tag: 'Sub', ask: 'Find the substrate carbon: the carbon bonded to the leaving group. That’s where the electrons go.' },
+  { part: 'leaving', tag: 'LG', ask: 'Find the leaving group: the atom that breaks off and takes the bond’s electrons with it.' },
 ]
 const SIDES: RxId[] = ['oh-mebr', 'cn-mei']
 const NAMES: Record<RxId, Record<string, string>> = {
@@ -29,6 +29,9 @@ export function CompareStep({ onMistake, onDone }: { onMistake: (m: TapMistake) 
 
   const cur = PARTS.find((p) => !SIDES.every((s) => found[s].includes(p.part)))
   const all = !cur
+  // say where the current part is still missing, so a tap on the other side is the obvious next move
+  const left = cur ? SIDES.filter((s) => !found[s].includes(cur.part)) : []
+  const where = !cur ? '' : left.length === SIDES.length ? 'Tap it in both reactions.' : `Done in ${RX[SIDES.find((s) => !left.includes(s))!].text.reactants}. Now tap it in ${RX[left[0]].text.reactants}.`
 
   useEffect(() => {
     if (all) onDone()
@@ -67,7 +70,10 @@ export function CompareStep({ onMistake, onDone }: { onMistake: (m: TapMistake) 
 
   return (
     <section className="og-step og-compare">
-      <p className="og-ask" aria-live="polite">{cur ? cur.ask : 'Same three parts. Run both.'}</p>
+      <p className="og-ask" aria-live="polite">
+        {cur ? cur.ask : 'Same three parts in both: nucleophile, substrate carbon, leaving group. Press Run both to watch them react side by side.'}
+        {cur && <span className="og-where">{where}</span>}
+      </p>
       <div className="og-pair-grid">
         {SIDES.map((side) => {
           const marks = Object.fromEntries(found[side].map((p) => [RX[side].parts[p], PARTS.find((q) => q.part === p)!.tag]))

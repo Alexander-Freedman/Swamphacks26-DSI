@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useId, useRef, useState, type FormEvent, type KeyboardEvent as ReactKeyboardEvent } from 'react'
 import { apiBase } from '../extras'
-import { askHelp, MAX_QUESTION } from './askHelp'
+import { askHelp, MAX_QUESTION } from './askHelpApi'
 import { HELP_TOPICS, startersFor } from './helpHints'
 import { useHelpSpot, type HelpSpot } from './session/helpSpot'
 import './AskHelp.css'

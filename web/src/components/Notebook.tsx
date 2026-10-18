@@ -1,6 +1,6 @@
 import type { MouseEvent } from 'react'
 import { BUST_AFTER, NOTEBOOK_HREF, entries, notebook, plays, type Card } from '../notebook'
-import { sessionFor, sessions } from '../sessions/registry'
+import { homeSessions, sessionFor } from '../sessions/registry'
 import './Notebook.css'
 
 const BASE = import.meta.env.BASE_URL
@@ -84,7 +84,7 @@ export function NotebookScreen({ onHome }: { onHome?: () => void }) {
   const played = plays(all)
   // Empty state (#162): count missed rematches honestly and point at a session not played yet.
   const missed = all.filter((e) => e.rematch === 'wrong').length
-  const next = sessions.find((s) => !all.some((e) => e.session === s.slug)) ?? sessions[0]
+  const next = homeSessions.find((s) => !all.some((e) => e.session === s.slug)) ?? homeSessions[0]
   const caught = cards.filter((c) => c.status === 'caught')
   const busted = cards.filter((c) => c.status === 'busted')
   return (
@@ -103,7 +103,7 @@ export function NotebookScreen({ onHome }: { onHome?: () => void }) {
           </p>
           {next && (
             <a className="nb-btn" href={`${BASE}?session=${next.slug}`}>
-              {played > 0 ? `Next: ${next.title}` : 'Start with the birthday problem'}
+              {played > 0 ? `Next: ${next.title}` : `Start with ${next.title.toLowerCase()}`}
             </a>
           )}
         </div>

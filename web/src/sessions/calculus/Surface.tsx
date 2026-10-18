@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState, type KeyboardEvent, type PointerEvent, type ReactNode } from 'react'
 import { record } from '../../notebook'
+import { CalcEnd } from './CalcEnd'
 import { dirOf, fx, fy, fz, HILL, type Dir, type Surf } from './surfaceMath'
 
 // Calc 3, first topic: a surface z = f(x, y) you can turn around, two slices through a point,
@@ -269,12 +270,6 @@ export function SurfaceStep({ onDone, topic }: { onDone: () => void; topic: stri
                 ))}
               </div>
               {note && <p className="calc-wrong" role="status"><b>✗</b> {note}</p>}
-              {q === 1 && !note && (
-                <p className="calc-correct" role="status">
-                  <span className="calc-check" aria-hidden="true">✓</span>
-                  <span><b>Correct!</b> The slice along x is just a 2D curve. Its slope at the dot is the partial derivative ∂f/∂x = {fx(START.x, START.y).toFixed(2)}: negative, so downhill.</span>
-                </p>
-              )}
             </div>
           )}
 
@@ -317,6 +312,7 @@ export function SurfaceStep({ onDone, topic }: { onDone: () => void; topic: stri
               <div className="calc-k calc-pad">slice along x (y = {y0.toFixed(1)})</div>
               <SliceChart along="x" x0={x0} y0={y0} />
               <p className="calc-pair">∂f/∂x = <b className="calc-hl calc-num">{fx(x0, y0).toFixed(2)}</b> · {dirOf(fx(x0, y0))}</p>
+              {q === 1 && <p className="calc-small">The slice along x is just a 2D curve; its slope at the dot is the partial derivative.</p>}
             </div>
           ) : (
             <p className="calc-small">The slices show up here as you answer.</p>
@@ -331,16 +327,7 @@ export function SurfaceStep({ onDone, topic }: { onDone: () => void; topic: stri
           </div>
         </div>
       </div>
-      {flat && (
-        <div className="calc-end" role="status">
-          <p>
-            <b>Saved to your notebook.</b> {missed ? 'Caught: “Walking a slice the wrong way”.' : <span className="calc-mastered" aria-label="mastered">✓ mastered</span>} Next: the gradient, the arrow that points straight uphill.
-          </p>
-          <div className="calc-endact">
-            <button className="calc-btn" onClick={onDone}>Done</button>
-          </div>
-        </div>
-      )}
+      {flat && <CalcEnd caught={missed ? ['“Walking a slice the wrong way”'] : []} mastered={missed === 0} remix="Next: the gradient, the arrow that points straight uphill." onDone={onDone} />}
     </section>
   )
 }

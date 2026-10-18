@@ -1,0 +1,116 @@
+{
+  "aliases": [
+    "richter scale",
+    "earthquake magnitude",
+    "earthquakes",
+    "magnitude scale",
+    "earthquake scale",
+    "moment magnitude"
+  ],
+  "spec": {
+    "spec_version": 4,
+    "slug": "earthquake-magnitude",
+    "topic": "Earthquake magnitude",
+    "concept": "Each step up in magnitude means about 32 times more energy released, so the scale is logarithmic.",
+    "definition": "Earthquake magnitude is a logarithmic measure of the energy an earthquake releases.",
+    "case": {
+      "widget": "curve",
+      "approximate": false,
+      "variables": [],
+      "curve": {
+        "expr": "10^(1.5 * (x - b))",
+        "mode": "value",
+        "x_min": 3,
+        "x_max": 9,
+        "x_label": "magnitude",
+        "y_label": "energy vs the smaller quake (x times)",
+        "ask_x": 7.0,
+        "ask_y": null,
+        "area_from": null,
+        "area_to": null,
+        "knob": {
+          "param": "b",
+          "label": "smaller quake magnitude",
+          "min": 3,
+          "max": 6,
+          "step": 0.5,
+          "default": 5
+        }
+      },
+      "sampler": null,
+      "prediction": {
+        "prompt": "How many times more energy does a magnitude 7 earthquake release than a magnitude 5?",
+        "input": "slider",
+        "slider": {
+          "min": 1,
+          "max": 2000,
+          "step": 1,
+          "unit": "x"
+        },
+        "options": []
+      },
+      "bands": [
+        {
+          "min": 1,
+          "max": 10,
+          "misconception_id": "linear-scale"
+        },
+        {
+          "min": 11,
+          "max": 699,
+          "misconception_id": "ten-per-step"
+        },
+        {
+          "min": 700,
+          "max": 1400,
+          "misconception_id": null
+        },
+        {
+          "min": 1401,
+          "max": 2000,
+          "misconception_id": "overshoot"
+        }
+      ],
+      "extremes": [
+        {
+          "param": "b",
+          "value": 3,
+          "watch": "A 7 vs a 3 is four steps: 10^6 = 1,000,000x the energy."
+        },
+        {
+          "param": "b",
+          "value": 6,
+          "watch": "A 7 vs a 6 is one step: only about 32x the energy."
+        }
+      ],
+      "answer_claimed": 1000
+    },
+    "misconceptions": [
+      {
+        "id": "linear-scale",
+        "label": "Magnitude 7 is a bit bigger than 5",
+        "why_tempting": "The numbers 5 and 7 look close.",
+        "refutation": "The scale is logarithmic: each whole step is about 32x the energy, so two steps is about 1,000x.",
+        "source_url": "https://en.wikipedia.org/wiki/Richter_magnitude_scale",
+        "source_note": "Page states the correct model; that this mistake is common is unverified"
+      },
+      {
+        "id": "ten-per-step",
+        "label": "10x per step, so 100x",
+        "why_tempting": "Each step is 10x in shaking amplitude, so 100x sounds right.",
+        "refutation": "Energy grows faster than shaking: about 32x per step, 1,000x for two steps.",
+        "source_url": "https://en.wikipedia.org/wiki/Richter_magnitude_scale",
+        "source_note": "Page states the correct model; that this mistake is common is unverified"
+      },
+      {
+        "id": "overshoot",
+        "label": "Way more than 1,000x",
+        "why_tempting": "Logarithmic scales sound like they explode.",
+        "refutation": "Each whole step is about 32x the energy (10^1.5), so two steps is 32 x 32 ≈ 1,000x, not more.",
+        "source_url": "https://en.wikipedia.org/wiki/Richter_magnitude_scale",
+        "source_note": "Page states the correct model; that this mistake is common is unverified"
+      }
+    ],
+    "compare": null
+  }
+}

@@ -1,21 +1,18 @@
 import { useEffect, useRef, useState, type PointerEvent as RPointerEvent } from 'react'
 import { frontSide, gradeSN2, HINTS, MISTAKES, type Arrow, type ArrowGrade, type ArrowMistake, type Pt, type Source, type Target } from './chem'
-import { dist, R, reducedMotion, svgPoint } from './geom'
+import { dist, reducedMotion, svgPoint } from './geom'
+import { mid, nearest, pointAlong, shapeArrow, type Cand, type Drawn } from './arrows'
 import { CurvedArrow, Scene } from './Scene'
-import { ease, lpPos, RX, sceneAt, VH, VW, type Rx } from './sn2'
+import { ease, lpPos, RX, sceneAt, VW, type Rx } from './sn2'
 
 // Step 2: draw the curved arrows of HO⁻ + CH₃Br yourself (pencil), then watch the real
 // mechanism in ink over them. Arrow checks are in chem.ts.
-
-type Drawn = { arrow: Arrow; p0: Pt; c: Pt; p3: Pt }
-type Cand<T> = { v: T; at: Pt; name: string }
 
 const START = sceneAt(RX['oh-mebr'], 0)
 const ATOM = new Map(START.atoms.map((a) => [a.id, a]))
 const NAME: Record<string, string> = { back: 'H', nu: 'O', c: 'C', h1: 'H', h2: 'H', h3: 'H', lg: 'Br' }
 const bondName = (a: string, b: string) => `${NAME[a]}–${NAME[b]} bond`
 const SIDE: Record<number, string> = { 0: 'right', 70: 'top', 90: 'top', 180: 'left', 270: 'bottom', 290: 'bottom' }
-const mid = (a: Pt, b: Pt): Pt => ({ x: (a.x + b.x) / 2, y: (a.y + b.y) / 2 })
 
 /** Every place an arrow can start: lone pairs, bonds, and (wrongly) bare atoms. */
 function sources(rx: Rx = RX['oh-mebr']): Cand<Source>[] {
@@ -32,33 +29,6 @@ function targets(rx: Rx = RX['oh-mebr']): Cand<Target>[] {
 const SRC = sources()
 const TGT = targets()
 
-const nearest = <T,>(list: Cand<T>[], p: Pt, within: number) => {
-  let best: Cand<T> | null = null
-  for (const c of list) if (dist(c.at, p) < within && (!best || dist(c.at, p) < dist(best.at, p))) best = c
-  return best
-}
-
-/** Turn a start, an end and the path in between into a curved arrow; `bendAt` is a point the curve passes near. */
-function shapeArrow(arrow: Arrow, p0: Pt, end: Pt, bendAt: Pt | null): Drawn {
-  const m = mid(p0, end)
-  const len = dist(p0, end) || 1
-  let c: Pt = bendAt ? { x: 2 * bendAt.x - m.x, y: 2 * bendAt.y - m.y } : m
-  if (dist(c, m) < 0.2 * len) {
-    // a straight drag still gets a curve, bowed up
-    const nx = (end.y - p0.y) / len
-    const ny = -(end.x - p0.x) / len
-    const s = ny <= 0 ? 1 : -1
-    c = { x: m.x + nx * s * 0.35 * len, y: m.y + ny * s * 0.35 * len }
-  }
-  c = { x: Math.min(VW - 6, Math.max(6, c.x)), y: Math.min(VH - 6, Math.max(6, c.y)) }
-  let p3 = end
-  if (arrow.to.kind === 'atom') {
-    const d = dist(c, end) || 1
-    p3 = { x: end.x + ((c.x - end.x) / d) * (R + 5), y: end.y + ((c.y - end.y) / d) * (R + 5) }
-  }
-  return { arrow, p0, c, p3 }
-}
-
 const C = ATOM.get('c')!
 const LG = ATOM.get('lg')!
 /** The real mechanism's two arrows, in ink. */
@@ -67,25 +37,10 @@ const REAL: Drawn[] = [
   shapeArrow({ from: { kind: 'bond', a: 'c', b: 'lg' }, to: { kind: 'atom', atom: 'lg' } }, mid(C, LG), LG, { x: (C.x + LG.x) / 2 - 9, y: C.y - 24 }),
 ]
 
-const pointAlong = (pts: Pt[], f: number): Pt => {
-  if (pts.length < 2) return pts[0]
-  const seg = pts.slice(1).map((p, i) => dist(pts[i], p))
-  const total = seg.reduce((a, b) => a + b, 0)
-  let want = total * f
-  for (let i = 0; i < seg.length; i++) {
-    if (want <= seg[i]) {
-      const u = seg[i] ? want / seg[i] : 0
-      return { x: pts[i].x + (pts[i + 1].x - pts[i].x) * u, y: pts[i].y + (pts[i + 1].y - pts[i].y) * u }
-    }
-    want -= seg[i]
-  }
-  return pts[pts.length - 1]
-}
-
 const CAPTION = (t: number) =>
   t < 0.3 ? 'The O’s lone pair heads for the back of the carbon.' : t < 0.68 ? 'Halfway: O–C forming, C–Br breaking, the H’s flat.' : 'Br leaves with the bond’s two electrons. The carbon turned inside out.'
 
-export function PushStep({ onGrade, onNext }: { onGrade: (mistakes: ArrowMistake[]) => void; onNext: () => void }) {
+export function PushStep({ onGrade, onNext, nextLabel = 'Find the same pattern →' }: { onGrade: (mistakes: ArrowMistake[]) => void; onNext: () => void; nextLabel?: string }) {
   const svg = useRef<SVGSVGElement>(null)
   const [arrows, setArrows] = useState<Drawn[]>([])
   const [pen, setPen] = useState<{ from: Cand<Source>; pts: Pt[] } | null>(null)
@@ -215,7 +170,7 @@ export function PushStep({ onGrade, onNext }: { onGrade: (mistakes: ArrowMistake
           <span className="og-rx">{t < 0.68 ? RX['oh-mebr'].text.reactants : RX['oh-mebr'].text.products}</span>
         </div>
         {phase === 'draw' ? (
-          <p className="og-cap">drag from a lone pair <span className="og-dots" aria-hidden="true">••</span> or a bond to where the electrons go</p>
+          <p className="og-cap">start an arrow on the electrons that move (a lone pair <span className="og-dots" aria-hidden="true">••</span> or a bond) and drag it to the atom they move to</p>
         ) : (
           <>
             <p className="og-cap og-ink-cap">{CAPTION(t)}</p>
@@ -288,7 +243,7 @@ export function PushStep({ onGrade, onNext }: { onGrade: (mistakes: ArrowMistake
         {phase !== 'draw' && (
           <div className="og-row">
             <button className="og-btn og-ghost" onClick={reset}>Draw again</button>
-            <button className="og-btn og-next" onClick={onNext}>Same pattern →</button>
+            <button className="og-btn og-next" onClick={onNext}>{nextLabel}</button>
           </div>
         )}
       </aside>

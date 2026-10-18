@@ -6,5 +6,6 @@ export const session: SessionDef = {
   title: 'You tested positive. Are you sick?',
   blurb: 'Test 1,000 people and watch where the positives really come from.',
   order: 3,
+  home: false,
   Component: PositiveSession,
 }

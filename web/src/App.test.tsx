@@ -1,5 +1,5 @@
 // @vitest-environment jsdom
-import { cleanup, fireEvent, render, screen } from '@testing-library/react'
+import { cleanup, render, screen } from '@testing-library/react'
 import { afterEach, beforeEach, describe, expect, it } from 'vitest'
 import App from './App'
 import { Reveal } from './components/Reveal'
@@ -9,16 +9,23 @@ import { computeTruth } from './truth'
 beforeEach(() => history.replaceState(null, '', import.meta.env.BASE_URL))
 afterEach(cleanup)
 
-describe('coin streak on Home', () => {
-  it('shows one coin entry, and it opens the coin session', () => {
+describe('Home cards', () => {
+  it('shows only the subjects; birthday, coin and positive test are off Home', () => {
     render(<App />)
-    // the old "Streaks in coin flips" round shares the coin-streak slug, so the session replaces it
+    const titles = [...document.querySelectorAll('.showcases.sessions .card-title')].map((t) => t.textContent)
+    expect(titles.slice(0, 2)).toEqual(['Organic chemistry', 'Calculus'])
+    expect(screen.queryByText('You tested positive. Are you sick?')).toBeNull()
+    expect(screen.queryByText('The birthday problem')).toBeNull()
+    expect(screen.queryByText('Be a coin')).toBeNull()
+    // the old "Streaks in coin flips" round shares the coin-streak slug, so it stays hidden too
     expect(screen.queryByText('Streaks in coin flips')).toBeNull()
-    expect(screen.getAllByText('Be a coin')).toHaveLength(1)
-    expect(screen.getByText(/Tap out 20 flips/)).toBeTruthy()
-    fireEvent.click(screen.getByText('Be a coin'))
+  })
+
+  it('the coin session still opens from its link', () => {
+    history.replaceState(null, '', `${import.meta.env.BASE_URL}?session=coin-streak`)
+    render(<App />)
     expect(screen.getByText('Be a coin. Tap out 20 flips.')).toBeTruthy()
-    expect((screen.getByText('Lock it in') as HTMLButtonElement).disabled).toBe(true)
+    expect((screen.getByText('Show me') as HTMLButtonElement).disabled).toBe(true)
   })
 })
 

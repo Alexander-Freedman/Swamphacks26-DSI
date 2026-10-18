@@ -28,13 +28,13 @@ describe('notebook screen', () => {
     expect(screen.getByText('Your notebook')).toBeTruthy()
     expect(location.search).toBe('?notebook=1')
     act(() => history.back())
-    await waitFor(() => expect(screen.getByText('Bet on your gut. Then watch reality.')).toBeTruthy())
+    await waitFor(() => expect(screen.getByText('See your thinking in layers.')).toBeTruthy())
     expect(location.search).toBe('')
     cleanup()
     history.replaceState(null, '', `${BASE}?notebook=1`)
     render(<App />)
     fireEvent.click(screen.getByText('← Home'))
-    expect(screen.getByText('Bet on your gut. Then watch reality.')).toBeTruthy()
+    expect(screen.getByText('See your thinking in layers.')).toBeTruthy()
     expect(location.search).toBe('')
   }, 20000)
 
@@ -43,7 +43,7 @@ describe('notebook screen', () => {
     render(<App />)
     expect(screen.getByText('Your notebook')).toBeTruthy()
     expect(screen.getByText('Nothing caught yet.')).toBeTruthy()
-    expect(screen.getByText('Start with the birthday problem').closest('a')?.getAttribute('href')).toBe(`${BASE}?session=birthday`)
+    expect(screen.getByText('Start with organic chemistry').closest('a')?.getAttribute('href')).toBe(`${BASE}?session=orgo`)
   })
 
   it('empty state counts missed rematches and points at a session not played yet (#162)', () => {
@@ -51,7 +51,7 @@ describe('notebook screen', () => {
     history.replaceState(null, '', `${BASE}?notebook=1`)
     render(<App />)
     expect(screen.getByText(/You've played 1 session and your first guess called it \(1 rematch missed\)/)).toBeTruthy()
-    expect(screen.getByText('Next: Be a coin').closest('a')?.getAttribute('href')).toBe(`${BASE}?session=coin-streak`)
+    expect(screen.getByText('Next: Organic chemistry').closest('a')?.getAttribute('href')).toBe(`${BASE}?session=orgo`)
   })
 
   it('shows a caught mistake in pencil', () => {
@@ -116,7 +116,7 @@ describe('reset shortcut', () => {
     render(<App />)
     expect(entries()).toEqual([])
     expect(location.search).toBe('')
-    expect(screen.getByText('Bet on your gut. Then watch reality.')).toBeTruthy()
+    expect(screen.getByText('See your thinking in layers.')).toBeTruthy()
   })
 
   it('Shift+R on Home clears it, but not while typing', () => {
@@ -142,7 +142,7 @@ describe('reset shortcut', () => {
     act(() => {
       fireEvent.keyDown(window, { key: 'R', shiftKey: true })
     })
-    expect(screen.getByText('Bet on your gut. Then watch reality.')).toBeTruthy()
+    expect(screen.getByText('See your thinking in layers.')).toBeTruthy()
     expect(location.search).toBe('')
   })
 })

@@ -25,8 +25,7 @@ afterEach(() => {
 const Session = session.Component
 const guessAndLock = (v: number) => {
   fireEvent.change(screen.getByLabelText("Chance you're actually sick?"), { target: { value: String(v) } })
-  fireEvent.click(screen.getByText('pretty sure'))
-  fireEvent.click(screen.getByText('Lock it in'))
+  fireEvent.click(screen.getByText('Show me'))
 }
 const testEveryone = async () => {
   fireEvent.click(screen.getByText('Test everyone'))
@@ -37,24 +36,22 @@ describe('positive test session', () => {
   it('guess → test everyone → you vs real → change the crowd → card → saved', async () => {
     vi.useFakeTimers()
     localStorage.clear()
+    // off Home now (subjects only), so it opens from its link
+    history.replaceState(null, '', `${import.meta.env.BASE_URL}?session=positive-test`)
     const { container } = render(<App />)
-    fireEvent.click(screen.getByText('You tested positive. Are you sick?'))
 
-    // same lock as the other sessions: slider, then how sure, then lock (#149)
+    // same button as the other sessions: slider, then "Show me" (no how-sure step, #194)
     const lock = screen.getByText('Move the slider first') as HTMLButtonElement
     expect(lock.disabled).toBe(true)
     expect(lock.className).toContain('ss-lock')
     expect(container.textContent).not.toContain('optional')
     fireEvent.change(screen.getByLabelText("Chance you're actually sick?"), { target: { value: '21' } })
-    expect(lock.textContent).toBe('Pick how sure you are')
-    expect(lock.disabled).toBe(true)
-    fireEvent.click(screen.getByText('certain'))
-    expect(lock.textContent).toBe('Lock it in')
+    expect(lock.textContent).toBe('Show me')
     expect(lock.disabled).toBe(false)
     fireEvent.click(screen.getByLabelText('ten more healthy positives'))
     fireEvent.click(screen.getByLabelText('one more sick positive'))
     expect(container.textContent).toContain('9.1% of positives are sick (1 of 11)')
-    fireEvent.click(screen.getByText('Lock it in'))
+    fireEvent.click(screen.getByText('Show me'))
 
     expect(screen.getByText('Test all 1,000.')).toBeTruthy()
     // the step title takes focus so keyboard and screen reader users land on the new step
@@ -84,7 +81,7 @@ describe('positive test session', () => {
     // 21% is 11.8 points from 9.2% but more than twice it: way off (#151), band → ignores-false-alarms.
     expect(screen.getByText('Way off')).toBeTruthy()
     expect(screen.getByText(/^This is the mistake your guess points to/)).toBeTruthy()
-    expect(container.textContent).toContain('You said 21% (certain).')
+    expect(container.textContent).toContain('You said 21%.')
     expect(screen.getByText('False alarms are too rare to matter')).toBeTruthy()
     expect(screen.getByText('9.2%', { selector: '.pt-reality' })).toBeTruthy()
     // saved when the card shows, before the rematch (#159)
@@ -122,7 +119,7 @@ describe('positive test session', () => {
     expect((screen.getByText('Move the slider first') as HTMLButtonElement).disabled).toBe(true)
     expect(container.textContent).not.toContain('27.9%')
     fireEvent.change(screen.getByLabelText("Chance you're actually sick?"), { target: { value: '60' } })
-    fireEvent.click(screen.getByText('Lock it in'))
+    fireEvent.click(screen.getByText('Show me'))
     expect(screen.getByText('27.9%', { selector: '.pt-reality' })).toBeTruthy()
     expect(screen.getByText('real 27.9%')).toBeTruthy()
     expect(screen.getByText('Way off')).toBeTruthy()
@@ -134,9 +131,9 @@ describe('positive test session', () => {
     const saved = JSON.parse(localStorage.getItem('mm.sessions') ?? '[]')
     // the rematch updated the card's entry instead of adding a second one
     expect(saved).toHaveLength(1)
-    expect(saved[0]).toMatchObject({ session: 'positive-test', at: atCard[0].at, guess: 21, confidence: 'certain', misconception: 'ignores-false-alarms', rematch: 'wrong', rematchGuess: 60, rematchTruth: 27.9, comparePick: 'accuracy', compareRight: false, compareText: 'too many false alarms' })
+    expect(saved[0]).toMatchObject({ session: 'positive-test', at: atCard[0].at, guess: 21, misconception: 'ignores-false-alarms', rematch: 'wrong', rematchGuess: 60, rematchTruth: 27.9, comparePick: 'accuracy', compareRight: false, compareText: 'too many false alarms' })
     fireEvent.click(screen.getByText('Done'))
-    expect(screen.getByText('You tested positive. Are you sick?')).toBeTruthy()
+    expect(screen.getByText('See your thinking in layers.')).toBeTruthy()
   })
 
   it('reduced motion jumps straight to the piles', () => {
@@ -211,14 +208,12 @@ const toCard = async (g: number) => {
 }
 
 describe('positive card and end bar (same shell as birthday)', () => {
-  it('confidence is required, no "optional"', () => {
+  it('no how-sure step: the slider alone enables "Show me" (#194)', () => {
     render(<Session onDone={() => {}} />)
+    expect(screen.queryByText('how sure?')).toBeNull()
     fireEvent.change(screen.getByLabelText("Chance you're actually sick?"), { target: { value: '40' } })
-    const lock = screen.getByText('Pick how sure you are') as HTMLButtonElement
-    expect(lock.disabled).toBe(true)
-    fireEvent.click(screen.getByText('unsure'))
+    const lock = screen.getByText('Show me') as HTMLButtonElement
     expect(lock.disabled).toBe(false)
-    expect(lock.textContent).toBe('Lock it in')
   })
 
   it('called-it guess, missed rematch: called-it line on the card, both parts on the bar (#150, #148)', async () => {
@@ -226,15 +221,15 @@ describe('positive card and end bar (same shell as birthday)', () => {
     localStorage.clear()
     const { container } = render(<Session onDone={() => {}} />)
     await toCard(9)
-    expect(screen.getByText('Called it')).toBeTruthy()
-    expect(screen.getByText("You called it. Here's the idea that makes it work, so you can do it again.")).toBeTruthy()
+    expect(screen.getByText('Spot on')).toBeTruthy()
+    expect(screen.getByText("You were right. Here's the idea that makes it work, so you can do it again.")).toBeTruthy()
     throughCompare()
     fireEvent.change(screen.getByLabelText("Chance you're actually sick?"), { target: { value: '100' } })
-    fireEvent.click(screen.getByText('Lock it in'))
+    fireEvent.click(screen.getByText('Show me'))
     expect(screen.getByText('Way off')).toBeTruthy()
     // 100% is the test's accuracy read as your chance: that's what the notebook keeps (#162)
     expect(container.querySelector('.ss-end')!.textContent).toContain(
-      "Saved to your notebook. Your first guess called it. Rematch missed: “The test's accuracy is my chance” is in your notebook to try again.",
+      "Saved to your notebook. Your first guess was right. Rematch missed: “The test's accuracy is my chance” is in your notebook to try again.",
     )
     expect(notebook().map((c) => c.id)).toEqual(['accuracy-is-my-chance'])
   })
@@ -259,7 +254,7 @@ describe('positive card and end bar (same shell as birthday)', () => {
     await toCard(9)
     throughCompare()
     fireEvent.change(screen.getByLabelText("Chance you're actually sick?"), { target: { value: '2' } })
-    fireEvent.click(screen.getByText('Lock it in'))
+    fireEvent.click(screen.getByText('Show me'))
     expect(JSON.parse(localStorage.getItem('mm.sessions')!)[0]).toMatchObject({ rematch: 'wrong', rematchMisconception: 'positive-barely-matters' })
     expect(container.querySelector('.ss-end')!.textContent).toContain('is in your notebook to try again.')
   })
@@ -297,7 +292,7 @@ describe('positive card and end bar (same shell as birthday)', () => {
     await toCard(9)
     throughCompare()
     fireEvent.change(screen.getByLabelText("Chance you're actually sick?"), { target: { value: '13' } })
-    fireEvent.click(screen.getByText('Lock it in'))
+    fireEvent.click(screen.getByText('Show me'))
     // 13% is 14.9 points from 27.9%, inside the old window, but under half of it
     expect(screen.getByText('Way off')).toBeTruthy()
   })

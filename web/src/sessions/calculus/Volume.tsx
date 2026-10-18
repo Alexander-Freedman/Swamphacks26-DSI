@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState, type KeyboardEvent, type PointerEvent } from 'react'
 import { record } from '../../notebook'
+import { CalcEnd } from './CalcEnd'
 import { clamp, ix, local, sx, useWidth, type Box } from './plot'
 import { Scene3D, SurfaceMesh, type Project, type View } from './Surface'
 import { COARSE, columns, columnSum, EXACT, GRIDS, GUESS_MAX, readVolume, ROOF, VOLUME_LABELS, type VolumeMistake } from './volumeMath'
@@ -273,17 +274,7 @@ export function VolumeStep({ onDone, topic }: { onDone: () => void; topic: strin
           )}
         </div>
       )}
-      {done && read && (
-        <div className="calc-end" role="status">
-          <p>
-            <b>Saved to your notebook.</b> {allCaught.length ? `Caught: ${allCaught.map((m) => `“${VOLUME_LABELS[m]}”`).join(' and ')}.` : !mastered ? 'No mistake named this time.' : null}{' '}
-            {mastered && <span className="calc-mastered" aria-label="mastered">✓ mastered</span>}
-          </p>
-          <div className="calc-endact">
-            <button className="calc-btn" onClick={onDone}>Done</button>
-          </div>
-        </div>
-      )}
+      {done && read && <CalcEnd caught={allCaught.map((m) => `“${VOLUME_LABELS[m]}”`)} mastered={mastered} remix="" onDone={onDone} />}
     </section>
   )
 }

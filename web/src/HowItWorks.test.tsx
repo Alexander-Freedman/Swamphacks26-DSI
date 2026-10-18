@@ -44,7 +44,7 @@ describe('How it works drawer', () => {
     const d = dialog()!
     expect(d).toBeTruthy()
     // no spoiler before the guess is locked (#171): no value, formula, claim, raw JSON or source titles
-    expect(within(d).getByText(/Lock in your guess first/)).toBeTruthy()
+    expect(within(d).getByText(/Make your guess first/)).toBeTruthy()
     expect(within(d).queryByTestId('hiw-value')).toBeNull()
     expect(within(d).queryByText('2 ÷ 3 × 100')).toBeNull()
     expect(within(d).queryByText('Round claims')).toBeNull()

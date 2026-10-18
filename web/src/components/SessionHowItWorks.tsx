@@ -49,7 +49,7 @@ export function SessionHowItWorks({ slug, onClose, shown, onShow }: { slug: stri
               ))}
             </dl>
           ) : (
-            <Wait text="The number shows after you lock in your guess." onPeek={() => (onShow ? onShow() : setPeek(true))} />
+            <Wait text="The number shows after you make your guess." onPeek={() => (onShow ? onShow() : setPeek(true))} />
           )}
         </section>
       </div>
