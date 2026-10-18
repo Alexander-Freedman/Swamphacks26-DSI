@@ -70,16 +70,27 @@ describe('LearnTopicBox', () => {
 })
 
 describe('LearnTopicBox chips', () => {
-  it('shows only reviewed topics as chips, but still matches typed text to live-built ones', async () => {
+  it('shows six chips (reviewed first), the rest behind Show more; live-built ones are marked', async () => {
     const onOpen = vi.fn()
     const api = createMockLearnApi()
-    api.listTopics = async () => [
-      { slug: 'compound-interest', topic: 'compound interest', checked: true },
-      { slug: 'hooke-s-law', topic: "Hooke's law", checked: false },
-    ]
+    const reviewed = ['a', 'b', 'c', 'd', 'e', 'f', 'g'].map((x) => ({ slug: `t-${x}`, topic: `topic ${x}`, checked: true }))
+    api.listTopics = async () => [{ slug: 'hooke-s-law', topic: "Hooke's law", checked: false }, ...reviewed]
     render(<LearnTopicBox onOpen={onOpen} api={api} />)
-    await screen.findByRole('button', { name: 'compound interest' })
+    await screen.findByRole('button', { name: 'topic a' })
+    expect(screen.queryByRole('button', { name: 'topic g' })).toBeNull()
     expect(screen.queryByRole('button', { name: "Hooke's law" })).toBeNull()
+    fireEvent.click(screen.getByRole('button', { name: 'Show 2 more' }))
+    expect(screen.getByRole('button', { name: 'topic g' })).toBeTruthy()
+    expect(screen.getByRole('button', { name: "Hooke's law" }).className).toContain('is-new')
+    expect(screen.getByRole('button', { name: 'Show fewer' })).toBeTruthy()
+  })
+
+  it('typed text still matches a live-built topic', async () => {
+    const onOpen = vi.fn()
+    const api = createMockLearnApi()
+    api.listTopics = async () => [{ slug: 'hooke-s-law', topic: "Hooke's law", checked: false }]
+    render(<LearnTopicBox onOpen={onOpen} api={api} />)
+    await screen.findByRole('button', { name: "Hooke's law" })
     fireEvent.change(screen.getByLabelText('topic to learn'), { target: { value: "Hooke's law" } })
     fireEvent.click(screen.getByRole('button', { name: 'Learn it' }))
     expect(onOpen).toHaveBeenCalledWith('hooke-s-law')

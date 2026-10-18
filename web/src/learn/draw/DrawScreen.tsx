@@ -11,7 +11,7 @@ const ROWS: { id: DrawCriterionId; label: string }[] = [
   { id: 'rule', label: 'The rule' },
   { id: 'why-rule', label: 'Why it holds' },
 ]
-const STAMP: Record<DrawCriterion['verdict'], string> = { demonstrated: '✓ got it', contradicted: 'not quite', unresolved: 'missing' }
+const STAMP: Record<DrawCriterion['verdict'], string> = { demonstrated: '✓ got it', contradicted: 'not quite', unresolved: 'not shown yet' }
 
 /** The canvas's 2d context set up as a pencil, with the bitmap matched to its box so strokes land under the finger. */
 function pencil(c: HTMLCanvasElement) {

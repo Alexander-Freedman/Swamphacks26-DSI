@@ -31,6 +31,8 @@ fi
 # domain's DNS points at GitHub Pages: with a CNAME file, github.io redirects to the domain.
 if [ -n "${PAGES_CNAME:-}" ]; then
   export VITE_BASE=/   # the custom domain serves from the root, not /Swamphacks26-DSI/
+  # Git Bash on Windows rewrites a lone "/" in env vars to C:/Program Files/Git/ (a blank site): don't.
+  export MSYS2_ENV_CONV_EXCL="VITE_BASE;VITE_API_BASE${MSYS2_ENV_CONV_EXCL:+;$MSYS2_ENV_CONV_EXCL}"
   echo "deploy-pages: custom domain $PAGES_CNAME (base /)"
 fi
 (cd web && npm ci --no-audit --no-fund >/dev/null && npm run build)
