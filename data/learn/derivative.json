@@ -1,0 +1,127 @@
+{
+  "slug": "derivative",
+  "topic": "derivative",
+  "checked": true,
+  "rubric": {
+    "entities": [
+      "An input quantity: the thing being varied, such as time or distance along a path.",
+      "An output quantity: the measured result that depends on the input, such as position, temperature, or height.",
+      "A chosen input location: the particular instant or point where the rate is wanted.",
+      "A small input interval around that location.",
+      "The corresponding output change across that interval.",
+      "Average rate of change: output change divided by input change over the interval.",
+      "The limiting instantaneous rate: the value the average rates approach as the interval is made arbitrarily small, when that approach exists."
+    ],
+    "causalLinks": [
+      "For a fixed output change, increasing the input interval decreases the average rate's magnitude because the same change is spread over more input units.",
+      "For a fixed input interval, increasing the output change increases the average rate because more output changes per input unit.",
+      "As the input interval shrinks around a smooth point, the average rate approaches the local instantaneous rate because the two sampled points isolate the curve's behavior ever closer to that point.",
+      "If output is increasing near the chosen location, the derivative is positive; if it is decreasing, the derivative is negative; if it is locally flat, the derivative is zero.",
+      "If the graph has a sharp corner, cusp, vertical tangent, jump, or incompatible left- and right-hand local rates, the derivative may fail to exist because there is no single finite local rate for shrinking intervals to approach."
+    ],
+    "coreRule": "The derivative at a chosen input location is the limit of average rates of change as the input interval approaches zero: derivative = lim as h approaches 0 of [f(x+h) - f(x)] / h, where f(x) is the output at input x and h is a small input change. It is the instantaneous output change per unit input, provided this limit exists.",
+    "whyRuleMatters": "Dividing by a nonzero input interval measures an average over a stretch, not behavior at one location. Making that stretch shrink removes the influence of farther-away behavior while retaining the ratio of tiny output change to tiny input change. Simply substituting a zero interval would produce division by zero, so the derivative uses the value approached by nearby nonzero intervals instead.",
+    "whyRuleQuestion": "Why must we examine average rates over ever-smaller nonzero intervals, instead of just dividing the output change by an input change of zero?",
+    "anchorDescription": "On a distance-versus-time graph, the slope between two recorded times is the object's average speed during that whole time span. A shorter time span can give a different slope if the object changes speed.",
+    "anchorPrompt": "A cyclist covers 100 meters from 0 to 10 seconds, but covers only 5 meters from 9 to 10 seconds. Which interval gives the better clue to the cyclist's speed at 10 seconds, and why?",
+    "contrastingCases": [
+      {
+        "label": "Same total distance, different speed now",
+        "detail": "Two runners have each traveled 100 meters by 10 seconds. Runner A moved at a steady 10 meters per second throughout. Runner B was standing still from 9 to 10 seconds after running fast earlier. Their average speed from 0 to 10 seconds is the same, but at 10 seconds Runner A's derivative of position with respect to time is 10 meters per second and Runner B's is 0 meters per second.",
+        "oneLine": "Same average speed, but different speed at 10 seconds."
+      },
+      {
+        "label": "Flat at an instant, not flat overall",
+        "detail": "A ball's height is 20 meters at 2 seconds, rises before 2 seconds, and falls after 2 seconds. At exactly 2 seconds it is at its highest point, so its height derivative with respect to time is 0 meters per second, even though the ball is moving and its height changes during nearby longer intervals.",
+        "oneLine": "At the peak, instantaneous height change is zero."
+      },
+      {
+        "label": "Sharp turn versus smooth turnaround",
+        "detail": "A car moves east at 5 meters per second just before noon and west at 5 meters per second just after noon, reversing direction instantly. Its position graph has a sharp corner at noon: average velocities from the left approach 5 meters per second while those from the right approach negative 5 meters per second. Unlike a smooth turnaround, there is no single derivative at noon.",
+        "oneLine": "Opposite one-sided rates mean no derivative."
+      }
+    ],
+    "extremeCaseDimensions": [
+      {
+        "key": "interval-width",
+        "description": "Push the measurement interval from broad to extremely narrow around one chosen input location. For a differentiable function, average rates should converge to one local rate; a broad interval can differ substantially from it."
+      },
+      {
+        "key": "local-flatness",
+        "description": "Push a smooth local behavior to perfectly flat at the chosen location, such as the top of a smooth hill. The derivative is zero there even if the output changes on both sides or changes greatly elsewhere."
+      },
+      {
+        "key": "one-sided-mismatch",
+        "description": "Push the local shape to a sharp corner or abrupt direction reversal. If shrinking intervals from the two sides approach different rates, there is no derivative at that location."
+      },
+      {
+        "key": "rate-magnitude",
+        "description": "Push a smooth local change from very gentle to very steep while keeping a finite tangent slope. The derivative's magnitude correspondingly moves from near zero to large, with its sign set by increasing versus decreasing output."
+      },
+      {
+        "key": "vertical-tangent",
+        "description": "Push a smooth-looking curve toward a vertical tangent, where output change per tiny input change grows without bound. Under the standard finite-real-number definition, the derivative does not exist as a finite number there."
+      }
+    ],
+    "confusableNeighbors": [
+      {
+        "key": "average-rate-of-change",
+        "label": "Average rate of change",
+        "question": "How is a derivative at 10 seconds different from average speed from 0 to 10 seconds?",
+        "correctDistinction": "Average rate of change uses two separated inputs and summarizes the entire interval. A derivative is the limiting average rate as those inputs close in on one chosen location; average rates are the approximations used to obtain it."
+      },
+      {
+        "key": "function-value",
+        "label": "Function value",
+        "question": "If a car's position is 100 meters at 10 seconds, what does that tell you differently from a derivative of 8 meters per second at 10 seconds?",
+        "correctDistinction": "The function value is the output itself, here where the car is. The derivative is how that output is changing locally, here its instantaneous velocity; it does not by itself give the position."
+      }
+    ],
+    "transferStructuralRequirements": [
+      "There must be an input that can be varied continuously enough to consider nearby values and an output that responds to it.",
+      "A comparison over a nonzero input interval must produce an average output-change-per-input-change rate.",
+      "The interval must be shrinkable around one chosen input location, with the average rates approaching one stable finite value for a derivative to exist.",
+      "The sign and magnitude of the limiting rate must encode the local direction and strength of output change, not the total change over a distant interval.",
+      "If left- and right-side limiting rates disagree, or no finite stable limit occurs, the analogy must predict no derivative at that location."
+    ],
+    "referenceTransferExample": "A streaming service adjusts its number of active viewers over time. At 8:00:00, it has 10,000 viewers. From 7:59:59 to 8:00:00 it gains 12 viewers, and from 8:00:00 to 8:00:01 it gains 13 viewers; using still shorter time windows around 8:00:00 produces rates near 12.5 viewers per second. The derivative of viewer count with respect to time at that instant is therefore about 12.5 viewers per second, not the total number of viewers and not necessarily the average growth rate over the whole day."
+  },
+  "misconceptions": [
+    {
+      "id": "derivative-is-total-change",
+      "label": "\"It is how much changed.\"",
+      "tell": "The learner says a car's derivative after traveling 100 meters is 100 meters.",
+      "fix": "A derivative is a rate, so it has units such as meters per second. It describes local change per unit input, whereas total change is the difference between two output values."
+    },
+    {
+      "id": "zero-interval-division",
+      "label": "\"Just plug in zero.\"",
+      "tell": "The learner tries to find an instantaneous rate by calculating zero output change divided by zero input change.",
+      "fix": "Zero divided by zero is indeterminate, not a rate. Use nearby nonzero intervals and ask what their average rates approach as the interval shrinks."
+    },
+    {
+      "id": "zero-derivative-means-nothing-moves",
+      "label": "\"Zero slope means nothing is happening.\"",
+      "tell": "The learner claims a ball at the top of its flight is not moving because the derivative of height is zero.",
+      "fix": "A zero derivative means that particular output has zero instantaneous change at that instant. The ball can still have nonzero horizontal motion and can begin decreasing in height immediately afterward."
+    }
+  ],
+  "extremeCases": [
+    {
+      "dimension": "interval-width",
+      "scenario": "A car travels 600 meters between 0 and 60 seconds, for an average speed of 10 meters per second. Between 59.9 and 60 seconds it travels 1.5 meters.",
+      "correctBehavior": "The 60-second average is 10 meters per second, while the last 0.1-second average is 15 meters per second. If still shorter intervals ending at 60 seconds settle near 15 meters per second, the derivative of position at 60 seconds is 15 meters per second."
+    },
+    {
+      "dimension": "local-flatness",
+      "scenario": "A smooth fountain stream reaches its maximum height of 4 meters at 1 second. Just before 1 second its height is increasing, and just after 1 second its height is decreasing.",
+      "correctBehavior": "At 1 second, the derivative of height with respect to time is 0 meters per second. The positive rate before and negative rate after can both approach zero at the smooth peak."
+    },
+    {
+      "dimension": "one-sided-mismatch",
+      "scenario": "A robot moves 3 meters per second to the right until exactly 5 seconds, then instantly moves 3 meters per second to the left. Its position has a sharp corner at 5 seconds.",
+      "correctBehavior": "The left-side local rate is positive 3 meters per second and the right-side local rate is negative 3 meters per second. Because they do not agree, the position derivative at 5 seconds does not exist."
+    }
+  ],
+  "visual": null
+}

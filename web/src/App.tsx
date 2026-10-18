@@ -23,6 +23,7 @@ import { useExtraRound } from './extras'
 import { misconceptionFor } from './verdict'
 import { LearnSession } from './learn/LearnSession'
 import { LearnTopicBox } from './learn/LearnTopicBox'
+import { learnForCard } from './learn/custom/registry'
 import { HOME, onScreenChange, pushScreen, readScreen, replaceScreen, type Screen } from './url'
 import './App.css'
 
@@ -52,7 +53,14 @@ function Home({
           {homeSessions.map((s, i) => {
             const art = artFor(s.slug)
             return (
-              <button key={s.slug} className={`showcase${art ? ' has-art' : ''}`} onClick={() => onSession(s.slug)}>
+              <button
+                key={s.slug}
+                className={`showcase${art ? ' has-art' : ''}`}
+                onClick={() => {
+                  const learn = learnForCard(s.slug)
+                  return learn ? onLearn(learn) : onSession(s.slug)
+                }}
+              >
                 {art && (
                   <img
                     className="card-art"
