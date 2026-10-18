@@ -117,5 +117,69 @@
       "correctBehavior": "The previous tendency for deep beaks to increase reverses under the drought conditions. Across later generations, shallow-beak variants tend to become more common if beak depth is heritable."
     }
   ],
-  "visual": null
+  "visual": {
+    "widget": "curve",
+    "spec": {
+      "widget": "curve",
+      "approximate": false,
+      "variables": [],
+      "curve": {
+        "expr": "100/(1 + 9*(1 - s/100)^x)",
+        "mode": "value",
+        "x_min": 0,
+        "x_max": 40,
+        "x_label": "generations",
+        "y_label": "brown beetles (%)",
+        "ask_x": 20,
+        "ask_y": null,
+        "area_from": null,
+        "area_to": null,
+        "knob": {
+          "param": "s",
+          "label": "how many fewer young green beetles leave (%)",
+          "min": 0,
+          "max": 50,
+          "step": 1,
+          "default": 20
+        }
+      },
+      "sampler": null,
+      "prediction": {
+        "prompt": "On dark soil, 10% of beetles start brown. Green beetles leave 20% fewer young each generation because birds spot them. After 20 generations, what share is brown?",
+        "input": "slider",
+        "slider": {
+          "min": 0,
+          "max": 100,
+          "step": 1,
+          "unit": "%"
+        },
+        "options": []
+      },
+      "bands": [
+        {
+          "min": 0,
+          "max": 79,
+          "misconception_id": "survival-is-the-whole-story"
+        },
+        {
+          "min": 80,
+          "max": 100,
+          "misconception_id": null
+        }
+      ],
+      "extremes": [
+        {
+          "param": "s",
+          "value": 0,
+          "watch": "With no edge, brown stays at 10% forever: no selection without a difference in young."
+        },
+        {
+          "param": "s",
+          "value": 50,
+          "watch": "With a 50% edge, brown passes 99% in about 10 generations."
+        }
+      ],
+      "answer_claimed": 90.6
+    }
+  }
 }
