@@ -23,5 +23,12 @@
 @media (max-width: 720px) {
   .learn { grid-template-columns: minmax(0, 1fr); gap: 12px; }
   .learn-why { position: static; order: -1; }
+  /* phone: every tap target at least 44px tall, and 16px text in fields so iOS doesn't zoom on focus */
+  .learn button,
+  .learn summary { min-height: 44px; }
+  .learn button { display: inline-flex; align-items: center; justify-content: center; }
+  .learn input:not([type='range']):not([type='checkbox']):not([type='radio']),
+  .learn select,
+  .learn textarea { min-height: 44px; font-size: 16px; }
 }
 .learn-thinking { font-style: italic; opacity: 0.8; }
