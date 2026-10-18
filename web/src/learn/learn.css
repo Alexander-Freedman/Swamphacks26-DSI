@@ -1,0 +1,26 @@
+/* Learn session shell: plain paper, 4px corners. */
+.learn { display: grid; grid-template-columns: minmax(0, 1fr) 280px; gap: 24px; align-items: start; }
+.learn-main { min-width: 0; }
+.learn-bar { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; margin-bottom: 16px; }
+.learn-back { border-radius: 4px; }
+.learn-topic { font-weight: 600; flex: 1; min-width: 0; }
+.learn-auto { font-weight: 400; opacity: 0.7; }
+.learn-dots { display: flex; gap: 6px; list-style: none; margin: 0; padding: 0; }
+.learn-dots li { width: 8px; height: 8px; border-radius: 50%; border: 1px solid currentColor; opacity: 0.5; }
+.learn-dots li.is-past { background: currentColor; opacity: 0.5; }
+.learn-dots li.is-now { background: currentColor; opacity: 1; }
+.learn-step h2 { margin: 0 0 12px; font-size: 1.15rem; }
+.learn-step .learn-instruction { margin: 0 0 12px; }
+.learn-step textarea, .learn-step input[type='text'] {
+  width: 100%; box-sizing: border-box; border-radius: 4px; border: 1px solid currentColor; padding: 8px; font: inherit; background: transparent; color: inherit;
+}
+.learn-step button { border-radius: 4px; margin-top: 12px; }
+.learn-offline { font-size: 0.85rem; opacity: 0.7; }
+.learn-why { position: sticky; top: 16px; font-size: 0.9rem; }
+.learn-why-fallback { border: 1px solid currentColor; border-radius: 4px; padding: 8px 12px; }
+.learn-why-fallback p { margin: 6px 0; }
+.learn-why-source { opacity: 0.7; font-size: 0.85rem; }
+@media (max-width: 720px) {
+  .learn { grid-template-columns: minmax(0, 1fr); gap: 12px; }
+  .learn-why { position: static; order: -1; }
+}

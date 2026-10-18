@@ -1,7 +1,7 @@
 // Which screen is open lives in the URL, so Back, Forward and refresh work.
-// Sessions are ?session=<slug>, showcase rounds are ?round=<slug>, the notebook is ?notebook=1,
+// Sessions are ?session=<slug>, showcase rounds are ?round=<slug>, Learn sessions are ?learn=<slug>, the notebook is ?notebook=1,
 // Home is the bare base URL.
-export type Screen = { kind: 'home' } | { kind: 'notebook' } | { kind: 'session'; slug: string } | { kind: 'round'; slug: string }
+export type Screen = { kind: 'home' } | { kind: 'notebook' } | { kind: 'session'; slug: string } | { kind: 'round'; slug: string } | { kind: 'learn'; slug: string }
 
 export const HOME: Screen = { kind: 'home' }
 
@@ -9,6 +9,8 @@ export function readScreen(search: string): Screen {
   const q = new URLSearchParams(search)
   const session = q.get('session')
   if (session) return { kind: 'session', slug: session }
+  const learn = q.get('learn')
+  if (learn) return { kind: 'learn', slug: learn }
   const round = q.get('round')
   if (round) return { kind: 'round', slug: round }
   if (q.has('notebook')) return { kind: 'notebook' }
