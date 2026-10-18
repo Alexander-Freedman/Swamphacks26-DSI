@@ -2,6 +2,7 @@
 // After the truth shows, the checker says whether the learner's rule already covered that case;
 // if not, it names the one missing piece, and a tap adds it to the rule. The rule grows card by card.
 // Cards open in order; after all three, the learner says why the rule works.
+import { notesLine } from '../../demo/demo'
 import { useCallback, useMemo, useState } from 'react'
 import { Curve } from '../../components/Curve'
 import type { StageProps, StressRequest, WhyRequest } from '../types'
@@ -205,7 +206,7 @@ export function StressScreen({ topic, state, update, next, api }: StageProps) {
           {offlineLine(offline)}
         </p>
       )}
-      {!offline && offlineGraded && <p className="learn-offline">Checked against the topic's notes (the live checker is busy or offline).</p>}
+      {!offline && offlineGraded && <p className="learn-offline">{notesLine()}</p>}
       <button className="st-next" onClick={next}>
         Next
       </button>

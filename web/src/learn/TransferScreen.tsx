@@ -1,4 +1,5 @@
 // Carry it: the same idea in a different world. One push if it doesn't map yet.
+import { checkLabel } from '../demo/demo'
 import { useCallback, useState } from 'react'
 import type { StageProps, TransferRequest } from './types'
 import { useGraded } from './useGraded'
@@ -55,7 +56,7 @@ export function TransferScreen({ topic, state, update, next, api }: StageProps) 
               missing: {result.missingPiece}
             </p>
           )}
-          {result.offline && <span className="learn-offline">offline check</span>}
+          {result.offline && <span className="learn-offline">{checkLabel()}</span>}
         </div>
       )}
       <div className="ldf-actions">

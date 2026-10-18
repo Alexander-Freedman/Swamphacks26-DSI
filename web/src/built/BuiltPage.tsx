@@ -41,12 +41,16 @@ function Row({ shot, alt, title, children, flip }: { shot: string; alt: string; 
 export function BuiltPage({ onHome, onLearn }: { onHome: () => void; onLearn: (slug: string) => void }) {
   return (
     <div className="bt-page">
-      <button className="rs-home linkish" onClick={onHome}>← Home</button>
-
       <header className="bt-hero sheet">
         <p className="bt-kicker">SwampHacks XII · Entertainment &amp; Creative Technology</p>
         <h1>How we built Onionskin</h1>
         <p className="bt-lede">Two students, two AI coding agents and 24 research papers, in one weekend.</p>
+        <div className="bt-go-row">
+          <button className="bt-go" onClick={onHome}>
+            Try the app →
+          </button>
+          <span>Pick a lesson and play with it. Three of them replay our AI's real feedback.</span>
+        </div>
         <ul className="bt-stats">
           {STATS.map(([n, label]) => (
             <li key={label}>
@@ -159,11 +163,14 @@ export function BuiltPage({ onHome, onLearn }: { onHome: () => void; onLearn: (s
       </section>
 
       <section className="bt-cta sheet">
-        <h2>Try a recorded demo</h2>
+        <h2>Try it yourself</h2>
         <div className="bt-demos">
+          <button className="bt-go" onClick={onHome}>
+            Open the app →
+          </button>
           {DEMOS.map(([slug, label]) => (
             <button key={slug} onClick={() => onLearn(slug)}>
-              {label} →
+              ★ {label} demo
             </button>
           ))}
         </div>

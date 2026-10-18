@@ -47,7 +47,7 @@ describe('Draw it', () => {
     const saved = update.mock.calls.map((c) => c[0]).find((p) => p.drawVerdicts)!
     expect(saved.drawVerdicts!.map((c) => c.id)).toEqual(['entities', 'links', 'rule', 'why-rule'])
     expect(screen.getByText(topic.rubric.whyRuleQuestion)).toBeTruthy()
-    expect(screen.getByText(/Checked against the topic's notes/)).toBeTruthy()
+    expect(screen.getByText(/Quick keyword check against our notes/)).toBeTruthy()
   })
 
   it('a rule that says it gets the rule stamped "got it"', async () => {

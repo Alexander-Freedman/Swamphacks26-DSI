@@ -1,4 +1,5 @@
 // Tell it apart: two cards, this topic and its look-alike; the learner says what separates them.
+import { checkLabel } from '../demo/demo'
 import { useCallback, useState } from 'react'
 import type { NeighborRequest, StageProps } from './types'
 import { useGraded } from './useGraded'
@@ -70,7 +71,7 @@ export function NeighborScreen({ topic, state, update, next, api }: StageProps) 
       {result && !busy && (
         <div className={`ldf-verdict is-${result.verdict}`} aria-live="polite">
           <strong>{SAY[result.verdict]}.</strong> {result.feedback}
-          {result.offline && <span className="learn-offline"> · offline check</span>}
+          {result.offline && <span className="learn-offline"> · {checkLabel()}</span>}
         </div>
       )}
       <div className="ldf-actions">
