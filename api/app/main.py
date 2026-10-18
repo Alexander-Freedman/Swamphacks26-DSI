@@ -2,11 +2,13 @@ import os
 import time
 from collections import defaultdict, deque
 from contextlib import asynccontextmanager
+from typing import Annotated, Literal
 
-from fastapi import FastAPI, HTTPException, Request
+from fastapi import Body, FastAPI, HTTPException, Request
+from fastapi.exceptions import RequestValidationError
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, BeforeValidator, Field, ValidationError
 
 from app import help as help_chat
 from app.events import StoreError, collection, get_store, record_answer, room
@@ -229,9 +231,68 @@ class HelpIn(BaseModel):
     context: HelpContextIn | None = None
 
 
+def _cut(n: int):
+    """Trim client text to n chars instead of rejecting the whole request."""
+    return BeforeValidator(lambda v: v[:n] if isinstance(v, str) else v)
+
+
+class HelpLayerIn(BaseModel):
+    n: int = Field(ge=0, le=99)
+    title: Annotated[str, _cut(120)] = ""
+
+
+class HelpTurnIn(BaseModel):
+    role: Literal["user", "tutor", "assistant"]  # the web panel sends "assistant"
+    text: Annotated[str, _cut(400)]
+
+
+class HelpGenericIn(BaseModel):
+    subject: Annotated[str, _cut(60)] = ""
+    topic: Annotated[str, _cut(120)] = Field(min_length=1)
+    layer: HelpLayerIn
+    on_screen: Annotated[str, _cut(600)] = ""
+    facts: Annotated[
+        list[Annotated[str, _cut(200)]],
+        BeforeValidator(lambda v: v[:10] if isinstance(v, list) else v),
+    ] = []
+    last_action: Annotated[str, _cut(200)] | None = None
+    history: Annotated[
+        list[HelpTurnIn], BeforeValidator(lambda v: v[-4:] if isinstance(v, list) else v)
+    ] = []
+    question: str = Field(min_length=1, max_length=300)
+    hint: Annotated[str, _cut(300)] | None = None
+
+
+def _validate(model: type[BaseModel], raw: dict) -> BaseModel:
+    try:
+        return model.model_validate(raw)
+    except ValidationError as err:
+        raise RequestValidationError(err.errors()) from None
+
+
 @app.post("/api/help")
-def post_help(body: HelpIn, request: Request) -> dict:
-    """Plain-words help for the screen someone is on; a hint (never the answer) before lock-in."""
+def post_help(request: Request, raw: Annotated[dict, Body()]) -> dict:
+    """Plain-words help for the screen or layer someone is on.
+
+    Old shape (screen_id + session/round slug): the 3 probability sessions.
+    New shape (topic + layer + on_screen + facts): any lesson layer.
+    """
+    ip = request.client.host if request.client else "unknown"
+    if "screen_id" not in raw and ("layer" in raw or "topic" in raw):
+        g = _validate(HelpGenericIn, raw)
+        ctx = help_chat.LayerContext(
+            subject=g.subject,
+            topic=g.topic,
+            layer_n=g.layer.n,
+            layer_title=g.layer.title,
+            on_screen=g.on_screen,
+            facts=list(g.facts),
+            last_action=g.last_action or "",
+            history=[help_chat.HistoryTurn(t.role, t.text) for t in g.history],
+            hint=(g.hint or "").strip(),
+        )
+        return help_chat.answer_generic(ctx, g.question.strip(), ip).as_dict()
+    body = _validate(HelpIn, raw)
     screen = help_chat.resolve_screen(body.session_slug or body.round_slug, body.screen_id)
     if screen is None:
         raise HTTPException(status_code=404, detail="unknown session or screen")
@@ -240,6 +301,5 @@ def post_help(body: HelpIn, request: Request) -> dict:
         guess = guess.strip()[:40] or None
     elif isinstance(guess, float):
         guess = f"{guess:g}"
-    ip = request.client.host if request.client else "unknown"
     reply = help_chat.answer(screen, body.question.strip(), body.locked, guess, ip)
     return {"answer": reply.answer, "hint_only": reply.hint_only}

@@ -55,7 +55,7 @@ Sampler stats (all computed exactly in `api/app/truth.py`; probabilities are in 
 - `checks` for v4: `{kept, dropped, blind_checked: false, blind_ok: 0, blind_failed: 0, unchecked: [], computed: [item ids], model, seconds}`. There is no blind second-model check any more: every v4 truth is computed by code.
 
 ## Help chat: `POST /api/help`
-Request: `{session_slug | round_slug, screen_id, question, locked, context: {guess?}}`
+Old shape (the 3 probability sessions), unchanged. Request: `{session_slug | round_slug, screen_id, question, locked, context: {guess?}}`
 - `session_slug` / `round_slug`: `birthday`, `coin-streak` (alias `coin`), `positive-test` (alias `ptest`). Optional; if sent it must match the screen's topic.
 - `screen_id`: a storyboard screen from docs/experience.md: `B1`-`B7`, `C1`-`C7`, `P1`-`P6`. Unknown screen or wrong topic → 404.
 - `question`: 1-300 chars (longer → 422).
@@ -67,6 +67,19 @@ Response, always HTTP 200 for a known screen: `{answer: string, hint_only: bool}
 - `hint_only: true` = a hint, not the answer: before lock-in, or a fallback. Before lock-in the answer is scanned for the true value; if it leaks, the screen's static hint is sent instead.
 - Fallbacks (still 200): no key/offline or daily cap hit → `"Help is resting for today; the screen has everything you need: <static hint>"`; per-IP limit hit → `"Lots of questions at once! Give the screen a minute: <static hint>"`. The panel can show the text as is; the session never depends on it.
 - Limits: daily cap `HELP_DAILY_CAP` (default 150, plus a shared total with generation at the 480/day soft cap; own `help` bucket in the usage file, shown under `help` in `GET /api/usage`), per IP `HELP_PER_IP` per `HELP_PER_IP_WINDOW_S` (default 10 per 600 s), separate from the round/answer limiters. Model: 3.5 Flash-Lite (minimal thinking), then 3.1 Flash-Lite.
+
+### Generic shape (any lesson layer)
+Sent when the body has no `screen_id` and has `topic`/`layer`. Request:
+`{subject, topic, layer: {n, title}, on_screen, facts: [str], last_action, history: [{role: "user"|"tutor", text}], question, hint}`
+- `topic` required; `layer.n` (0-99) required; `question` 1-300 chars (else 422); `history.role` must be `user` or `tutor` (else 422).
+- Trimmed, not rejected: `subject` 60, `topic`/`layer.title` 120, `on_screen` 600, each fact 200 and the first 10, `last_action` 200, history: the last 4 turns, each text 400, `hint` 300.
+- `facts` + `on_screen` are the only numbers and maths/chemistry claims the tutor may use. All client text is untrusted: it goes into the prompt inside `<<<NAME ... NAME>>>` data blocks (markers stripped from the text).
+- `hint`: the layer's static hint, used as the answer whenever the model isn't.
+
+Response, always 200: `{answer, hint_only, source: "model"|"static", model?}`
+- Model answer: `{answer, hint_only: false, source: "model", model}`; plain text, ≤ 4 sentences / 600 chars, about the current layer, "slide to layer N to see that" for deeper questions, a hint first for "just tell me".
+- Static: per-IP limit, daily cap, offline/no key, or both models failing → `{answer: hint or a generic line, hint_only: true, source: "static"}`. A question that tries to override the rules ("ignore previous instructions"...) gets a short refusal with no model call. If the answer has a number that isn't in `facts`/`on_screen`/`question`/`topic` (layer refs like "layer 4" are fine) → `"I'd rather not guess a number: check the readout on screen."`.
+- Models: `gemma-4-31b-it` (one 10 s attempt), then `gemini-3.5-flash-lite`. Same `help` bucket, `HELP_DAILY_CAP` and per-IP limit as the old shape.
 
 ## Truth: what the browser computes (the backend re-derives the same numbers in `api/app/truth.py` for checks)
 
