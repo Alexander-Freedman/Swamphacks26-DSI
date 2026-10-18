@@ -9,13 +9,15 @@ import {
 import { reducedMotion, useWidth } from './plot'
 import { SlopeChart } from './SlopeChart'
 import { FINE, fineXs, pencilAt } from './slopeGeo'
+import { ContourStep } from './Contour'
+import { FieldStep } from './Field'
 import { GradientStep } from './Gradient'
 import { SurfaceStep } from './Surface'
 import { COURSES, type CalcStep, type CalcTopic } from './topics'
 import { VolumeStep } from './Volume'
 import './calculus.css'
 
-const LABEL: Record<CalcStep, string> = { draw: 'Draw the slope', tangent: 'Drag the tangent', area: 'Fill the area', card: 'Your mistake', compare: 'Same idea twice', surface: 'Slices', gradient: 'The gradient', volume: 'Volume' }
+const LABEL: Record<CalcStep, string> = { draw: 'Draw the slope', tangent: 'Drag the tangent', area: 'Fill the area', card: 'Your mistake', compare: 'Same idea twice', surface: 'Slices', gradient: 'The gradient', volume: 'Volume', contour: 'Contour maps', field: 'Vector fields' }
 
 // One plain-language guidance line per screen.
 const TITLES: Record<CalcStep, [string, string]> = {
@@ -26,6 +28,8 @@ const TITLES: Record<CalcStep, [string, string]> = {
   compare: ['Same idea, twice.', 'Drag time on either graph. Watch which numbers match, then pick what the two have in common.'],
   surface: ['Slices of a surface.', 'With two inputs, x and y, the graph is a surface: a height above every point of the floor. Drag it to turn it around. Slicing it straight along x or y gives an ordinary curve, and that curve’s slope is a partial derivative.'],
   gradient: ['The gradient.', 'On a hill, one direction climbs fastest. The gradient is the arrow on the floor that points that way, and its length is how steep the climb is. Turn the hill around, then pick the arrow you think is steepest.'],
+  contour: ['Contour maps.', 'Flood two hills and lower the water: the shoreline at each height is a contour line. Each one is stamped onto a flat map, which is all a hiker ever gets. Then read the hills back off the map alone.'],
+  field: ['Vector fields.', 'A vector field hands every point of the floor an arrow: which way the water flows there, and how fast. Predict where a leaf goes first, then drop leaves and watch the arrows carry them.'],
   volume: ['Volume under a surface.', 'Stand columns on the floor under a curved roof and add up their volumes, like rectangles under a curve but in 3D. Guess the real volume first, then make the columns thinner and watch the total close in.'],
 }
 const REMIX: Record<string, string> = {
@@ -164,6 +168,8 @@ function CalcRun({ topic, onTopics, onDone }: { topic: CalcTopic; onTopics: () =
       {cur === 'surface' && <SurfaceStep onDone={onDone} topic={topic.id} />}
       {cur === 'gradient' && <GradientStep onDone={onDone} topic={topic.id} />}
       {cur === 'volume' && <VolumeStep onDone={onDone} topic={topic.id} />}
+      {cur === 'contour' && <ContourStep onDone={onDone} topic={topic.id} />}
+      {cur === 'field' && <FieldStep onDone={onDone} topic={topic.id} />}
     </Frame>
   )
 }

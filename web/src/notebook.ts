@@ -60,6 +60,12 @@ const EXTRA_LABELS: Record<string, string> = {
   'gradient-points-at-peak': 'Steepest = straight at the top',
   'gradient-is-height': 'Steeper the higher you go',
   'more-columns-more-volume': 'More columns = more volume',
+  // calculus, Calc 3 (sessions/calculus/contourMath.ts, fieldMath.ts)
+  'contour-count-is-height': 'Hill with more rings = higher point',
+  'contour-spacing-flat': 'Close lines = flat ground',
+  'field-arrows-are-paths': 'One arrow = the whole path',
+  'whirl-spirals-in': 'A whirl spirals inward',
+  'field-length-ignored': 'Arrow length doesn’t matter',
   // orgo (sessions/orgo/chem.ts MISTAKES)
   'carbon-five-bonds': 'A carbon with 5 bonds',
   'hydrogen-two-bonds': 'Hydrogen with 2 bonds',

@@ -244,3 +244,34 @@
 .calc-sums td { text-align: right; }
 .calc-sums tr.on { background: var(--marker-soft); font-weight: 700; }
 .calc-correct + .calc-k { margin-top: 14px; }
+
+/* Calc 3: contour maps (calc-ctr-): flooded hills, then the flat map */
+.calc-ctr-water { fill: #9fc7e8; fill-opacity: 0.85; stroke: #6f9fc4; stroke-width: 0.5; stroke-opacity: 0.6; }
+.calc-ctr-shore { fill: none; stroke: var(--off); stroke-width: 3; stroke-linecap: round; }
+.calc-ctr-range { margin-top: 6px; grid-template-columns: 6em 1fr; }
+.calc-ctr-map { display: block; width: 100%; height: auto; max-height: min(54vh, 460px); margin: 0 auto; user-select: none; -webkit-user-select: none; }
+.calc-ctr-map.tap { touch-action: none; cursor: crosshair; }
+.calc-ctr-map:focus-visible, .calc-fld:focus-visible { outline: 2px dashed var(--ink); outline-offset: 2px; }
+.calc-3d-side .calc-ctr-map { max-height: 30vh; }
+.calc-ctr-paper { fill: var(--paper); stroke: var(--ink-soft); stroke-width: 1; }
+.calc-ctr-line { fill: none; stroke: var(--ink); stroke-width: 1.2; stroke-linecap: round; }
+.calc-ctr-line.major { stroke-width: 2.2; }
+.calc-ctr-live { fill: none; stroke: var(--off); stroke-width: 3; stroke-linecap: round; }
+.calc-ctr-hlab { font: 700 11px var(--font-mono); fill: var(--ink); paint-order: stroke; stroke: var(--paper); stroke-width: 3px; stroke-linejoin: round; }
+.calc-ctr-cmp circle { fill: var(--marker); stroke: var(--ink); stroke-width: 2; }
+.calc-ctr-cmp text { font: 700 13px var(--font-mono); fill: var(--ink); }
+.calc-ctr-grad line { stroke: var(--off); stroke-width: 5; stroke-linecap: round; }
+.calc-ctr-grad polygon { fill: var(--off); stroke: var(--off); stroke-width: 1.5; stroke-linejoin: round; }
+.calc-ctr-grad .calc-ctr-tan { stroke: var(--called); stroke-width: 2.5; stroke-dasharray: 5 4; }
+.calc-ctr-grad .calc-ctr-right { fill: none; stroke: var(--ink); stroke-width: 1.5; }
+
+/* Calc 3: vector fields (calc-fld-): arrows on a grid, leaves and their dotted trails */
+.calc-fld { display: block; width: 100%; height: auto; max-height: min(54vh, 460px); margin: 0 auto; user-select: none; -webkit-user-select: none; }
+.calc-fld.tap { touch-action: none; cursor: crosshair; }
+.calc-fld-head { justify-content: space-between; padding: 2px 4px 8px; }
+.calc-fld-head .calc-seg button:disabled { color: var(--pencil); cursor: default; }
+.calc-fld-arrows line { stroke: var(--ink); stroke-width: 2; stroke-linecap: round; }
+.calc-fld-arrows polygon, .calc-fld-arrows circle { fill: var(--ink); }
+.calc-fld-dot { fill: var(--off); }
+.calc-fld-start { fill: var(--paper); stroke: var(--off); stroke-width: 1.5; }
+.calc-fld-end { fill: var(--called); stroke: var(--ink); stroke-width: 2; }

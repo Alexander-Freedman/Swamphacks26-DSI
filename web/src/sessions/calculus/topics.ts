@@ -2,7 +2,7 @@
 // purpose instead of a fixed path. A topic is a list of steps from the session. Topics that aren't
 // built yet stay on the menu as "coming next" so the whole map of the subject is visible.
 
-export type CalcStep = 'draw' | 'tangent' | 'area' | 'card' | 'compare' | 'surface' | 'gradient' | 'volume'
+export type CalcStep = 'draw' | 'tangent' | 'area' | 'card' | 'compare' | 'surface' | 'gradient' | 'volume' | 'contour' | 'field'
 
 export type CalcTopic = {
   id: string
@@ -96,7 +96,7 @@ export const COURSES: CalcCourse[] = [
         topics: [
           { id: 'surface', title: 'Slices of a surface', blurb: 'Turn a 3D surface around, slice it, and read the partial derivatives off the cuts.', steps: ['surface'], ready: true },
           { id: 'gradient', title: 'The gradient', blurb: 'The arrow on the floor that points straight uphill. Follow it to the top.', steps: ['gradient'], ready: true },
-          soon('contour', 'Contour maps', 'Flatten the hills into a topographic map and read it back.'),
+          { id: 'contour', title: 'Contour maps', blurb: 'Flood two hills, stamp each shoreline on a flat map, then read the hills back off the map alone.', steps: ['contour'], ready: true },
         ],
       },
       {
@@ -109,7 +109,7 @@ export const COURSES: CalcCourse[] = [
         id: 'vector',
         title: 'Vector calculus',
         blurb: 'Arrows everywhere: flow, spin and work.',
-        topics: [soon('field', 'Vector fields', 'Drop a leaf in a flow and watch where the arrows carry it.')],
+        topics: [{ id: 'field', title: 'Vector fields', blurb: 'Drop a leaf in a flow and watch where the arrows carry it.', steps: ['field'], ready: true }],
       },
     ],
   },
