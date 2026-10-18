@@ -96,7 +96,8 @@ describe('StressScreen: predict, then check', () => {
   })
 
   it('a case without predict data checks the rule directly', async () => {
-    render(<Harness api={scripted([{ verdict: 'survives' }])} fix="it grows" t={base} />)
+    const noCards: Topic = { ...base, extremeCases: base.extremeCases.map((c) => ({ ...c, predict: null })) }
+    render(<Harness api={scripted([{ verdict: 'survives' }])} fix="it grows" t={noCards} />)
     await act(async () => void fireEvent.click(within(card(1)).getByRole('button', { name: 'Test my rule' })))
     expect(within(card(1)).getByText('✓ Your rule covered this.')).toBeTruthy()
   })
