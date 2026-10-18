@@ -60,6 +60,13 @@ const EXTRA_LABELS: Record<string, string> = {
   'gradient-points-at-peak': 'Steepest = straight at the top',
   'gradient-is-height': 'Steeper the higher you go',
   'more-columns-more-volume': 'More columns = more volume',
+  // calculus, Calc 1 (sessions/calculus/limitMath.ts, chainMath.ts, boxMath.ts, ladderMath.ts)
+  'limit-needs-the-point': 'A hole means no limit',
+  'limit-is-the-value': 'Limit = the value at the point',
+  'chain-rates-add': 'Chain rule: the rates add',
+  'chain-outer-only': 'Chain rule: only the outside counts',
+  'flat-means-max': 'Slope 0 means a maximum',
+  'ladder-same-speed': 'Both ends of the ladder move at the same speed',
   // orgo (sessions/orgo/chem.ts MISTAKES)
   'carbon-five-bonds': 'A carbon with 5 bonds',
   'hydrogen-two-bonds': 'Hydrogen with 2 bonds',

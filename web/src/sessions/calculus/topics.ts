@@ -2,7 +2,7 @@
 // purpose instead of a fixed path. A topic is a list of steps from the session. Topics that aren't
 // built yet stay on the menu as "coming next" so the whole map of the subject is visible.
 
-export type CalcStep = 'draw' | 'tangent' | 'area' | 'card' | 'compare' | 'surface' | 'gradient' | 'volume'
+export type CalcStep = 'draw' | 'tangent' | 'area' | 'card' | 'compare' | 'surface' | 'gradient' | 'volume' | 'limit' | 'chain' | 'optimize' | 'related'
 
 export type CalcTopic = {
   id: string
@@ -28,7 +28,7 @@ export const COURSES: CalcCourse[] = [
         id: 'limits',
         title: 'Limits',
         blurb: 'Zoom in on a point until the curve stops surprising you.',
-        topics: [soon('limit', 'What a limit is', 'Slide toward a point from both sides and watch where the height settles.')],
+        topics: [{ id: 'limit', title: 'What a limit is', blurb: 'Zoom in on a point from both sides and watch where the height settles.', steps: ['limit'], ready: true }],
       },
       {
         id: 'derivatives',
@@ -36,9 +36,9 @@ export const COURSES: CalcCourse[] = [
         blurb: 'How steep a curve is at each point: its rate of change.',
         topics: [
           { id: 'slope', title: 'The slope of a curve', blurb: 'Sketch how steep the curve is, then check it with a sliding tangent line.', steps: ['draw', 'tangent', 'card'], ready: true },
-          soon('chain', 'Chain rule', 'A function inside a function: watch the two rates multiply.'),
-          soon('optimize', 'Maximums and minimums', 'Find where the slope hits 0 and decide which is the max.'),
-          soon('related', 'Related rates', 'A ladder slides down a wall: two speeds tied together.'),
+          { id: 'chain', title: 'Chain rule', blurb: 'A function inside a function: watch the two stretches multiply.', steps: ['chain'], ready: true },
+          { id: 'optimize', title: 'Maximums and minimums', blurb: 'Fold a box from a cut sheet, find where the slope hits 0, and decide which flat spot is the max.', steps: ['optimize'], ready: true },
+          { id: 'related', title: 'Related rates', blurb: 'A ladder slides down a wall: two speeds tied together.', steps: ['related'], ready: true },
         ],
       },
       {

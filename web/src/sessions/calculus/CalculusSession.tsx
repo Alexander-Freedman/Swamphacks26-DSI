@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
-import { NOTEBOOK_HREF, record } from '../../notebook'
+import { record } from '../../notebook'
 import { Frame, SessionHead, Title } from '../../components/session/Shell'
 import { AreaChart, GuessBar, MiniRects, MiniTangent, PositionChart, VelocityChart } from './AreaCharts'
 import {
@@ -9,13 +9,18 @@ import {
 import { reducedMotion, useWidth } from './plot'
 import { SlopeChart } from './SlopeChart'
 import { FINE, fineXs, pencilAt } from './slopeGeo'
+import { CalcEnd } from './CalcEnd'
+import { ChainStep } from './Chain'
+import { LadderStep } from './Ladder'
+import { LimitStep } from './Limit'
+import { OptimizeStep } from './Optimize'
 import { GradientStep } from './Gradient'
 import { SurfaceStep } from './Surface'
 import { COURSES, type CalcStep, type CalcTopic } from './topics'
 import { VolumeStep } from './Volume'
 import './calculus.css'
 
-const LABEL: Record<CalcStep, string> = { draw: 'Draw the slope', tangent: 'Drag the tangent', area: 'Fill the area', card: 'Your mistake', compare: 'Same idea twice', surface: 'Slices', gradient: 'The gradient', volume: 'Volume' }
+const LABEL: Record<CalcStep, string> = { draw: 'Draw the slope', tangent: 'Drag the tangent', area: 'Fill the area', card: 'Your mistake', compare: 'Same idea twice', surface: 'Slices', gradient: 'The gradient', volume: 'Volume', limit: 'Limit', chain: 'Chain rule', optimize: 'Max and min', related: 'Related rates' }
 
 // One plain-language guidance line per screen.
 const TITLES: Record<CalcStep, [string, string]> = {
@@ -26,6 +31,10 @@ const TITLES: Record<CalcStep, [string, string]> = {
   compare: ['Same idea, twice.', 'Drag time on either graph. Watch which numbers match, then pick what the two have in common.'],
   surface: ['Slices of a surface.', 'With two inputs, x and y, the graph is a surface: a height above every point of the floor. Drag it to turn it around. Slicing it straight along x or y gives an ordinary curve, and that curve’s slope is a partial derivative.'],
   gradient: ['The gradient.', 'On a hill, one direction climbs fastest. The gradient is the arrow on the floor that points that way, and its length is how steep the climb is. Turn the hill around, then pick the arrow you think is steepest.'],
+  limit: ['What a limit is.', 'A limit is where a curve is heading as you walk toward a point, not what sits at the point. Two walkers come in from either side; zoom in and watch what height they settle on.'],
+  chain: ['The chain rule.', 'When one function feeds another, a step in x gets stretched twice: once going into u, once going into y. The stretches multiply. Slide x and watch the fans.'],
+  optimize: ['Maximums and minimums.', 'Cut the corners off a sheet and fold up a box. The volume depends on the cut. The biggest box is where the volume curve goes flat, but flat spots need checking: a bottom is flat too.'],
+  related: ['Related rates.', 'A ladder slides down a wall. The foot moves at a steady speed; how fast does the top fall? The two speeds are tied together by the ladder’s length.'],
   volume: ['Volume under a surface.', 'Stand columns on the floor under a curved roof and add up their volumes, like rectangles under a curve but in 3D. Guess the real volume first, then make the columns thinner and watch the total close in.'],
 }
 const REMIX: Record<string, string> = {
@@ -164,6 +173,10 @@ function CalcRun({ topic, onTopics, onDone }: { topic: CalcTopic; onTopics: () =
       {cur === 'surface' && <SurfaceStep onDone={onDone} topic={topic.id} />}
       {cur === 'gradient' && <GradientStep onDone={onDone} topic={topic.id} />}
       {cur === 'volume' && <VolumeStep onDone={onDone} topic={topic.id} />}
+      {cur === 'limit' && <LimitStep onDone={onDone} topic={topic.id} />}
+      {cur === 'chain' && <ChainStep onDone={onDone} topic={topic.id} />}
+      {cur === 'optimize' && <OptimizeStep onDone={onDone} topic={topic.id} />}
+      {cur === 'related' && <LadderStep onDone={onDone} topic={topic.id} />}
     </Frame>
   )
 }
@@ -542,21 +555,5 @@ function CompareStep({ slope, area, onDone, onPick }: { slope: SlopeRead | null;
       </div>
       {right && <CalcEnd caught={caught} mastered={done} remix="" onDone={onDone} />}
     </section>
-  )
-}
-
-/** The yellow end bar: saved, what was caught, Open notebook, Done. */
-function CalcEnd({ caught, mastered: ok, remix, onDone }: { caught: string[]; mastered: boolean; remix: string; onDone: () => void }) {
-  return (
-    <div className="calc-end" role="status">
-      <p>
-        <b>Saved to your notebook.</b> {caught.length ? `Caught: ${caught.join(' and ')}.` : 'No mistake caught this time.'}{' '}
-        {ok && <span className="calc-mastered" aria-label="mastered">✓ mastered</span>} {remix}
-      </p>
-      <div className="calc-endact">
-        <a className="calc-nblink" href={NOTEBOOK_HREF}>Open notebook</a>
-        <button className="calc-btn" onClick={onDone}>Done</button>
-      </div>
-    </div>
   )
 }

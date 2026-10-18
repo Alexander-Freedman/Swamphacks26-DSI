@@ -195,7 +195,7 @@
 .calc-slice-tan { stroke: var(--off); stroke-width: 2.5; stroke-dasharray: 6 4; }
 .calc-ask { font: 700 17px/1.4 var(--font-body); margin: 6px 0 0; }
 .calc-picks-row { grid-template-columns: repeat(3, minmax(0, 1fr)); }
-.calc-range { display: grid; grid-template-columns: 5.5em 1fr; align-items: center; gap: 10px; margin-top: 10px; font: 700 15px var(--font-mono); }
+.calc-range { display: grid; grid-template-columns: max-content 1fr; align-items: center; gap: 10px; margin-top: 10px; font: 700 15px var(--font-mono); }
 
 /* Calc 3 fits one screen: surface on the left, question + small slices on the right */
 .calc-3d-layout { display: grid; grid-template-columns: minmax(0, 1.25fr) minmax(320px, 1fr); gap: 16px; align-items: start; }
@@ -244,3 +244,31 @@
 .calc-sums td { text-align: right; }
 .calc-sums tr.on { background: var(--marker-soft); font-weight: 700; }
 .calc-correct + .calc-k { margin-top: 14px; }
+
+/* Calc 1: what a limit is (the zoom lens) */
+.calc-lens { width: 100%; }
+.calc-lens-glass { fill: var(--card); stroke: var(--ink); stroke-width: 2; }
+.calc-lens-target { stroke: var(--called); stroke-width: 1.5; stroke-dasharray: 6 4; }
+.calc-lens-hole { fill: var(--paper); stroke: var(--ink); stroke-width: 2.5; }
+.calc-handle.right { fill: var(--called); }
+.calc-zoom { margin-top: 6px; }
+
+/* Calc 1: the chain rule (number lines and fans) */
+.calc-chain-step { stroke: var(--ink); stroke-width: 5; stroke-linecap: round; }
+.calc-chain-fan { fill: var(--marker-soft); stroke: var(--marker); stroke-width: 1; }
+
+/* Calc 1: maximums and minimums (the cut sheet) */
+.calc-sheet { margin: 0 auto; }
+.calc-sheet-paper { fill: var(--card); stroke: var(--ink); stroke-width: 2; }
+.calc-sheet-floor { fill: var(--marker-soft); }
+.calc-sheet-cut { fill: var(--grid); stroke: var(--ink-soft); stroke-width: 1; stroke-dasharray: 3 3; }
+.calc-sheet-fold { stroke: var(--ink-soft); stroke-width: 1.5; stroke-dasharray: 5 4; }
+
+/* Calc 1: related rates (the ladder) */
+.calc-ladder { width: 100%; max-width: 420px; margin: 0 auto; }
+.calc-ladder-wall { stroke: var(--ink); stroke-width: 3; stroke-linecap: square; }
+.calc-ladder-rail { stroke: var(--ink); stroke-width: 6; stroke-linecap: round; }
+.calc-ladder-rung { stroke: var(--paper); stroke-width: 2; }
+.calc-ladder-arrow line { stroke-width: 4; stroke-linecap: round; }
+.calc-ladder-arrow.foot line, .calc-ladder-arrow.foot polygon { stroke: var(--ink); fill: var(--ink); }
+.calc-ladder-arrow.top line, .calc-ladder-arrow.top polygon { stroke: var(--off); fill: var(--off); }
