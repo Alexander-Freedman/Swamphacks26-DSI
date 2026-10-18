@@ -247,7 +247,12 @@ export default function App() {
     return (
       <main className="app">
         <header className="topbar">
-          <button className="logo" style={{ border: 0, background: 'none', padding: 0 }} onClick={home}>Onionskin</button>
+          <span className="brand">
+            <button className="logo" style={{ border: 0, background: 'none', padding: 0 }} onClick={home}>Onionskin</button>
+            <button className="brand-tab" onClick={() => go({ kind: 'built' })}>
+              <strong>How we built it</strong>
+            </button>
+          </span>
           <div className="topbar-actions">
             {!isStatic() && <AskHelp key={screen.slug} slug={screen.slug} kind="session" subject={screen.slug.replace(/-/g, ' ')} docked />}
           </div>
@@ -260,7 +265,12 @@ export default function App() {
     return (
       <main className="app">
         <header className="topbar">
-          <button className="logo" style={{ border: 0, background: 'none', padding: 0 }} onClick={home}>Onionskin</button>
+          <span className="brand">
+            <button className="logo" style={{ border: 0, background: 'none', padding: 0 }} onClick={home}>Onionskin</button>
+            <button className="brand-tab" onClick={() => go({ kind: 'built' })}>
+              <strong>How we built it</strong>
+            </button>
+          </span>
           <div className="topbar-actions">
             {!isStatic() && <AskHelp key={session.slug} slug={session.slug} kind="session" subject={session.title} />}
             {sessionHowItWorks[session.slug] && <SessionDrawer key={session.slug} slug={session.slug} />}
@@ -281,7 +291,7 @@ export default function App() {
                 <strong>Research:</strong> why it works
               </button>
             )}
-            {screen.kind === 'home' && (
+            {screen.kind !== 'built' && (
               <button className="brand-tab" onClick={() => go({ kind: 'built' })}>
                 <strong>How we built it</strong>
               </button>
