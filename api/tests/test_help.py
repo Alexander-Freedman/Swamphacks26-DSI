@@ -255,15 +255,15 @@ def test_generic_happy_path(glive) -> None:
         "answer": "The oxygen has a spare pair of electrons. Watch the red arrow.",
         "hint_only": False,
         "source": "model",
-        "model": "gemma-4-31b-it",
+        "model": "gemini-3.5-flash-lite",
     }
     c = calls[0]
-    assert c["model"] == "gemma-4-31b-it"
+    assert c["model"] == "gemini-3.5-flash-lite"
     assert c["system"] == help_chat.GENERIC_SYSTEM
     assert "<<<LAYER\nlayer 2: Curved arrows\nLAYER>>>" in c["prompt"]
     assert "- SN2 is one step" in c["prompt"]
     assert "<<<LAST_ACTION\ndragged HO⁻ toward the carbon\nLAST_ACTION>>>" in c["prompt"]
-    assert gen.Usage().snapshot()["help"] == {"gemma-4-31b-it": 1}
+    assert gen.Usage().snapshot()["help"] == {"gemini-3.5-flash-lite": 1}
 
 
 def test_generic_history_goes_in_as_data(glive) -> None:
@@ -341,12 +341,14 @@ def test_generic_markdown_stripped_and_capped(glive) -> None:
     assert len(gask().json()["answer"]) <= help_chat.GENERIC_MAX_CHARS
 
 
-def test_generic_gemma_then_flash(glive) -> None:
+def test_generic_flash_then_gemma(glive) -> None:
     calls, replies = glive
-    replies["text"] = lambda m: RuntimeError("500") if m.startswith("gemma") else "Watch the arrow."
+    replies["text"] = lambda m: (
+        RuntimeError("500") if m.startswith("gemini") else "Watch the arrow."
+    )
     res = gask().json()
-    assert [c["model"] for c in calls] == ["gemma-4-31b-it", "gemini-3.5-flash-lite"]
-    assert res["model"] == "gemini-3.5-flash-lite" and res["answer"] == "Watch the arrow."
+    assert [c["model"] for c in calls] == ["gemini-3.5-flash-lite", "gemma-4-31b-it"]
+    assert res["model"] == "gemma-4-31b-it" and res["answer"] == "Watch the arrow."
 
 
 def test_generic_both_fail_gives_client_hint(glive) -> None:

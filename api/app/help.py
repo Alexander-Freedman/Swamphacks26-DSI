@@ -224,7 +224,8 @@ def answer(
 # untrusted text and goes into the prompt inside delimited data blocks.
 # ---------------------------------------------------------------------------
 
-GENERIC_MODELS = ["gemma-4-31b-it", "gemini-3.5-flash-lite"]
+# Gemma timed out or 500ed on every live call Sat night, so Flash Lite answers first.
+GENERIC_MODELS = ["gemini-3.5-flash-lite", "gemma-4-31b-it"]
 GENERIC_MAX_SENTENCES = 4
 GENERIC_MAX_CHARS = 600
 
