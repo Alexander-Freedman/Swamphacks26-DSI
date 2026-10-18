@@ -1,8 +1,8 @@
-import { useEffect, useRef } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { answerUnit, gapText, num, withUnit } from '../format'
 import type { Computed } from '../truth'
-import { shareAtLeast } from '../truth'
-import type { Item, Round } from '../types'
+import { leftSum, shareAtLeast } from '../truth'
+import type { CurveTruth, Item, Round } from '../types'
 import { fmt, misconceptionFor, verdictFor, verdictText } from '../verdict'
 import { Curve } from './Curve'
 import { Distribution } from './Distribution'
@@ -49,6 +49,27 @@ function TruthLine({ item, truth }: { item: Item; truth: Computed }) {
     )
   }
   return null
+}
+
+const STEPS = [1, 2, 4, 8, 16, 32, 64, 128, 200]
+
+/** Area reveal: fill the region with thinner and thinner rectangles and watch the sum close in. */
+function RiemannPicture({ t, f, from, to, guess, exact }: { t: CurveTruth; f: (x: number) => number; from: number; to: number; guess: number | null; exact: number | null }) {
+  const [k, setK] = useState(0)
+  const n = STEPS[k]
+  const sum = leftSum(f, from, to, n)
+  return (
+    <figure className="riemann">
+      <Curve t={t} f={f} area={{ from, to, n, guess }} />
+      <label className="riemann-n">
+        <span>
+          {n} {n === 1 ? 'rectangle' : 'rectangles'}: <strong>{num(sum)}</strong>
+          {exact != null && <> · exact area <strong>{num(exact)}</strong></>}
+        </span>
+        <input type="range" min={0} max={STEPS.length - 1} value={k} onChange={(e) => setK(+e.target.value)} aria-label="number of rectangles" />
+      </label>
+    </figure>
+  )
 }
 
 // Pencil (the guess) over ink (the truth) on the slider's own scale, the gap between them in marker.
@@ -155,7 +176,17 @@ export function Reveal({ item, round, answer, truth, signals }: Props) {
         <Distribution hist={truth.hist} xLabel={t.x_label} guess={guess} range={item.slider ? { min: item.slider.min, max: item.slider.max } : undefined} />
       )}
       {truth.kind === 'icons' && <IconArray counts={truth.counts} />}
-      {truth.kind === 'curve' && t.widget === 'curve' && <Curve t={t} f={truth.f} guess={guess} point={truth.point} pointLabel={pointLabel} />}
+      {truth.kind === 'curve' && t.widget === 'curve' && truth.show === 'tangent' && t.ask_x != null && (
+        <Curve t={t} f={truth.f} tangent={{ x: t.ask_x, slope: truth.value }} guessSlope={guess} point={truth.point} pointLabel={truth.value != null ? `slope ${num(truth.value)}` : ''} />
+      )}
+      {truth.kind === 'curve' && t.widget === 'curve' && truth.show === 'riemann' && t.area_from != null && t.area_to != null && (
+        <RiemannPicture t={t} f={truth.f} from={t.area_from} to={t.area_to} guess={guess} exact={truth.value} />
+      )}
+      {truth.kind === 'curve' && t.widget === 'curve' && truth.show === 'limit' && (
+        <Curve t={t} f={truth.f} mark={t.ask_x} point={truth.point} pointLabel={truth.value != null ? `limit ${num(truth.value)}` : ''} hole />
+      )}
+      {truth.kind === 'curve' && t.widget === 'curve' && !truth.show && <Curve t={t} f={truth.f} guess={guess} point={truth.point} pointLabel={pointLabel} />}
+      {item.approximate && <p className="approx-tag hand">approximate picture, not a full model</p>}
 
       <div className="verdict-row" ref={verdictRef} tabIndex={-1}>
         <span className={`stamp ${v}`}>{verdictText(v, answer.confidence)}</span>

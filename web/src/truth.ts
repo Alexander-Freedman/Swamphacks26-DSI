@@ -120,6 +120,42 @@ export function firstReaching(f: (x: number) => number, y: number, lo: number, h
   return null
 }
 
+// ---------- calculus answers (engine v4 truth.show), all computed here ----------
+
+/** Slope of f at x: central difference with a step scaled to the plotted range. */
+export function slopeAt(f: (x: number) => number, x: number, span = 1): number {
+  const h = Math.max(1e-6, Math.abs(span) * 1e-5)
+  return (f(x + h) - f(x - h)) / (2 * h)
+}
+
+/** Left Riemann sum of f on [a, b] with n equal rectangles. */
+export function leftSum(f: (x: number) => number, a: number, b: number, n: number): number {
+  const w = (b - a) / n
+  let s = 0
+  for (let i = 0; i < n; i++) s += f(a + i * w)
+  return s * w
+}
+
+/** The exact area under f from a to b (Simpson's rule, fine enough to be exact at 4 digits). */
+export function areaUnder(f: (x: number) => number, a: number, b: number, n = 2000): number {
+  const w = (b - a) / n
+  let s = f(a) + f(b)
+  for (let i = 1; i < n; i++) s += (i % 2 ? 4 : 2) * f(a + i * w)
+  return (s * w) / 3
+}
+
+/** The limit of f at x from both sides, or null when the sides disagree or blow up. */
+export function limitAt(f: (x: number) => number, x: number, span = 1): number | null {
+  const hs = [1e-3, 1e-4, 1e-5].map((k) => Math.max(1e-9, Math.abs(span) * k))
+  const left = hs.map((h) => f(x - h))
+  const right = hs.map((h) => f(x + h))
+  const l = left[left.length - 1]
+  const r = right[right.length - 1]
+  if (![l, r].every(Number.isFinite)) return null
+  const tol = Math.max(1e-4, 1e-3 * Math.abs(l))
+  return Math.abs(l - r) <= tol ? (l + r) / 2 : null
+}
+
 // The true value the round states: answer_expr computed here (numbers only), else answer_claimed.
 export function answerValue(item: Item): number | null {
   if (item.answer_expr) {
@@ -223,7 +259,7 @@ export function distributionAnswer(item: Item, hist: Histogram): { value: number
 export type Computed =
   | { kind: 'distribution'; hist: Histogram; value: number; stat: DistStat }
   | { kind: 'icons'; counts: ReturnType<typeof baseRate>; value: number }
-  | { kind: 'curve'; f: (x: number) => number; value: number | null; point: CurvePoint | null }
+  | { kind: 'curve'; f: (x: number) => number; value: number | null; point: CurvePoint | null; show?: 'tangent' | 'riemann' | 'limit' }
   | { kind: 'estimate'; value: number | null }
   | { kind: 'none'; value: number | null }
 
@@ -244,6 +280,18 @@ export function computeTruth(item: Item): Computed {
     if (t.preset === 'birthday_match_probability') {
       const half = firstReaching(f, 0.5, t.x_min, 366)
       return { kind: 'curve', f, value: half, point: half == null ? null : { x: half, y: f(half), axis: 'x' } }
+    }
+    const span = t.x_max - t.x_min
+    if (t.show === 'tangent' && t.ask_x != null) {
+      const y = f(t.ask_x)
+      return { kind: 'curve', f, value: slopeAt(f, t.ask_x, span), point: Number.isFinite(y) ? { x: t.ask_x, y, axis: 'y' } : null, show: 'tangent' }
+    }
+    if (t.show === 'riemann' && t.area_from != null && t.area_to != null) {
+      return { kind: 'curve', f, value: areaUnder(f, t.area_from, t.area_to), point: null, show: 'riemann' }
+    }
+    if (t.show === 'limit' && t.ask_x != null) {
+      const v = limitAt(f, t.ask_x, span)
+      return { kind: 'curve', f, value: v, point: v == null ? null : { x: t.ask_x, y: v, axis: 'y' }, show: 'limit' }
     }
     const value = answerValue(item)
     const point = curvePoint(item, t, f, value)

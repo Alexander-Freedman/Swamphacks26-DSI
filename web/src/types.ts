@@ -35,6 +35,12 @@ export type CurveTruth = {
   // The spot the question asks about: the y at ask_x, or the x where the curve reaches ask_y.
   ask_x?: number | null
   ask_y?: number | null
+  // Engine v4 (shared/schema/README.md): what the answer is. tangent = slope at ask_x; riemann = the
+  // exact area from area_from to area_to (the explore knob is the number of rectangles); limit = the
+  // limit at ask_x (the curve may have a hole there); null = a value on the curve.
+  show?: 'tangent' | 'riemann' | 'limit' | null
+  area_from?: number | null
+  area_to?: number | null
 }
 export type EstimateTruth = { widget: 'estimate'; unit?: string; source_url?: string | null }
 export type StepperTruth = { widget: 'stepper'; steps: string[]; source_url?: string | null }
@@ -57,6 +63,11 @@ export type Item = {
   // default: the knob's value in the question as asked; curve exprs may use param next to x.
   explore?: { param: string; label: string; min: number; max: number; step: number; default?: number | null } | null
   targets?: string[]
+  // Engine v4: the answer as computed by the server's code (cross-check only), and whether the
+  // picture is a simplified one ("approximate picture, not a full model").
+  truth_value?: number | null
+  computed?: boolean | null
+  approximate?: boolean | null
 }
 
 export type Round = {
