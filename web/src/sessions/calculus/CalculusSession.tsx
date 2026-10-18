@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
-import { NOTEBOOK_HREF, record } from '../../notebook'
+import { record } from '../../notebook'
 import { Frame, SessionHead, Title } from '../../components/session/Shell'
 import { AreaChart, GuessBar, MiniRects, MiniTangent, PositionChart, VelocityChart } from './AreaCharts'
 import {
@@ -9,6 +9,7 @@ import {
 import { reducedMotion, useWidth } from './plot'
 import { SlopeChart } from './SlopeChart'
 import { FINE, fineXs, pencilAt } from './slopeGeo'
+import { CalcEnd } from './CalcEnd'
 import { GradientStep } from './Gradient'
 import { SurfaceStep } from './Surface'
 import { COURSES, type CalcStep, type CalcTopic } from './topics'
@@ -542,21 +543,5 @@ function CompareStep({ slope, area, onDone, onPick }: { slope: SlopeRead | null;
       </div>
       {right && <CalcEnd caught={caught} mastered={done} remix="" onDone={onDone} />}
     </section>
-  )
-}
-
-/** The yellow end bar: saved, what was caught, Open notebook, Done. */
-function CalcEnd({ caught, mastered: ok, remix, onDone }: { caught: string[]; mastered: boolean; remix: string; onDone: () => void }) {
-  return (
-    <div className="calc-end" role="status">
-      <p>
-        <b>Saved to your notebook.</b> {caught.length ? `Caught: ${caught.join(' and ')}.` : 'No mistake caught this time.'}{' '}
-        {ok && <span className="calc-mastered" aria-label="mastered">✓ mastered</span>} {remix}
-      </p>
-      <div className="calc-endact">
-        <a className="calc-nblink" href={NOTEBOOK_HREF}>Open notebook</a>
-        <button className="calc-btn" onClick={onDone}>Done</button>
-      </div>
-    </div>
   )
 }

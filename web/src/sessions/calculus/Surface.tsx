@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState, type KeyboardEvent, type PointerEvent, type ReactNode } from 'react'
 import { record } from '../../notebook'
+import { CalcEnd } from './CalcEnd'
 import { dirOf, fx, fy, fz, HILL, type Dir, type Surf } from './surfaceMath'
 
 // Calc 3, first topic: a surface z = f(x, y) you can turn around, two slices through a point,
@@ -331,16 +332,7 @@ export function SurfaceStep({ onDone, topic }: { onDone: () => void; topic: stri
           </div>
         </div>
       </div>
-      {flat && (
-        <div className="calc-end" role="status">
-          <p>
-            <b>Saved to your notebook.</b> {missed ? 'Caught: “Walking a slice the wrong way”.' : <span className="calc-mastered" aria-label="mastered">✓ mastered</span>} Next: the gradient, the arrow that points straight uphill.
-          </p>
-          <div className="calc-endact">
-            <button className="calc-btn" onClick={onDone}>Done</button>
-          </div>
-        </div>
-      )}
+      {flat && <CalcEnd caught={missed ? ['“Walking a slice the wrong way”'] : []} mastered={missed === 0} remix="Next: the gradient, the arrow that points straight uphill." onDone={onDone} />}
     </section>
   )
 }
