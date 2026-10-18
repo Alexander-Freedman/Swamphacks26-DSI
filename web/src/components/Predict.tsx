@@ -1,5 +1,7 @@
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
+import { computeTruth } from '../truth'
 import type { Confidence, Item } from '../types'
+import { Curve } from './Curve'
 
 export type Answer = { value: number | null; optionId: string | null; confidence: Confidence }
 
@@ -22,6 +24,8 @@ export function Predict({ item, onLock }: { item: Item; onLock: (a: Answer) => v
   return (
     <div>
       <h2 className="prompt" ref={promptRef} tabIndex={-1}>{item.prompt}</h2>
+
+      {item.input_type === 'slider' && s && <GuessPicture item={item} guess={touched ? value : null} />}
 
       {item.input_type === 'slider' && s && (
         <div className="slider-row">
@@ -59,4 +63,38 @@ export function Predict({ item, onLock }: { item: Item; onLock: (a: Answer) => v
       </button>
     </div>
   )
+}
+
+/**
+ * Slope and area items draw your guess while you slide: a pencil tangent that turns with the slope,
+ * or your area as one pencil rectangle over the shaded region. Reading the curve is the skill there,
+ * so the curve shows; for a value or a limit it would give the answer away, so nothing is drawn.
+ */
+function GuessPicture({ item, guess }: { item: Item; guess: number | null }) {
+  const t = item.truth
+  const f = useMemo(() => {
+    if (t.widget !== 'curve' || t.preset) return null
+    try {
+      const c = computeTruth(item)
+      return c.kind === 'curve' ? c.f : null
+    } catch {
+      return null
+    }
+  }, [item, t])
+  if (t.widget !== 'curve' || !f) return null
+  if (t.show === 'tangent' && t.ask_x != null)
+    return (
+      <figure className="guess-picture">
+        <Curve t={t} f={f} tangent={{ x: t.ask_x, slope: null }} guessSlope={guess} mark={t.ask_x} />
+        <figcaption className="hand">{guess == null ? 'slide to tilt your tangent line' : `your tangent: slope ${guess}`}</figcaption>
+      </figure>
+    )
+  if (t.show === 'riemann' && t.area_from != null && t.area_to != null)
+    return (
+      <figure className="guess-picture">
+        <Curve t={t} f={f} area={{ from: t.area_from, to: t.area_to, n: null, guess }} />
+        <figcaption className="hand">{guess == null ? 'slide to size your rectangle' : `your area: ${guess}, drawn as one rectangle over the same base`}</figcaption>
+      </figure>
+    )
+  return null
 }

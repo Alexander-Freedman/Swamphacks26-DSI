@@ -12,3 +12,12 @@
 .curve-drop { stroke: var(--ink); stroke-width: 1.5; stroke-dasharray: 2 4; animation: fade 300ms 900ms both; }
 .curve-target circle { fill: var(--ink); stroke: var(--paper); stroke-width: 3; animation: pop 300ms 900ms cubic-bezier(.3, 1.6, .5, 1) both; transform-box: fill-box; transform-origin: center; }
 .curve-target text { font-weight: 800; font-size: 18px; fill: var(--ink); paint-order: stroke; stroke: var(--paper); stroke-width: 5px; stroke-linejoin: round; animation: fade 300ms 1000ms both; }
+
+/* Calculus pictures (engine v4): ink tangent over your pencil one, the area and its rectangles. */
+.curve-tangent { stroke: var(--ink); stroke-width: 3; stroke-linecap: round; }
+.curve-tangent-pencil { stroke: var(--pencil); stroke-width: 3; stroke-dasharray: 7 6; stroke-linecap: round; }
+.curve-area { fill: var(--marker-soft); stroke: none; }
+.curve-rect { fill: rgba(255, 216, 77, 0.35); stroke: var(--ink); stroke-width: 1; }
+.curve-guess-rect { fill: none; stroke: var(--pencil); stroke-width: 2.5; stroke-dasharray: 7 6; }
+.curve-mark { stroke: var(--pencil); stroke-width: 1.5; stroke-dasharray: 3 4; }
+.curve-target circle.curve-hole { fill: var(--card); stroke: var(--ink); stroke-width: 3; }

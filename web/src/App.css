@@ -61,3 +61,7 @@ input[type='range'] { width: 100%; accent-color: var(--pencil); height: 28px; }
   .card-art { width: 120px; min-height: 120px; aspect-ratio: auto; object-fit: contain; flex: none; border-bottom: 0; border-right: 2px solid var(--ink); }
   .showcase.has-art .card-text { align-self: center; }
 }
+
+/* engine v4: your guess drawn on the curve while you slide */
+.guess-picture { margin: 0 0 8px; }
+.guess-picture figcaption { text-align: center; color: var(--pencil); font-size: 15px; }
