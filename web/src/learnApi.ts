@@ -30,7 +30,7 @@ import type {
 } from './learn/types'
 import { isOffline } from './learn/types'
 
-export const AUTHOR_TIMEOUT_MS = 60_000
+export const AUTHOR_TIMEOUT_MS = 150_000
 export const CALL_TIMEOUT_MS = 20_000
 
 const staticUrl = (file: string) => `${import.meta.env.BASE_URL}learn/${file}`

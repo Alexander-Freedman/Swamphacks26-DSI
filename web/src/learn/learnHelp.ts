@@ -19,6 +19,8 @@ const ON_SCREEN: Record<Stage, (t: Topic, s: LearnState) => string> = {
 export function learnHelp(topic: Topic, state: LearnState): LayerReport {
   const stage = state.stage
   const facts = [
+    `Why this step works (learning research): ${why[stage].why} Source: ${why[stage].source}.`,
+    `The steps in order, each backed by learning research: guess first (pretesting), one true fact (concrete before abstract), compare two cases (contrasting cases), stress test (extreme cases), draw it (drawing to learn), tell it apart (discrimination), carry it over (designed-for transfer).`,
     `The pieces of this idea: ${topic.rubric.entities.join('; ')}`,
     `A true starting fact: ${topic.rubric.anchorDescription}`,
     ...(stage === 'done' ? [`The rule: ${topic.rubric.coreRule}`] : []),
@@ -30,7 +32,7 @@ export function learnHelp(topic: Topic, state: LearnState): LayerReport {
     title: STEP_NAME[stage],
     onScreen: ON_SCREEN[stage](topic, state).slice(0, 590),
     facts,
-    suggested: ['What is this step asking me to do?', 'Can you give me a hint without the answer?', 'Why does this step help?'],
+    suggested: ['What is this step asking me to do?', 'Can you give me a hint without the answer?', "What's the research behind this step?"],
     hint: why[stage].doing,
   }
 }
