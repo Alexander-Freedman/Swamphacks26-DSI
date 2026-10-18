@@ -581,3 +581,18 @@ def test_rejected_visual_gets_one_retry_with_the_reason(monkeypatch) -> None:
     assert res.status_code == 200 and res.json()["visual"] is not None
     assert len(prompts_seen) == 2
     assert "REJECTED" in prompts_seen[1] and "knob" in prompts_seen[1]
+
+
+def test_overlong_label_in_a_live_curve_is_trimmed_not_dropped(monkeypatch) -> None:
+    real = codex.fake_reply
+
+    def reply(task, prompt):
+        r = real(task, prompt)
+        if task == "visual" and r.get("visual"):
+            for v in r["visual"]["spec"]["variables"]:
+                v["unit"] = "kilopascal liters per mole kelvin"
+        return r
+
+    monkeypatch.setattr(codex, "fake_reply", reply)
+    res = post("topics", topic="gas pressure")
+    assert res.status_code == 200 and res.json()["visual"] is not None
