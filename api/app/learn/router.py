@@ -44,6 +44,7 @@ from app.learn.schemas import (
 )
 from app.schema import SpecWidget
 from app.spec import SpecRejected, compile_case, compute_truth
+from app.truth import eval_expr
 
 log = logging.getLogger("mm.learn")
 
@@ -196,6 +197,19 @@ def _vet_visual(topic: Topic, reply: VisualReply) -> Visual | None:
         raise SpecRejected(f"bands name unknown misconceptions {sorted(unknown)}")
     if case.answer_claimed is None:
         raise SpecRejected("no answer_claimed")
+    # Evaluate first, so an expression the engine can't run says so (the knob check would
+    # otherwise swallow the error and report "the knob doesn't change the curve").
+    names = {v.name: v.value for v in case.variables}
+    for x in (c.x_min, c.ask_x, c.x_max):
+        for k in (c.knob.min, c.knob.default, c.knob.max):
+            try:
+                eval_expr(c.expr, x=x, **{**names, c.knob.param: k})
+            except Exception as err:
+                raise SpecRejected(
+                    f"expr {c.expr!r} doesn't evaluate at x={x:g}, {c.knob.param}={k:g}: {err}. "
+                    "Use only + - * / ^, numbers, x, the knob, declared variables and "
+                    "sin cos tan exp log log2 log10 sqrt abs min max pow; keep it under 200 chars."
+                ) from err
     item_id = f"{topic.slug[:52].rstrip('-')}-anchor"  # item ids are slugs, max 60 chars
     compile_case(case, item_id, known)  # bands cover the slider, knob moves, expr names, ...
     truth = compute_truth(case)
@@ -226,6 +240,7 @@ async def _author_visual(topic: Topic) -> Visual | None:
     timeout = float(os.environ.get("MM_CODEX_VISUAL_TIMEOUT_S", VISUAL_TIMEOUT_S))
     reason = ""
     for attempt in (1, 2):
+        raw: object = {}
         prompt = prompts.visual(topic)
         if reason:
             prompt += (
@@ -243,7 +258,17 @@ async def _author_visual(topic: Topic) -> Visual | None:
             return None
         except Exception as err:  # failed a check: retry once with the reason
             reason = str(err)[:300]
-            log.warning("visual %s: attempt %d rejected: %s", topic.slug, attempt, reason)
+            spec = (raw.get("visual") or {}).get("spec") or {} if isinstance(raw, dict) else {}
+            curve = spec.get("curve") or {}
+            log.warning(
+                "visual %s: attempt %d rejected: %s | expr=%r knob=%r vars=%r",
+                topic.slug,
+                attempt,
+                reason,
+                curve.get("expr"),
+                (curve.get("knob") or {}).get("param"),
+                [v.get("name") for v in spec.get("variables") or []],
+            )
             continue
         if visual is None:
             log.info("visual %s: no single curve fits", topic.slug)
