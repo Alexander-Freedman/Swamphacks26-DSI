@@ -1,6 +1,10 @@
 // @vitest-environment jsdom
 import { afterEach, describe, expect, it, vi } from 'vitest'
 
+// a build with a live server unless a test says otherwise (the static site has none)
+const env = vi.hoisted(() => ({ base: 'https://api.test' as string | null }))
+vi.mock('../extras', () => ({ apiBase: () => env.base }))
+
 vi.mock('./replies.json', () => ({
   default: {
     'derivative/guess': { request: { text: 'The derivative is how much a function changes overall.' }, reply: { classification: 'concrete', misconceptionId: 'x', message: 'saved' } },
@@ -12,6 +16,7 @@ const { demoHelp, demoOn, demoReply, fillStep } = await import('./demo')
 
 const at = (search: string) => history.replaceState(null, '', `/${search}`)
 afterEach(() => {
+  env.base = 'https://api.test'
   sessionStorage.clear()
   document.body.innerHTML = ''
 })
@@ -37,6 +42,12 @@ describe('demo mode', () => {
     expect(demoReply('derivative', 'stress', { caseIndex: 0, fix: 'any rule', history: [] })).toBeNull()
     expect(demoHelp('derivative', 'Can you give me a hint?')).toEqual({ answer: 'a saved hint', hintOnly: true, fallback: false })
     expect(demoHelp('derivative', 'another question')).toBeNull()
+  })
+
+  it('is always on for the static site (no server)', () => {
+    env.base = null
+    at('?learn=derivative')
+    expect(demoOn()).toBe(true)
   })
 
   it('fills the empty boxes of the current step from the script and leaves typed ones alone', () => {

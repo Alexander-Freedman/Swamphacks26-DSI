@@ -55,7 +55,7 @@ export function LearnTopicBox({ onOpen, api = learnApi }: { onOpen: (slug: strin
     try {
       const r = await api.createTopic(topic)
       if (isOffline(r)) {
-        setNote(r.reason === 'no_backend' ? 'Building a new topic needs the live backend. Try one of these:' : offlineLine(r))
+        setNote(r.reason === 'no_backend' ? 'New topics were built live by our AI server, which is now retired. Try one of these:' : offlineLine(r))
       } else {
         onOpen(r.slug)
       }

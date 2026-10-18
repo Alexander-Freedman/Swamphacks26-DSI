@@ -4,6 +4,8 @@
 
 **Live: https://onionskin.study**
 
+> **After the hackathon:** the AI server is retired and the site is fully static. The Calculus, Organic chemistry and Base rates lessons are recorded demos: their example answers replay the AI's real replies. Other topics use the built-in offline check. See **How we built it** on the site.
+
 Type any topic and Onionskin builds you a short lesson that takes you from a first guess to a model you can actually run in your head. You guess before you're taught, predict from one true fact, compare look-alike cases, push your own rule to the extremes, draw it from memory, tell it apart from its look-alike, and carry it to a new field. At the end it names the wrong idea you started with and shows the fix.
 
 Every step comes from published learning-science research, and the app says so as you go: a rail beside each lesson explains why the step works and cites the paper, and the **Research: why it works** page lists all 24 sources with links you can check.

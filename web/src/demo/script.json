@@ -20,5 +20,12 @@
     "why answer": "Because the derivative only looks at a tiny interval right around the moment, so a shrinking window shows the local rate.",
     "draw rule": "Derivative = the limit of change in output over change in input as the interval shrinks",
     "draw notes": "shrink the interval, and the average rate turns into the rate at one point"
+  },
+  "sn2-reaction": {
+    "guess answer": "The leaving group falls off first, then the nucleophile comes in and takes its place.",
+    "rule When": "the nucleophile attacks from the back side of the carbon",
+    "rule then": "the leaving group leaves at the same moment and the carbon flips inside out",
+    "rule because": "the new bond forms while the old one breaks, in one step",
+    "transfer answer": "A revolving door: you only get in as the person ahead is pushed out, both in one motion, and the door swings around the way the carbon flips."
   }
 }
