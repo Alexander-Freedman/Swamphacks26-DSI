@@ -110,17 +110,80 @@
     {
       "dimension": "interval-width",
       "scenario": "A car travels 600 meters between 0 and 60 seconds, for an average speed of 10 meters per second. Between 59.9 and 60 seconds it travels 1.5 meters.",
-      "correctBehavior": "The 60-second average is 10 meters per second, while the last 0.1-second average is 15 meters per second. If still shorter intervals ending at 60 seconds settle near 15 meters per second, the derivative of position at 60 seconds is 15 meters per second."
+      "correctBehavior": "The 60-second average is 10 meters per second, while the last 0.1-second average is 15 meters per second. If still shorter intervals ending at 60 seconds settle near 15 meters per second, the derivative of position at 60 seconds is 15 meters per second.",
+      "predict": {
+        "question": "What do the shorter time intervals suggest about speed at 60 seconds?",
+        "choices": [
+          {
+            "text": "The speed at 60 seconds is 10 meters per second.",
+            "correct": false,
+            "misconceptionId": null
+          },
+          {
+            "text": "Shorter averages near 60 seconds approach 15 meters per second.",
+            "correct": true,
+            "misconceptionId": null
+          },
+          {
+            "text": "The derivative is 600 meters because that is how far the car traveled.",
+            "correct": false,
+            "misconceptionId": "derivative-is-total-change"
+          }
+        ],
+        "piece": "shrinking intervals reveal the local rate"
+      }
     },
     {
       "dimension": "local-flatness",
       "scenario": "A smooth fountain stream reaches its maximum height of 4 meters at 1 second. Just before 1 second its height is increasing, and just after 1 second its height is decreasing.",
-      "correctBehavior": "At 1 second, the derivative of height with respect to time is 0 meters per second. The positive rate before and negative rate after can both approach zero at the smooth peak."
+      "correctBehavior": "At 1 second, the derivative of height with respect to time is 0 meters per second. The positive rate before and negative rate after can both approach zero at the smooth peak.",
+      "predict": {
+        "question": "What is the height derivative at the smooth highest point?",
+        "choices": [
+          {
+            "text": "It is 0 meters per second, as rates from both sides approach zero.",
+            "correct": true,
+            "misconceptionId": null
+          },
+          {
+            "text": "It does not exist because one side rises and the other falls.",
+            "correct": false,
+            "misconceptionId": null
+          },
+          {
+            "text": "It is 4 meters because the fountain is at 4 meters high.",
+            "correct": false,
+            "misconceptionId": "derivative-is-total-change"
+          }
+        ],
+        "piece": "at a smooth flat peak, the local rate is zero"
+      }
     },
     {
       "dimension": "one-sided-mismatch",
       "scenario": "A robot moves 3 meters per second to the right until exactly 5 seconds, then instantly moves 3 meters per second to the left. Its position has a sharp corner at 5 seconds.",
-      "correctBehavior": "The left-side local rate is positive 3 meters per second and the right-side local rate is negative 3 meters per second. Because they do not agree, the position derivative at 5 seconds does not exist."
+      "correctBehavior": "The left-side local rate is positive 3 meters per second and the right-side local rate is negative 3 meters per second. Because they do not agree, the position derivative at 5 seconds does not exist.",
+      "predict": {
+        "question": "What is the position derivative at exactly 5 seconds?",
+        "choices": [
+          {
+            "text": "It is 0 meters per second because the robot changes direction.",
+            "correct": false,
+            "misconceptionId": null
+          },
+          {
+            "text": "It is found by dividing zero meters by zero seconds.",
+            "correct": false,
+            "misconceptionId": "zero-interval-division"
+          },
+          {
+            "text": "It does not exist, because the left rate is 3 and the right rate is negative 3.",
+            "correct": true,
+            "misconceptionId": null
+          }
+        ],
+        "piece": "different left and right rates prevent one local rate"
+      }
     }
   ],
   "visual": null

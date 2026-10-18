@@ -102,17 +102,80 @@
     {
       "dimension": "many-periods",
       "scenario": "$1 at 5% a year, left alone for 500 years.",
-      "correctBehavior": "It grows to about $39 billion; with enough periods even a small rate overwhelms any flat yearly addition."
+      "correctBehavior": "It grows to about $39 billion; with enough periods even a small rate overwhelms any flat yearly addition.",
+      "predict": {
+        "question": "After all those years, what happens to the balance?",
+        "choices": [
+          {
+            "text": "It grows to about $39 billion.",
+            "correct": true,
+            "misconceptionId": null
+          },
+          {
+            "text": "It grows to $26, adding the same 5 cents every year.",
+            "correct": false,
+            "misconceptionId": "simple-interest"
+          },
+          {
+            "text": "It stops at $1.05 after one year of interest.",
+            "correct": false,
+            "misconceptionId": "interest-paid-once"
+          }
+        ],
+        "piece": "more periods let interest keep growing on a bigger balance"
+      }
     },
     {
       "dimension": "zero-rate",
       "scenario": "$1,000 at 0% a year, left for 40 years.",
-      "correctBehavior": "The balance stays exactly $1,000; with nothing added there is nothing to compound."
+      "correctBehavior": "The balance stays exactly $1,000; with nothing added there is nothing to compound.",
+      "predict": {
+        "question": "What happens to the balance over the 40 years?",
+        "choices": [
+          {
+            "text": "It gets larger because many years always make money compound.",
+            "correct": false,
+            "misconceptionId": null
+          },
+          {
+            "text": "It stays exactly $1,000.",
+            "correct": true,
+            "misconceptionId": null
+          },
+          {
+            "text": "It falls because money always changes over time.",
+            "correct": false,
+            "misconceptionId": null
+          }
+        ],
+        "piece": "with a zero rate, nothing is added to the balance"
+      }
     },
     {
       "dimension": "tiny-principal",
       "scenario": "One cent at 10% a year for 200 years.",
-      "correctBehavior": "It becomes about $1.9 million; the principal only scales the result, the growth factor comes from rate and time."
+      "correctBehavior": "It becomes about $1.9 million; the principal only scales the result, the growth factor comes from rate and time.",
+      "predict": {
+        "question": "What happens to this tiny starting amount after 200 years?",
+        "choices": [
+          {
+            "text": "It reaches 21 cents, adding the same amount each year.",
+            "correct": false,
+            "misconceptionId": "simple-interest"
+          },
+          {
+            "text": "It becomes 1.1 cents because interest happens once.",
+            "correct": false,
+            "misconceptionId": "interest-paid-once"
+          },
+          {
+            "text": "It becomes about $1.9 million.",
+            "correct": true,
+            "misconceptionId": null
+          }
+        ],
+        "piece": "a tiny principal can still grow huge when interest has time"
+      }
     }
   ],
   "visual": {
