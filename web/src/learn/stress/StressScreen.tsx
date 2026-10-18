@@ -1,8 +1,10 @@
 // Stress test: the learner's one-line fix meets three extreme cases. Each card stamps SURVIVES or BREAKS.
 // Two survives on different cases unlock the why question; three breaks bring the reveal, tied to their wrong turns.
-import { useCallback, useEffect, useRef, useState } from 'react'
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
+import { Curve } from '../../components/Curve'
 import type { RevealRequest, StageProps, StressRequest, WhyRequest } from '../types'
 import { useGraded } from '../useGraded'
+import { extremeCurve } from './extremes'
 import { latestByCase, offlineLine } from './stress'
 import './stress.css'
 
@@ -11,6 +13,8 @@ const SURVIVES_FOR_WHY = 2
 
 export function StressScreen({ topic, state, update, next, api }: StageProps) {
   const cases = topic.extremeCases.slice(0, 3)
+  // a curve topic: each card gets its curve pushed to that card's extreme (computed in code)
+  const pictures = useMemo(() => topic.extremeCases.slice(0, 3).map((_, i) => extremeCurve(topic, i)), [topic])
   const stressCall = useCallback((b: StressRequest) => api.stress(topic.slug, b), [api, topic.slug])
   const whyCall = useCallback((b: WhyRequest) => api.why(topic.slug, b), [api, topic.slug])
   const revealCall = useCallback((b: RevealRequest) => api.reveal(topic.slug, b), [api, topic.slug])
@@ -93,6 +97,15 @@ export function StressScreen({ topic, state, update, next, api }: StageProps) {
           return (
             <li key={i} className={'st-card' + (h ? ` st-${h.verdict}` : '')} aria-label={`case ${i + 1}`}>
               <p className="st-scenario">{c.scenario}</p>
+              {pictures[i] && (
+                <figure className="st-pic">
+                  <Curve t={pictures[i]!.spec.curve} f={pictures[i]!.f} />
+                  <figcaption>
+                    <span className="st-pic-at">{pictures[i]!.at}</span>
+                    {pictures[i]!.watch && <span className="st-pic-watch">{pictures[i]!.watch}</span>}
+                  </figcaption>
+                </figure>
+              )}
               {testing === i ? (
                 <p className="learn-thinking" role="status">thinking…</p>
               ) : h ? (
