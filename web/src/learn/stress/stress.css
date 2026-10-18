@@ -26,3 +26,15 @@
 .st-q { font-weight: 700; color: var(--ink); }
 .st-rule { font: 700 17px/1.35 var(--font-body); color: var(--ink); background: var(--marker-soft); padding: 2px 4px; }
 .st-result { margin-top: 10px; }
+
+/* a curve topic: each card carries a small picture of the curve at its extreme */
+.st-pic { margin: 8px 0 4px; }
+.st-pic .curve { display: block; width: 100%; height: auto; }
+/* the chart is drawn 640 wide and shown ~200 wide here, so lines and labels are scaled up to stay legible */
+.st-pic .curve-ink { stroke-width: 11; }
+.st-pic .curve-axis { stroke-width: 5; }
+.st-pic .curve-tick { font-size: 32px; }
+.st-pic .curve-ylabel { font-size: 30px; }
+.st-pic figcaption { display: grid; gap: 2px; margin-top: 4px; }
+.st-pic-at { font: 700 11px var(--font-mono); text-transform: uppercase; letter-spacing: 0.06em; color: var(--ink-soft); }
+.st-pic-watch { font: 14px/1.35 var(--font-hand); color: var(--ink); }
