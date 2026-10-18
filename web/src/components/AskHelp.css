@@ -71,3 +71,9 @@
     margin-left: calc(50% - 50vw + max(32px, (100vw - 360px - min(1100px, 100vw - 424px)) / 2));
   }
 }
+
+/* phones: a full 44px tap target */
+@media (max-width: 720px) {
+  .hiw-btn.ask-btn { height: 44px; min-width: 44px; padding: 0 12px 0 8px; }
+  .brand-tab { min-height: 44px; }
+}
