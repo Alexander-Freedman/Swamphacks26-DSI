@@ -18,5 +18,234 @@
    "feedback": "Your claim that a positive is “not automatically” strong evidence fits the roughly 100 false alarms versus only 10 real cases among 10,000 people. But your prediction of “about 39%” is unclear and seems to conflict with that reasoning.",
    "followUpQuestion": "Using this same group, what does your “39%” describe, and how does it fit with about 100 false alarms and only 10 people who truly have the condition?"
   }
+ },
+ "base-rates-and-false-positives/stress/0": {
+  "request": {
+   "fix": "When the condition is rare, most positives are false alarms, because healthy people vastly outnumber sick ones.",
+   "caseIndex": 0,
+   "history": []
+  },
+  "reply": {
+   "verdict": "survives",
+   "critique": "Your point that “healthy people vastly outnumber sick ones” explains why most positives are false alarms in this extremely rare case.",
+   "piece": null
+  }
+ },
+ "base-rates-and-false-positives/stress/1": {
+  "request": {
+   "fix": "When the condition is rare, most positives are false alarms, because healthy people vastly outnumber sick ones.",
+   "caseIndex": 1,
+   "history": [
+    {
+     "caseIndex": 0,
+     "fix": "When the condition is rare, most positives are false alarms, because healthy people vastly outnumber sick ones.",
+     "verdict": "survives"
+    }
+   ]
+  },
+  "reply": {
+   "verdict": "breaks",
+   "critique": "Your claim that rarity makes “most positives false alarms” leaves out how rarely this test gives false alarms.",
+   "piece": "very few false positives means positive results are mostly genuine"
+  }
+ },
+ "help/base rates and false positives/Can you give me a hint without the answer?": {
+  "answer": "Look at the case where the test falsely reports positive for only 1 in 1,000,000 people without the condition. Think about both how rare the condition is and how rarely the test gives a false alarm. Does your rule take both into account?",
+  "hint_only": false,
+  "source": "model",
+  "model": "codex"
+ },
+ "base-rates-and-false-positives/stress/2": {
+  "request": {
+   "fix": "When the condition is rare, most positives are false alarms, because healthy people vastly outnumber sick ones; and very few false positives means positive results are mostly genuine",
+   "caseIndex": 2,
+   "history": [
+    {
+     "caseIndex": 0,
+     "fix": "When the condition is rare, most positives are false alarms, because healthy people vastly outnumber sick ones.",
+     "verdict": "survives"
+    },
+    {
+     "caseIndex": 1,
+     "fix": "When the condition is rare, most positives are false alarms, because healthy people vastly outnumber sick ones.",
+     "verdict": "breaks"
+    }
+   ]
+  },
+  "reply": {
+   "verdict": "breaks",
+   "critique": "Your rule mentions “rare” conditions and “very few false positives,” but leaves out what happens when the test detects only 1% of true cases.",
+   "piece": "low sensitivity produces few true positives among positive results"
+  }
+ },
+ "base-rates-and-false-positives/why": {
+  "request": {
+   "answer": "Because a positive can come from a sick person the test catches or a healthy person it mislabels, and when sick people are rare the mislabeled healthy ones outnumber them."
+  },
+  "reply": {
+   "verdict": "demonstrated",
+   "feedback": "You explain both ways a positive happens: a sick person the test catches and a healthy person it mislabels. Your point about mislabeled healthy people shows why both groups’ numbers matter, rather than treating a positive as a 99% chance of being sick.",
+   "followUpQuestion": null
+  }
+ },
+ "base-rates-and-false-positives/draw": {
+  "request": {
+   "rule": "Chance a positive is real = true positives / all positives",
+   "notes": "sick people the test catches, plus healthy people it wrongly flags, both feed the positives",
+   "image": null
+  },
+  "reply": {
+   "criteria": [
+    {
+     "id": "entities",
+     "verdict": "unresolved",
+     "note": "Your labels show sick and healthy people and both kinds of positives, but omit the total tested, base rate, sensitivity, and false-positive rate."
+    },
+    {
+     "id": "links",
+     "verdict": "unresolved",
+     "note": "“Both feed the positives” shows where positives come from, but not how changing the base rate or either test rate changes the counts and chance."
+    },
+    {
+     "id": "rule",
+     "verdict": "demonstrated",
+     "note": "“True positives / all positives” correctly gives the chance that a positive is real."
+    },
+    {
+     "id": "why-rule",
+     "verdict": "demonstrated",
+     "note": "Your note that caught sick people and wrongly flagged healthy people “both feed the positives” explains why both belong in the total."
+    }
+   ],
+   "followUpQuestion": "Holding the total tested fixed, how would raising the base rate, sensitivity, or false-positive rate one at a time change the two kinds of positive counts and the chance a positive is real?"
+  }
+ },
+ "base-rates-and-false-positives/neighbor": {
+  "request": {
+   "key": "sensitivity",
+   "answer": "Sensitivity is how often sick people test positive; whether a positive is real also depends on how many healthy people get false alarms.",
+   "priorAnswer": null
+  },
+  "reply": {
+   "verdict": "partial",
+   "feedback": "You correctly describe sensitivity and connect false alarms among healthy people to whether a positive is real. You haven't yet explained how the share of people who are sick affects that chance.",
+   "followUpQuestion": "If the condition becomes rarer but the test works the same way, would a positive result be more or less likely to be real, and why?"
+  }
+ },
+ "base-rates-and-false-positives/transfer": {
+  "request": {
+   "analogy": "A smoke alarm in a kitchen: most beeps are burnt toast, not fires, because real fires are rare and toast happens every day.",
+   "wasPushed": false
+  },
+  "reply": {
+   "verdict": "partial",
+   "critique": "Your kitchen alarm gives fires, their rarity, and beeps from fires or toast, but “most beeps” leaves the comparison unsupported. How would you use the numbers of fire-caused and toast-caused beeps to find the share caused by fires?",
+   "missingPiece": "Comparing fire-caused beeps with all beeps"
+  }
+ },
+ "derivative/guess": {
+  "request": {
+   "text": "The derivative is how much a function changes overall."
+  },
+  "reply": {
+   "classification": "concrete",
+   "misconceptionId": "derivative-is-total-change",
+   "message": "Your guess that it measures how much a function “changes overall” gives us something testable. Next, we’ll test that idea against how the real system behaves."
+  }
+ },
+ "derivative/stress/0": {
+  "request": {
+   "fix": "When you shrink the interval around one moment, the average rate settles on the speed right then, because the derivative is the local rate, not the total change.",
+   "caseIndex": 0,
+   "history": []
+  },
+  "reply": {
+   "verdict": "survives",
+   "critique": "Your phrase “shrink the interval around one moment” explains why the car’s final narrow interval tells a different story from the full 60 seconds.",
+   "piece": null
+  }
+ },
+ "derivative/stress/1": {
+  "request": {
+   "fix": "When you shrink the interval around one moment, the average rate settles on the speed right then, because the derivative is the local rate, not the total change.",
+   "caseIndex": 1,
+   "history": [
+    {
+     "caseIndex": 0,
+     "fix": "When you shrink the interval around one moment, the average rate settles on the speed right then, because the derivative is the local rate, not the total change.",
+     "verdict": "survives"
+    }
+   ]
+  },
+  "reply": {
+   "verdict": "survives",
+   "critique": "Your “local rate, not the total change” handles the fountain’s smooth peak at 1 second, even though its height changes on both sides.",
+   "piece": null
+  }
+ },
+ "derivative/stress/2": {
+  "request": {
+   "fix": "When you shrink the interval around one moment, the average rate settles on the speed right then, because the derivative is the local rate, not the total change.",
+   "caseIndex": 2,
+   "history": [
+    {
+     "caseIndex": 0,
+     "fix": "When you shrink the interval around one moment, the average rate settles on the speed right then, because the derivative is the local rate, not the total change.",
+     "verdict": "survives"
+    },
+    {
+     "caseIndex": 1,
+     "fix": "When you shrink the interval around one moment, the average rate settles on the speed right then, because the derivative is the local rate, not the total change.",
+     "verdict": "survives"
+    }
+   ]
+  },
+  "reply": {
+   "verdict": "breaks",
+   "critique": "Your rule says the average rate “settles,” but leaves out how the robot’s sharp reversal at 5 seconds can prevent that.",
+   "piece": "different left and right rates prevent one local rate"
+  }
+ },
+ "derivative/why": {
+  "request": {
+   "answer": "Because the derivative only looks at a tiny interval right around the moment, so a shrinking window shows the local rate."
+  },
+  "reply": {
+   "verdict": "unresolved",
+   "feedback": "Your “shrinking window shows the local rate” identifies the goal, but doesn't explain how shrinking the window isolates that rate or why a zero interval cannot be used.",
+   "followUpQuestion": "What influence does shrinking the window remove, and what happens to output change divided by input change if the input change is exactly zero?"
+  }
+ },
+ "derivative/draw": {
+  "request": {
+   "rule": "Derivative = the limit of change in output over change in input as the interval shrinks",
+   "notes": "shrink the interval, and the average rate turns into the rate at one point",
+   "image": null
+  },
+  "reply": {
+   "criteria": [
+    {
+     "id": "entities",
+     "verdict": "unresolved",
+     "note": "You name input, output, an interval, and rates, but do not clearly identify a chosen input location or corresponding changes across its interval."
+    },
+    {
+     "id": "links",
+     "verdict": "unresolved",
+     "note": "“Shrink the interval” describes one connection, but you do not show how changing either change affects the average rate, or when a single rate fails to exist."
+    },
+    {
+     "id": "rule",
+     "verdict": "demonstrated",
+     "note": "Your rule correctly describes the derivative as the limit of output change divided by input change as the interval shrinks."
+    },
+    {
+     "id": "why-rule",
+     "verdict": "unresolved",
+     "note": "“The average rate turns into the rate at one point” states what happens without explaining why shrinking the interval isolates behavior near that point."
+    }
+   ],
+   "followUpQuestion": "If the output change stays the same while the input interval doubles, what happens to the size of the average rate, and why?"
+  }
  }
 }
