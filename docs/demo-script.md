@@ -1,87 +1,103 @@
-# Demo script: the 3:00 table demo (orgo + calculus)
+# Demo script: the table demo (Learn flow, seasons + 20 s of orgo)
 
-What the judge sees and does, click by click, matched to the live site (main @ 6f52ea9, walked at 1440×900 on Sat Oct 17). Spine: **Organic chemistry** (build ethanol, then SN2 step by step) and **Calculus** (Calc 1 slope, then area). The words are in [docs/pitch.md](pitch.md); this file wins for what's on screen.
+What the judge sees and hears, click by click, for the **current** flow: Home → a Learn topic → 8 steps (guess, one true fact, compare, stress, draw, tell it apart, carry it over, what you caught) with the why rail. Matched to main @ 480310b and the live API, walked Sun Oct 18 ~2-3 AM at 1440 px and 390 px.
 
-Name: **Onionskin**. Headline **"See your thinking in layers."** Subline **"Type any topic. Watch it come alive."** Live at https://alexander-freedman.github.io/Swamphacks26-DSI/, API on Vultr at https://45-77-118-201.sslip.io.
+**Time budget:** judges spend ~3 min at the table, so **1:45 of demo, ~1:15 of questions**. Keep a 60-second cut for rushed judges.
 
-**Roles:** **narrator** talks and keeps time. **Driver** runs the laptop (or hands the trackpad / phone to the judge) and takes the technical questions. Both of us learn both roles.
+Live: https://onionskin.study (old link https://alexander-freedman.github.io/Swamphacks26-DSI/ redirects there). API: https://45-77-118-201.sslip.io.
 
-## The story, said over the first screen
-**Chatbot line:** **"ChatGPT tells you the answer. Onionskin builds you a world where you find out you were wrong, and why."**
-**AI story:** **the AI builds the simulation; code guarantees the truth; you do the thinking.** Honest scope: the orgo and calculus levels are hand-built and compute everything in the browser. A typed topic currently plays as a number slider in the round player, not yet a draggable curve, so the demo doesn't lean on it. No betting language anywhere (no "bet", "lock it in", "called it").
+## Why not run it all live (measured)
 
-## Confirm before each judging block
-- [ ] Home shows two cards, **Organic chemistry** and **Calculus**, plus the topic box. (The first click right after load can be ignored while the page settles: wait a second after Home appears.)
-- [ ] **Organic chemistry** opens straight on **Build ethanol** ("1 of 2"), no menu (#253). Step 2 is the SN2 arrows + scrubber.
-- [ ] **Calculus** opens straight on **Draw the slope.** ("1 of 4": sketch → tangent → area → card), no menu (#253); one rectangle shows **7.5**, exact **4.57**.
-- [ ] Reset before each judge: open with `?reset=1` or `Shift+R` on Home (clears answers and notebook).
-- [ ] #218 (SN2 vs E2) *if merged*: only then may the narrator mention it; otherwise SN2 is the mechanism we show.
-
-## Every number on screen or out loud comes from this table
-
-| Claim | Value | Source |
-|---|---|---|
-| Ethanol's formula | **C₂H₆O** (2 C, 6 H, 1 O) | standard; on screen as "target: ethanol"; `web/src/sessions/orgo/BuildStep.tsx`  |
-| Same formula, different molecule | dimethyl ether is also C₂H₆O (C–O–C vs ethanol's C–C–O–H) | isomer check in `chem.ts` ; [Dimethyl ether](https://en.wikipedia.org/wiki/Dimethyl_ether) |
-| Bonds per atom | C 4, H 1, O 2, N 3, Br 1 | `chem.ts` valence table  |
-| Oxygen with 3 bonds | **FC = 6 − 2 − 3 = +1** (O⁺) | formal charge = valence − nonbonding electrons − bonds ([Formal charge](https://en.wikipedia.org/wiki/Formal_charge)); on-screen line in `chem.ts` |
-| Cyanide's charge sits on carbon | C: 4 − 2 − 3 = **−1**; N: 5 − 2 − 3 = 0 | computed, same rule; cyanide attacks through C to give nitriles ([Kolbe nitrile synthesis](https://en.wikipedia.org/wiki/Kolbe_nitrile_synthesis)) |
-| SN2 | HO⁻ + CH₃Br → CH₃OH + Br⁻; one step, backside attack, inversion; Br⁻ leaves with 4 lone pairs | [SN2 reaction](https://en.wikipedia.org/wiki/SN2_reaction), [Walden inversion](https://en.wikipedia.org/wiki/Walden_inversion); scene in `sn2.ts`  |
-| Calculus curve | f(x) = (x³ − 6x² + 9x)/2 + 1; hill at x = 1 (height **3**, slope 0), valley at x = 3; steepest downhill slope **−1.5** at x = 2 | computed: f′(x) = 1.5(x − 1)(x − 3); `web/src/sessions/calculus/math.ts` |
-| Area guess, one rectangle | **7.5** | computed: left edge, f(1) × 2.5 = 3 × 2.5 |
-| Exact area from 1 to 3.5 | **4.57** (4.5703) | computed: F(x) = x⁴/8 − x³ + 9x²/4 + x, F(3.5) − F(1) = 585/128 |
-| Rectangles, left edges | 1 → 7.50, 10 → 4.78, 50 → 4.61, **200 → 4.58** | computed (Riemann sums, same formula as `riemann()` in math.ts) |
-| Area mistake trigger | a guess ≥ 7.25 is named "More rectangles = more area"; within 15% (3.88-5.26) counts as close | `readArea()` in math.ts |
-
-Never say: "proven to make you learn faster", "permanently fixes misconceptions", or that a typed topic becomes a draggable curve.
-
-## The 3:00 script
-Timings are rough, from walking the live site at 1440×900 with a real person's pace added.
-
-| Time | Judge sees / does | Narrator says | Driver clicks |
-|---|---|---|---|
-| **0:00**<br>Hook | Home: **Onionskin · See your thinking in layers.** Two cards: **Organic chemistry**, **Calculus**. | "ChatGPT tells you the answer. Onionskin builds you a world where you find out you were wrong, and why." | Taps **Organic chemistry**. |
-| **0:10**<br>Straight in | **Build ethanol, 1 of 2**: no menu, the first screen is already interactive. | "No menu. You're building a molecule in one tap." | Hands over the trackpad. |
-| **0:15**<br>Build, one mistake named live | Empty paper, palette **C H O N Br**, **↶ Undo**, **Clear**, "target: ethanol C₂H₆O". Judge drags atoms on and bonds them. **Deliberate mistake:** a 5th bond on a carbon → **"A carbon with 5 bonds"** shows under the formula right away. | "Ethanol, C₂H₆O. Each atom has slots: carbon four, oxygen two, hydrogen one. Watch what happens with one bond too many." … "It names the mistake as I make it." | If the judge builds cleanly, the driver drags one extra H onto a full carbon. |
-| **0:35**<br>Undo → Finish ✓ | **↶ Undo** takes the 5th bond back. Judge fills the last H's, taps **Check it** → "Correct!", **✓ ethanol CH₃–CH₂–OH**, then the next button → step 2. | "Undo, finish it … and it checks the actual structure, not just the count." | Taps **Show how the electrons move →**. |
-| **0:55**<br>2 of 2: Draw the arrows | HO⁻ + CH₃Br. The judge drags two curved arrows (lone pair on O → carbon; C–Br bond → Br), then **Show me**: the real arrows ink over theirs and the reaction plays: **CH₃OH + Br⁻**. Drag the scrubber back and forth to replay it. | "Draw where the electrons go. Arrows start on electrons. … Pencil is you, ink is reality: in from the back, bromide leaves with the bond's two electrons." | Drag stalls: **Draw with lists**. |
-| **1:30**<br>Calculus: slope | Home → **Calculus** opens straight on **Draw the slope.** Judge pencils the slope, then **Check it with a tangent** and drags the tangent along the curve; the true slope inks over the sketch. | "Calculus, same idea. Draw how steep this curve is. Now drag the tangent: the real slope draws itself over your pencil. The top of the hill is high, but it's flat there: slope zero." | Sketch copied the curve's height → the named mistake is **"Slope = height of the curve"**. |
-| **2:10**<br>Calculus: area | Next screen (3 of 4): guess the area; one rectangle says **7.5**; **Fill it with rectangles**, slider **1 → 200**; the sum settles on **4.57**. | "Guess the area. One rectangle says 7.5. Thinner and thinner: 4.8, 4.6, and it lands on 4.57. Code computes every number." | Drags the slider slowly. |
-| **2:40**<br>Close | 4 of 4: the card names what the pencil got wrong, saved to the notebook. | "Every wrong idea goes in your notebook. Onionskin. See your thinking in layers." | **Stop talking. Hand over for questions.** |
-
-**Typed topics:** a typed topic plays as a number slider in the round player, not a draggable curve yet, and the live behaviour of "derivative of x squared" wasn't confirmed in the last walk. So the 3:00 doesn't type a topic. If a judge asks, tap a **hand-checked** chip (e.g. **Exponential doubling**) and say "type any topic and it builds a small model you can run; the numbers are computed in code".
-**If the judge is fast:** go back to Home and type a topic (Learn session, docs/learn-plan.md) once it's live.
-**If the judge is slow:** skip the area guess (go straight to rectangles). **Never cut** the live-named 5th bond, the arrows, or the tangent.
-
-## The 90-second version (rushed judge)
-| Time | What happens |
+| Call | Live time |
 |---|---|
-| 0:00 | Chatbot line. **Organic chemistry → Build ethanol**: driver forces a 5th bond → "A carbon with 5 bonds" named live → **↶ Undo** → **Check it** → **Finish ✓**. |
-| 0:30 | Step 2: two arrows, **Show me**, scrub the reaction. |
-| 1:00 | **Calculus**: sketch, drag the tangent over it. If time: next screen, rectangles 1 → 200, 7.5 → 4.57. |
-| 1:25 | "Onionskin. See your thinking in layers." Stop at 1:30. |
+| Guess (`POST /api/learn/why-we-have-seasons/guess`) | 4.3 s |
+| Anchor | 4.9 s |
+| Stress, per card | 4.5 s |
+| Transfer | 6.1 s |
+| A new typed topic (Bernoulli, Doppler) | 1 to 2.5 min |
 
-## Fallbacks (driver decides, no discussion at the table)
-| Breaks | Do this | Say |
+Measured Sun Oct 18 ~2:45 AM, one run each. A full live session spends ~40 s waiting on the model, so **only the guess runs live**. Everything else is pre-run.
+
+## Demo mode = pre-staged tabs (no code)
+
+There is no `?demo` mode. These tabs do the same job:
+
+| Tab | URL | State | Between judges |
+|---|---|---|---|
+| 1 Live | `?learn=why-we-have-seasons` | Fresh guess screen ("Why we have seasons? Say it in your own words.") | Reload (state is in memory, so a reload is fresh) |
+| 2 Played | `?learn=why-we-have-seasons` | Played start to finish beforehand with good answers. All 8 steps stay stacked on the page, including one stress card that BREAKS and the done card | **Never reload.** Keep a spare copy (2b) |
+| 3 Orgo | Home → Organic chemistry card (`?learn=sn2-reaction`) | Guess submitted; sitting on *Build ethanol* | Press *Clear* |
+| 4 Research | `?research=1` | Scrolled to "Why no points, XP, streaks…" | — |
+| Phone | Backup video, downloaded | For a dead laptop or dead wifi | — |
+
+If asked why it isn't all live: "Live, each step takes about five seconds because a model reads your free-text answer. We ran this one earlier so you can see the whole arc. Tab one is live."
+
+## The 1:45 script
+
+**Roles:** narrator talks and keeps time; driver clicks and takes technical questions. Both learn both.
+
+| Time | Screen / driver | Narrator says |
 |---|---|---|
-| A drag doesn't take on the trackpad | Orgo build: click a palette letter to add an atom bonded to the picked one; arrows: **Draw with lists**. Calculus: use the phone | "Let me drive this one." |
-| Judge builds something odd | **↶ Undo** (or Ctrl+Z) step by step, or **Clear** | "Start from one carbon." |
-| Judge picks the wrong mechanism on the chart | Let it play: the reason line explains the square; pick again | "That's the point: it tells you why." |
-| Page stuck or odd state | Reload with `?session=orgo` or `?session=calculus` | (nothing) |
-| Backend down (dot red) | Nothing changes: orgo and calculus run fully in the browser | — |
-| Venue wifi dies | Local `vite preview` build, opened before the expo | (nothing) |
-| Laptop dies | Backup video, downloaded on the phone | "Here's the 2-minute cut." |
+| 0:00 | Tab 1, seasons guess screen | "Before we show you anything: why is it hotter in summer?" Let the judge answer. (Most say "Earth is closer". Harvard graduates said the same in the documentary *A Private Universe*.) |
+| 0:12 | Type the judge's answer, or "summer is when Earth is closer to the Sun" → Submit. ~4 s wait | "It starts with your guess, not a lecture. It's checking your answer against the misconceptions documented for this topic." Lands on **sounds like: Summer is when Earth is closer**. |
+| 0:25 | Tab 2 → *One true fact*: the noon-Sun curve over the year at 40° N | "Pencil is your guess, ink is reality, the gap is the lesson. June 21: 73.5°. Computed in code, never by the AI." |
+| 0:40 | Scroll to *Compare two cases* | "Same distance from the Sun, opposite seasons: New York summer, Buenos Aires winter. Distance can't explain it." |
+| 0:50 | Scroll to *Stress test*; point at the card that BREAKS | "Then we push your rule to extremes. No tilt: the curve goes flat, no seasons. A rule that only works in easy cases breaks here." |
+| 1:05 | Point at the why rail (*What you're doing / Why it works* + citation) | "Every step has a reason and the paper behind it. And there are no points or streaks, on purpose: rewards change your goal from understanding to scoring." |
+| 1:20 | Tab 3: *add carbon*, then *add hydrogen* ×5. The 5th H lands loose: **drag it onto the carbon** (keyboard: Enter on the H, Enter on the C) | "Same engine for organic chemistry. Give carbon a fifth bond and it names the mistake as you make it." **"A carbon with 5 bonds"** → Undo. |
+| 1:35 | Tab 2, done card (*What you caught*) | "It ends by naming the wrong idea you started with and saves it to your notebook. Type any topic and it builds all this in about a minute. The AI grades, code keeps the facts true, you do the thinking." |
+| 1:45 | Hands off | Stop. "What would you like to see?" |
+
+**Save for questions:** Ask Onion (hints not answers; doesn't cave when you push), the Calculus card, the Research page (Tab 4), typing a new topic (only if they can wait 1-2 min).
+
+**Never say:** "proven to make you learn faster", "revolutionizes learning", "personalized AI tutor", "gamified", or that a typed topic is instant.
+
+## 60-second cut (rushed judge, or API down)
+
+1. **0:00** "Why is it hotter in summer?" Skip Tab 1 and go straight to Tab 2.
+2. **0:10** The guess, its named misconception, the pencil-vs-ink curve.
+3. **0:25** The stress card that breaks: "No tilt, no seasons."
+4. **0:40** The why rail: "Every step is a learning-science result, and there are no points on purpose."
+5. **0:50** The done card: "The AI grades, code keeps it true, you do the thinking." Stop.
+
+## Research lines (decision first, paper second; all on the Research page)
+
+| Decision | Paper | Line |
+|---|---|---|
+| No points / XP / streaks / leaderboards | Deci, Koestner & Ryan 1999 (128 experiments); Hanus & Fox 2015 | "Expected rewards lowered people's own interest across 128 experiments. In a semester class, badges and a leaderboard lowered motivation and final-exam scores." |
+| The AI never just hands over the answer | Bastani et al. 2025, PNAS | "Students with a plain chatbot scored 17% worse once it was taken away; hint-only tutoring removed most of that." |
+| Guess first | Richland, Kornell & Kao 2009; Sinha & Kapur 2021 | "Trying first, even wrong, makes the answer stick, as long as the answer follows." |
+| Compare two cases | Gentner, Loewenstein & Thompson 2003 | "Comparing two cases side by side carries over to new problems far better." |
+| Extremes | Clement 2009 | "Experts test a model at the extremes." |
+| Holds its ground when you push back | Kasneci & Kasneci 2026 (**preprint**) | "AI tutors tend to cave under pushback; ours keeps its verdict." |
+| Feels harder | Deslauriers et al. 2019, PNAS | "Active learners learned more but felt they learned less." |
+
+Say this before they ask: "These are effects from the literature; we haven't run our own study yet. A pre/post test is first."
+
+## Short answers to likely questions
+
+1. **vs ChatGPT:** "It tells you the answer. Onionskin makes you guess first, runs reality on top, and the model can't write the facts."
+2. **vs Khan Academy / Brilliant:** "Those are hand-authored. Type any topic and you get the same eight research-backed steps, starting from *your* wrong idea, with no streaks."
+3. **Does it work?** "No data of our own yet; each step is a published effect. A pre/post test is next."
+4. **AI vs code:** "For a new topic the model writes the cases and misconceptions as schema-checked JSON; curves and numbers come from mathjs. In a session the model only grades free text."
+5. **Model / speed:** "Grading runs on an OpenAI model via the Codex CLI with JSON schemas (Ask Onion falls back to Gemini). ~5 s per graded step, 1-2.5 min per new topic; prebuilt topics are instant."
+6. **Wrong grading?** "It happens; we've seen it. That's why the truth on the curve never comes from the model."
+7. **No points, won't people quit?** "Rewards change what people come back for. Spaced review is the research-backed way to bring them back."
+8. **Who's it for?** "A college STEM student the week before an exam." One person, not "everyone".
+
+## Fallbacks (driver decides, no discussion)
+
+| Breaks | Do | Say |
+|---|---|---|
+| Live guess slow or API down | Skip Tab 1; start on Tab 2 | "Here's one we ran earlier." |
+| Tab 2 lost (reloaded) | Tab 2b | — |
+| The 5th-bond drag fails | Keyboard: Enter on the loose H, Enter on the C; or skip orgo | — |
+| Site down | Local `vite preview` build opened before the expo, then the phone video | "Here's the two-minute cut." |
 
 Never show a raw error or a spinner.
 
-## Likely judge questions (short form; full set in [pitch.md](pitch.md) §3)
-1. **"Is the chemistry right?"** "The rules are in code, not in a model: formal charge is valence minus nonbonding electrons minus bonds, so oxygen with three bonds is 6 − 2 − 3 = +1. SN2 is one step with backside attack, so the carbon inverts. Cyanide attacks through carbon because that's where the minus charge is."
-2. **"How is the derivative checked?"** "The curve's derivative is written in closed form, f′(x) = 1.5(x − 1)(x − 3), and the area is F(3.5) − F(1) = 4.57; unit tests check them against a numeric derivative and Riemann sums (`math.test.ts`). For typed topics the model picks the curve and code computes the slope."
-3. **"How is this different from a chatbot?"** The chatbot line, then: "you predict, it runs on top of your guess, and your wrong idea gets named."
-4. **"Doesn't the AI hallucinate?"** "The showcase levels have no model in them. For a typed topic the model fills a spec and code computes the truth; if nothing fits, it says so."
+## Before each judging block
 
-## Rehearsal checklist
-- Run the 3:00 and the 90-second versions 3 times each, both of us solo, with a stopwatch.
-- Once on the phone (finger drags), once on the trackpad.
-- Once with **Draw with lists** instead of dragging arrows.
-- Check every number said out loud against the table above.
+- [ ] https://onionskin.study loads (not blank) and the header says *backend online*.
+- [ ] Tabs 1-4 staged as above; Tab 2 shows all 8 steps and one BREAKS card.
+- [ ] One full run of the 1:45 with a stopwatch, both roles.
