@@ -1,20 +1,45 @@
-/* Why-pane: quiet by design. Plain card, no grid, no highlight; it sits beside the screen, not on it. */
-.why-layout { display: grid; grid-template-columns: minmax(0, 1fr) 260px; gap: 20px; align-items: start; }
+/* Why rail: the steps down the left, current one open, past ones folded, future ones quiet. */
+.why-layout { display: grid; grid-template-columns: 250px minmax(0, 1fr); gap: 24px; align-items: start; }
 .why-main { min-width: 0; }
 
-.why-pane { background: var(--card); border: 1.5px solid var(--ink-soft); border-radius: 4px; padding: 14px 16px; position: sticky; top: 16px; }
+.why-rail { position: sticky; top: 16px; }
 .why-toggle { display: none; }
-.why-k { margin: 0; font: 700 11px var(--font-mono); text-transform: uppercase; letter-spacing: 0.08em; color: var(--ink-soft); }
-.why-doing { margin: 2px 0 12px; font: 700 15px/1.35 var(--font-body); color: var(--ink); }
-.why-why { margin: 2px 0 12px; font: 15px/1.4 var(--font-body); color: var(--ink); }
-.why-source { margin: 0; padding-top: 10px; border-top: 1px solid var(--grid); font: 13px/1.35 var(--font-hand); color: var(--ink-soft); }
+.why-steps { list-style: none; margin: 0; padding: 0; display: grid; gap: 4px; }
+.why-step { border-radius: 4px; }
+.why-name { margin: 0; display: flex; align-items: center; gap: 8px; font: 600 14px/1.3 var(--font-body); color: var(--ink); }
+.why-num {
+  flex: none; display: inline-grid; place-items: center; width: 22px; height: 22px; border-radius: 4px;
+  border: 1.5px solid currentColor; font: 700 12px var(--font-mono);
+}
 
-/* phone: the pane moves above the screen as a one-line strip that opens on tap */
+.why-step.is-next { padding: 6px 10px; }
+.why-step.is-next .why-name { color: var(--ink-soft); font-weight: 400; opacity: 0.75; }
+
+.why-step.is-past { padding: 6px 10px; }
+.why-step.is-past summary { cursor: pointer; list-style: none; color: var(--ink-soft); }
+.why-step.is-past summary::-webkit-details-marker { display: none; }
+.why-step.is-past .why-num { border-color: transparent; background: var(--marker-soft); color: var(--ink); }
+.why-step.is-past .why-body { margin: 8px 0 4px 30px; }
+
+.why-step.is-now { background: var(--card); border: 2px solid var(--ink); padding: 12px 14px; box-shadow: 3px 3px 0 var(--ink); margin: 4px 0; }
+.why-step.is-now .why-num { background: var(--ink); color: var(--card); border-color: var(--ink); }
+.why-step.is-now .why-body { margin-top: 10px; }
+
+.why-k { margin: 0; font: 700 11px var(--font-mono); text-transform: uppercase; letter-spacing: 0.08em; color: var(--ink-soft); }
+.why-doing { margin: 2px 0 10px; font: 700 15px/1.35 var(--font-body); color: var(--ink); }
+.why-why { margin: 2px 0 10px; font: 14px/1.4 var(--font-body); color: var(--ink); }
+.why-source { margin: 0; padding-top: 8px; border-top: 1px solid var(--grid); font: 13px/1.35 var(--font-hand); color: var(--ink-soft); }
+
+/* phone: one line at the top ("Step 3 of 8 · ..."), the whole list opens on tap */
 /* same breakpoint as learn.css, so the rail and the strip never mix */
 @media (max-width: 720px) {
   .why-layout { grid-template-columns: minmax(0, 1fr); gap: 10px; }
-  .why-pane { order: -1; position: static; padding: 0; }
-  .why-toggle { display: flex; width: 100%; justify-content: space-between; align-items: center; min-height: 44px; padding: 8px 14px; background: none; border: 0; font: 700 15px var(--font-body); color: var(--ink); cursor: pointer; }
-  .why-body { display: none; padding: 0 14px 12px; }
-  .why-pane.open .why-body { display: block; }
+  .why-rail { position: static; border: 1.5px solid var(--ink-soft); border-radius: 4px; background: var(--card); }
+  .why-toggle {
+    display: flex; width: 100%; justify-content: space-between; align-items: center; min-height: 44px; gap: 8px;
+    padding: 8px 14px; background: none; border: 0; font: 700 15px var(--font-body); color: var(--ink); cursor: pointer; text-align: left;
+  }
+  .why-steps { display: none; padding: 0 10px 10px; }
+  .why-rail.open .why-steps { display: grid; }
+  .why-step.is-now { box-shadow: none; }
 }
