@@ -2,137 +2,78 @@
 
 **See your thinking in layers.**
 
-Like an animator's onion skin, your guess stays on screen as a faint pencil layer while the real answer is drawn over it in ink. Short visual sessions take you from not understanding a concept to understanding it: you guess first, poke a real example, push it to the extremes, see your model next to reality, and get your exact mistake named.
+**Live: https://onionskin.study**
 
-**Live:** https://alexander-freedman.github.io/Swamphacks26-DSI/ (birthday session: [`?session=birthday`](https://alexander-freedman.github.io/Swamphacks26-DSI/?session=birthday))
+Type any topic and Onionskin builds you a short lesson that takes you from a first guess to a model you can actually run in your head. You guess before you're taught, predict from one true fact, compare look-alike cases, push your own rule to the extremes, draw it from memory, tell it apart from its look-alike, and carry it to a new field. At the end it names the wrong idea you started with and shows the fix.
 
-![Birthday session, screen 5: your pencil curve under the exact ink curve, the gap shaded](qa/screens/birthday-session/desk-b5-reveal.png)
+Every step comes from published learning-science research, and the app says so as you go: a rail beside each lesson explains why the step works and cites the paper, and the **Research: why it works** page lists all 24 sources with links you can check.
 
-*Birthday session, screen 5 of 7: the dashed line is the curve the learner drew, the solid line is the exact probability, the yellow is the gap. At 23 people the real chance is 50.7% (computed); this learner's curve said 15%.*
+Built at SwampHacks XII (Oct 16-18, 2026) by Alex Freedman and Luana Maldaner. Track: Entertainment & Creative Technology.
 
-Built at SwampHacks XII (Oct 16-18 2026), Entertainment & Creative Technology track.
+## What you can do
 
-## What it does
-
-Every session is 2-3 minutes and uses five moves ([docs/experience.md](docs/experience.md)):
-
-| Move | On screen |
+| | |
 |---|---|
-| 1. Guess first | You commit a guess in pencil before seeing anything, plus how sure you are. |
-| 2. Watch a real example run | One concrete case plays out and you can poke it (add a person, empty the room, try again). |
-| 3. Push it to the extremes | One big slider for the knob that matters; the ink truth moves live. |
-| 4. Your model next to reality | Your pencil guess or drawn curve stays on the same axes as the ink truth, the gap shaded. |
-| 5. Your mistake named | One card: what you probably thought, why it's tempting, the fix in two sentences. Then one rematch with new numbers. |
+| **Try any topic** | Type anything. Ten reviewed topics open instantly (seasons, compound interest, natural selection, Ohm's law, base rates, supply and demand, opportunity cost, recursion, derivatives, SN2 reactions). A new topic is built live in 1 to 2 minutes, with a graph when one honestly fits. |
+| **Guided demos** | Organic chemistry and Calculus walk the same Learn steps, but with their own tools inside: build ethanol atom by atom, push SN2 arrows, sketch a slope and drag the tangent, fill the area under a curve. |
+| **Ask Onion** | A tutor beside every step. It knows the topic and the step you're on, gives hints instead of answers, and on the research page answers only from the research we cite. |
+| **Notebook** | Every wrong idea a lesson caught, with the fix. Learn the topic again and get it right twice to cross it off. |
 
-No points, XP, streaks or leaderboards: the reward is the reveal.
+## How a lesson works
 
-**Birthday problem (live, 7 screens).** Guess how many people it takes for a 50% chance of a shared birthday, fill a room one person at a time and watch the pair lines pile up (23 people = 253 pairs, computed), empty it and try again, draw your own curve, then see it under the exact curve and drag the group size from 2 to 80. The mistake card is picked from your guess ("it's about MY birthday" or "you need about half of 365"), then a rematch.
-
-| Fill a room | Draw your curve | Mistake named |
+| Step | What you do | Why it works |
 |---|---|---|
-| ![Fill a room](qa/screens/birthday-session/desk-b2-room.png) | ![Draw your curve](qa/screens/birthday-session/desk-b4-draw.png) | ![Mistake card](qa/screens/birthday-session/desk-b6-card.png) |
+| 1. Guess first | Write your best guess before being taught | A committed guess, even a wrong one, makes the real answer stick (Richland, Kornell & Kao 2009) |
+| 2. One true fact | Predict from a single fact, often on a live graph | Concrete first, then abstract (Fyfe et al. 2014) |
+| 3. Compare two cases | Two look-alikes, one difference; write your rule as *When ___, then ___, because ___* | Comparing cases surfaces the shared structure (Gentner et al. 2003; Schwartz & Martin 2004) |
+| 4. Stress test | Predict what happens at three extremes; see if your rule saw it coming, and add the missing piece | Experts test models on extreme cases (Clement 2009) |
+| 5. Draw it | Sketch the model from memory; each part is checked | Drawing to learn (Schmeck et al. 2014) |
+| 6. Tell it apart | Pick this idea against its look-alike | Practicing the choice sharpens it (Brunmair & Richter 2019) |
+| 7. Carry it over | The same idea in a totally different field | Far transfer is rare unless you practice it (Barnett & Ceci 2002) |
+| 8. What you caught | The wrong idea you started with, and its fix, saved to the Notebook | Misconceptions change when they're named and replaced (Chi 2005) |
 
-**Coming next (in review, not on main yet):** a coin streak session (the longest run in 100 fair flips averages 6.98, computed) and a positive test session (1% base rate, 90% sensitivity, 9% false positives: a positive means about a 9.2% chance you're sick, computed). On main today both play as short question rounds in the round player on the home page.
+No points, XP, streaks or leaderboards: expected rewards can crowd out interest in the learning itself (Deci, Koestner & Ryan 1999). The full reasoning and every source are on the research page.
 
-**Typed topics (labelled extra, backend only for now).** `POST /api/rounds` turns a typed topic into a short 3-question round. Ten hand-reviewed extra topics (Monty Hall, compound interest, regression to the mean, ...) are served without a model call; anything else is generated and labelled *auto-checked*. There is no typed-topic box on the live site yet.
+## How it's built
 
-**Help chat (API only for now).** `POST /api/help` answers "I'm stuck" questions about the screen you're on, in plain words. The panel inside the sessions isn't merged yet.
+- **Web** (`web/`): React + TypeScript + Vite, deployed to GitHub Pages at onionskin.study. Ready-made topics ship as static JSON, so they open even without the backend.
+- **API** (`api/`): FastAPI on a Vultr VM behind Caddy (HTTPS). Lessons are authored and answers graded by OpenAI's Codex CLI running on the server, with a fixed grading contract: judge piece by piece, never give the answer mid-attempt, one targeted follow-up, quote the learner's own words, hold the verdict under pushback.
+- **Truth is computed in code, never by a model.** Every graph is a formula the app evaluates itself; a model-proposed graph is only shown if the app's checker recomputes its answer and every number in its captions. A bad graph never ships; a missing one is fine.
+- **Data**: answer events in Tiger Data (Postgres + TimescaleDB), with SQLite as a fallback.
+- **Topics** (`data/learn/`): the ten reviewed lessons, each with its cases, extreme tests, three-choice prediction cards, common misconceptions and, where one fits, a graph.
 
-## How it works
+## How we used AI
 
-```mermaid
-flowchart LR
-  subgraph Browser["Static site on GitHub Pages"]
-    S["Sessions + round player<br/>React + Vite"]
-    T["Truth in code<br/>exact formulas + seeded simulation"]
-    S --> T
-  end
-  subgraph API["FastAPI backend (api/)"]
-    R["/api/rounds<br/>showcase, reviewed, generated"]
-    C["checks.py<br/>computed truth, lint, blind check"]
-    H["/api/help<br/>hint before lock-in"]
-    E["/api/answers<br/>answer events"]
-  end
-  G["Gemini API, free tier"]
-  DB[("SQLite")]
-  D["data/rounds/*.json<br/>hand-reviewed"]
-  S -. "optional; falls back to static JSON" .-> R
-  R --> D
-  R --> G
-  G --> C
-  H --> G
-  E --> DB
-```
+We built Onionskin with AI coding agents, and we want to be clear about the split. We made the decisions. The agents wrote most of the code.
 
-- **Frontend:** React 19 + TypeScript + Vite, deployed as a static site to GitHub Pages (`scripts/deploy-pages.sh`). It needs no backend: the showcase rounds ship as static JSON next to the page. Each session lives in its own folder under `web/src/sessions/` and is picked up by `registry.ts`.
-- **Truth is computed in code, never trusted from a model.** The birthday curve is the exact formula 1 − ∏(365 − k)/365; streaks and test results come from seeded simulations or exact arithmetic in `web/src/truth.ts`, re-derived on the backend in `api/app/truth.py` for checks. Formulas: [shared/schema/README.md](shared/schema/README.md).
-- **Rounds:** one JSON contract, `shared/schema/round.schema.json`, generated from the Pydantic models in `api/app/schema.py`. Showcase rounds (`data/rounds/`) and extra topics (`data/rounds/extra/`) are written and checked by hand and marked *reviewed*.
-- **Typed topics:** one structured-output Gemini call per fresh topic (free tier: `gemini-3.5-flash-lite`, then `gemini-3.1-flash-lite`, then Gemma), cached on disk by normalized topic. The model writes a spec, not the answer: `api/app/checks.py` evaluates every answer expression, checks it lands in the right band, lints the slider bands, and drops anything that fails. Items code can't compute go to a blind check by a second model; items with no blind answer are reported as `unchecked`, never as checked. Limits: 12 generations per IP per hour, a 480/day soft cap under the free quota, and a fallback to the showcase topics on any failure. Model choice and quotas: [docs/research/gemini.md](docs/research/gemini.md).
-- **Help chat:** the server builds the context (topic, screen, misconceptions, the true value) itself and ignores any "truth" the client sends. Before you lock in a guess it only hints, and the reply is scanned for the true value: a leak is swapped for the screen's static hint. Per-IP limit (10 per 10 min) and a daily cap (150), both env-configurable; capped or offline, it returns the static hint with HTTP 200, so a session never depends on it.
-- **Answer events:** `POST /api/answers` maps a locked answer to its misconception and stores it in SQLite (`data/local.db`). The table is shaped to move to a Tiger Data (Timescale) hypertable; that change is in review, not on main.
-- **Secrets:** the Gemini key is read from the server's environment only (kept in a git-ignored `.env`). The frontend never calls a paid API.
+**What we did.** We designed the learning experience: the eight-step path from a first guess to a model you can run, based on learning-science research Alex had been doing since September (contrasting cases, guessing before learning, drawing from memory, transfer). We chose what to build and what to cut, set the visual design, and wrote the acceptance criteria for each feature. The agents reviewed each other's pull requests under rules we set: tests had to pass, and each agent reviewed the other's work. We approved every change of direction, tested the live site on desktop and phone, and reviewed every prebuilt topic before it shipped.
+
+**How we built it.** Each of us ran a Claude Code agent, first on our own cloud servers and later on our own laptops. The two agents worked in one GitHub repo through issues and pull requests, and a shared Discord server let each of us steer our own agent and see status. We built the tooling around them ourselves: watchdogs that restart stalled sessions, usage caps, and a rule that the agents coordinate only through GitHub so every change is reviewable.
+
+**AI inside the product.** When you type a topic, OpenAI's Codex writes the lesson structure (the cases, extreme tests, prediction cards and common misconceptions), proposes a graph when one fits, and grades your answers against the lesson. Codex also powers the "Ask Onion" help chat, with Google's Gemini as a backup. The ten showcase topics were written by Codex and reviewed by us. The illustrations on the Home cards were generated with an Azure OpenAI image model and picked by us. Numbers you see in the visuals are computed in code, not generated by a model.
 
 ## Run it locally
 
-Needs Python 3.12 + [uv](https://docs.astral.sh/uv/) and Node 22. Run the backend and frontend in two terminals.
-
 ```bash
-# 1. backend on :8000 (no key needed: without GEMINI_API_KEY it runs offline and serves reviewed rounds)
-cd api && uv sync && uv run uvicorn app.main:app
-
-# 2. frontend (proxies /api to :8000; works without the backend too)
+# web (http://localhost:5173)
 cd web && npm ci && npm run dev
-# open http://localhost:5173/Swamphacks26-DSI/?session=birthday
 
-# 3. tests
-cd api && uv run pytest -q
-cd web && npm test
+# api (http://localhost:8000); MM_CODEX_FAKE=1 uses canned grading, no Codex needed
+cd api && uv sync && MM_CODEX_FAKE=1 uv run uvicorn app.main:app --reload
 ```
 
-Quick API check: `curl localhost:8000/api/health` and `curl localhost:8000/api/rounds`. Lint: `uv run ruff check .` in `api/`, `npm run lint` in `web/`. CI runs lint, tests and the build on every PR ([.github/workflows/ci.yml](.github/workflows/ci.yml)).
+Point the web app at a running API with `VITE_API_BASE=http://localhost:8000`. Tests: `npm test` in `web/`, `uv run pytest` in `api/`.
 
-## Honest numbers
+Deploying: `scripts/deploy-pages.sh` (Pages, with `PAGES_CNAME=onionskin.study` and `VITE_API_BASE`) and `deploy/vultr/update.sh` (API). Details in `deploy/README.md`.
 
-| Number | Value | Source |
-|---|---|---|
-| Birthday: chance of a shared birthday at 23 people | 50.7% | computed (exact formula, tested in `web/src/sessions/birthday/math.test.ts`) |
-| Birthday: pairs among 23 people | 253 | computed (23 × 22 / 2) |
-| Coin streak: average longest run in 100 fair flips | 6.98 | computed (exact 6.977, tested in `web/src/truth.test.ts`) |
-| Positive test: chance you're sick at 1% / 90% / 9% | 9.2% | computed (`base_rate_test` in [shared/schema/README.md](shared/schema/README.md)) |
-| Generation trial: topics delivered | 24 of 25 | our own 25-topic trial, prompt v2 ([NOTES.md](NOTES.md), Sat ~12:10 AM); small sample |
-| Generation trial: time per topic | median 27 s, p90 51 s | same trial; too slow to generate live on stage |
-| Free-tier quota on the generator model | 500 requests/day, 15/min | AI Studio rate-limit page for our project ([docs/research/gemini.md](docs/research/gemini.md)) |
-| Backend tests | 72 passing | `uv run pytest -q` |
-| Frontend tests | 21 | `npm test` (vitest; CI green on main) |
+## Repo map
 
-What the trial also showed ([NOTES.md](NOTES.md)): every generated item came out as a plain number estimate rather than a visual, several had wrong answers that slipped past the checks, and the blind check often timed out while still reporting a pass. That's why the sessions we demo are hand-built and typed topics are a labelled extra. The blind check now reports unanswered items as `unchecked`.
-
-## Limits and what's next
-
-- Only the birthday session is a full visual session on main; the coin streak and positive test sessions are in review.
-- The backend isn't hosted yet, so the live site runs on static reviewed rounds: no typed topics or help chat in the browser until it's deployed (a Vultr/Render deploy kit is in review).
-- Generated rounds are slow (median 27 s) and mostly plain estimates; a generator version that prefers curve and distribution widgets is in review.
-- Progress is saved in the browser only (`localStorage`). Planned: a collection of misconceptions caught → busted, and a remix of the same topic the next day.
-- On a slow single-core machine a few simulation-heavy web tests can hit vitest's default timeout; a longer timeout is in review.
-
-## Team
-
-- Alex Freedman ([@Alexander-Freedman](https://github.com/Alexander-Freedman)): engine, backend, data, birthday session
-- Luana Maldaner ([@luanamaldaner](https://github.com/luanamaldaner)): frontend, visual design, coin streak and positive test sessions
-
-SwampHacks XII, University of Florida, Oct 16-18 2026. Track: Entertainment & Creative Technology. How we work: [CONTRIBUTING.md](CONTRIBUTING.md). Decisions: [NOTES.md](NOTES.md). Storyboard and look: [docs/experience.md](docs/experience.md), [docs/experience-look.md](docs/experience-look.md).
-
-## Rules and credits
-
-- All project code was written during the event's hacking window (Fri Oct 16, 8:30 PM to Sun Oct 18, 8:30 AM).
-- The five moves draw on learning-science work cited with links in [docs/experience.md](docs/experience.md) (prediction first, hypercorrection, runnable mental models, checked drawing).
-- Birthday problem framing: [Live Science](https://www.livescience.com/what-is-birthday-paradox), [Conversable Economist](https://conversableeconomist.com/2014/02/22/intuition-behind-the-birthday-bets/).
-- Built with React, Vite, FastAPI, Pydantic, uv and the Gemini API (free tier).
-
-## AI tools disclosure
-
-> **TO BE WORDED BEFORE SUBMIT.** SwampHacks XII requires disclosing AI tool use. This section is a placeholder and will be written before submission.
-
-## License
-
-No license file yet: all rights reserved by the authors until one is added.
+| Path | What's there |
+|---|---|
+| `web/src/learn/` | The Learn session: the eight steps, the why rail, the stress cards, topic-specific tools (`custom/`) |
+| `web/src/research/` | The research page and its 24 sources |
+| `web/src/sessions/` | The orgo and calculus tools |
+| `api/app/learn/` | Authoring, grading and live-graph checks (Codex wrapper, prompts, schemas) |
+| `api/app/spec.py`, `api/app/truth.py` | The code that computes every graph's truth |
+| `data/learn/` | The ten reviewed topics |
+| `docs/` | The plan, the API contract, the research notes behind the why rail |
