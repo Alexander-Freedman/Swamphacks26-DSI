@@ -1,0 +1,121 @@
+{
+  "slug": "natural-selection",
+  "topic": "natural selection",
+  "checked": true,
+  "rubric": {
+    "entities": [
+      "Individuals in a population",
+      "Heritable traits: differences that can be passed from parents to offspring",
+      "Environmental conditions, including resources, predators, disease, and mates",
+      "Survival and reproductive success: how many offspring an individual leaves",
+      "Trait frequencies: how common each heritable trait is in later generations"
+    ],
+    "causalLinks": [
+      "When individuals differ in a heritable trait, parents with that trait tend to produce offspring with the same trait more often than parents without it.",
+      "If one heritable trait makes its carriers leave more surviving offspring in the current environment, carriers of that trait contribute more copies of it to the next generation.",
+      "As those extra offspring reproduce, the advantageous heritable trait usually becomes more common across generations.",
+      "If environmental conditions change so that a different trait leads to more offspring, the direction of trait-frequency change can reverse.",
+      "If a trait difference is not heritable, differences in survival or success during one lifetime do not by themselves make that difference more common in descendants."
+    ],
+    "coreRule": "Natural selection occurs when individuals vary in a heritable trait and that trait causes consistent differences in reproductive success: traits associated with more surviving offspring tend to increase in frequency across generations, while traits associated with fewer tend to decrease.",
+    "whyRuleMatters": "The population changes because reproduction copies traits unevenly, not because individuals need a trait or try to change. A trait that helps survival but produces no additional descendants will not necessarily spread; the crucial causal link is heritable variation to different numbers of offspring to changed trait frequencies.",
+    "whyRuleQuestion": "Why must a trait both be heritable and affect the number of offspring, rather than merely helping an individual during its own lifetime?",
+    "anchorDescription": "In a beetle population, some beetles are brown and some are green, and color is inherited. On dark soil, birds more often spot and eat green beetles than brown ones.",
+    "anchorPrompt": "After several generations on the dark soil, what change would you predict in the proportion of brown beetles, and why?",
+    "contrastingCases": [
+      {
+        "label": "Inherited camouflage versus a temporary stain",
+        "detail": "On dark soil, 100 brown beetles and 100 green beetles begin a season. Birds eat 60 green beetles but only 20 brown beetles. In Case A, beetle color is inherited, so brown survivors usually have brown offspring. In Case B, every beetle was originally green but 100 happened to be coated with washable brown mud; their offspring are not more likely to be brown. Both groups of brown-looking beetles survive better this season, but only Case A makes brown color more common in later generations.",
+        "oneLine": "Inherited brown spreads; washable brown mud does not."
+      },
+      {
+        "label": "Survival advantage versus reproductive advantage",
+        "detail": "Two inherited rabbit fur colors occur on snow. White rabbits evade foxes better: 80 of 100 white rabbits survive, compared with 40 of 100 brown rabbits. But suppose each surviving white rabbit produces 1 offspring while each surviving brown rabbit produces 3 offspring because brown rabbits have much greater mating success. Brown rabbits leave 120 offspring and white rabbits leave 80, so brown fur can increase despite lower survival.",
+        "oneLine": "More survival alone loses to more total offspring."
+      },
+      {
+        "label": "Same trait, changed environment",
+        "detail": "A population has inherited light and dark fur. On pale sand, hawks catch 70 of 100 dark mice and 20 of 100 light mice, so light fur tends to increase. After a volcanic eruption covers the ground in dark ash, hawks catch 70 of 100 light mice and 20 of 100 dark mice, so dark fur tends to increase instead.",
+        "oneLine": "The favored inherited color flips when ground color flips."
+      }
+    ],
+    "extremeCaseDimensions": [
+      {
+        "key": "zero-heritability",
+        "description": "Push inheritance to none: if an apparent survival or reproduction advantage is not passed to offspring, predict no systematic evolutionary increase of that acquired or temporary difference across generations."
+      },
+      {
+        "key": "no-reproductive-difference",
+        "description": "Push fitness differences to zero: when heritable variants leave equal expected numbers of offspring in a specified environment, natural selection produces no directional change in their frequencies, even if they look different."
+      },
+      {
+        "key": "selection-direction-reversal",
+        "description": "Reverse which variant leaves more offspring by changing the environment or social conditions: predict that the formerly favored heritable trait stops increasing and the newly higher-reproduction trait tends to increase."
+      },
+      {
+        "key": "strong-reproductive-skew",
+        "description": "Make one heritable variant leave far more surviving offspring than another: predict a rapid directional increase of the high-success variant, subject to the trait remaining heritable and variation still being present."
+      }
+    ],
+    "confusableNeighbors": [
+      {
+        "key": "evolution-by-genetic-drift",
+        "label": "Genetic drift",
+        "question": "If an inherited trait becomes common after a flood randomly leaves only a few survivors, is that natural selection or genetic drift?",
+        "correctDistinction": "Natural selection is nonrandom with respect to heritable trait effects on reproductive success: the trait helps cause its own higher or lower reproduction. Genetic drift is random change in trait frequencies caused by chance sampling, especially in small populations. Both can change inherited trait frequencies at the same time; drift can overwhelm a weak selective advantage in a small population."
+      },
+      {
+        "key": "individual-acclimation",
+        "label": "Acclimation or learning",
+        "question": "A person develops a tan, or a bird learns a better route; why is that not natural selection by itself?",
+        "correctDistinction": "Acclimation and learning are changes within an individual during its lifetime. Natural selection is a population-level change across generations caused by inherited differences in offspring production. An individual change could matter to selection only if relevant variation is heritable and individuals carrying it consequently leave different numbers of descendants."
+      }
+    ],
+    "transferStructuralRequirements": [
+      "A population containing multiple variants of some reproducible feature.",
+      "The variants must be copied or transmitted to new members with enough fidelity that descendants tend to resemble their sources.",
+      "In the specified setting, variants must cause consistent differences in how many descendants or copies they produce.",
+      "Repeated unequal copying must change the fraction of variants over successive generations or replication cycles.",
+      "The direction of change must depend on the setting's effect on replication, rather than on purposeful change by individual variants."
+    ],
+    "referenceTransferExample": "In a digital simulation, 1,000 programs make copies of themselves. Programs with a heritable instruction that compresses their code finish copying in 2 seconds, while programs without it take 4 seconds; the computer deletes old copies only when memory is full. The faster-copying instruction becomes more common over many copy cycles because programs carrying it generate more descendant copies. If a new security check makes compressed programs fail twice as often, that advantage can disappear or reverse."
+  },
+  "misconceptions": [
+    {
+      "id": "need-causes-traits",
+      "label": "“Animals change because they need to.”",
+      "tell": "“The giraffes stretched for leaves, so their necks became longer and their babies inherited the length.”",
+      "fix": "Individual effort does not create a heritable adaptation on demand. If neck length varies heritably, giraffes with lengths that lead to more offspring can make longer-neck variants more common over generations."
+    },
+    {
+      "id": "survival-is-the-whole-story",
+      "label": "“The survivors always win.”",
+      "tell": "“Whichever animals live longest must become the most common.”",
+      "fix": "What matters is total reproductive success, including mating and offspring survival, not survival alone. A shorter-lived variant can spread if it leaves more surviving offspring."
+    },
+    {
+      "id": "selection-has-a-goal",
+      "label": "“Nature chooses what is best.”",
+      "tell": "“Natural selection will make the species perfectly adapted to whatever it needs.”",
+      "fix": "Natural selection has no foresight or goal; it filters existing heritable variation through current reproduction. Constraints, changing environments, tradeoffs, chance, and lack of useful variation can prevent perfect adaptation."
+    }
+  ],
+  "extremeCases": [
+    {
+      "dimension": "zero-heritability",
+      "scenario": "On black lava, 90 white lizards are painted black with harmless paint and birds eat fewer of them that summer. Their hatchlings receive no paint and are born white.",
+      "correctBehavior": "The temporary black appearance does not become more common through natural selection because it was not inherited. White hatchlings remain the expected color unless inherited color variants differ in reproduction."
+    },
+    {
+      "dimension": "no-reproductive-difference",
+      "scenario": "A beetle population has inherited red and blue shell colors. In a laboratory, 100 red beetles and 100 blue beetles each leave an average of two surviving offspring.",
+      "correctBehavior": "Natural selection predicts no directional increase of either shell color in this setting. Their frequencies may still wander by chance, but neither color has a selection advantage."
+    },
+    {
+      "dimension": "selection-direction-reversal",
+      "scenario": "Before a drought, deep-beaked finches crack the common large seeds and leave more chicks than shallow-beaked finches. During a long drought, only small soft seeds remain, and shallow-beaked finches now leave more chicks.",
+      "correctBehavior": "The previous tendency for deep beaks to increase reverses under the drought conditions. Across later generations, shallow-beak variants tend to become more common if beak depth is heritable."
+    }
+  ],
+  "visual": null
+}
