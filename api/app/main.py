@@ -22,7 +22,7 @@ from app.gen import (
     offline,
 )
 from app.learn.router import router as learn_router
-from app.learn.topics import prebuilt_topics
+from app.learn.topics import get_topic, prebuilt_topics
 from app.rounds import extra_for_topic, extra_rounds, showcase_rounds
 from app.schema import Round
 from app.spec import nearest_topics
@@ -219,6 +219,64 @@ def post_answer(body: AnswerIn, request: Request) -> dict:
 @app.get("/api/collection/{session_id}")
 def get_collection(session_id: str) -> list[dict]:
     return collection(session_id)
+
+
+class LearnEventIn(BaseModel):
+    session_id: str = Field(min_length=8, max_length=64, pattern=r"^[A-Za-z0-9_-]+$")
+    slug: str = Field(max_length=80)
+    step: Literal["guess", "stress"]
+    # guess: the misconception the guess grader matched (None = no known one)
+    misconception_id: str | None = Field(default=None, max_length=60)
+    # stress: which extreme case, and which predict choice was picked
+    case_index: int | None = Field(default=None, ge=0, le=9)
+    choice: int | None = Field(default=None, ge=0, le=9)
+
+
+@app.post("/api/learn-events")
+def post_learn_event(body: LearnEventIn, request: Request) -> dict:
+    """Record one Learn answer in the answers hypertable (Tiger Data) and return how everyone
+    answered the same step, from the room_hourly continuous aggregate.
+
+    guess: which known misconception the first guess matched ('correct' in the room = none).
+    stress: which prediction was picked on an extreme case; right or wrong is decided here from
+    the topic's own predict card, never taken from the browser. One answer per session per step.
+    """
+    ip = request.client.host if request.client else "unknown"
+    if _rate_limited("answers:" + ip, ANSWERS_PER_IP_PER_HOUR):
+        raise HTTPException(status_code=429, detail="slow down")
+    topic = get_topic(body.slug)
+    if topic is None:
+        raise HTTPException(status_code=404, detail="unknown topic")
+    known = {m.id for m in topic.misconceptions}
+    option_id = None
+    if body.step == "guess":
+        if body.misconception_id is not None and body.misconception_id not in known:
+            raise HTTPException(status_code=422, detail="unknown misconception")
+        item_id, misconception_id = "guess", body.misconception_id
+    else:
+        cases = topic.extremeCases
+        if body.case_index is None or body.choice is None or body.case_index >= len(cases):
+            raise HTTPException(status_code=422, detail="need case_index and choice")
+        predict = cases[body.case_index].predict
+        if predict is None or body.choice >= len(predict.choices):
+            raise HTTPException(status_code=422, detail="no such prediction")
+        picked = predict.choices[body.choice]
+        item_id, option_id = f"stress-{body.case_index}", str(body.choice)
+        # a wrong pick with no named misconception still must not count as right
+        misconception_id = (
+            None if picked.correct else (picked.misconceptionId or "wrong-prediction")
+        )
+    round_slug = f"learn:{body.slug}"
+    record_answer(
+        session_id=body.session_id,
+        round_slug=round_slug,
+        item_id=item_id,
+        value_num=None,
+        option_id=option_id,
+        confidence=None,
+        misconception_id=misconception_id,
+    )
+    return {"room": room(round_slug, item_id)}
 
 
 class HelpContextIn(BaseModel):

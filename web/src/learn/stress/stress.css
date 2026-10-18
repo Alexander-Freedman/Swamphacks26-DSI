@@ -61,6 +61,7 @@
 .st-choice.is-wrong { border-color: var(--off); background: color-mix(in srgb, var(--off) 10%, var(--paper)); text-decoration: line-through; }
 .st-truth { margin: 0; padding: 8px 12px; border-left: 3px solid var(--called); background: var(--paper); }
 .st-truth.no { border-left-color: var(--off); }
+.st-room { margin: 0; font: 600 13px var(--font-mono, ui-monospace, monospace); color: var(--ink-soft); }
 .st-check { padding: 10px 12px; border: 1.5px dashed var(--ink-soft); border-radius: 4px; display: grid; gap: 8px; }
 .st-check p { margin: 0; }
 .st-check-survives { border-style: solid; border-color: var(--called); }
