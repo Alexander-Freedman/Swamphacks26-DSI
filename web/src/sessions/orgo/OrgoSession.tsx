@@ -10,6 +10,7 @@ import { ContrastStep } from './ContrastStep'
 import { MechStep } from './MechStep'
 import { MECHS } from './mechs'
 import { PushStep } from './PushStep'
+import { Thumb } from './Thumb'
 import { SECTIONS, type OrgoStep, type OrgoTopic } from './topics'
 import { reducedMotion } from './geom'
 import './orgo.css'
@@ -67,6 +68,7 @@ function OrgoMenu({ onPick }: { onPick: (t: OrgoTopic) => void }) {
             <div className="og-topics">
               {s.topics.map((t) => (
                 <button key={t.id} className="og-topic" disabled={!t.ready} onClick={() => onPick(t)} aria-describedby={`og-t-${t.id}`}>
+                  <Thumb topic={t.id} />
                   <span className="og-topic-title">{t.title}</span>
                   <span id={`og-t-${t.id}`} className="og-topic-blurb">{t.blurb}</span>
                   {!t.ready && <span className="og-soon">coming next</span>}
