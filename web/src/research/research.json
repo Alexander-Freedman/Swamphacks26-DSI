@@ -1,0 +1,325 @@
+{
+  "sources": [
+    {
+      "id": "richland-2009",
+      "authors": "Richland, Kornell & Kao",
+      "year": 2009,
+      "title": "The pretesting effect: Do unsuccessful retrieval attempts enhance learning?",
+      "venue": "Journal of Experimental Psychology: Applied",
+      "url": "https://doi.org/10.1037/a0016496",
+      "finding": "Trying to answer questions before studying, and mostly getting them wrong, led to better later learning than spending that time just studying."
+    },
+    {
+      "id": "sinha-kapur-2021",
+      "authors": "Sinha & Kapur",
+      "year": 2021,
+      "title": "When Problem Solving Followed by Instruction Works: Evidence for Productive Failure",
+      "venue": "Review of Educational Research",
+      "url": "https://doi.org/10.3102/00346543211019105",
+      "finding": "Across many studies, trying a problem before being taught beat teaching first for deep understanding and transfer, most of all when the design followed productive failure closely."
+    },
+    {
+      "id": "fyfe-2014",
+      "authors": "Fyfe, McNeil, Son & Goldstone",
+      "year": 2014,
+      "title": "Concreteness Fading in Mathematics and Science Instruction: a Systematic Review",
+      "venue": "Educational Psychology Review",
+      "url": "https://doi.org/10.1007/s10648-014-9249-3",
+      "finding": "Starting with a concrete example and then fading to the abstract form is a promising way to teach ideas that carry over to new problems."
+    },
+    {
+      "id": "gentner-2003",
+      "authors": "Gentner, Loewenstein & Thompson",
+      "year": 2003,
+      "title": "Learning and transfer: A general role for analogical encoding",
+      "venue": "Journal of Educational Psychology",
+      "url": "https://doi.org/10.1037/0022-0663.95.2.393",
+      "finding": "People who compared two cases side by side used the shared principle on a new problem far more often than people who studied each case alone."
+    },
+    {
+      "id": "schwartz-martin-2004",
+      "authors": "Schwartz & Martin",
+      "year": 2004,
+      "title": "Inventing to Prepare for Future Learning: The Hidden Efficiency of Encouraging Original Student Production in Statistics Instruction",
+      "venue": "Cognition and Instruction",
+      "url": "https://doi.org/10.1207/s1532690xci2202_1",
+      "finding": "Students who first tried to invent a method from contrasting cases learned more from a later lesson than students who were shown the method first."
+    },
+    {
+      "id": "clement-2009",
+      "authors": "Clement",
+      "year": 2009,
+      "title": "The Role of Imagistic Simulation in Scientific Thought Experiments",
+      "venue": "Topics in Cognitive Science",
+      "url": "https://doi.org/10.1111/j.1756-8765.2009.01031.x",
+      "finding": "Experts thinking aloud tested ideas by running them in their heads, often by pushing a case to an extreme to see what must happen."
+    },
+    {
+      "id": "schmeck-2014",
+      "authors": "Schmeck, Mayer, Opfermann, Pfeiffer & Leutner",
+      "year": 2014,
+      "title": "Drawing pictures during learning from scientific text: testing the generative drawing effect and the prognostic drawing effect",
+      "venue": "Contemporary Educational Psychology",
+      "url": "https://doi.org/10.1016/j.cedpsych.2014.07.003",
+      "finding": "Drawing what a science text describes helped understanding, and the accuracy of a learner's drawing predicted how well they understood."
+    },
+    {
+      "id": "leutner-biele-2025",
+      "authors": "Leutner & Biele",
+      "year": 2025,
+      "title": "Without Integration, Everything Is Nothing: A Meta-Analysis of the Effectiveness of Instructional Support for Drawing-to-Learn",
+      "venue": "Educational Psychology Review",
+      "url": "https://doi.org/10.1007/s10648-025-10067-7",
+      "finding": "Help with drawing only paid off when it made learners connect their drawing to the real thing, such as comparing it with a correct picture."
+    },
+    {
+      "id": "wammes-2016",
+      "authors": "Wammes, Meade & Fernandes",
+      "year": 2016,
+      "title": "The drawing effect: Evidence for reliable and robust memory benefits in free recall",
+      "venue": "Quarterly Journal of Experimental Psychology",
+      "url": "https://doi.org/10.1080/17470218.2015.1094494",
+      "finding": "People who drew words remembered about twice as many as people who wrote them out, even with quick, rough drawings."
+    },
+    {
+      "id": "dunlosky-2013",
+      "authors": "Dunlosky, Rawson, Marsh, Nathan & Willingham",
+      "year": 2013,
+      "title": "Improving Students' Learning With Effective Learning Techniques: Promising Directions From Cognitive and Educational Psychology",
+      "venue": "Psychological Science in the Public Interest",
+      "url": "https://doi.org/10.1177/1529100612453266",
+      "finding": "Of ten common study methods, self-testing and spreading practice over time worked best; re-reading and highlighting worked poorly."
+    },
+    {
+      "id": "brunmair-richter-2019",
+      "authors": "Brunmair & Richter",
+      "year": 2019,
+      "title": "Similarity matters: A meta-analysis of interleaved learning and its moderators",
+      "venue": "Psychological Bulletin",
+      "url": "https://doi.org/10.1037/bul0000209",
+      "finding": "Mixing examples of different categories helped learning overall, and helped most when the categories were hard to tell apart."
+    },
+    {
+      "id": "kornell-bjork-2008",
+      "authors": "Kornell & Bjork",
+      "year": 2008,
+      "title": "Learning Concepts and Categories: Is Spacing the \"Enemy of Induction\"?",
+      "venue": "Psychological Science",
+      "url": "https://doi.org/10.1111/j.1467-9280.2008.02127.x",
+      "finding": "People learned to recognize painters' styles better when paintings were mixed than when grouped by artist, yet most believed grouping worked better."
+    },
+    {
+      "id": "barnett-ceci-2002",
+      "authors": "Barnett & Ceci",
+      "year": 2002,
+      "title": "When and where do we apply what we learn? A taxonomy for far transfer",
+      "venue": "Psychological Bulletin",
+      "url": "https://doi.org/10.1037/0033-2909.128.4.612",
+      "finding": "Whether learning carries over depends on how far apart the settings are, and evidence for carrying ideas into distant settings is mixed."
+    },
+    {
+      "id": "chi-2005",
+      "authors": "Chi",
+      "year": 2005,
+      "title": "Commonsense Conceptions of Emergent Processes: Why Some Misconceptions Are Robust",
+      "venue": "Journal of the Learning Sciences",
+      "url": "https://doi.org/10.1207/s15327809jls1402_1",
+      "finding": "The most stubborn misconceptions come from filing a process under the wrong kind of thing, so fixing them needs a change of category."
+    },
+    {
+      "id": "bjork-bjork-2023",
+      "authors": "Bjork & Bjork",
+      "year": 2023,
+      "title": "Introducing Desirable Difficulties Into Practice and Instruction: Obstacles and Opportunities",
+      "venue": "In Their Own Words (Overson, Hakala, Kordonowy & Benassi, eds.), APA Division 2",
+      "url": "https://www.unh.edu/teaching-learning-resource-hub/sites/default/files/media/2023-06/itow-introducing-desirable-difficulties-into-practice-and-instruction-bjork-and-bjork.pdf",
+      "finding": "Methods that feel harder, like spacing and self-testing, build longer-lasting learning, while re-reading feels like mastery because the text seems familiar."
+    },
+    {
+      "id": "mayer-2024",
+      "authors": "Mayer",
+      "year": 2024,
+      "title": "The Past, Present, and Future of the Cognitive Theory of Multimedia Learning",
+      "venue": "Educational Psychology Review",
+      "url": "https://doi.org/10.1007/s10648-023-09842-1",
+      "finding": "People learn more deeply from words and pictures together than from words alone, when the design does not overload working memory."
+    },
+    {
+      "id": "hoffler-leutner-2007",
+      "authors": "Höffler & Leutner",
+      "year": 2007,
+      "title": "Instructional animation versus static pictures: A meta-analysis",
+      "venue": "Learning and Instruction",
+      "url": "https://doi.org/10.1016/j.learninstruc.2007.09.013",
+      "finding": "Animations beat still pictures on average, and the gain was largest when the animation directly showed the change or process being learned."
+    },
+    {
+      "id": "bastani-2025",
+      "authors": "Bastani, Bastani, Sungu, Ge, Kabakcı & Mariman",
+      "year": 2025,
+      "title": "Generative AI without guardrails can harm learning: Evidence from high school mathematics",
+      "venue": "Proceedings of the National Academy of Sciences",
+      "url": "https://doi.org/10.1073/pnas.2422633122",
+      "finding": "Students given a plain chatbot copied answers and later scored 17% worse alone; a tutor told to give hints, not answers, removed most of that harm."
+    },
+    {
+      "id": "kasneci-2026",
+      "authors": "Kasneci & Kasneci",
+      "year": 2026,
+      "title": "Sycophancy is an Educational Safety Risk: Why LLM Tutors Need Sycophancy Benchmarks",
+      "venue": "arXiv preprint",
+      "url": "https://arxiv.org/abs/2605.14604",
+      "finding": "AI tutors can back down from a correct position when a learner pushes with authority or social pressure, which can confirm a learner's misconception."
+    },
+    {
+      "id": "kestin-2025",
+      "authors": "Kestin, Miller, Klales, Milbourne & Ponti",
+      "year": 2025,
+      "title": "AI tutoring outperforms in-class active learning: an RCT introducing a novel research-based design in an authentic educational setting",
+      "venue": "Scientific Reports",
+      "url": "https://doi.org/10.1038/s41598-025-97652-6",
+      "finding": "An AI tutor grounded in instructor-written solutions and built on learning research produced over twice the learning gain of an active-learning class."
+    },
+    {
+      "id": "deci-1999",
+      "authors": "Deci, Koestner & Ryan",
+      "year": 1999,
+      "title": "A meta-analytic review of experiments examining the effects of extrinsic rewards on intrinsic motivation",
+      "venue": "Psychological Bulletin",
+      "url": "https://doi.org/10.1037/0033-2909.125.6.627",
+      "finding": "Across 128 experiments, expected rewards for doing or finishing a task lowered people's own interest in it afterward."
+    },
+    {
+      "id": "hanus-fox-2015",
+      "authors": "Hanus & Fox",
+      "year": 2015,
+      "title": "Assessing the effects of gamification in the classroom: A longitudinal study on intrinsic motivation, social comparison, satisfaction, effort, and academic performance",
+      "venue": "Computers & Education",
+      "url": "https://doi.org/10.1016/j.compedu.2014.08.019",
+      "finding": "Over a semester, a class with badges and a leaderboard lost more motivation and scored lower on the final exam than the same class without them."
+    },
+    {
+      "id": "deslauriers-2019",
+      "authors": "Deslauriers, McCarty, Miller, Callaghan & Kestin",
+      "year": 2019,
+      "title": "Measuring actual learning versus feeling of learning in response to being actively engaged in the classroom",
+      "venue": "Proceedings of the National Academy of Sciences",
+      "url": "https://doi.org/10.1073/pnas.1821936116",
+      "finding": "Students in active classes learned more than students in polished lectures, but felt they had learned less."
+    },
+    {
+      "id": "rayner-2016",
+      "authors": "Rayner, Schotter, Masson, Potter & Treiman",
+      "year": 2016,
+      "title": "So Much to Read, So Little Time: How Do We Read, and Can Speed Reading Help?",
+      "venue": "Psychological Science in the Public Interest",
+      "url": "https://doi.org/10.1177/1529100615623267",
+      "finding": "Reading speed is limited by understanding language, not eye movements, so reading much faster means understanding less."
+    }
+  ],
+  "decisions": [
+    {
+      "step": "Guess first",
+      "what": "Before anything is taught, you write your best guess.",
+      "why": "A guess you commit to, even a wrong one, primes you to notice what matters, so the real answer sticks better when it arrives. It only works because the answer always follows.",
+      "sources": ["richland-2009", "sinha-kapur-2021"]
+    },
+    {
+      "step": "One true fact, then predict",
+      "what": "You get one concrete, true fact and use it to predict what happens next.",
+      "why": "A concrete case gives you something solid to reason from. Moving from the concrete case to the general rule (called concreteness fading) helps the idea carry over to new problems.",
+      "sources": ["fyfe-2014"]
+    },
+    {
+      "step": "Compare two look-alikes",
+      "what": "You compare two cases that look alike and write why they differ.",
+      "why": "Lining up two cases makes you match their parts, so the shared principle shows up on its own. People who compare cases use that principle on new problems far more often than people who study one case at a time.",
+      "sources": ["gentner-2003", "schwartz-martin-2004"]
+    },
+    {
+      "step": "Stress test your rule",
+      "what": "You run your rule on extreme cases and watch where it breaks.",
+      "why": "Experts test an idea by pushing it to an extreme. A rule that only works in easy cases breaks there, and the struggle to fix it prepares you to learn the real rule.",
+      "sources": ["clement-2009", "sinha-kapur-2021", "schwartz-martin-2004"]
+    },
+    {
+      "step": "Draw it from memory",
+      "what": "You sketch the model from memory, then write its rule.",
+      "why": "Drawing forces you to pick the parts and connect them, so a wrong picture shows a wrong idea. Drawing helps most when you then check your drawing against the real thing.",
+      "sources": ["schmeck-2014", "leutner-biele-2025", "wammes-2016"]
+    },
+    {
+      "step": "Tell it apart from a look-alike",
+      "what": "You pick which idea fits, against a close cousin that looks similar.",
+      "why": "Telling similar ideas apart is its own skill. Practice that mixes look-alikes helps most when the ideas are easy to confuse, even though it feels harder.",
+      "sources": ["brunmair-richter-2019", "kornell-bjork-2008"]
+    },
+    {
+      "step": "Carry it to a new field",
+      "what": "You state the same idea in a completely different field.",
+      "why": "Ideas rarely jump to distant settings on their own. Naming the shared principle and where else it applies is how you build that bridge on purpose.",
+      "sources": ["barnett-ceci-2002", "gentner-2003"]
+    },
+    {
+      "step": "The mistake card",
+      "what": "If you slip, a card names the misconception behind your answer.",
+      "why": "The most stubborn wrong ideas come from treating a process as the wrong kind of thing. Naming that wrong category helps you swap the idea itself, not just patch one answer.",
+      "sources": ["chi-2005"]
+    },
+    {
+      "step": "Spaced re-checks in the Notebook",
+      "what": "Saved ideas come back later, and you need to get each right twice.",
+      "why": "Pulling an idea from memory, spread out over days, is one of the best-proven ways to make learning last. It feels harder than re-reading, and that effort is what makes it stick.",
+      "sources": ["dunlosky-2013", "bjork-bjork-2023"]
+    },
+    {
+      "step": "Visual models you can move",
+      "what": "Ideas are shown as pictures and models you can change, not walls of text.",
+      "why": "Words plus pictures teach better than words alone. When the idea is a process, seeing it change beats a still picture.",
+      "sources": ["mayer-2024", "hoffler-leutner-2007"]
+    },
+    {
+      "step": "An AI tutor that gives hints, not answers",
+      "what": "The AI tutor gives hints instead of answers and keeps its verdict when you push back.",
+      "why": "Students with a plain chatbot copied answers and did worse once it was gone; hints removed that harm. AI tutors can also cave to pushback and confirm a wrong idea, so this one holds its ground.",
+      "sources": ["bastani-2025", "kasneci-2026"]
+    }
+  ],
+  "faq": [
+    {
+      "q": "Why no points, XP, streaks, badges or leaderboards?",
+      "a": "Expected rewards for doing a task tend to lower your own interest in it. In a semester-long class, adding badges and a leaderboard lowered motivation and final exam scores. Onionskin is built to be worth using with no reward layer at all, so the reward is understanding the idea.",
+      "sources": ["deci-1999", "hanus-fox-2015"]
+    },
+    {
+      "q": "Why make me guess when I don't know anything yet?",
+      "a": "A wrong guess still helps. Trying first makes you notice what matters, so the answer sticks better when you see it. This only works when the real answer follows, and here it always does.",
+      "sources": ["richland-2009", "sinha-kapur-2021"]
+    },
+    {
+      "q": "Why not just show me the answer and explain it?",
+      "a": "Being handed answers feels like learning but often is not. Students who copied answers from a chatbot did worse on their own later. Students in active classes learn more than in smooth lectures, even though they feel they learned less.",
+      "sources": ["bastani-2025", "deslauriers-2019"]
+    },
+    {
+      "q": "Why draw instead of re-reading?",
+      "a": "Drawing makes you rebuild the idea, so gaps show up right away. People who draw words remember far more of them than people who write them out, and how accurate the drawing is predicts how well they understood.",
+      "sources": ["wammes-2016", "schmeck-2014"]
+    },
+    {
+      "q": "Why does it test my rule on weird extreme cases?",
+      "a": "Experts check an idea by pushing it to an extreme to see what must happen. A rule that only works for easy cases breaks there, which shows you where your picture is off. Struggling with that break first makes the real rule easier to learn.",
+      "sources": ["clement-2009", "sinha-kapur-2021"]
+    },
+    {
+      "q": "Is the AI making things up?",
+      "a": "The facts each step checks against are computed in code, not written by the AI. The AI only grades and critiques your answers against those facts, and prebuilt topics were reviewed by a person. Research on AI tutors found that grounding the AI in checked solutions is what keeps it accurate.",
+      "sources": ["bastani-2025", "kestin-2025"]
+    },
+    {
+      "q": "Is speed-reading or re-reading notes useful?",
+      "a": "Not much. Reading speed is limited by how fast you understand language, so reading faster means understanding less. Re-reading and highlighting rank among the weakest study methods, while testing yourself over time ranks among the best.",
+      "sources": ["rayner-2016", "dunlosky-2013"]
+    }
+  ]
+}

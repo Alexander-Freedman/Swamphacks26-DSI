@@ -1,0 +1,21 @@
+/* The research page: a readable column, numbered citations, plain links. */
+.rs { line-height: 1.5; }
+.rs-title { margin: 0 0 8px; }
+.rs-h { margin: 28px 0 12px; font-size: 1.2rem; }
+.rs-steps { list-style: none; margin: 0; padding: 0; display: grid; gap: 14px; counter-reset: rs; }
+.rs-step { padding: 12px 14px; border: 1.5px solid var(--ink-soft); border-radius: 4px; background: var(--paper); }
+.rs-step h3 { margin: 0 0 4px; font-size: 1.02rem; }
+.rs-what { margin: 0 0 4px; font-weight: 600; }
+.rs-why { margin: 0 0 6px; color: var(--ink-soft); }
+.rs-cites { margin: 0; display: flex; flex-wrap: wrap; gap: 6px 10px; font-size: 0.85rem; }
+.rs-cite { color: var(--ink); text-decoration: underline; text-underline-offset: 2px; }
+.rs-faq { display: grid; gap: 8px; }
+.rs-q { border: 1.5px solid var(--ink-soft); border-radius: 4px; padding: 10px 14px; background: var(--paper); }
+.rs-q summary { cursor: pointer; font-weight: 700; }
+.rs-q p { margin: 8px 0 0; }
+.rs-sources { margin: 0; padding-left: 26px; display: grid; gap: 10px; font-size: 0.92rem; }
+.rs-sources li { scroll-margin-top: 16px; }
+.rs-sources li:target { background: var(--marker-soft); border-radius: 4px; }
+.rs-ref { display: block; }
+.rs-finding { display: block; color: var(--ink-soft); }
+.rs-link { margin-top: 10px; }
