@@ -356,10 +356,12 @@ def fake_reply(task: str, prompt: str) -> dict:
             return {
                 "verdict": "survives",
                 "critique": f'Applied as written, "{fix[:40]}" holds here.',
+                "piece": None,
             }
         return {
             "verdict": "breaks",
             "critique": f'"{fix[:40]}" gives no definite answer in this case.',
+            "piece": "each step builds on the amount there now",
         }
     if task == "reveal":
         m = re.search(r"The correct rule is: (.*?)\.\n", prompt, re.S)
@@ -467,6 +469,18 @@ def fake_visual(ids: list[str]) -> dict:
     return {"fits": True, "visual": {"widget": "curve", "spec": spec}}
 
 
+def _fake_predict(question: str, texts: list[str], piece: str) -> dict:
+    """A predict card whose first choice is the correct one; the second is tied."""
+    ids = [None, "same-amount-each-step", None]
+    return {
+        "question": question,
+        "choices": [
+            {"text": t, "correct": i == 0, "misconceptionId": ids[i]} for i, t in enumerate(texts)
+        ],
+        "piece": piece,
+    }
+
+
 def fake_authored(name: str) -> dict:
     """A structurally complete authored topic for any name (content is a placeholder)."""
     return {
@@ -542,16 +556,31 @@ def fake_authored(name: str) -> dict:
                 "dimension": "many-steps",
                 "scenario": "100 grows by 1% a step for 10,000 steps.",
                 "correctBehavior": "The amount becomes enormous; late steps dwarf early ones.",
+                "predict": _fake_predict(
+                    "What happens to the amount after 10,000 steps?",
+                    ["It becomes enormous", "It grows by 100 each step", "It grows once"],
+                    "more steps means each step adds more than the last",
+                ),
             },
             {
                 "dimension": "zero-rate",
                 "scenario": "100 at a rate of 0% for any number of steps.",
                 "correctBehavior": "Nothing changes; the amount stays 100.",
+                "predict": _fake_predict(
+                    "What happens to the 100 over time?",
+                    ["It stays 100", "It grows a little each step", "It shrinks to 0"],
+                    "a zero rate adds nothing, however long you wait",
+                ),
             },
             {
                 "dimension": "tiny-start",
                 "scenario": "0.01 grows by 50% a step for 20 steps.",
                 "correctBehavior": "It still multiplies the same way; only the scale is small.",
+                "predict": _fake_predict(
+                    "How does the tiny start grow?",
+                    ["It multiplies the same way", "It barely moves", "It grows by 0.5 a step"],
+                    "the start size sets the scale, not the pattern",
+                ),
             },
         ],
     }

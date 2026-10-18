@@ -116,17 +116,80 @@
     {
       "dimension": "base-case-boundary",
       "scenario": "A sum instruction adds the whole numbers from 1 up to a given number. When given 0, it returns 0 immediately.",
-      "correctBehavior": "It makes no further self-call. The call stack does not grow, because 0 is the direct stopping case."
+      "correctBehavior": "It makes no further self-call. The call stack does not grow, because 0 is the direct stopping case.",
+      "predict": {
+        "question": "What happens when the sum instruction is given 0?",
+        "choices": [
+          {
+            "text": "It calls itself once more, then returns 0.",
+            "correct": false,
+            "misconceptionId": null
+          },
+          {
+            "text": "It returns 0 immediately, with no further self-call or stack growth.",
+            "correct": true,
+            "misconceptionId": null
+          },
+          {
+            "text": "It keeps adding down from 0 until the stack fills.",
+            "correct": false,
+            "misconceptionId": "base-case-is-optional"
+          }
+        ],
+        "piece": "a base case returns directly, so it adds no new call"
+      }
     },
     {
       "dimension": "no-progress",
       "scenario": "A search instruction says that if there are no boxes left, return “not found”; otherwise it asks itself to search the same 5 boxes again.",
-      "correctBehavior": "It never reaches the no-boxes stopping case because it always still has 5 boxes. It keeps nesting calls until the runtime reports excessive recursion depth or stack overflow."
+      "correctBehavior": "It never reaches the no-boxes stopping case because it always still has 5 boxes. It keeps nesting calls until the runtime reports excessive recursion depth or stack overflow.",
+      "predict": {
+        "question": "What happens when the search keeps using the same 5 boxes?",
+        "choices": [
+          {
+            "text": "It keeps calling itself until the program hits its limit and crashes.",
+            "correct": true,
+            "misconceptionId": null
+          },
+          {
+            "text": "It finds no boxes after repeating the search enough times.",
+            "correct": false,
+            "misconceptionId": null
+          },
+          {
+            "text": "It is correct recursion because the instruction calls itself.",
+            "correct": false,
+            "misconceptionId": "self-call-is-enough"
+          }
+        ],
+        "piece": "a self-call must make progress, or calls keep piling up"
+      }
     },
     {
       "dimension": "branching-factor",
       "scenario": "A stair-counting instruction may take 1 or 2 steps at a time. For 20 steps remaining, each non-stopping call asks about both one fewer and two fewer remaining steps.",
-      "correctBehavior": "Every branch eventually reaches 0 or fewer remaining steps, so it terminates. But many subproblems are recomputed, so the total number of calls grows rapidly as the number of steps increases."
+      "correctBehavior": "Every branch eventually reaches 0 or fewer remaining steps, so it terminates. But many subproblems are recomputed, so the total number of calls grows rapidly as the number of steps increases.",
+      "predict": {
+        "question": "What happens for 20 steps remaining?",
+        "choices": [
+          {
+            "text": "It stops after the first smaller call returns.",
+            "correct": false,
+            "misconceptionId": "smaller-answer-is-final-answer"
+          },
+          {
+            "text": "It never reaches a stopping case because it makes two calls.",
+            "correct": false,
+            "misconceptionId": null
+          },
+          {
+            "text": "It terminates, but repeated subproblems make calls grow rapidly.",
+            "correct": true,
+            "misconceptionId": null
+          }
+        ],
+        "piece": "smaller calls can end, yet repeated branches can create many calls"
+      }
     }
   ],
   "visual": null

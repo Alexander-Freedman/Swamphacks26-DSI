@@ -27,6 +27,7 @@ from app.learn.schemas import (
     AnchorOut,
     Authored,
     DrawOut,
+    ExtremeCase,
     GuessOut,
     NeighborOut,
     RevealOut,
@@ -38,6 +39,7 @@ from app.learn.schemas import (
     Visual,
     VisualReply,
     WhyOut,
+    clip_text,
     schema_file,
     topic_from_authored,
     validate_clipped,
@@ -128,7 +130,7 @@ async def _judge(task: str, prompt: str, model: type[BaseModel], **kw) -> BaseMo
         log.warning("%s: %s", task, err)
         raise HTTPException(status_code=502, detail="codex_call_failed") from None
     try:
-        return model.model_validate(raw)
+        return validate_clipped(model, raw)
     except ValidationError as err:
         log.warning("%s: bad reply shape: %s", task, str(err)[:300])
         raise HTTPException(status_code=502, detail="codex_bad_reply") from None
@@ -401,7 +403,19 @@ async def stress(slug: str, body: StressIn) -> StressOut:
     prompt = prompts.stress(t, body.fix.strip(), body.caseIndex, history)
     out = await _judge("stress", prompt, StressOut)
     out.critique = topics.scrub(out.critique, t.rubric.coreRule, "stress")
+    out.piece = _missing_piece(t.extremeCases[body.caseIndex], out)
     return out
+
+
+def _missing_piece(case: ExtremeCase, out: StressOut) -> str | None:
+    """None when the rule survives; else the case's own piece, the model's, or a stand-in."""
+    if out.verdict == "survives":
+        return None
+    if case.predict is not None:
+        return case.predict.piece
+    if out.piece and out.piece.strip():
+        return out.piece.strip()
+    return clip_text(case.correctBehavior, 70)
 
 
 @router.post("/{slug}/why", dependencies=[Depends(graded_limit)])

@@ -24,10 +24,26 @@ Base: the same backend as `/api/rounds` (`VITE_API_BASE`). All responses are JSO
     "referenceTransferExample": "..."
   },
   "misconceptions": [ { "id": "kebab", "label": "...", "tell": "...", "fix": "..." } ],   // 2-3 pre-authored wrong models
-  "extremeCases": [ { "dimension": "key", "scenario": "...", "correctBehavior": "..." } ], // 3 pre-authored, screen 4
+  "extremeCases": [ { "dimension": "key", "scenario": "...", "correctBehavior": "...", "predict": { ... } } ], // 3 pre-authored, screen 4
   "visual": null
 }
 ```
+
+Each extreme case may carry a `predict` card for the Stress test step ("predict, then check"). It is optional, so older topics without it still load:
+
+```jsonc
+"predict": {
+  "question": "What happens to the leaves above the ring?",   // <= 120 chars
+  "choices": [                                                // exactly 3, exactly one correct
+    { "text": "...", "correct": true,  "misconceptionId": null },
+    { "text": "...", "correct": false, "misconceptionId": "kebab" },   // a topic misconception id, or null
+    { "text": "...", "correct": false, "misconceptionId": null }
+  ],
+  "piece": "cutting the phloem stops sugar moving down"      // <= 70 chars: the one rule piece this case tests
+}
+```
+
+The learner picks a choice, sees `correctBehavior`, then their one-line rule is checked against the case with `/stress`.
 
 `visual` is `null` or `{ "widget": "curve" | "distribution" | "estimate" | "stepper", "spec": <an existing v4 spec case> }` when the topic has a runnable widget; then screen 2 makes the prediction on the widget.
 
@@ -40,7 +56,7 @@ Base: the same backend as `/api/rounds` (`VITE_API_BASE`). All responses are JSO
 | POST | `/api/learn/topics` | `{ "topic": string }` | Topic JSON (authored live, cached on disk; 30-90 s; rate-limited per IP) |
 | POST | `/api/learn/{slug}/guess` | `{ "text": string }` | `{ "classification": "concrete" / "vague" / "tangled", "misconceptionId": string or null, "message": string }` |
 | POST | `/api/learn/{slug}/anchor` | `{ "answer": string }` | `{ "verdict": "demonstrated" / "unresolved", "feedback": string, "followUpQuestion": string or null }` |
-| POST | `/api/learn/{slug}/stress` | `{ "fix": string, "caseIndex": 0-2, "history": [ { "caseIndex", "fix", "verdict" } ] }` | `{ "verdict": "survives" / "breaks", "critique": string }` (one sentence) |
+| POST | `/api/learn/{slug}/stress` | `{ "fix": string, "caseIndex": 0-2, "history": [ { "caseIndex", "fix", "verdict" } ] }` | `{ "verdict": "survives" / "breaks", "critique": string, "piece": string or null }` (critique is one sentence. Judged generously: "survives" when the rule, read charitably, already implies this case. `piece` is null on "survives", else the one missing rule piece, at most 70 chars, the case's `predict.piece` when it has one, for the learner to tap into their rule) |
 | POST | `/api/learn/{slug}/why` | `{ "answer": string }` | `{ "verdict": "demonstrated" / "unresolved", "feedback": string, "followUpQuestion": string or null }` |
 | POST | `/api/learn/{slug}/reveal` | `{ "history": [ { "caseIndex", "fix", "verdict" } ] }` | `{ "explanation": string, "revealedRule": string, "confirmCase": string }` |
 | POST | `/api/learn/{slug}/draw` | `{ "rule": string, "notes": string, "image": string or null }` (image = PNG data URL, optional) | `{ "criteria": [ { "id": "entities" / "links" / "rule" / "why-rule", "verdict": "demonstrated" / "contradicted" / "unresolved", "note": string } ], "followUpQuestion": string or null }` |

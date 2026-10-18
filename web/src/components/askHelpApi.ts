@@ -57,7 +57,7 @@ export function layerBody(a: LayerAsk) {
     topic: cut(a.topic, 120),
     layer: { n: a.layerN, title: cut(a.title, 120) },
     on_screen: cut(a.onScreen, 600),
-    facts: a.facts.slice(0, 12).map((f) => cut(f, 200)),
+    facts: a.facts.slice(0, 24).map((f) => cut(f, 320)),
     last_action: a.lastAction ? cut(a.lastAction, 200) : null,
     history: a.history.slice(-4).map((t) => ({ role: t.role, text: cut(t.text, 600) })),
     question: cut(a.question, MAX_QUESTION),

@@ -114,17 +114,80 @@
     {
       "dimension": "carbon-crowding",
       "scenario": "Iodide ion is mixed separately with methyl bromide and with tert-butyl bromide under the same polar aprotic conditions. Methyl bromide has no carbon-containing group besides the reacting carbon, whereas tert-butyl bromide has three around it.",
-      "correctBehavior": "Methyl bromide undergoes rapid SN2 substitution. Tert-butyl bromide is too crowded for ordinary SN2 backside attack and shows essentially no SN2 reaction."
+      "correctBehavior": "Methyl bromide undergoes rapid SN2 substitution. Tert-butyl bromide is too crowded for ordinary SN2 backside attack and shows essentially no SN2 reaction.",
+      "predict": {
+        "question": "Which mixture shows an ordinary fast substitution?",
+        "choices": [
+          {
+            "text": "Both react fast because iodide is a strong nucleophile.",
+            "correct": false,
+            "misconceptionId": "stronger-means-faster-alone"
+          },
+          {
+            "text": "Methyl bromide reacts rapidly. Tert-butyl bromide shows essentially no SN2 reaction.",
+            "correct": true,
+            "misconceptionId": null
+          },
+          {
+            "text": "Tert-butyl bromide reacts faster because it has more carbon groups.",
+            "correct": false,
+            "misconceptionId": null
+          }
+        ],
+        "piece": "more crowding blocks backside approach, so SN2 slows or stops"
+      }
     },
     {
       "dimension": "nucleophile-availability",
       "scenario": "Two otherwise identical mixtures contain 0.10 moles per liter of 1-bromopropane. One has 0.10 moles per liter of cyanide ion and the other has 0.20 moles per liter of cyanide ion.",
-      "correctBehavior": "At the start, the mixture with 0.20 moles per liter cyanide ion reacts about twice as fast. If cyanide ion concentration approaches zero, the SN2 rate approaches zero."
+      "correctBehavior": "At the start, the mixture with 0.20 moles per liter cyanide ion reacts about twice as fast. If cyanide ion concentration approaches zero, the SN2 rate approaches zero.",
+      "predict": {
+        "question": "How does doubling the cyanide ion concentration affect the starting rate?",
+        "choices": [
+          {
+            "text": "The mixture with twice the cyanide ion reacts about twice as fast.",
+            "correct": true,
+            "misconceptionId": null
+          },
+          {
+            "text": "It reacts about four times as fast.",
+            "correct": false,
+            "misconceptionId": null
+          },
+          {
+            "text": "No change, because the bromine has to leave before cyanide matters.",
+            "correct": false,
+            "misconceptionId": "leaving-group-first"
+          }
+        ],
+        "piece": "more nucleophile means more encounters, so the SN2 rate rises"
+      }
     },
     {
       "dimension": "stereochemical-geometry",
       "scenario": "A pure chiral form of 2-bromobutane reacts with azide ion under conditions chosen for SN2 substitution. The carbon bonded to bromine has four different attachments, so its three-dimensional arrangement can be identified.",
-      "correctBehavior": "Azide replaces bromine through opposite-side attack. The product has the inverted three-dimensional arrangement at that carbon, not retention of the starting arrangement."
+      "correctBehavior": "Azide replaces bromine through opposite-side attack. The product has the inverted three-dimensional arrangement at that carbon, not retention of the starting arrangement.",
+      "predict": {
+        "question": "What arrangement does the product have at the reacting carbon?",
+        "choices": [
+          {
+            "text": "It keeps the starting three-dimensional arrangement.",
+            "correct": false,
+            "misconceptionId": "any-side-attack"
+          },
+          {
+            "text": "It is a random mix of the starting and opposite arrangements.",
+            "correct": false,
+            "misconceptionId": "any-side-attack"
+          },
+          {
+            "text": "It has the inverted three-dimensional arrangement at that carbon.",
+            "correct": true,
+            "misconceptionId": null
+          }
+        ],
+        "piece": "opposite-side attack makes the reacting carbon invert"
+      }
     }
   ],
   "visual": null

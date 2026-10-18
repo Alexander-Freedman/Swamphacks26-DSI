@@ -86,10 +86,47 @@ class Misconception(Strict):
     fix: str = Field(max_length=400)
 
 
+class PredictChoice(Strict):
+    text: str = Field(max_length=90)
+    correct: bool
+    misconceptionId: Slug | None = None
+
+
+class Predict(Strict):
+    """A "predict, then check" card: pick what happens, see the truth, then test the rule."""
+
+    question: str = Field(max_length=120)
+    choices: list[PredictChoice] = Field(min_length=3, max_length=3)
+    piece: str = Field(max_length=70)
+
+    @field_validator("choices")
+    @classmethod
+    def _one_correct(cls, choices: list[PredictChoice]) -> list[PredictChoice]:
+        if sum(c.correct for c in choices) != 1:
+            raise ValueError("exactly one choice must be correct")
+        return choices
+
+
 class ExtremeCase(Strict):
     dimension: Slug
     scenario: str = Field(max_length=400)
     correctBehavior: str = Field(max_length=400)
+    predict: Predict | None = None
+
+
+class PredictDraft(Strict):
+    """Predict as the author call writes it: shape only, checked into Predict afterwards."""
+
+    question: str
+    choices: list[PredictChoice]
+    piece: str
+
+
+class AuthoredCase(Strict):
+    dimension: str
+    scenario: str
+    correctBehavior: str
+    predict: PredictDraft
 
 
 class Visual(Strict):
@@ -113,7 +150,7 @@ class Authored(Strict):
     transferStructuralRequirements: list[str]
     referenceTransferExample: str
     misconceptions: list[Misconception]
-    extremeCases: list[ExtremeCase]
+    extremeCases: list[AuthoredCase]
 
 
 class Topic(Strict):
@@ -137,13 +174,18 @@ class Topic(Strict):
         ids = [m.id for m in self.misconceptions]
         if len(set(ids)) != len(ids):
             raise ValueError("misconception ids must be distinct")
+        for c in self.extremeCases:
+            tied = [ch.misconceptionId for ch in (c.predict.choices if c.predict else [])]
+            unknown = [i for i in tied if i is not None and i not in ids]
+            if unknown:
+                raise ValueError(f"predict choice misconception id not in topic: {unknown}")
         return self
 
     def neighbor(self, key: str) -> ConfusableNeighbor | None:
         return next((n for n in self.rubric.confusableNeighbors if n.key == key), None)
 
 
-def _clip_text(text: str, limit: int) -> str:
+def clip_text(text: str, limit: int) -> str:
     """Shorten to `limit` chars, ending at a sentence (or word) boundary when one is close."""
     if len(text) <= limit:
         return text
@@ -176,7 +218,7 @@ def validate_clipped(model: type[BaseModel], data: dict) -> BaseModel:
                     node = node[key]
                 limit = int(e["ctx"]["max_length"])
                 value = node[last]
-                node[last] = _clip_text(value, limit) if isinstance(value, str) else value[:limit]
+                node[last] = clip_text(value, limit) if isinstance(value, str) else value[:limit]
     return model.model_validate(data)
 
 
@@ -184,6 +226,9 @@ def topic_from_authored(slug: str, name: str, authored: Authored, *, checked: bo
     data = authored.model_dump()
     misconceptions = data.pop("misconceptions")
     cases = data.pop("extremeCases")
+    ids = {m["id"] for m in misconceptions}
+    for case in cases:
+        case["predict"] = _checked_predict(case.get("predict"), ids)
     return Topic(
         slug=slug,
         topic=name,
@@ -193,6 +238,23 @@ def topic_from_authored(slug: str, name: str, authored: Authored, *, checked: bo
         extremeCases=cases,
         visual=None,
     )
+
+
+def _checked_predict(raw: dict | None, misconception_ids: set[str]) -> dict | None:
+    """The author's predict card trimmed to its caps, or None when it can't be used.
+
+    A bad card (not 3 choices, not exactly one correct) drops just the card, not the lesson.
+    """
+    if not raw:
+        return None
+    raw = copy.deepcopy(raw)
+    for choice in raw.get("choices") or []:
+        if choice.get("correct") or choice.get("misconceptionId") not in misconception_ids:
+            choice["misconceptionId"] = None
+    try:
+        return validate_clipped(Predict, raw).model_dump()
+    except ValidationError:
+        return None
 
 
 class VisualReply(Strict):
@@ -230,6 +292,7 @@ class AnchorOut(Strict):
 class StressOut(Strict):
     verdict: Literal["survives", "breaks"]
     critique: str
+    piece: str | None = Field(default=None, max_length=70)
 
 
 class WhyOut(Strict):
