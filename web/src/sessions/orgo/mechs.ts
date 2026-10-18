@@ -71,7 +71,7 @@ const RAW: Record<MechId, Mech> = {
     stages: [
       {
         title: 'SN1, step 1: the slow step',
-        sub: 'Draw what happens first. Water is waiting.',
+        sub: 'Draw the curved arrow for the first step: the change that happens on its own, before water does anything. An arrow starts on a pair of electrons and ends where that pair goes.',
         real: [LEAVE],
         traps: [
           { when: fromLp('o', ['c']), mistake: 'sn1-attack-first' },
@@ -82,7 +82,7 @@ const RAW: Record<MechId, Mech> = {
       },
       {
         title: 'SN1, step 2: fill the C⁺',
-        sub: 'Now there’s a carbocation. Draw the attack.',
+        sub: 'Br left with both electrons, so the carbon has only 3 bonds and a + charge (C⁺). Draw the arrow that gives it a 4th bond.',
         real: [{ pat: { from: lp('o'), to: atom('c') }, bend: { x: 286, y: 52 }, missing: { hint: 'mech-attack' } }],
         traps: [{ when: fromAtom('c'), mistake: 'arrow-from-electrophile' }],
         caption: (u) => (u < 0.5 ? 'Water’s lone pair fills the empty spot on C⁺.' : 'O has 3 bonds now (O⁺). Another water takes that H⁺: (CH₃)₃C–OH.'),
@@ -120,7 +120,7 @@ const RAW: Record<MechId, Mech> = {
     stages: [
       {
         title: 'E2: one step, three arrows',
-        sub: 'A strong base and a crowded carbon. Draw every arrow.',
+        sub: 'Everything happens in one step, so draw every arrow at once: which electrons grab an H, which make the new C=C, and which leave with Br. Then watch it run.',
         real: [
           { pat: { from: lp('o'), to: atom('hb') }, bend: { x: 150, y: 22 }, missing: { hint: 'mech-base' } },
           { pat: { from: bond('cb', 'hb'), to: bond('cb', 'c') }, alts: [{ from: bond('cb', 'hb'), to: atom('c') }], bend: { x: 214, y: 64 }, missing: { mistake: 'ch-bond-lost', needs: 0, hint: 'mech-ch' } },
@@ -174,7 +174,7 @@ const RAW: Record<MechId, Mech> = {
     stages: [
       {
         title: 'E1, step 1: the slow step',
-        sub: 'Water is a weak base. Draw what happens first.',
+        sub: 'Water is a weak base, so it can’t pull an H off yet. Draw the arrow for the change that happens on its own first.',
         real: [LEAVE],
         traps: [
           { when: fromLp('o', ['hx', 'hy', 'hz']), mistake: 'e1-base-first' },
@@ -186,7 +186,7 @@ const RAW: Record<MechId, Mech> = {
       },
       {
         title: 'E1, step 2: lose an H⁺',
-        sub: 'Make the double bond. Two arrows.',
+        sub: 'Now there’s a C⁺ next to a carbon with H’s. Draw the two arrows that turn it into a C=C double bond.',
         real: [
           {
             pat: { from: lp('o'), to: atom('hx') },

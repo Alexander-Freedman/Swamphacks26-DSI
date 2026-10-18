@@ -1,69 +1,65 @@
 # Scorecard: the current demo vs the XII rubric
 
-**Mode: BUILD.** This grades the demo **as a judge would see it right now**, not the plan. The script it's graded against is docs/demo-script.md (the three visual sessions). Re-grade after every gate in the re-plan (docs/build-plan.md, top) and after every merge that changes what a judge sees.
+**Mode: BUILD.** This grades the demo **as a judge would see it right now**, not the plan. The demo is **orgo + calculus** (team decision Sat ~6:05 PM, NOTES.md); the script it's graded against is docs/demo-script.md on branch `alexander-freedman/demo-orgo-calc` (PR #212, not merged yet). Re-grade after every merge that changes what a judge sees.
 
-Scores are 1-5 gut calls against the 7 official Devpost criteria. They're not data.
+Scores are 1-5 gut calls against the 7 official Devpost criteria plus track fit. They're not data.
 
-**Last graded:** Sat Oct 17, ~11:15 AM, against the **live** site (https://alexander-freedman.github.io/Swamphacks26-DSI/), main at e09f264 (coin streak #107, positive test #99, notebook #130, URL/Back #106, Onionskin #142, birthday card fixes #122, generator v3 #127 backend only). Played all three sessions end to end with the QA drivers (`~/qa/bday.mjs`, `rev107c.mjs`, `rev99b.mjs`, pointed at the live URL) at 1440×900 and 390×844, plus a flow check (Home card → URL, refresh, Back, notebook after a session, `?reset=1`): 0 console errors, 0 horizontal overflow on every screen. Screenshots in `~/qa/regrade2/` (local, not in the repo).
+**Last graded:** Sat Oct 17, ~7:50 PM, against the **live** site (https://alexander-freedman.github.io/Swamphacks26-DSI/), main at 6f52ea9 (calc chapters #221, orgo topics menu #219, Home cards #214/#205), API https://45-77-118-201.sslip.io (`/api/health` → `{"status":"ok"}`). Played with Playwright at 1440x900 and 390x844: Home, orgo menu → Build ethanol (6 taps on "add carbon" chain-bond into C6, Undo works), orgo SN2, calculus menu → The slope of a curve (sketch → drag tangent → x = 1, 2, 4 give 0.00 / -1.50 / 4.50, gap shaded), Area under a curve (opens on "One rectangle says 7.5 squares"), Slices of a surface (3D surface turns, question 1 of 2), typed topic "derivative of x squared". 0 console errors on every screen. Screenshots in `~/qa/ev1/`, `~/qa/ev2/` (local, not in the repo).
 
 ## What a judge sees right now (honest)
-- **Home:** "Bet on your gut. Then watch reality." with **three matching session cards** (birthday, *Be a coin*, *You tested positive. Are you sick?*), each with a subtitle, and a dashed **Notebook** card. No "Try any topic" box (#136 has changes requested). On desktop it's a narrow column with a lot of empty page; the session art (#124) isn't on Home. Tab icon is still the Vite bolt (#145 open).
-- **Birthday (`?session=birthday`):** unchanged from the last grade and still the strongest: guess → room fills with pair lines → draw → ink over pencil → WAY OFF + "You need about half of 365" + 5.9% vs 50.7% wheels → rematch → "Saved to your notebook ... Open notebook". The double paren is fixed.
-- **Coin streak (`?session=coin-streak`):** live, 5 steps. Tap 20 H/T, a real 20 deals in under yours with runs marked in yellow, "your longest: 2 · real: 5", **Flip again**; guess the longest run in 100; *Your coin vs the real coin* (your pencil row next to a real 100, runs of 5+ marked, switch-rate and longest-run gap bars); extremes to 10,000; card "RANDOM MEANS EVENLY MIXED" quoting your guess and your 79% switch rate, then a "which row is the real coin" rematch. Numbers labelled exact (DP).
-- **Positive test (`?session=positive-test`):** live, 6 steps. Guess + sketch, **Test all 1,000**: positives fly into piles, **9 / 98 → 9.2% EXACT** next to "you guessed 90%"; compare; *Same test. Change the crowd* with prevalence / false-alarm sliders, the 1,000-dot grid recolouring and an ink curve over your dashed guess (coin flip at 9.1%); card "The test's accuracy is my chance", WAY OFF, "One more, new numbers".
-- **URL / Back / reset:** Home cards put `?session=<slug>` in the URL, Back returns Home, `?reset=1` clears `mm.sessions` and shows a "Notebook cleared" pill. **Refresh mid-session restarts the session at step 1** (the locked guess is gone).
-- **Notebook (`?notebook=1`):** after one birthday run: "1 caught · 0 busted · 1 session played", the mistake in pencil, "1 more right answer to bust it". Coin and positive write to it too. Only the birthday end screen links to it.
-- **Two session shells:** coin plays inside the white framed card with numbered step tabs; birthday and positive play full-width on the grid with progress dots. Each looks good alone; side by side they read like two apps.
-- **Backend:** still not deployed (#118). Nothing Gemini-powered is visible: no typed topics, no help-chat panel, no Tiger room % (#103 open). Generator v3 (#127) is merged but only in the backend.
-- **Facts:** the positive card's source line says doctors' "most frequent estimate was 90% vs a correct 7.7%" (data/rounds/positive-test.json); demo-script, pitch and Devpost say "about 95 of 100 guessed ~75%" (APS Observer on Eddy 1982). One of them is wrong or they cite different studies; the 7.7% primary isn't checked (unverified, see devpost-draft.md).
-- **Submission:** AI-tools disclosure in docs/devpost-draft.md is still a placeholder. User testing round 1 hasn't run (1:30 PM).
+- **Home:** "See your thinking in layers. / Type any topic. Watch it come alive." Two illustrated cards (**Organic chemistry**, **Calculus**), a **Try any topic** box with an *auto-checked* tag and 4 hand-checked chips (+6 more), a Notebook card, "backend online" dot. Clean on desktop and phone. The three probability sessions are no longer on Home (still reachable by `?session=` and the topic box).
+- **Orgo (`?session=orgo`):** a topic menu, not a session: Molecules (Build ethanol), Mechanisms (SN2, SN1, E2, E1), Guided path (Start to finish). Build ethanol: palette tap or drag adds atoms, tapping again bonds to the picked atom, live formula ("C6" vs target C₂H₆O), Undo / Clear. SN2 opens on "Find the parts" (1 of 4: tap nucleophile / substrate / leaving group), then size up, pick, arrows. SN1/E2/E1 step-by-step is PR #223, SN2 vs E2 side by side is #218, both open.
+- **Calculus (`?session=calculus`):** Calc 1/2/3 course menu. Live: The slope of a curve, Area under a curve, Slope and area undo each other, Slices of a surface (3D), Start to finish. Everything else is a dashed "COMING NEXT" card (limits, chain rule, max/min, related rates, all of Calc 2...). On phone the first card a judge sees is a COMING NEXT one.
+- **Slope topic** is the best screen in the product: pencil sketch of the slope, drag the tangent, the real slope inks over the dashed pencil with the gap in yellow, "Top of the hill, bottom of the valley: slope 0. Your pencil said 2.0 at the hilltop."
+- **Typed topic:** "derivative of x squared" built on the live API and played as "How steep is the curve y = x^2 exactly at the point where x = 3?" with a **plain 0-12 number slider**, not a curve or a draggable tangent. So the "any topic → a visual" promise shows as a one-number guess for this topic.
+- **Sponsors:** Vultr backend live (sslip.io, not a custom domain); Gemini behind typed topics + Ask panel; Tiger answer events are written but nothing on screen shows them; no domain.
+- **Submission:** AI-tools disclosure in docs/devpost-draft.md is still a placeholder. docs/user-testing.md has the kit but **no results rows** (no tester quotes yet).
 
 ## Grades
 
-| Criterion | Before (2:20 AM) | Now | Evidence (what a judge sees) | Single biggest gap |
+| Criterion | Before (11:15 AM) | Now | Evidence (what a judge sees) | Single biggest gap |
 |---|---|---|---|---|
-| **Technical Understanding** | 3 | **4** | All three sessions label numbers EXACT and say how (formula under B5, "dynamic programming over run length" on the coin card, 9 / 98 counts on positive). Real simulation in the room, the coin rows and the 1,000 dots. The generator, its checks and the backend are invisible. | One visible typed topic with its *auto-checked* / *reviewed* label (#136), so the engine shows. |
-| **Innovation & Creativity** | 3 | **4** | "Your model next to reality" is now a pattern, three times over: pencil curve under ink, your tapped row next to a real 100, your dashed guess over the ink curve while you change the crowd. | The kickoff pitch is *any topic*. With no topic box, the "general engine" claim is only words. |
-| **Functionality** | 3 | **4** | 3 / 3 sessions end to end on desktop and phone, 0 errors, 0 overflow. URL per session, Back, reset and notebook all work live. | Typed topics don't play (no box, no backend); refresh mid-session drops your locked guess. |
-| **Design & Usability** | 3 | **4** | Session screens are strong (stamps, hand lettering, marker gaps, clean phone layouts). Home now routes only into sessions with matching cards. Drags: two session shells, a narrow bare Home on desktop, Vite favicon. | One session shell for all three + session art on the Home cards. |
-| **Purpose & Audience** | 3 | **3** | Each session walks a wrong, confident guess to a named mistake and a rematch in ~2 min, and the notebook gives a reason to come back. Still zero evidence from real users. | User test round 1 (1:30 PM) and 2 quotable lines. |
-| **Track & Challenge Relevance** (Entertainment & Creative Tech) | 3 | **4** | Toy feel in all three: drop people into a room, tap coins and watch a real one out-streak you, test 1,000 people and drag the crowd. | Same as Design: Home doesn't sell the toys (text-only cards). |
-| **Sponsor Challenge Criteria** | 2 | **2** | Easy On The Eyes: now a solid 4. Gemini: nothing visible. Tiger: #103 open, invisible. Domain: none (github.io). Averaged over what we enter, still a 2. | A visible Gemini moment (#136 with the truth shown), then the backend deploy. |
-| **Track fit (prize odds)** | 3 | **4** | Any card a judge taps opens a visual session. | Same as Purpose: real user lines. |
+| **Technical Understanding** | 4 | **4** | Chemistry rules in code (valence slots, live formula), closed-form slope with tested numbers (0 / -1.5 / 4.5 at x = 1, 2, 4), a real 3D surface, a live typed-topic engine with an honest no-fit path. | The engine's best output (curve/sampler) doesn't show for the demo topic: "derivative of x squared" is a number slider. |
+| **Innovation & Creativity** | 4 | **4** | "Pencil vs ink" now spans chemistry and calculus: your sketch under the real slope, the gap shaded; build a molecule and get mistakes named live. | A visual "aha" in orgo that's as strong as the tangent screen (the arrows/scrubber is behind 1-3 taps of menus). |
+| **Functionality** | 4 | **4** | Every live topic I opened works on desktop and phone, 0 errors, backend healthy, typed topic built inside 15 s. | Lots of COMING NEXT cards and open PRs (#218, #223, #225) make the menus look half-built; menu → topic adds clicks the script doesn't have. |
+| **Design & Usability** | 4 | **4** | New Home with illustrated cards is the cleanest it's been; slope and 3D screens are polished on phone. | Calc menu on phone opens on a disabled "What a limit is" card; hide COMING NEXT or collapse it. |
+| **Purpose & Audience** | 3 | **3** | Real student subjects (orgo, Calc 1-3) with named mistakes and a notebook is a clearer audience than the probability puzzles. Still zero user-test evidence. | Run round 1 on orgo + slope: 3-5 people, 2 quotable lines. |
+| **Track & Challenge Relevance** (Entertainment & Creative Tech) | 4 | **4** | Toy feel: snap atoms, drag a tangent, spin a surface. | Orgo's toy moment (scrub the mechanism) should be one tap from Home. |
+| **Sponsor Challenge Criteria** | 2 | **3** | Vultr: backend deployed and the dot says "backend online". Gemini: typed topics build live. Easy On The Eyes: solid. Tiger: invisible. Domain: none. | Show one thing Tiger powers (e.g. "N people missed this" on a mistake card), and a real domain if free. |
+| **Track fit (prize odds)** | 4 | **4** | Any Home card a judge taps opens something to manipulate (after one menu tap). | Same as Purpose. |
 
-**Total now: 25 / 35** (up from 20 at 2:20 AM; coin + positive + notebook are the gain, 2 under the 27 I forecast because Purpose waits on user testing and Sponsor on anything Gemini). Target at freeze: 30+. The cheapest path there: #136 (+1 Sponsor, +0.5 Tech), user test (+1 Purpose), one shell + Home art (+0.5 Design), deploy (+0.5-1 Sponsor).
+**Total now: 26 / 35** (7 criteria, track fit not counted; up from 25: Sponsor +1 for the live Vultr backend and Gemini typed topics). Target at freeze: 30+. Cheapest path: demo script matched to the menus (+protects Functionality live), typed topic → visual for the demo topic (+0.5 Tech, +0.5 Innov), user test (+1 Purpose), hide COMING NEXT (+0.5 Design), Tiger visible (+0.5 Sponsor).
 
 ## Top 5 gaps, in order
 | # | Gap | Owner | Cheapest fix | Est. points |
 |---|---|---|---|---|
-| 1 | **Typed topics have no surface.** The only Gemini moment and the proof of "any topic". #136 is up but reviewed topics show no true answer after the guess. | @luanamaldaner (topic box, round player) | Fix the reveal in #136 so a reviewed item shows the truth + its label, merge it. No backend needed: chips play the cached reviewed set. | +1 Sponsor, +0.5 Tech/Innov |
-| 2 | **No user-test evidence.** Purpose & Audience is stuck at 3. | me (kit #120, docs/user-testing.md), both run it | Round 1 at 1:30 PM: 3-5 people, one session each, log guess, confidence, verdict and one quote; put 2 lines in the pitch and the Devpost. | +1 Purpose, +0.5 Track fit |
-| 3 | **Backend not deployed.** Help chat (API merged, no panel), live typed topics, Tiger room % all dark. | me (#118 deploy, #103 Tiger) | Deploy after #136 lands, with the per-IP limit, daily cap and demo token already in the kit; then one small "N people guessed this" line from Tiger on a session card. Skip the chat panel unless it's free. | +0.5-1 Sponsor |
-| 4 | **Submission honesty: AI disclosure blank + a fact mismatch.** The positive card says doctors' "most frequent estimate was 90%"; every script says "~75%". | me (docs, data) | Draft the disclosure for approval in #questions; check the APS source and make data/rounds/positive-test.json and the scripts say the same sourced thing. | Protects every score (a wrong number at the table costs more than a point) |
-| 5 | **Two session shells, bare Home.** Coin is framed with step tabs, birthday/positive full-width with dots; desktop Home is a narrow text list; Vite favicon. | @luanamaldaner (Home, coin, positive); me favicon (#145) | Pick one shell (the full-width one has more room for visuals) and use it for coin; put the #124 session art on the three Home cards; merge #145. | +0.5 Design, +0.5 Track |
+| 1 | **Demo script doesn't match the live click path.** Home → Orgo and Home → Calculus now open menus; Build ethanol is "1 of 1" (no "Push the electrons →"); SN2 starts at "Find the parts"; area is a separate topic (no "Now the area" button). | me (PR #212 script) | Rewrite the script on the menus: Orgo → **Start to finish** (or Build ethanol, then back → SN2), Calculus → **Start to finish** or slope then area; re-time with a stopwatch. | Protects Functionality and every live score |
+| 2 | **Typed demo topic isn't visual.** "derivative of x squared" plays as a 0-12 number slider. | me (engine v4, prebuilt #206) | Make the derivative/tangent family pick the curve kind (or pin a hand-checked curve item for this phrase in the prebuilt set, #206) and verify it live; else change the script to a chip that's known to render a curve. | +0.5 Tech, +0.5 Innov |
+| 3 | **No user-test evidence.** Purpose stuck at 3. | me (kit in docs/user-testing.md), both run it | 3-5 people tonight on orgo Build ethanol + calc slope; log rows + 2 quotes into the pitch and Devpost. | +1 Purpose, +0.5 Track fit |
+| 4 | **Menus look half-built.** Calc 1/2/3 is mostly dashed COMING NEXT; on phone the first card is disabled. | @luanamaldaner (calculus/orgo UI) | Hide COMING NEXT cards (or collapse into one "more coming" line) and put the live topics first; land #218/#223/#225 or keep them out of the demo. | +0.5 Design, +0.5 Func |
+| 5 | **Submission honesty + invisible sponsors.** AI-tools disclosure is a placeholder; Tiger shows nothing; no domain. | me (docs, backend) | Draft the disclosure for approval in #questions; one Tiger-backed line on a mistake card ("N people made this one"), rate-limited read only. | +0.5 Sponsor; disclosure is required by the rules |
 
-Next after these: keep the locked guess on refresh (store the session step in the URL or sessionStorage), an "Open notebook" link on the coin and positive end screens like birthday's, notebook bust rule (#143), domain + QR.
-
-## Demo script vs what's clickable today (docs/demo-script.md)
+## Demo script vs what's clickable today (PR #212, docs/demo-script.md)
 | Step | Today on the live site |
 |---|---|
-| Before: reset shortcut | **Works.** `?reset=1` clears the notebook and shows "Notebook cleared". |
-| Before: Home shows three session cards + "Try any topic" box | **Partly.** Three cards yes; **no topic box** (#136). |
-| Before: birthday seeded | Works: first match at 23 again. |
-| 0:00 Home → Birthday | Works; URL becomes `?session=birthday`. |
-| 0:10-1:00 B1-B5 | Work as before (desktop + phone). "Add a person" is a tap, not a hold. |
-| 1:20 B6 stamp + card | Works, **narration mismatch still in the script**: the card is **"You need about half of 365"** (WAY OFF stamp), not "It's about MY birthday"; the MY-birthday idea is the left wheel. Fix the script line, not the app. |
-| 1:35 Coin streak C1-C2 | **Works.** Tap 20, real row deals under, runs marked, "your longest: 2 · real: 5", Flip again. |
-| 2:05 Positive test P1-P3 | **Works**, with two narration fixes: the dots are **9 sick (dark) among 89 healthy (yellow)**, not "9 ink among 89 grey"; and "almost all doctors guessed around 75%" contradicts the card's own source line (90%). Don't say the doctor number until gap 4 is fixed. |
-| 2:30 Any-topic extra | **Fails.** No box on live, backend not deployed. Skip the beat (the fallback line covers it). |
-| 2:45 End screen + Notebook | **Works for birthday** ("Saved to your notebook ... Open notebook" → caught in pencil). Coin and positive save too but have no notebook link on their end screen. |
-| Fallback: reload `?session=<slug>` | Works for all three slugs, but restarts at step 1. |
-| Fallback: "a session isn't live yet (true right now)" | Outdated: all three are live. Mockups only matter for the any-topic beat now. |
-| Script header "Working name: mm" and Q&A 6 ("every item came out as a plain number guess") | Outdated: name is Onionskin (#142); generator v3 (#127) makes curve/distribution items for most quantitative topics. Update in the script/pitch PRs. |
+| Before: `/api/health`, backend dot green | **Works** (`{"status":"ok"}`, "backend online"). |
+| Before: calculus shows 7.5 and 4.57 | **Partly.** `?session=calculus` opens the course menu; 7.5 is on **Area under a curve** after one tap. 4.57 not checked this pass. |
+| 0:00 Home → "Push the electrons" card → step 1 Build ethanol | **Fails as written.** The card is "Organic chemistry" and opens a topic menu; tap **Build ethanol** (or **Start to finish**). |
+| 0:15 Build, 5th bond named live | Atoms add and bond by tap and drag on desktop and phone (verified to C6). The "A carbon with 5 bonds" message not exercised this pass. |
+| 0:40 Check it → "Push the electrons →" | **Fails as written** from the Build ethanol topic (1 of 1, no next step). Only reachable via **Start to finish** or back to the menu → SN2. |
+| 0:55 Draw two arrows on HO⁻ + CH₃Br | **Fails as written.** SN2 opens on "Find the parts" (1 of 4); arrows come after parts / size up / pick. Budget the extra taps or start from Start to finish. |
+| 1:20 Scrubber | Not exercised this pass (behind the earlier steps). |
+| 1:35 N≡C⁻ + CH₃I, Run both | Not on the menu; may be inside Start to finish ("spot the same pattern in a new reaction"), unverified. |
+| 1:50 Calculus slope sketch → drag tangent | **Works** after tapping **The slope of a curve** from the menu. |
+| 2:15 Area, rectangles 1 → 200 | **Fails as written** from the slope topic (no "Now the area" step). Open **Area under a curve** from the menu, or use Start to finish. |
+| 2:35 Typed "derivative of x squared" → draggable tangent | **Fails.** Builds, but plays as a number slider (0-12) at x = 3, no tangent. |
+| 2:50 Notebook | Notebook card on Home; contents after orgo/calc not checked this pass. |
+| Fallback "palette buttons add an atom" | **Works** (tap "add carbon" chains bonded atoms). |
 
-**Next loop:** review #136 again so it can merge (gap 1), run user test round 1 (gap 2), then deploy (gap 3); re-grade here after #136 is on Pages.
+**Next loop:** fix the script to the menus (gap 1) and the typed demo topic (gap 2), run user test round 1, re-grade after #218/#223/#225 land.
 
 ## History
+- Sat Oct 17 ~11:15 AM: graded the three probability sessions (birthday, coin streak, positive test) live: 25 / 35; top gaps were the typed-topic surface (now live), user testing (still open), backend deploy (done), disclosure + a doctor-number mismatch, two session shells.
 - Sat Oct 17 ~2:20 AM: graded against the live site with only birthday as a visual session: 20 / 35; top gaps were coin + positive live (done), Home routing (done), typed-topic surface (still open), reset (done).
 - Sat Oct 17 ~12:45 AM: graded after the re-plan, before any session was built: 16 / 35, biggest gap was the birthday session (now live).
 - Fri Oct 16 ~11:20 PM (B1): graded the old plan (3 showcase rounds as one-guess items + the judge's live topic as the headline): 16 / 35, biggest gaps were the coin-streak card, the "How it works" drawer and hosting the live topic. The vision note (Oct 16 ~11:40 PM) and the generation trial (Sat ~12:10 AM) replaced that plan with visual sessions; that version is in git history for this file.
