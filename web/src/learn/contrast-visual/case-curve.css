@@ -1,0 +1,9 @@
+/* A tiny curve on a contrast card. The chart is drawn 640 wide and shown card-size, so the line and
+   labels are scaled up to stay legible. */
+.lcv-pic { margin: 8px 0 4px; }
+.lcv-pic .curve { display: block; width: 100%; height: auto; }
+.lcv-pic .curve-ink { stroke-width: 9; }
+.lcv-pic .curve-axis { stroke-width: 4; }
+.lcv-pic .curve-tick { font-size: 28px; }
+.lcv-pic .curve-ylabel { font-size: 26px; }
+.lcv-pic figcaption { margin-top: 4px; font: 700 11px var(--font-mono); text-transform: uppercase; letter-spacing: 0.06em; color: var(--ink-soft); }
