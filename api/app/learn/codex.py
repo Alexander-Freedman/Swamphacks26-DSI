@@ -315,6 +315,8 @@ def _listed_ids(prompt: str, heading: str) -> list[str]:
 
 
 def fake_reply(task: str, prompt: str) -> dict:
+    if task == "help":
+        return {"answer": "Look at the fact on screen. Try one small prediction from it."}
     if task == "author":
         m = re.search(r'The concept to author is: "(.*?)"', prompt)
         return fake_authored(m.group(1) if m else "the topic")

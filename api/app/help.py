@@ -367,6 +367,33 @@ def _static(ctx: LayerContext) -> GenericReply:
     return GenericReply(ctx.hint or GENERIC_FALLBACK, True, "static")
 
 
+def _ask_codex(prompt: str) -> tuple[str, str] | None:
+    """Codex first (the same engine that grades Learn steps); None if it's off, down or slow.
+
+    MM_HELP_CODEX=0 turns it off (the tests do, so they never shell out to a real codex).
+    """
+    if os.environ.get("MM_HELP_CODEX", "1") != "1":
+        return None
+    from app.learn import codex
+
+    if codex.status() != "ok":
+        return None
+    try:
+        raw = codex.run_json_sync(
+            GENERIC_SYSTEM
+            + "\n\n"
+            + prompt
+            + '\n\nRespond with ONLY raw JSON: {"answer": "<your 2-4 short sentences>"}',
+            task="help",
+            timeout_s=float(os.environ.get("MM_HELP_CODEX_TIMEOUT_S", "30")),
+        )
+    except Exception as err:  # timeout, bad reply: fall back to Gemini, then the static hint
+        log.warning("help call failed on codex: %s", type(err).__name__)
+        return None
+    text = clean_generic(str(raw.get("answer", "")))
+    return (text, "codex") if text else None
+
+
 def _ask_generic(prompt: str, usage: Usage) -> tuple[str, str] | None:
     for model in GENERIC_MODELS:
         if not usage.available(model):
@@ -399,9 +426,11 @@ def answer_generic(
             "static",
         )
     usage = usage or Usage()
-    if offline() or usage.help_total() >= daily_cap() or usage.total() >= DAILY_SOFT_CAP:
-        return _static(ctx)
-    got = _ask_generic(build_generic_prompt(ctx, question), usage)
+    prompt = build_generic_prompt(ctx, question)
+    got = _ask_codex(prompt)
+    capped = offline() or usage.help_total() >= daily_cap() or usage.total() >= DAILY_SOFT_CAP
+    if got is None and not capped:
+        got = _ask_generic(prompt, usage)
     if got is None:
         return _static(ctx)
     text, model = got
