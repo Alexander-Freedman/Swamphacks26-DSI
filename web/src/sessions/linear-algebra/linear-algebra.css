@@ -1,0 +1,27 @@
+/* Linear algebra: the old grid in pencil, the moved grid in ink, î in marker, ĵ in green. */
+.linalg .la-two { grid-template-columns: minmax(0, 1fr) minmax(300px, 1fr); }
+.linalg .la-planecard { display: grid; place-items: center; }
+.linalg .la-plane { max-height: 54vh; max-width: 54vh; overflow: hidden; }
+.linalg .la-old { stroke: var(--grid); stroke-width: 1; }
+.linalg .la-new { stroke: var(--ink-soft); stroke-width: 1; stroke-opacity: 0.55; }
+.linalg .la-square { fill: var(--marker-soft); stroke: var(--ink); stroke-width: 1.5; }
+.linalg .la-square.sq { fill: var(--marker); }
+.linalg .la-house { fill: none; stroke: var(--ink); stroke-width: 3; stroke-linejoin: round; }
+.linalg .la-arrow line { stroke-width: 4; stroke-linecap: round; }
+.linalg .la-arrow.i line { stroke: #c79a00; }
+.linalg .la-arrow.j line { stroke: var(--called); }
+.linalg .la-head.i { fill: #c79a00; }
+.linalg .la-head.j { fill: var(--called); }
+.linalg .la-arrow text { font: 700 18px var(--font-display); fill: var(--ink); }
+.linalg .la-arrow.live { cursor: grab; }
+.linalg .la-arrow.live:focus-visible { outline: none; }
+.linalg .la-arrow.live:focus-visible .la-handle { stroke-dasharray: 3 3; stroke-width: 3; }
+.linalg .la-handle { fill: var(--card); fill-opacity: 0.7; stroke: var(--ink); stroke-width: 2; }
+.linalg .la-matrix .la-mat { display: flex; align-items: center; gap: 10px; font: 700 26px var(--font-mono); }
+.linalg .la-bracket { font-size: 64px; font-weight: 300; line-height: 1; }
+.linalg .la-col { display: grid; gap: 2px; text-align: center; padding: 2px 8px; border-radius: 4px; }
+.linalg .la-col i { font: 700 13px var(--font-body); font-style: normal; color: var(--ink-soft); }
+.linalg .la-col.i { background: rgba(255, 216, 77, 0.35); }
+.linalg .la-col.j { background: rgba(31, 138, 76, 0.15); }
+.linalg .la-next { margin-top: 10px; }
+.linalg .la-mastered { font-weight: 700; color: var(--called); }
