@@ -1,10 +1,10 @@
 # Pitch: the live 3:00, the 1:30, and judge Q&A
 
-**Status:** rewritten Sat Oct 17 evening for the team decision of Sat ~6:05 PM: **the demo is the orgo showcase (PR #204) and the calculus level (PR #202, merged)**; typed topic → runnable visual, the three probability sessions and the notebook support it. The screens and clicks come from [docs/demo-script.md](demo-script.md): where they differ, demo-script.md wins for what's on screen and this file wins for the words. Every orgo line is **[if #204 merged]**; until it is, use the "calculus first" order in demo-script.md.
+**Status:** rewritten Sat Oct 17 evening: **the demo is Organic chemistry (Build ethanol, then SN2 step by step) and Calculus (Calc 1 slope, then area)**. The screens and clicks come from [docs/demo-script.md](demo-script.md): where they differ, demo-script.md wins for what's on screen and this file wins for the words. Matched to the live site (main @ 6f52ea9) on Sat Oct 17.
 
 **Headline:** **"See your thinking in layers."** Subline: **"Type any topic. Watch it come alive."**
 **Chatbot line (word for word):** **"ChatGPT tells you the answer. Onionskin builds you a world where you find out you were wrong, and why."**
-**The AI story, one breath:** **the AI builds the simulation; code guarantees the truth; you do the thinking.** Honest scope: orgo, calculus and the probability sessions are hand-built; the AI builds the simulation for a topic you type. No betting language.
+**The AI story, one breath:** **the AI builds the simulation; code guarantees the truth; you do the thinking.** Honest scope: orgo and calculus are hand-built; a typed topic plays as a number slider today, so we don't demo it live. No betting language.
 
 **Slot:** 3:00 live demo + 1:00 Q&A at our table, expo style ([Devpost rules](https://swamphacks-xii.devpost.com/rules)). Judges rank the handful of tables they saw, so the goal is to be the one they remember ([MLH judging plan](https://guide.mlh.com/general-information/judging-and-submissions/judging-plan)).
 
@@ -21,7 +21,7 @@ Same table as docs/demo-script.md (sources there). Anything not here doesn't get
 
 | Claim | Value | Source |
 |---|---|---|
-| Ethanol | **C₂H₆O**; dimethyl ether has the same formula | standard; isomer check in `chem.ts` (#204) |
+| Ethanol | **C₂H₆O**; dimethyl ether has the same formula | standard; isomer check in `chem.ts` |
 | Oxygen with 3 bonds | **FC = 6 − 2 − 3 = +1** | formal charge = valence − nonbonding electrons − bonds ([Formal charge](https://en.wikipedia.org/wiki/Formal_charge)) |
 | Cyanide | − charge on carbon: 4 − 2 − 3 = −1 | computed; [Kolbe nitrile synthesis](https://en.wikipedia.org/wiki/Kolbe_nitrile_synthesis) |
 | SN2 | one step, backside attack, inversion | [SN2 reaction](https://en.wikipedia.org/wiki/SN2_reaction), [Walden inversion](https://en.wikipedia.org/wiki/Walden_inversion) |
@@ -43,19 +43,19 @@ Never say: "proven to make you learn faster", "permanently fixes misconceptions"
 
 | Time | On screen (driver) | Narrator says |
 |---|---|---|
-| **0:00-0:15**<br>**Hook** | Home, then the orgo card **Push the electrons**, step 1 "Build ethanol", target **C₂H₆O**. Trackpad/phone to the judge. | "ChatGPT tells you the answer. Onionskin builds you a world where you find out you were wrong, and why. Here's organic chemistry. Build me ethanol: two carbons, six hydrogens, one oxygen." |
-| **0:15-0:40**<br>**Mistake named live** *[if #204 merged]* | Judge drags atoms and bonds. A 5th bond on a carbon: the ring turns red, **"A carbon with 5 bonds"** shows. | "Every atom has slots. Give a carbon one bond too many … and it names the mistake while I make it. Carbon has four slots; a fifth bond has no electrons to use." |
-| **0:40-0:55**<br>**Check it** | **Check it**: ethanol ✓, or "Same formula, different molecule" (ether), or "Oxygen with 3 bonds, no charge" (FC = 6 − 2 − 3 = +1). | Clean: "And if you'd joined the same atoms differently, it would show you dimethyl ether next to ethanol." |
-| **0:55-1:35**<br>**Push the electrons** | HO⁻ + CH₃Br. Judge draws two arrows; **Show me** inks the real ones over theirs; scrubber 0 → 50 → 100. Optional step 3: cyanide + CH₃I, **Run both**. | "This is the part everyone memorizes and nobody sees. Draw where the electrons go. … Pencil is you, ink is reality. The hydroxide comes in from the back, opposite the bromine. Halfway, one bond forming, one breaking. Bromide leaves with the bond's two electrons, and the carbon flips inside out like an umbrella." |
-| **1:35-2:30**<br>**Calculus** | `?session=calculus`. Judge pencils the slope; drags the tangent while the true slope inks over the sketch; guesses the area; slider 1 → 200 rectangles; mistake card ("Slope = height of the curve") if named. | "Same idea in calculus. Draw how steep this curve is. Now drag the tangent: the real slope draws itself over your pencil. The top of the hill is high, but the slope there is zero. Now the area: one rectangle says 7.5. Thinner and thinner … it lands on exactly 4.57. Every number here is computed, never guessed by a model." |
-| **2:30-2:45**<br>**Any topic** | Home → **Try any topic** → "derivative of x squared" → a draggable tangent. | "Type any topic. Watch it come alive. The AI builds the simulation; code guarantees the truth; you do the thinking. When nothing fits, it says so instead of faking a chart." *(Backend down: say it over Home.)* |
-| **2:45-3:00**<br>**Close** | Notebook with the judge's caught mistakes. | "Every wrong idea you had lands in your notebook and comes back with new numbers. No points: the reward is the moment your guess meets reality. Onionskin. See your thinking in layers. Questions?" **Stop.** |
+| **0:00-0:15**<br>**Hook** | Home → **Organic chemistry** → **Build ethanol**, target **C₂H₆O**. Trackpad to the judge. | "ChatGPT tells you the answer. Onionskin builds you a world where you find out you were wrong, and why. Build me ethanol: two carbons, six hydrogens, one oxygen." |
+| **0:15-0:55**<br>**Mistake named live → Finish ✓** | A 5th bond on a carbon: **"A carbon with 5 bonds"** shows. **↶ Undo**, finish, **Check it** → ✓ ethanol CH₃–CH₂–OH → **Finish ✓**. | "Every atom has slots. Give a carbon one bond too many … and it names the mistake while I make it. Undo. Finish it, and it checks the real structure." |
+| **0:55-1:35**<br>**SN2, step by step** | **← All orgo topics → SN2**: find the parts → Strong / Methyl / Good → pick **SN2** on the chart. | "Mechanisms the way you'd work them on an exam. Find the three players. Size them up: strong nucleophile, methyl carbon, good leaving group. That lands on one square of the chart: SN2, one step." |
+| **1:35-2:00**<br>**Draw the arrows** | Two arrows, **Show me**: real arrows ink over theirs, **CH₃OH + Br⁻**. | "Now draw where the electrons go. Pencil is you, ink is reality. In from the back, and bromide leaves with the bond's two electrons." |
+| **2:00-2:30**<br>**Calculus: slope** | Home → **Calculus** → **The slope of a curve**: sketch, **Check it with a tangent**, drag. | "Same idea in calculus. Draw how steep this curve is. Now drag the tangent: the real slope draws itself over your pencil. The top of the hill is high, but the slope there is zero." |
+| **2:30-2:50**<br>**Calculus: area** | **Area under a curve**: guess, rectangles 1 → 200, 7.5 → 4.57. | "One rectangle says 7.5. Thinner and thinner … it lands on 4.57. Every number here is computed, never guessed by a model." |
+| **2:50-3:00**<br>**Close** | The Calc 1/2/3 menu. | "Orgo and calculus, step by step, with your wrong ideas named. Onionskin. See your thinking in layers. Questions?" **Stop.** |
 
 **Branches:**
-- **#204 not merged:** calculus first (1:30), then any topic, then the birthday session as "more" (23 people → 50.7%), then the close.
-- **Judge is fast:** add the birthday session as "more".
-- **Judge is slow:** skip cyanide and the calculus compare. Never cut the named orgo mistake, the scrubber or the tangent.
-- **Backend down or slow:** skip typing; one line over Home.
+- **Judge is fast:** Calc 3 → **Slices of a surface** (3D).
+- **Judge is slow:** tap through Size them up and skip the area guess. Never cut the named 5th bond, the arrows or the tangent.
+- **Typed topic asked about:** tap a hand-checked chip; a typed topic plays as a number slider today, not a draggable curve, so we don't type one live.
+- **#218 (SN2 vs E2), if merged:** one line after the chart: "and E2 is right next to it on the chart."
 
 ---
 
@@ -63,11 +63,10 @@ Never say: "proven to make you learn faster", "permanently fixes misconceptions"
 
 | Time | On screen | Narrator says |
 |---|---|---|
-| **0:00** | Orgo step 1; judge drags atoms; a 5th bond on a carbon. | "ChatGPT tells you the answer. Onionskin builds you a world where you find out you were wrong. Build ethanol … a carbon with five bonds, named while you make it." |
-| **0:25** | Step 2: two arrows, **Show me**, scrub. | "Draw the electrons. Ink over pencil: backside attack, the bromide leaves, the carbon inverts." |
-| **0:50** | Calculus: tangent over the sketch; rectangles 1 → 200. | "Drag the tangent; the real slope inks over your guess. Rectangles: 7.5 down to exactly 4.57." |
-| **1:15** | Home: "Try any topic". | "Type any topic: the AI builds the simulation, code guarantees the truth, you do the thinking." |
-| **1:30** | | Stop. |
+| **0:00** | Organic chemistry → Build ethanol; a 5th bond; Undo; Finish ✓. | "ChatGPT tells you the answer. Onionskin builds you a world where you find out you were wrong. A carbon with five bonds, named while you make it." |
+| **0:30** | SN2: parts → Strong / Methyl / Good → SN2 → arrows → Show me. | "Find the parts, size them up, pick it off the chart, draw the electrons. Ink over pencil." |
+| **1:00** | Calculus → The slope of a curve: tangent over the sketch; area if time. | "Drag the tangent; the real slope inks over your guess." |
+| **1:25** | | "Onionskin. See your thinking in layers." Stop. |
 
 ---
 
@@ -123,8 +122,8 @@ Each answer is ≤ 3 sentences. Driver takes the technical ones (2, 4, 6, 7, 9, 
 16. **"What's next? Is there a business?"**
     "More widgets so more typed topics become runnable models, and a remix schedule that brings each unbusted mistake back on growing gaps, since spaced retrieval is about the best-established finding in learning science ([learning-science.md](research/learning-science.md)). We haven't validated a business, so I won't pretend; the obvious paths are a free app for students and a classroom mode where a room guesses together."
 
-17. **"Is the chemistry right?"** *[if #204 merged]*
-    "The rules are code, not a model. Formal charge is valence minus nonbonding electrons minus bonds, so an oxygen with three bonds and one lone pair is 6 − 2 − 3 = +1, and cyanide's minus sits on carbon (4 − 2 − 3 = −1), which is why carbon attacks ([Formal charge](https://en.wikipedia.org/wiki/Formal_charge), [Kolbe nitrile synthesis](https://en.wikipedia.org/wiki/Kolbe_nitrile_synthesis)). SN2 is one step with the nucleophile coming in opposite the leaving group, so the carbon inverts like an umbrella, and that's what the scrubber shows ([SN2](https://en.wikipedia.org/wiki/SN2_reaction), [Walden inversion](https://en.wikipedia.org/wiki/Walden_inversion)). Honest limit: it's a 2-D picture of one mechanism, not a quantum simulation."
+17. **"Is the chemistry right?"** 
+    "The rules are code, not a model. Formal charge is valence minus nonbonding electrons minus bonds, so an oxygen with three bonds and one lone pair is 6 − 2 − 3 = +1, and cyanide's minus sits on carbon (4 − 2 − 3 = −1), which is why carbon attacks ([Formal charge](https://en.wikipedia.org/wiki/Formal_charge), [Kolbe nitrile synthesis](https://en.wikipedia.org/wiki/Kolbe_nitrile_synthesis)). SN2 is one step with the nucleophile coming in opposite the leaving group, so the carbon inverts like an umbrella ([SN2](https://en.wikipedia.org/wiki/SN2_reaction), [Walden inversion](https://en.wikipedia.org/wiki/Walden_inversion)). Honest limit: it's a 2-D picture of one mechanism, not a quantum simulation."
 
 18. **"How is the derivative checked?"**
     "The level's curve is f(x) = (x³ − 6x² + 9x)/2 + 1 with its derivative and antiderivative written in closed form, so the ink slope and the 4.57 area come from formulas; unit tests check them against a numeric derivative and Riemann sums (`web/src/sessions/calculus/math.test.ts`). For a typed topic like 'derivative of x squared', the model only picks the curve and the point; our code computes the slope and rejects a spec whose claimed number is off by more than 2% (PR #187)."

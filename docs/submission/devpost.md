@@ -17,17 +17,15 @@ Animators draw on onion skin: the last frame stays faintly visible under the new
 Being told isn't the same as having a model you can run in your head. In one classic case, about 95 of 100 doctors estimated a positive mammogram meant roughly a 75% chance of cancer; the answer was 7.7% ([APS Observer on Eddy 1982](https://www.psychologicalscience.org/observer/helping-physicians-understand-screening-tests-will-improve-health-care)). And watching isn't enough: students who only *watched* a physics demo understood it no better than students who never saw it, while students who *predicted* first did significantly better ([Crouch et al. 2004](https://doi.org/10.1119/1.1707018)). So every Onionskin screen starts with your guess, and every step is something you drag, draw or watch move.
 
 ## What it does
-Onionskin takes you from never having seen a concept to a picture of it you can run yourself. You guess first, watch it run on top of your guess, and the exact wrong idea gets named. **The AI builds the simulation; code guarantees the truth; you do the thinking.**
+Onionskin takes you from never having seen a concept to a picture of it you can run yourself. Home has two subjects, **Organic chemistry** and **Calculus**, plus a box to type any topic. You try it first, the real thing runs on top of your attempt, and the exact wrong idea gets named.
 
-**Calculus: slopes and areas.** Pencil in how steep a hilly curve is, then drag the tangent along it while the true derivative inks over your sketch. Guess the area under the curve, then drag from 1 to 200 rectangles: one rectangle says 7.5, and the sum closes in on the exact 4.57 (computed). Copy the curve's shape instead of its steepness and the mistake is named: "Slope = height of the curve." Last, slope and area side by side: one undoes the other.
+**Organic chemistry.** Pick what to practice. *Molecules:* build ethanol (C₂H₆O) by dragging atoms and bonds. Mistakes are named as you make them: give a carbon a fifth bond and "A carbon with 5 bonds" appears; Undo takes it back, and Check it tests the real structure, not just the atom count. *Mechanisms:* SN2, SN1, E2 and E1, each worked step by step the way you'd do it on an exam: find the nucleophile, substrate carbon and leaving group, size them up (how strong, what kind of carbon, how good a leaving group), pick the mechanism off the chart, then draw the curved arrows. The real arrows ink over yours and the reaction plays. *Guided path:* build ethanol, work out HO⁻ + CH₃Br, draw its arrows, then spot the same pattern in a new reaction.
 
-**[if merged] Organic chemistry: push the electrons.** Build ethanol (C₂H₆O) by dragging atoms and bonds. Mistakes are named as you make them: "A carbon with 5 bonds", or an oxygen with three bonds and no charge (formal charge 6 − 2 − 3 = +1, so it's O⁺). Then draw the curved arrows for HO⁻ + CH₃Br. The real arrows ink over yours and the SN2 mechanism plays on a scrubber: backside attack, Br leaves with the bond's electrons, the carbon inverts. Then find the same three parts in cyanide + CH₃I, where carbon, not nitrogen, attacks.
+**Calculus.** A Calc 1 / Calc 2 / Calc 3 menu. In *The slope of a curve* you pencil in how steep a hilly curve is, then drag the tangent along it while the true derivative inks over your sketch. In *Area under a curve* you guess the area, then drag from 1 to 200 rectangles: one rectangle says 7.5, and the sum closes in on the exact 4.57 (computed). Calc 3 has a 3D surface you can turn and slice. More chapters are on the menu, marked "coming next".
 
-**Type any topic.** The engine turns a topic into a runnable visual: a curve with a knob, a sampler, or a calculus view (slope, area, limit). Type "derivative of x squared" and you get a tangent to drag. The answer is computed in code from the spec, never written by the model. If nothing fits ("the French Revolution", gibberish), it says so and offers the nearest checked topic instead of faking a chart. **[if merged]** 18 hand-checked topics load instantly.
+**Type any topic.** The engine turns a typed topic into a small model with a number you can change; the answer is computed in code from the spec, never written by the model. If nothing fits, it says so instead of faking a chart. Hand-checked topics load instantly.
 
-**Three probability sessions**, each with a compare screen: the birthday problem (23 people → 50.7%, computed; compared with shared 4-digit PINs), coin streaks (a run of 5+ in 97.2% of 100 fair flips, computed exactly) and a positive medical test (9.2% chance you're sick, not 90%, computed). Comparing two cases helps an idea transfer ([Gentner, Loewenstein & Thompson 2003](https://doi.org/10.1037/0022-0663.95.2.393)).
-
-**Around every session:** a notebook that keeps your mistakes and brings them back as rematches with new numbers; an Ask panel that gives a hint, never the answer; and a "How it works" drawer that shows the math.
+**Around every session:** a notebook that keeps the mistakes you made and brings them back.
 
 **No points, on purpose.** In a semester-long class, badges and a leaderboard lowered final-exam scores ([Hanus & Fox 2015](https://doi.org/10.1016/j.compedu.2014.08.019)). The reward is the moment your layer meets reality.
 
@@ -45,7 +43,7 @@ Onionskin takes you from never having seen a concept to a picture of it you can 
 - **Visual, not a quiz.** Our first version was a guess plus a text answer: correct and forgettable. We rebuilt every step as something you manipulate.
 
 ## Accomplishments that we're proud of
-- The birthday reveal: your hand-drawn curve under the real one, gap shaded, then the PIN case showing it's the same idea.
+- Building ethanol and having "A carbon with 5 bonds" named the moment you make the mistake.
 - Every number on screen is computed or sourced, including in typed topics.
 - An AI feature that admits when it can't help.
 - Every session works on a phone and by keyboard.
@@ -80,7 +78,7 @@ For each item, what must be true on the live site at submit time. If it isn't, c
 **Not merged / not live as of this draft (Sat evening):**
 - [ ] **Pre-built set** (PR #206, 18 hand-checked v4 topics): merged and deployed? If not, cut "18 hand-checked topics load instantly".
 - [ ] **Calculus level** (PR #202, merged; `?session=calculus`): deployed? Check the screen shows 7.5 for one rectangle and 4.57 exact (computed: f(x) = (x³ − 6x² + 9x)/2 + 1 on [1, 3.5], F(3.5) − F(1) = 4.5703; one left rectangle = f(1) × 2.5 = 7.5; `web/src/sessions/calculus/math.ts`).
-- [ ] **Orgo showcase** (PR #204, build a molecule + push the electrons): merged and deployed? If not, cut the whole "[if merged] Organic chemistry" paragraph. Chemistry checks: FC = V − N − B ([formal charge](https://en.wikipedia.org/wiki/Formal_charge)): O with 3 bonds and 1 lone pair = 6 − 2 − 3 = +1; SN2 backside attack with inversion ([SN2](https://en.wikipedia.org/wiki/SN2_reaction), [Walden inversion](https://en.wikipedia.org/wiki/Walden_inversion)); cyanide attacks through carbon, giving nitriles ([Kolbe nitrile synthesis](https://en.wikipedia.org/wiki/Kolbe_nitrile_synthesis)); ethanol and dimethyl ether are both C₂H₆O.
+- [x] **Orgo** is live (main @ 6f52ea9): Build ethanol, SN2/SN1/E2/E1 step by step, Guided path. #218 (SN2 vs E2) only if merged. Chemistry checks: FC = V − N − B ([formal charge](https://en.wikipedia.org/wiki/Formal_charge)): O with 3 bonds and 1 lone pair = 6 − 2 − 3 = +1; SN2 backside attack with inversion ([SN2](https://en.wikipedia.org/wiki/SN2_reaction), [Walden inversion](https://en.wikipedia.org/wiki/Walden_inversion)); cyanide attacks through carbon, giving nitriles ([Kolbe nitrile synthesis](https://en.wikipedia.org/wiki/Kolbe_nitrile_synthesis)); ethanol and dimethyl ether are both C₂H₆O.
 - [ ] **Home rewrite / no betting language** (PR #205): merged? The headline and subline assume the new Home. Also check no "lock it in", "called it" or confidence picker is left on screen.
 - [ ] When all four are in, delete the **[if merged]** tag.
 
