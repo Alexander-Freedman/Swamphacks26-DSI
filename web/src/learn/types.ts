@@ -22,7 +22,10 @@ export type Rubric = {
 }
 
 export type Misconception = { id: string; label: string; tell: string; fix: string }
-export type ExtremeCase = { dimension: string; scenario: string; correctBehavior: string }
+/** Predict, then check: what the learner picks on a stress card (one choice is correct). */
+export type PredictChoice = { text: string; correct: boolean; misconceptionId: string | null }
+export type Predict = { question: string; choices: PredictChoice[]; piece: string }
+export type ExtremeCase = { dimension: string; scenario: string; correctBehavior: string; predict?: Predict | null }
 
 export type Visual = { widget: 'curve' | 'distribution' | 'estimate' | 'stepper'; spec: unknown } | null
 
@@ -54,7 +57,8 @@ export type AnchorResponse = Off & { verdict: 'demonstrated' | 'unresolved'; fee
 
 export type StressHistoryItem = { caseIndex: number; fix: string; verdict: 'survives' | 'breaks' }
 export type StressRequest = { fix: string; caseIndex: number; history: StressHistoryItem[] }
-export type StressResponse = Off & { verdict: 'survives' | 'breaks'; critique: string }
+/** `piece`: when the rule didn't cover the case, the one missing piece (tap to add it to the rule). */
+export type StressResponse = Off & { verdict: 'survives' | 'breaks'; critique: string; piece?: string | null }
 
 export type WhyRequest = { answer: string }
 export type WhyResponse = AnchorResponse
@@ -128,6 +132,8 @@ export type LearnState = {
   fix: string
   stressHistory: StressHistoryItem[]
   stressCritiques: StressResponse[]
+  /** Predict, then check: the choice picked on each card (case index -> choice index). */
+  stressChoices: Record<number, number>
   whyResult: WhyResponse | null
   revealResult: RevealResponse | null
   drawRule: string
