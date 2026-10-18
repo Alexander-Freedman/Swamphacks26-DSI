@@ -2,7 +2,7 @@
 // purpose instead of a fixed path. A topic is a list of steps from the session. Topics that aren't
 // built yet stay on the menu as "coming next" so the whole map of the subject is visible.
 
-export type CalcStep = 'draw' | 'tangent' | 'area' | 'card' | 'compare' | 'surface'
+export type CalcStep = 'draw' | 'tangent' | 'area' | 'card' | 'compare' | 'surface' | 'gradient' | 'volume'
 
 export type CalcTopic = {
   id: string
@@ -95,7 +95,7 @@ export const COURSES: CalcCourse[] = [
         blurb: 'z = f(x, y): a height above every spot on the floor.',
         topics: [
           { id: 'surface', title: 'Slices of a surface', blurb: 'Turn a 3D surface around, slice it, and read the partial derivatives off the cuts.', steps: ['surface'], ready: true },
-          soon('gradient', 'The gradient', 'The arrow on the floor that points straight uphill.'),
+          { id: 'gradient', title: 'The gradient', blurb: 'The arrow on the floor that points straight uphill. Follow it to the top.', steps: ['gradient'], ready: true },
           soon('contour', 'Contour maps', 'Flatten the hills into a topographic map and read it back.'),
         ],
       },
@@ -103,7 +103,7 @@ export const COURSES: CalcCourse[] = [
         id: 'multiple',
         title: 'Multiple integrals',
         blurb: 'Volume under a surface, built from columns.',
-        topics: [soon('double', 'Volume under a surface', 'Fill the space under a surface with thinner and thinner columns.')],
+        topics: [{ id: 'double', title: 'Volume under a surface', blurb: 'Fill the space under a surface with thinner and thinner columns.', steps: ['volume'], ready: true }],
       },
       {
         id: 'vector',

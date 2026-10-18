@@ -1,31 +1,35 @@
-import { useEffect, useMemo, useRef, useState, type KeyboardEvent, type PointerEvent } from 'react'
+import { useEffect, useRef, useState, type KeyboardEvent, type PointerEvent, type ReactNode } from 'react'
 import { record } from '../../notebook'
-import { dirOf, fx, fy, fz, type Dir } from './surfaceMath'
+import { dirOf, fx, fy, fz, HILL, type Dir, type Surf } from './surfaceMath'
 
 // Calc 3, first topic: a surface z = f(x, y) you can turn around, two slices through a point,
 // and the partial derivatives read off the slices as ordinary 2D slopes.
 // Drawn in plain SVG: a small projection, quads sorted back to front (painter's algorithm).
+// The gradient and volume topics (Gradient.tsx, Volume.tsx) draw on the same stage.
 
-const R = 3 // the floor runs from −R to R in x and y
+const R = 3 // the hill's floor runs from −R to R in x and y
 const N = 22 // grid cells per side
 const W = 520
 const H = 360
 
+export type View = { yaw: number; pitch: number }
+/** Where the scene sits: the floor point in the middle of the picture, pixels per unit, how far down to shift it. */
+export type Fit = { cx: number; cy: number; scale: number; lift: number }
+const HILL_FIT: Fit = { cx: 0, cy: 0, scale: 62, lift: 40 }
 
-type View = { yaw: number; pitch: number }
+export type Project = (x: number, y: number, z: number) => { x: number; y: number; depth: number }
 
-function projector({ yaw, pitch }: View) {
+function projector({ yaw, pitch }: View, { cx, cy: cy0, scale, lift }: Fit): Project {
   const cy = Math.cos(yaw)
   const sy = Math.sin(yaw)
   const cp = Math.cos(pitch)
   const sp = Math.sin(pitch)
-  const scale = 62
   return (x: number, y: number, z: number) => {
-    const xr = x * cy - y * sy
-    const yr = x * sy + y * cy
+    const xr = (x - cx) * cy - (y - cy0) * sy
+    const yr = (x - cx) * sy + (y - cy0) * cy
     return {
       x: W / 2 + scale * xr,
-      y: H / 2 + 40 - scale * (z * cp + yr * sp * 0.9),
+      y: H / 2 + lift - scale * (z * cp + yr * sp * 0.9),
       depth: yr * cp - z * sp, // bigger = farther back
     }
   }
@@ -33,35 +37,15 @@ function projector({ yaw, pitch }: View) {
 
 const pts = (ps: { x: number; y: number }[]) => ps.map((p) => `${p.x.toFixed(1)},${p.y.toFixed(1)}`).join(' ')
 
-/** The rotating surface with the point, its two slices, and the floor axes. */
-export function SurfaceView({ view, setView, x0, y0, showX, showY }: { view: View; setView: (f: (v: View) => View) => void; x0: number; y0: number; showX: boolean; showY: boolean }) {
-  const P = projector(view)
-  const quads = useMemo(() => {
-    const out: { d: string; depth: number; t: number }[] = []
-    const step = (2 * R) / N
-    for (let i = 0; i < N; i++)
-      for (let j = 0; j < N; j++) {
-        const xa = -R + i * step
-        const ya = -R + j * step
-        const c = [
-          [xa, ya],
-          [xa + step, ya],
-          [xa + step, ya + step],
-          [xa, ya + step],
-        ].map(([x, y]) => P(x, y, fz(x, y)))
-        const zc = fz(xa + step / 2, ya + step / 2)
-        out.push({ d: pts(c), depth: c.reduce((s, p) => s + p.depth, 0) / 4, t: zc / 3 })
-      }
-    return out.sort((a, b) => b.depth - a.depth)
-  }, [P])
-  const line = (f: (u: number) => [number, number]) =>
-    pts(Array.from({ length: 61 }, (_, k) => -R + (2 * R * k) / 60).map((u) => {
-      const [x, y] = f(u)
-      return P(x, y, fz(x, y))
-    }))
+/**
+ * The turnable 3D stage: drag or the arrow keys turn it. Draws the floor (the surface's rectangle)
+ * and the x and y axes, then whatever `children` draws with the projection it's handed.
+ */
+export function Scene3D(p: { view: View; setView: (f: (v: View) => View) => void; surf: Surf; fit?: Fit; label: string; children: (P: Project) => ReactNode }) {
+  const { view, setView, surf, fit = HILL_FIT, label, children } = p
+  const P = projector(view, fit)
   const floor = (x: number, y: number) => P(x, y, 0)
-  const p = P(x0, y0, fz(x0, y0))
-  const pf = floor(x0, y0)
+  const { x0, x1, y0, y1 } = surf
 
   const drag = useRef<{ x: number; y: number } | null>(null)
   const down = (e: PointerEvent<SVGSVGElement>) => {
@@ -90,7 +74,7 @@ export function SurfaceView({ view, setView, x0, y0, showX, showY }: { view: Vie
       viewBox={`0 0 ${W} ${H}`}
       role="img"
       tabIndex={0}
-      aria-label={`3D surface z = f(x, y), a hill. Point at x = ${x0.toFixed(1)}, y = ${y0.toFixed(1)}, height ${fz(x0, y0).toFixed(2)}. Drag or use the arrow keys to turn it.`}
+      aria-label={label}
       onPointerDown={down}
       onPointerMove={move}
       onPointerUp={up}
@@ -98,34 +82,115 @@ export function SurfaceView({ view, setView, x0, y0, showX, showY }: { view: Vie
       onKeyDown={key}
     >
       {/* the floor and its axes */}
-      <polygon className="calc-3d-floor" points={pts([floor(-R, -R), floor(R, -R), floor(R, R), floor(-R, R)])} />
-      <line className="calc-3d-axis" x1={floor(-R, 0).x} y1={floor(-R, 0).y} x2={floor(R + 0.6, 0).x} y2={floor(R + 0.6, 0).y} />
-      <line className="calc-3d-axis" x1={floor(0, -R).x} y1={floor(0, -R).y} x2={floor(0, R + 0.6).x} y2={floor(0, R + 0.6).y} />
-      <text className="calc-3d-lab" x={floor(R + 0.9, 0).x} y={floor(R + 0.9, 0).y}>x</text>
-      <text className="calc-3d-lab" x={floor(0, R + 0.9).x} y={floor(0, R + 0.9).y}>y</text>
-      {quads.map((q, i) => (
-        <polygon key={i} className="calc-3d-quad" points={q.d} style={{ fillOpacity: 0.12 + 0.6 * q.t }} />
-      ))}
-      {showX && <polyline className="calc-3d-slice sx" points={line((u) => [u, y0])} />}
-      {showY && <polyline className="calc-3d-slice sy" points={line((u) => [x0, u])} />}
-      <line className="calc-3d-stem" x1={pf.x} y1={pf.y} x2={p.x} y2={p.y} />
-      <circle className="calc-3d-foot" cx={pf.x} cy={pf.y} r={4} />
-      <circle className="calc-3d-pt" cx={p.x} cy={p.y} r={8} />
+      <polygon className="calc-3d-floor" points={pts([floor(x0, y0), floor(x1, y0), floor(x1, y1), floor(x0, y1)])} />
+      <line className="calc-3d-axis" x1={floor(x0, 0).x} y1={floor(x0, 0).y} x2={floor(x1 + 0.6, 0).x} y2={floor(x1 + 0.6, 0).y} />
+      <line className="calc-3d-axis" x1={floor(0, y0).x} y1={floor(0, y0).y} x2={floor(0, y1 + 0.6).x} y2={floor(0, y1 + 0.6).y} />
+      <text className="calc-3d-lab" x={floor(x1 + 0.9, 0).x} y={floor(x1 + 0.9, 0).y}>x</text>
+      <text className="calc-3d-lab" x={floor(0, y1 + 0.9).x} y={floor(0, y1 + 0.9).y}>y</text>
+      {children(P)}
     </svg>
   )
 }
 
+/** The surface as shaded quads sorted back to front (higher = more yellow). `wire` draws only its grid. */
+export function SurfaceMesh({ P, surf, wire = false, n = N }: { P: Project; surf: Surf; wire?: boolean; n?: number }) {
+  const sx = (surf.x1 - surf.x0) / n
+  const sy = (surf.y1 - surf.y0) / n
+  let top = 0
+  for (let i = 0; i <= n; i++) for (let j = 0; j <= n; j++) top = Math.max(top, surf.z(surf.x0 + i * sx, surf.y0 + j * sy))
+  const quads: { d: string; depth: number; t: number }[] = []
+  for (let i = 0; i < n; i++)
+    for (let j = 0; j < n; j++) {
+      const xa = surf.x0 + i * sx
+      const ya = surf.y0 + j * sy
+      const c = [
+        [xa, ya],
+        [xa + sx, ya],
+        [xa + sx, ya + sy],
+        [xa, ya + sy],
+      ].map(([x, y]) => P(x, y, surf.z(x, y)))
+      quads.push({ d: pts(c), depth: c.reduce((s, q) => s + q.depth, 0) / 4, t: surf.z(xa + sx / 2, ya + sy / 2) / top })
+    }
+  quads.sort((a, b) => b.depth - a.depth)
+  return (
+    <g className={wire ? 'calc-3d-wire' : undefined}>
+      {quads.map((q, i) => (
+        <polygon key={i} className="calc-3d-quad" points={q.d} style={wire ? undefined : { fillOpacity: 0.12 + 0.6 * q.t }} />
+      ))}
+    </g>
+  )
+}
+
+/** An arrow lying flat on the floor from (x, y) along (dx, dy). The head is drawn on the floor too, so it turns with the view. */
+export function FloorArrow({ P, x, y, dx, dy, className, label }: { P: Project; x: number; y: number; dx: number; dy: number; className: string; label?: string }) {
+  const l = Math.hypot(dx, dy)
+  if (l < 0.02) return null
+  const ux = dx / l
+  const uy = dy / l
+  const head = Math.min(0.3, l * 0.45)
+  const tx = x + dx
+  const ty = y + dy
+  const side = (s: number) => P(tx - head * ux - s * head * 0.55 * uy, ty - head * uy + s * head * 0.55 * ux, 0)
+  const a = P(x, y, 0)
+  const b = P(tx, ty, 0)
+  const neck = P(tx - head * ux * 0.8, ty - head * uy * 0.8, 0)
+  const lab = P(tx + 0.32 * ux, ty + 0.32 * uy, 0)
+  return (
+    <g className={'calc-3d-arrow ' + className}>
+      <line x1={a.x} y1={a.y} x2={neck.x} y2={neck.y} />
+      <polygon points={pts([b, side(1), side(-1)])} />
+      {label && <text className="calc-3d-alab" x={lab.x} y={lab.y + 5} textAnchor="middle">{label}</text>}
+    </g>
+  )
+}
+
+/** The rotating surface with the point, its two slices, and the floor axes. `overlay` draws on top (arrows, a trail). */
+export function SurfaceView(p: { view: View; setView: (f: (v: View) => View) => void; x0: number; y0: number; showX: boolean; showY: boolean; surf?: Surf; overlay?: (P: Project) => ReactNode }) {
+  const { view, setView, x0, y0, showX, showY, surf = HILL, overlay } = p
+  const z = surf.z
+  return (
+    <Scene3D
+      view={view}
+      setView={setView}
+      surf={surf}
+      label={`3D surface z = f(x, y), ${surf.name}. Point at x = ${x0.toFixed(1)}, y = ${y0.toFixed(1)}, height ${z(x0, y0).toFixed(2)}. Drag or use the arrow keys to turn it.`}
+    >
+      {(P) => {
+        const line = (f: (u: number) => [number, number], a: number, b: number) =>
+          pts(Array.from({ length: 61 }, (_, k) => a + ((b - a) * k) / 60).map((u) => {
+            const [x, y] = f(u)
+            return P(x, y, z(x, y))
+          }))
+        const pt = P(x0, y0, z(x0, y0))
+        const pf = P(x0, y0, 0)
+        return (
+          <>
+            <SurfaceMesh P={P} surf={surf} />
+            {showX && <polyline className="calc-3d-slice sx" points={line((u) => [u, y0], surf.x0, surf.x1)} />}
+            {showY && <polyline className="calc-3d-slice sy" points={line((u) => [x0, u], surf.y0, surf.y1)} />}
+            <line className="calc-3d-stem" x1={pf.x} y1={pf.y} x2={pt.x} y2={pt.y} />
+            <circle className="calc-3d-foot" cx={pf.x} cy={pf.y} r={4} />
+            {overlay?.(P)}
+            <circle className="calc-3d-pt" cx={pt.x} cy={pt.y} r={8} />
+          </>
+        )
+      }}
+    </Scene3D>
+  )
+}
+
 /** One slice as a flat 2D curve, with the tangent at the point: its slope is the partial derivative. */
-export function SliceChart({ along, x0, y0 }: { along: 'x' | 'y'; x0: number; y0: number }) {
+export function SliceChart({ along, x0, y0, surf = HILL }: { along: 'x' | 'y'; x0: number; y0: number; surf?: Surf }) {
   const w = 300
   const h = 130
   const l = 28
-  const sx = (u: number) => l + ((u + R) / (2 * R)) * (w - l - 10)
+  const [lo, hi] = along === 'x' ? [surf.x0, surf.x1] : [surf.y0, surf.y1]
+  const sx = (u: number) => l + ((u - lo) / (hi - lo)) * (w - l - 10)
   const sy = (z: number) => h - 22 - (z / 3.2) * (h - 36)
-  const g = (u: number) => (along === 'x' ? fz(u, y0) : fz(x0, u))
+  const g = (u: number) => (along === 'x' ? surf.z(u, y0) : surf.z(x0, u))
   const u0 = along === 'x' ? x0 : y0
-  const s = along === 'x' ? fx(x0, y0) : fy(x0, y0)
-  const curve = Array.from({ length: 61 }, (_, k) => -R + (2 * R * k) / 60).map((u) => `${sx(u).toFixed(1)},${sy(g(u)).toFixed(1)}`).join(' ')
+  const s = along === 'x' ? surf.zx(x0, y0) : surf.zy(x0, y0)
+  const curve = Array.from({ length: 61 }, (_, k) => lo + ((hi - lo) * k) / 60).map((u) => `${sx(u).toFixed(1)},${sy(g(u)).toFixed(1)}`).join(' ')
   const t = (u: number) => g(u0) + s * (u - u0)
   const a = u0 - 0.9
   const b = u0 + 0.9
