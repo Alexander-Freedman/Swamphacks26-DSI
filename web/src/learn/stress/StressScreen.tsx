@@ -71,13 +71,18 @@ export function StressScreen({ topic, state, update, next, api }: StageProps) {
         <span className="st-fix-k">your fix</span>
         {editing ? (
           <>
-            <input
-              type="text"
+            <textarea
               aria-label="your fix"
+              rows={3}
               value={state.fix}
-              placeholder="one line: what decides the outcome?"
+              placeholder="In your own words: what decides the outcome?"
               onChange={(e) => update({ fix: e.target.value })}
-              onKeyDown={(e) => e.key === 'Enter' && fix && setEditing(false)}
+              onKeyDown={(e) => {
+                if (e.key === 'Enter' && !e.shiftKey && fix) {
+                  e.preventDefault()
+                  setEditing(false)
+                }
+              }}
             />
             <button className="st-small" disabled={!fix} onClick={() => setEditing(false)}>Use it</button>
           </>
