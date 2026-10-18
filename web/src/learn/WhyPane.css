@@ -1,0 +1,19 @@
+/* Why-pane: quiet by design. Plain card, no grid, no highlight; it sits beside the screen, not on it. */
+.why-layout { display: grid; grid-template-columns: minmax(0, 1fr) 260px; gap: 20px; align-items: start; }
+.why-main { min-width: 0; }
+
+.why-pane { background: var(--card); border: 1.5px solid var(--ink-soft); border-radius: 4px; padding: 14px 16px; position: sticky; top: 16px; }
+.why-toggle { display: none; }
+.why-k { margin: 0; font: 700 11px var(--font-mono); text-transform: uppercase; letter-spacing: 0.08em; color: var(--ink-soft); }
+.why-doing { margin: 2px 0 12px; font: 700 15px/1.35 var(--font-body); color: var(--ink); }
+.why-why { margin: 2px 0 12px; font: 15px/1.4 var(--font-body); color: var(--ink); }
+.why-source { margin: 0; padding-top: 10px; border-top: 1px solid var(--grid); font: 13px/1.35 var(--font-hand); color: var(--ink-soft); }
+
+/* phone: the pane moves above the screen as a one-line strip that opens on tap */
+@media (max-width: 760px) {
+  .why-layout { grid-template-columns: minmax(0, 1fr); gap: 10px; }
+  .why-pane { order: -1; position: static; padding: 0; }
+  .why-toggle { display: flex; width: 100%; justify-content: space-between; align-items: center; min-height: 44px; padding: 8px 14px; background: none; border: 0; font: 700 15px var(--font-body); color: var(--ink); cursor: pointer; }
+  .why-body { display: none; padding: 0 14px 12px; }
+  .why-pane.open .why-body { display: block; }
+}
