@@ -2,7 +2,7 @@
 
 **See your thinking in layers.**
 
-**Live: https://onionskin.study**
+**Live: https://alexander-freedman.github.io/Swamphacks26-DSI/**
 
 > **After the hackathon:** the AI server is retired and the site is fully static. The Calculus, Organic chemistry and Base rates lessons are recorded demos: their example answers replay the AI's real replies. Other topics use the built-in offline check. See **How we built it** on the site.
 
@@ -38,7 +38,7 @@ No points, XP, streaks or leaderboards: expected rewards can crowd out interest 
 
 ## How it's built
 
-- **Web** (`web/`): React + TypeScript + Vite, deployed to GitHub Pages at onionskin.study. Ready-made topics ship as static JSON, so they open even without the backend.
+- **Web** (`web/`): React + TypeScript + Vite, deployed to GitHub Pages. Ready-made topics ship as static JSON, so they open even without the backend.
 - **API** (`api/`): FastAPI on a Vultr VM behind Caddy (HTTPS). Lessons are authored and answers graded by OpenAI's Codex CLI running on the server, with a fixed grading contract: judge piece by piece, never give the answer mid-attempt, one targeted follow-up, quote the learner's own words, hold the verdict under pushback.
 - **Truth is computed in code, never by a model.** Every graph is a formula the app evaluates itself; a model-proposed graph is only shown if the app's checker recomputes its answer and every number in its captions. A bad graph never ships; a missing one is fine.
 - **Data**: no accounts and no server-side learner data. The Notebook lives in your browser. (The API has a Tiger Data store wired up from an earlier version, but the current lessons don't send it anything.)
@@ -66,7 +66,7 @@ cd api && uv sync && MM_CODEX_FAKE=1 uv run uvicorn app.main:app --reload
 
 Point the web app at a running API with `VITE_API_BASE=http://localhost:8000`. Tests: `npm test` in `web/`, `uv run pytest` in `api/`.
 
-Deploying: `scripts/deploy-pages.sh` (Pages, with `PAGES_CNAME=onionskin.study` and `VITE_API_BASE`) and `deploy/vultr/update.sh` (API). Details in `deploy/README.md`.
+Deploying: `scripts/deploy-pages.sh` (Pages; the static site is built with no `VITE_API_BASE`. During the hackathon it ran on onionskin.study with `PAGES_CNAME`) and `deploy/vultr/update.sh` (API). Details in `deploy/README.md`.
 
 ## Repo map
 
