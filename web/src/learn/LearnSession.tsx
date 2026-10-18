@@ -119,7 +119,12 @@ export function LearnSession({
         <div className="learn-bar sheet">
           <span className="learn-topic">
             {topic.topic}
-            {!topic.checked && <span className="learn-auto"> · auto-checked</span>}
+            {!topic.checked && (
+              <span className="learn-auto" title="Built by the AI just now for your topic; the eight ready-made topics were reviewed by us">
+                {" "}
+                · built just now, not yet reviewed
+              </span>
+            )}
           </span>
           <ol className="learn-dots" aria-label={`Step ${idx + 1} of ${STAGES.length}`}>
             {STAGES.map((s, i) => (
