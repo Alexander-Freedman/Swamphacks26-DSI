@@ -7,4 +7,5 @@ __pycache__/
 .ruff_cache/
 .pytest_cache/
 data/cache/
+data/learn-cache/
 data/local.db
