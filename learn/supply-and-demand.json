@@ -109,17 +109,80 @@
     {
       "dimension": "fixed-price-shortage",
       "scenario": "A city caps apartment rent at $900 per month. At that rent, 2,000 households want apartments but landlords offer only 1,200 apartments.",
-      "correctBehavior": "There is a shortage of 800 apartments. People may queue, search longer, or use other rationing methods; if the cap were removed and conditions stayed the same, rent would tend to rise."
+      "correctBehavior": "There is a shortage of 800 apartments. People may queue, search longer, or use other rationing methods; if the cap were removed and conditions stayed the same, rent would tend to rise.",
+      "predict": {
+        "question": "What happens while the rent cap stays in place?",
+        "choices": [
+          {
+            "text": "There is a shortage of 800 apartments, and people may queue or search longer.",
+            "correct": true,
+            "misconceptionId": null
+          },
+          {
+            "text": "The shortage disappears because rent cannot rise.",
+            "correct": false,
+            "misconceptionId": null
+          },
+          {
+            "text": "There is a surplus of 800 apartments, so rent should fall.",
+            "correct": false,
+            "misconceptionId": null
+          }
+        ],
+        "piece": "more buyers than sellers at a price means a shortage"
+      }
     },
     {
       "dimension": "demand-collapse",
       "scenario": "A disease warning makes most customers avoid a salad bar. At the former price of $12 per meal, restaurants still prepare 500 meals but customers now want only 150.",
-      "correctBehavior": "There is a surplus of 350 meals at the former price. With supply otherwise unchanged and prices flexible, the price and number of meals sold tend to fall."
+      "correctBehavior": "There is a surplus of 350 meals at the former price. With supply otherwise unchanged and prices flexible, the price and number of meals sold tend to fall.",
+      "predict": {
+        "question": "With flexible prices, what happens after customers avoid the salad bar?",
+        "choices": [
+          {
+            "text": "The price rises because restaurants still made 500 meals.",
+            "correct": false,
+            "misconceptionId": "supply-demand-always-mean-price-rises"
+          },
+          {
+            "text": "There is a surplus of 350 meals, so price and meals sold tend to fall.",
+            "correct": true,
+            "misconceptionId": null
+          },
+          {
+            "text": "Demand did not change, because the meal price stayed at 12 dollars.",
+            "correct": false,
+            "misconceptionId": null
+          }
+        ],
+        "piece": "too much supply at one price pushes price down"
+      }
     },
     {
       "dimension": "supply-collapse",
       "scenario": "A storm closes the only road bringing strawberries into town. At the former price of $4 per basket, shoppers want 1,000 baskets but stores can receive only 200.",
-      "correctBehavior": "There is a shortage of 800 baskets at the former price. With prices flexible, the price tends to rise, reducing purchases and encouraging any available suppliers to bring in more baskets."
+      "correctBehavior": "There is a shortage of 800 baskets at the former price. With prices flexible, the price tends to rise, reducing purchases and encouraging any available suppliers to bring in more baskets.",
+      "predict": {
+        "question": "With flexible prices, what happens after the storm closes the road?",
+        "choices": [
+          {
+            "text": "Price tends to fall, so shoppers buy even more baskets.",
+            "correct": false,
+            "misconceptionId": null
+          },
+          {
+            "text": "The shortage remains 800 baskets with no reason for price to change.",
+            "correct": false,
+            "misconceptionId": "price-only-benefits-sellers"
+          },
+          {
+            "text": "There is a shortage of 800 baskets, so price tends to rise.",
+            "correct": true,
+            "misconceptionId": null
+          }
+        ],
+        "piece": "too little supply at one price pushes price up"
+      }
     }
   ],
   "visual": null
