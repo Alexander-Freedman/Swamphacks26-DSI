@@ -6,8 +6,8 @@
   },
   "anchor": {
     "doing": "Use one true fact to predict what happens next.",
-    "why": "A real fact gives you something solid to reason from, and a prediction shows you where your picture is thin.",
-    "source": "Onionskin research brief, section 9: start concrete, then abstract"
+    "why": "A real fact gives you something solid to reason from, and predicting from it shows what you already understand.",
+    "source": "Fyfe, McNeil, Son & Goldstone 2014, concrete first, then abstract"
   },
   "contrast": {
     "doing": "Compare two look-alike cases and write why they differ.",
@@ -16,13 +16,13 @@
   },
   "stress": {
     "doing": "Test your fix on three extreme cases and watch what breaks.",
-    "why": "Extreme cases expose rules that only work in easy cases, so a break shows exactly which part of your model is wrong.",
+    "why": "Extreme cases expose rules that only work in easy cases, and a break points to the part of your model to rethink.",
     "source": "Clement 2009, experts test models with extreme cases"
   },
   "draw": {
     "doing": "Sketch the model from memory, then write its rule.",
-    "why": "Drawing makes you pick the parts, link them, and put them together, and a wrong picture shows a wrong idea.",
-    "source": "Wammes, Meade & Fernandes 2016, drawing roughly doubles recall"
+    "why": "Drawing makes you pick the parts and link them, and a wrong picture shows a wrong idea.",
+    "source": "Schmeck, Mayer, Opfermann, Pfeiffer & Leutner 2014, drawing to learn"
   },
   "neighbor": {
     "doing": "Pick which idea this is, against its look-alike cousin.",
@@ -31,12 +31,12 @@
   },
   "transfer": {
     "doing": "Say the same idea in a totally different field.",
-    "why": "Ideas rarely carry over to new settings on their own, so you build the bridge by naming where else it applies.",
-    "source": "Barnett & Ceci 2002, far transfer must be designed for"
+    "why": "Ideas rarely carry over to a new field on their own, so you practice the jump on purpose.",
+    "source": "Barnett & Ceci 2002, far transfer is rare and hard"
   },
   "done": {
     "doing": "Read the mistake card, then save it to your Notebook.",
-    "why": "Seeing why a wrong idea felt right lets you replace the idea itself, not just patch one answer.",
+    "why": "Naming the wrong idea next to its fix helps you replace the idea itself, not just patch one answer.",
     "source": "Chi 2005, stubborn misconceptions need a new category"
   }
 }
