@@ -1,0 +1,10 @@
+/* Statistics: bars in ink and marker on the paper grid. */
+.stats .st-bar { fill: var(--marker); stroke: var(--ink); stroke-width: 1.2; }
+.stats .st-bar.pop { fill: var(--card); stroke-width: 2; }
+.stats .st-axis { stroke: var(--ink); stroke-width: 1.5; }
+.stats .st-tick { font: 11px var(--font-mono); fill: var(--ink-soft); text-anchor: middle; }
+.stats .st-mean { stroke: var(--off); stroke-width: 2; stroke-dasharray: 5 4; }
+.stats .st-mean-lab { font: 700 11px var(--font-mono); fill: var(--off); }
+.stats .st-q { font: 700 48px var(--font-display); fill: var(--pencil); text-anchor: middle; dominant-baseline: middle; }
+.stats .st-mastered { font-weight: 700; color: var(--called); }
+.stats .sj-finish { margin-top: 12px; }

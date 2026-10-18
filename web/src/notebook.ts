@@ -54,6 +54,10 @@ export type Card = {
 // Session-only misconceptions that aren't in a round JSON.
 const EXTRA_LABELS: Record<string, string> = {
   'too-few': 'A handful of people is enough',
+  // statistics (sessions/statistics/clt.ts CLT_MISTAKES)
+  'averages-keep-shape': 'Averages keep the original shape',
+  'averages-flat': 'Every average is equally likely',
+  'bigger-sample-wider': 'Bigger samples spread out more',
   // calculus, Calc 3 (sessions/calculus/Surface.tsx)
   'partial-wrong-way': 'Walking a slice the wrong way',
   // orgo (sessions/orgo/chem.ts MISTAKES)

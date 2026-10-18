@@ -1,0 +1,46 @@
+/* Shared by the newer subjects: menu, buttons, answer cards, verdicts, cards. Square corners, no pills. */
+.subject .sj-menu { display: grid; gap: 22px; max-width: 980px; }
+.subject .sj-sec-title { font: 700 22px var(--font-display); margin: 0; }
+.subject .sj-sec-blurb { margin: 2px 0 10px; color: var(--ink-soft); }
+.subject .sj-topics { display: grid; grid-template-columns: repeat(auto-fill, minmax(210px, 1fr)); gap: 12px; }
+.subject .sj-topic { display: grid; gap: 4px; text-align: left; padding: 14px 16px; background: var(--card); color: var(--ink); border: 2px solid var(--ink); border-radius: 4px; box-shadow: 0 3px 0 var(--ink); cursor: pointer; font: inherit; }
+.subject .sj-topic:hover:not(:disabled) { background: var(--marker-soft); }
+.subject .sj-topic:active:not(:disabled) { transform: translateY(2px); box-shadow: 0 1px 0 var(--ink); }
+.subject .sj-topic:disabled { cursor: default; opacity: 0.55; box-shadow: none; border-style: dashed; }
+.subject .sj-topic-title { font: 700 18px var(--font-display); }
+.subject .sj-topic-blurb { font-size: 14px; color: var(--ink-soft); }
+.subject .sj-soon { justify-self: start; font: 700 11px var(--font-mono); text-transform: uppercase; letter-spacing: 0.06em; color: var(--pencil); border: 1.5px dashed var(--pencil); border-radius: 4px; padding: 1px 6px; }
+
+.subject .sj-btn { font: 700 16px var(--font-body); background: var(--ink); color: var(--paper); border: 2px solid var(--ink); border-radius: 4px; padding: 10px 16px; min-height: 46px; box-shadow: 0 3px 0 #000; touch-action: manipulation; }
+.subject .sj-btn:active:not(:disabled) { transform: translateY(2px); box-shadow: 0 1px 0 #000; }
+.subject .sj-btn:disabled { opacity: 0.45; cursor: not-allowed; }
+.subject .sj-go { background: var(--marker); color: var(--ink); }
+.subject .sj-ghost { background: var(--card); color: var(--ink); }
+.subject .sj-back { min-height: 36px; padding: 4px 10px; font-size: 14px; margin: 6px 0 2px; }
+
+.subject .sj-two { display: grid; grid-template-columns: minmax(0, 1.25fr) minmax(300px, 1fr); gap: 16px; align-items: start; }
+@media (max-width: 860px) { .subject .sj-two { grid-template-columns: 1fr; } }
+.subject .sj-col { display: grid; gap: 12px; align-content: start; min-width: 0; }
+.subject .sj-card { background: var(--card); border: 2px solid var(--ink); border-radius: 4px; box-shadow: 0 3px 0 var(--ink); padding: 14px 16px; min-width: 0; }
+.subject .sj-k { font: 700 12px var(--font-mono); text-transform: uppercase; letter-spacing: 0.08em; color: var(--ink-soft); margin-bottom: 8px; }
+.subject .sj-ask { font: 700 17px/1.4 var(--font-body); margin: 0 0 10px; }
+.subject .sj-svg { display: block; width: 100%; height: auto; max-height: 52vh; touch-action: none; user-select: none; -webkit-user-select: none; }
+.subject .sj-range { display: grid; grid-template-columns: 7.5em 1fr; align-items: center; gap: 10px; margin-top: 8px; font: 700 14px var(--font-mono); }
+.subject .sj-num { font-family: var(--font-mono); }
+.subject .sj-hl { background: var(--marker); padding: 0 4px; border-radius: 2px; }
+.subject .sj-small { font: 15px/1.4 var(--font-hand); color: var(--ink-soft); margin: 6px 0 0; }
+
+.subject .sj-choices { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 10px; }
+.subject .sj-choice { display: grid; gap: 2px; text-align: left; font: 15px/1.3 var(--font-body); color: var(--ink); background: var(--card); border: 2px solid var(--ink); border-radius: 4px; box-shadow: 0 3px 0 var(--ink); padding: 9px 12px; min-height: 48px; cursor: pointer; }
+.subject .sj-choice b { font: 700 16px var(--font-body); }
+.subject .sj-choice span { color: var(--ink-soft); font-size: 13px; }
+.subject .sj-choice:active:not(:disabled) { transform: translateY(2px); box-shadow: 0 1px 0 var(--ink); }
+.subject .sj-choice:disabled { cursor: default; }
+.subject .sj-choice.wrong { opacity: 0.5; text-decoration: line-through; border-style: dashed; }
+.subject .sj-mark { display: inline-block; width: 1.3em; }
+
+.subject .sj-wrong { margin: 10px 0 0; font-size: 15px; line-height: 1.4; }
+.subject .sj-mname { background: var(--marker); padding: 0 4px; border-radius: 2px; font-weight: 700; }
+.subject .sj-correct { display: flex; gap: 10px; align-items: flex-start; margin: 10px 0 0; font-size: 15px; line-height: 1.4; }
+.subject .sj-check { flex: none; display: inline-grid; place-items: center; width: 30px; height: 30px; border-radius: 50%; background: var(--called); color: var(--paper); font-weight: 700; }
+.subject .sj-rule { font: 700 16px/1.5 var(--font-body); margin: 10px 0 0; display: grid; gap: 2px; }
