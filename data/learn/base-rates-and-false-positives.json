@@ -186,13 +186,18 @@
       "extremes": [
         {
           "param": "F",
-          "value": 0.1,
-          "watch": "Cut false alarms to 0.1% and a positive means about a 50% chance, a coin flip."
+          "value": 1,
+          "watch": "With 1% false alarms, a positive is real only 9% of the time when 1 in 1,000 has it, and almost never at 1 in 1,000,000."
         },
         {
           "param": "F",
-          "value": 10,
-          "watch": "At 10% false alarms, a positive means under a 1% chance."
+          "value": 0.0001,
+          "watch": "With false alarms at 1 in 1,000,000, a positive is real 99.9% of the time even when only 1 in 1,000 has it."
+        },
+        {
+          "param": "S",
+          "value": 1,
+          "watch": "Catching only 1% of real cases, a positive is real 0.1% of the time at 1 in 1,000 and 1% at 1 in 100: no better than chance."
         }
       ],
       "answer_claimed": 9.0
