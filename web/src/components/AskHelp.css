@@ -77,3 +77,8 @@
   .hiw-btn.ask-btn { height: 44px; min-width: 44px; padding: 0 12px 0 8px; }
   .brand-tab { min-height: 44px; }
 }
+
+/* Lesson and research pages: Ask Onion floats in the top-right corner while you scroll
+   (hidden while its panel is open, which has its own Close). */
+.app:has(.learn, .rs-page) .hiw-btn.ask-btn { position: fixed; top: 14px; right: 20px; z-index: 30; }
+.app:has(.learn, .rs-page) .hiw-btn.ask-btn[aria-expanded='true'] { visibility: hidden; }
