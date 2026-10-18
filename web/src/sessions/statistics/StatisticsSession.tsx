@@ -163,7 +163,7 @@ function CltRun({ topic, onTopics, onDone }: { topic: StatTopic; onTopics: () =>
                 <span>n = {n}</span>
                 <input type="range" min={1} max={50} value={n} onChange={(e) => { setN(+e.target.value); setShown(COUNT) }} aria-label="people per average" />
               </label>
-              <p className="sj-small">At n = 1 the “averages” are just single waits, so the pile looks like the waits. Slide right and watch the bell form and tighten.</p>
+              {phase === 'explore' && <p className="sj-small">At n = 1 the “averages” are just single waits, so the pile looks like the waits. Slide right and watch the bell form and tighten.</p>}
               <p className="sj-rule">
                 <span>Averages pile into a <span className="sj-hl">bell</span>, whatever the original shape.</span>
                 <span>Bigger samples, <span className="sj-hl">narrower</span> bell: spread ÷ √n.</span>
