@@ -2,6 +2,7 @@
 // Each stage is its own file (StageProps from ./types), so screens can be built in parallel.
 import { useEffect, useState, type ComponentType } from 'react'
 import { learnApi } from '../learnApi'
+import { initialState } from './state'
 import { STAGES, type LearnApi, type LearnState, type Stage, type StageProps, type Topic } from './types'
 import why from './why.json'
 import { GuessScreen } from './GuessScreen'
@@ -14,7 +15,7 @@ import { TransferScreen } from './TransferScreen'
 import { DoneScreen } from './DoneScreen'
 import './learn.css'
 
-export const SCREENS: Record<Stage, ComponentType<StageProps>> = {
+const SCREENS: Record<Stage, ComponentType<StageProps>> = {
   guess: GuessScreen,
   anchor: AnchorScreen,
   contrast: ContrastScreen,
@@ -24,28 +25,6 @@ export const SCREENS: Record<Stage, ComponentType<StageProps>> = {
   transfer: TransferScreen,
   done: DoneScreen,
 }
-
-export const initialState = (): LearnState => ({
-  stage: 'guess',
-  guess: '',
-  confidence: 50,
-  guessResult: null,
-  misconceptionId: null,
-  anchorAnswer: '',
-  anchorResult: null,
-  fix: '',
-  stressHistory: [],
-  stressCritiques: [],
-  whyResult: null,
-  revealResult: null,
-  drawRule: '',
-  drawNotes: '',
-  drawVerdicts: [],
-  neighborAnswer: '',
-  neighborResult: null,
-  transferAnalogy: '',
-  transferResult: null,
-})
 
 // The why-pane is owned by another file; mount it only once it exists.
 type WhyPaneModule = { WhyPane?: ComponentType<{ stage: Stage }>; default?: ComponentType<{ stage: Stage }> }
@@ -71,9 +50,8 @@ export function LearnSession({ slug, onDone, api = learnApi }: { slug: string; o
   const [state, setState] = useState<LearnState>(initialState)
 
   useEffect(() => {
+    // The App keys this component by slug, so a new slug is a fresh mount (no reset needed here).
     let live = true
-    setTopic(undefined)
-    setState(initialState())
     api.getTopic(slug).then(
       (t) => live && setTopic(t),
       () => live && setTopic(null),

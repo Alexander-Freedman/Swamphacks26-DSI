@@ -30,6 +30,8 @@ describe('LearnSession shell', () => {
     await screen.findByText('compound interest')
     fireEvent.change(screen.getByLabelText('guess answer'), { target: { value: 'my guess' } })
     fireEvent.click(screen.getByRole('button', { name: 'Next' }))
+    await screen.findByRole('region', { name: 'anchor' })
+    expect(screen.queryByText('thinking…')).toBeNull()
     fireEvent.click(screen.getByRole('button', { name: 'Back' }))
     expect((screen.getByLabelText('guess answer') as HTMLTextAreaElement).value).toBe('my guess')
   })

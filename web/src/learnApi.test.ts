@@ -2,10 +2,9 @@
 import { afterEach, describe, expect, it, vi } from 'vitest'
 import { createLearnApi, createMockLearnApi, mockGraders } from './learnApi'
 import { isOffline, type Topic } from './learn/types'
-import staticTopic from '../public/learn/compound-interest.json'
-import fixture from './learn/fixtures/compound-interest.json'
+import fixture from '../../data/learn/compound-interest.json'
 
-const topic = fixture as Topic
+const topic = fixture as unknown as Topic
 const json = (body: unknown, status = 200) => new Response(JSON.stringify(body), { status, headers: { 'Content-Type': 'application/json' } })
 
 afterEach(() => {
@@ -13,13 +12,11 @@ afterEach(() => {
   vi.unstubAllGlobals()
 })
 
-describe('static topic file', () => {
-  it('matches the bundled fixture and follows the Topic shape', () => {
-    expect(staticTopic).toEqual(fixture)
+describe('bundled topic', () => {
+  it('follows the Topic shape', () => {
     expect(topic.misconceptions.length).toBeGreaterThanOrEqual(2)
     expect(topic.extremeCases).toHaveLength(3)
-    expect(topic.rubric.contrastingCases).toHaveLength(2)
-    expect(topic.rubric.anchorDescription).toContain('$110.41')
+    expect(topic.visual?.widget).toBe('curve')
   })
 })
 
@@ -46,9 +43,9 @@ describe('client fallbacks', () => {
     expect(await api.listTopics()).toEqual([{ slug: 'x', topic: 'static x', checked: true }])
     expect((await api.getTopic('x'))?.topic).toBe('static x')
     // graded calls now fall back to the offline check for that topic
-    const g = await api.guess('x', { text: 'it adds the same amount each year' })
+    const g = await api.guess('x', { text: '1,000 + 30 x 70 = $3,100' })
     expect(isOffline(g)).toBe(false)
-    expect(g).toMatchObject({ offline: true, misconceptionId: 'linear-growth' })
+    expect(g).toMatchObject({ offline: true, misconceptionId: 'simple-interest' })
   })
 
   it('no backend and no static file -> mock', async () => {
@@ -84,23 +81,27 @@ describe('client fallbacks', () => {
 describe('mock graders', () => {
   const g = mockGraders(topic)
   it('guess matches a misconception by keyword', () => {
-    expect(g.guess({ text: 'just multiply the rate by the years' }).misconceptionId).toBe('rate-times-years')
-    expect(g.guess({ text: 'compound every second and you get infinite money' }).misconceptionId).toBe('infinite-compounding')
+    expect(g.guess({ text: 'you add 7% a single time and stop' }).misconceptionId).toBe('interest-paid-once')
+    expect(g.guess({ text: 'doubling the rate matters more than doubling the years' }).misconceptionId).toBe('rate-is-all-that-matters')
     expect(g.guess({ text: 'hmm' })).toMatchObject({ classification: 'vague', misconceptionId: null, offline: true })
   })
   it('stress returns the pre-authored correct behavior with a keyword verdict', () => {
-    const r = g.stress({ fix: 'the balance stays $100 because 1 to any power is 1', caseIndex: 0, history: [] })
-    expect(r).toEqual({ offline: true, verdict: 'survives', critique: topic.extremeCases[0].correctBehavior })
-    expect(g.stress({ fix: 'more money', caseIndex: 2, history: [] }).verdict).toBe('breaks')
+    const r = g.stress({ fix: 'with nothing added the balance stays exactly the same', caseIndex: 1, history: [] })
+    expect(r).toEqual({ offline: true, verdict: 'survives', critique: topic.extremeCases[1].correctBehavior })
+    expect(g.stress({ fix: 'hmm', caseIndex: 2, history: [] }).verdict).toBe('breaks')
   })
   it('draw grades all four criteria', () => {
-    const r = g.draw({ rule: 'balance multiplied by (1 + rate) each period, power n', notes: 'principal, rate, periods', image: null })
+    const r = g.draw({ rule: topic.rubric.coreRule, notes: topic.rubric.entities.join(', '), image: null })
     expect(r.criteria.map((c) => c.id)).toEqual(['entities', 'links', 'rule', 'why-rule'])
     expect(r.criteria[2].verdict).toBe('demonstrated')
   })
   it('neighbor and transfer give verdicts', () => {
     expect(g.neighbor({ key: 'simple-interest', answer: 'no idea', priorAnswer: null }).verdict).toBe('incorrect')
     expect(g.transfer({ analogy: 'growth', wasPushed: false }).verdict).toBe('too-abstract')
+  })
+  it('reveal ties the confirm case to the first break', () => {
+    const r = g.reveal({ history: [{ caseIndex: 0, fix: 'a', verdict: 'survives' }, { caseIndex: 2, fix: 'b', verdict: 'breaks' }] })
+    expect(r.confirmCase).toBe(topic.extremeCases[2].correctBehavior)
   })
   it('mock api with an unknown slug is Offline', async () => {
     expect(isOffline(await createMockLearnApi().guess('nope', { text: 'x' }))).toBe(true)

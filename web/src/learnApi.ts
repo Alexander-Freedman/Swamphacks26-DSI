@@ -1,7 +1,8 @@
 // Client for the Learn API (docs/learn-api.md). Backend first; prebuilt topics fall back to the static
 // files on Pages; model-graded calls fall back to the pre-authored offline check (labelled offline: true).
 import { apiBase } from './extras'
-import bundledTopic from './learn/fixtures/compound-interest.json'
+// One real prebuilt topic is bundled so the mock works with no backend and no static file.
+import bundledTopic from '../../data/learn/compound-interest.json'
 import type {
   AnchorRequest,
   AnchorResponse,
@@ -110,12 +111,14 @@ export function mockGraders(topic: Topic) {
         followUpQuestion: ok ? null : r.whyRuleQuestion,
       }
     },
-    reveal(_: RevealRequest): RevealResponse {
+    reveal({ history }: RevealRequest): RevealResponse {
+      // Tie the reveal to the first case the learner's fix broke on.
+      const broke = history.find((h) => h.verdict === 'breaks')
       return {
         offline: true,
         explanation: r.whyRuleMatters,
         revealedRule: r.coreRule,
-        confirmCase: topic.extremeCases[0]?.correctBehavior ?? '',
+        confirmCase: topic.extremeCases[broke?.caseIndex ?? 0]?.correctBehavior ?? '',
       }
     },
     draw({ rule, notes }: DrawRequest): DrawResponse {
@@ -160,7 +163,7 @@ export function mockGraders(topic: Topic) {
 
 // ---------- mock API (deterministic, no network) ----------
 
-export function createMockLearnApi(seed: Topic[] = [bundledTopic as Topic]): LearnApi & { add(t: Topic): void } {
+export function createMockLearnApi(seed: Topic[] = [bundledTopic as unknown as Topic]): LearnApi & { add(t: Topic): void } {
   const topics = new Map(seed.map((t) => [t.slug, t]))
   const noTopic = (): Offline => ({ offline: true, reason: 'no_backend', detail: 'unknown topic' })
   const graded =
@@ -230,7 +233,7 @@ async function staticJson<T>(file: string): Promise<T | null> {
   }
 }
 
-const useMock = () => import.meta.env.VITE_LEARN_MOCK === '1'
+const mockMode = () => import.meta.env.VITE_LEARN_MOCK === '1'
 
 export function createLearnApi(mock = createMockLearnApi()): LearnApi {
   const enc = encodeURIComponent
@@ -238,26 +241,26 @@ export function createLearnApi(mock = createMockLearnApi()): LearnApi {
   const graded =
     <Req, Res>(name: string, offline: (slug: string, body: Req) => Promise<Result<Res>>) =>
     async (slug: string, body: Req): Promise<Result<Res>> => {
-      if (useMock()) return offline(slug, body)
+      if (mockMode()) return offline(slug, body)
       const r = await call<Res>('POST', `/api/learn/${enc(slug)}/${name}`, body)
       return isOffline(r) ? (await mock.getTopic(slug)) ? offline(slug, body) : r : r
     }
   return {
     async listTopics() {
-      if (useMock()) return mock.listTopics()
+      if (mockMode()) return mock.listTopics()
       const r = await call<TopicSummary[]>('GET', '/api/learn/topics')
       if (!isOffline(r)) return r
       return (await staticJson<TopicSummary[]>('index.json')) ?? mock.listTopics()
     },
     async getTopic(slug) {
-      if (useMock()) return mock.getTopic(slug)
+      if (mockMode()) return mock.getTopic(slug)
       const r = await call<Topic>('GET', `/api/learn/topics/${enc(slug)}`)
       const t = !isOffline(r) ? r : ((await staticJson<Topic>(`${enc(slug)}.json`)) ?? (await mock.getTopic(slug)))
       if (t) mock.add(t)
       return t
     },
     async createTopic(topic) {
-      if (useMock()) return mock.createTopic(topic)
+      if (mockMode()) return mock.createTopic(topic)
       const r = await call<Topic>('POST', '/api/learn/topics', { topic }, AUTHOR_TIMEOUT_MS)
       if (!isOffline(r)) mock.add(r)
       return r
