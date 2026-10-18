@@ -14,6 +14,7 @@ import { GradientStep } from './Gradient'
 import { SurfaceStep } from './Surface'
 import { COURSES, type CalcStep, type CalcTopic } from './topics'
 import { VolumeStep } from './Volume'
+import { slopeLayer } from './help'
 import './calculus.css'
 
 const LABEL: Record<CalcStep, string> = { draw: 'Draw the slope', tangent: 'Drag the tangent', area: 'Fill the area', card: 'Your mistake', compare: 'Same idea twice', surface: 'Slices', gradient: 'The gradient', volume: 'Volume' }
@@ -143,7 +144,7 @@ function CalcRun({ topic, onTopics, onDone }: { topic: CalcTopic; onTopics: () =
 
   return (
     <Frame className="calc">
-      <SessionHead chip={`Calculus · ${topic.title}`} step={step} total={steps.length} labels={steps.map((s) => LABEL[s])} canGo={canGo} onGo={(i) => go(i + 1)} />
+      <SessionHead chip={`Calculus · ${topic.title}`} step={step} total={steps.length} labels={steps.map((s) => LABEL[s])} canGo={canGo} onGo={(i) => go(i + 1)} layer={topic.id === 'slope' ? slopeLayer(cur, step, slope) : undefined} />
       <button className="calc-btn calc-ghost calc-sm calc-back" onClick={onTopics}>← All calculus topics</button>
       <Title h={h} sub={sub} headingRef={title} />
       {cur === 'draw' && (

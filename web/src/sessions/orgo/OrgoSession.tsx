@@ -13,6 +13,7 @@ import { PushStep } from './PushStep'
 import { Thumb } from './Thumb'
 import { SECTIONS, type OrgoStep, type OrgoTopic } from './topics'
 import { reducedMotion } from './geom'
+import { sn2Layer } from './help'
 import './orgo.css'
 
 export const SLUG = 'orgo'
@@ -132,7 +133,7 @@ function OrgoTopicRun({ topic, onTopics, onDone }: { topic: OrgoTopic; onTopics:
 
   return (
     <Frame className="orgo">
-      <SessionHead chip={`Orgo · ${topic.title}`} step={step} total={steps.length} labels={steps.map((s) => LABEL[s])} canGo={(i) => i < reached} onGo={(i) => go(i + 1)} />
+      <SessionHead chip={`Orgo · ${topic.title}`} step={step} total={steps.length} labels={steps.map((s) => LABEL[s])} canGo={(i) => i < reached} onGo={(i) => go(i + 1)} layer={sn2Layer(topic.id, cur, step)} />
       <button className="og-btn og-ghost og-back" onClick={onTopics}>← All orgo topics</button>
       <Title h={h} sub={sub} headingRef={title} />
       {/* steps stay mounted so going back keeps your molecule and your arrows */}
