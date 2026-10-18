@@ -1,5 +1,6 @@
 // Client for the Learn API (docs/learn-api.md). Backend first; prebuilt topics fall back to the static
 // files on Pages; model-graded calls fall back to the pre-authored offline check (labelled offline: true).
+import { demoReply } from './demo/demo'
 import { apiBase } from './extras'
 // One real prebuilt topic is bundled so the mock works with no backend and no static file.
 import bundledTopic from '../../data/learn/compound-interest.json'
@@ -247,6 +248,8 @@ export function createLearnApi(mock = createMockLearnApi()): LearnApi {
     <Req, Res>(name: string, offline: (slug: string, body: Req) => Promise<Result<Res>>) =>
     async (slug: string, body: Req): Promise<Result<Res>> => {
       if (mockMode()) return offline(slug, body)
+      const demo = demoReply<Res>(slug, name, body)
+      if (demo) return demo
       const r = await call<Res>('POST', `/api/learn/${enc(slug)}/${name}`, body)
       return isOffline(r) ? (await mock.getTopic(slug)) ? offline(slug, body) : r : r
     }

@@ -1,4 +1,5 @@
 import { apiBase } from '../extras'
+import { demoHelp } from '../demo/demo'
 import { hintFor } from './helpHints'
 
 // POST /api/help (shared/schema/README.md "Help chat"). The server holds the key, the limits and
@@ -97,5 +98,7 @@ export function askHelp(a: HelpAsk, timeoutMs = HELP_TIMEOUT_MS): Promise<HelpRe
 
 /** Every other screen: the layer's own words and facts. */
 export function askLayer(a: LayerAsk, timeoutMs = HELP_TIMEOUT_MS): Promise<HelpReply> {
+  const demo = demoHelp(cut(a.topic, 120), cut(a.question, MAX_QUESTION))
+  if (demo) return new Promise((ok) => setTimeout(() => ok(demo), 600))
   return post(layerBody(a), a.hint, timeoutMs)
 }
