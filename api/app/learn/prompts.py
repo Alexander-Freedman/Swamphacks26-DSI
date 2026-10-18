@@ -10,9 +10,11 @@ schemas.py enforces the same shape through --output-schema.
 
 Two changes from the prototype, for the six-screen contract:
 - author() also asks for 2-3 pre-authored misconceptions, 3 pre-authored extreme cases
-  (one per dimension) and a one-line version of each contrasting case.
+  (one per dimension, each with a 3-choice predict card) and a one-line version of each
+  contrasting case.
 - stress() tests the learner's fix against the PRE-AUTHORED extreme case at caseIndex
-  (not a freshly constructed one) and wants a one-sentence critique; guess() also picks
+  (not a freshly constructed one), judges the learner's rule generously, and wants a
+  one-sentence critique plus the one missing piece when it breaks; guess() also picks
   the closest pre-authored misconception.
 
 visual() is new here: an optional second authoring call that asks for one curve for the
@@ -81,6 +83,7 @@ Do this authoring work now, for "{topic_name}":
 11. Write ONE worked reference transfer example of your own (a concrete instance of this idea in a different domain), for a POST-HOC side-by-side comparison shown only after the learner's own attempt has already been independently graded — never shown to them beforehand.
 12. Write 2 to 3 MISCONCEPTIONS: common wrong models real beginners hold about "{topic_name}". For each: a short kebab-case id, a label (a few words, in the learner's voice if natural), the tell (what someone holding it says or predicts, 1 sentence), and the fix (the correction in 1-2 plain sentences).
 13. Write exactly 3 EXTREME CASES, each on a DIFFERENT one of the dimensions from step 8 (dimension = that dimension's key): a concrete scenario with real specifics (1-2 sentences, no symbols without definitions) and the correct behavior the real system shows in it (1-2 sentences). These are shown to the learner as cards, so keep them short and plain.
+14. For EACH of the 3 extreme cases, write a PREDICT card ("predict"): the learner sees the scenario, picks what happens, then sees the correct behavior. question: at most 120 characters, plain, asks what happens (e.g. "What happens to the leaves above the ring?"). choices: exactly 3, each at most 90 characters, exactly ONE with correct=true that says the same thing as that case's correct behavior (any number in it must match the correct behavior exactly); the two wrong ones are plausible beginner predictions that are clearly wrong. Tie a wrong choice to one of your step-12 misconception ids (misconceptionId) when it is that misconception applied to this case, else null; the correct choice has null. Vary where the correct choice sits. piece: at most 70 characters, the ONE piece of the rule this case tests, as a cause-and-effect fragment a learner could add to their own rule (e.g. "cutting the phloem stops sugar moving down"), never the whole rule. Plain words a 15-year-old understands; no em-dashes.
 
 Ground every piece in facts you are confident are actually correct for "{topic_name}" — do not fabricate a plausible-sounding but wrong mechanism. If the concept is genuinely contested or the "correct" rule depends on a convention/context, pick the most standard/canonical version and state that convention explicitly rather than hedging vaguely.
 
@@ -99,7 +102,7 @@ Respond with ONLY raw JSON matching this shape (no other keys, no prose outside 
   "transferStructuralRequirements": string[],
   "referenceTransferExample": string,
   "misconceptions": [ {{ "id": string, "label": string, "tell": string, "fix": string }} ],
-  "extremeCases": [ {{ "dimension": string, "scenario": string, "correctBehavior": string }} ]
+  "extremeCases": [ {{ "dimension": string, "scenario": string, "correctBehavior": string, "predict": {{ "question": string, "choices": [ {{ "text": string, "correct": boolean, "misconceptionId": string | null }} ], "piece": string }} }} ]
 }}"""
 
 
@@ -164,17 +167,24 @@ def stress(topic: Topic, fix: str, case_index: int, history: list[dict]) -> str:
     case = topic.extremeCases[case_index]
     dim = next((d for d in topic.rubric.extremeCaseDimensions if d.key == case.dimension), None)
     dim_text = f"{case.dimension}: {dim.description}" if dim else case.dimension
+    piece_text = (
+        f"The one piece of the rule this case tests (a hint for judging, never to be quoted whole): {case.predict.piece}\n\n"
+        if case.predict
+        else ""
+    )
     return (
         contract(topic)
-        + f'\nTASK: Build/Repair loop, one round (the "propose -> test on an extreme -> break/survive -> revise" cycle). The learner already worked out (via a contrasting set: {_cases_text(topic)}) that a naive account isn\'t enough, and is now proposing a fix.\n\n'
+        + f'\nTASK: Build/Repair loop, one round (the "propose -> test on an extreme -> break/survive -> revise" cycle). The learner already worked out (via a contrasting set: {_cases_text(topic)}) that a naive account isn\'t enough, and has written their own one-line rule.\n\n'
         + f"Cards already run this session:\n{_history_text(topic, history)}\n\n"
         + f"This round's extreme case is PRE-AUTHORED — do not construct a different one and do not change its specifics:\n  Dimension: {dim_text}\n  Scenario: {case.scenario}\n  What the real system does here (grading key, never to be quoted to the learner): {case.correctBehavior}\n\n"
-        + f'The learner\'s fix (their own words, may be informal/incomplete — if it is not concrete enough to actually apply to this case, that itself is a reason it should break):\n"""{fix}"""\n\n'
-        + "Do this:\n"
-        + '1. Literally apply the learner\'s stated fix, as they wrote it, to the scenario above. Decide: does it predict the behavior the real system shows (verdict "survives"), or does it clearly misbehave or is it too vague/incomplete to even produce a definite answer (verdict "breaks")?\n'
-        + "2. Write a ONE-sentence critique that says what their specific fix does on this specific case, and where that goes wrong (if it breaks) — reference their own words. Do NOT state the correct rule or the grading key, even in passing, even as an aside, even if their fix happens to already equal it (in that case, just confirm it survives without naming what it is).\n\n"
+        + piece_text
+        + f'The learner\'s fix (their own one-line rule, written by a beginner, informal):\n"""{fix}"""\n\n'
+        + "The learner has just predicted this case and seen what really happens. Decide whether their own rule ALREADY covered it. Judge GENEROUSLY, the way a kind teacher reads a beginner:\n"
+        + '1. Read the rule charitably, as the learner most likely meant it. Verdict "survives" if the rule, read that way, already implies the real behavior above: the direction is right and the mechanism it names is compatible with what happens. It does not have to name every detail, use the right terms, or mention this case. Verdict "breaks" ONLY if the rule predicts the wrong thing here, or says nothing at all about the cause this case turns on.\n'
+        + "2. Write a ONE-sentence critique, short, that refers to the learner's own words: if it survives, say which part of their rule handles this case; if it breaks, say what their rule predicts or leaves out here. Do NOT state the correct rule or the grading key, even in passing, even if their rule already equals it.\n"
+        + '3. piece: if it breaks, the ONE missing piece their rule needs for this case, as a short cause-and-effect phrase (at most 70 characters) the learner could add to their rule, e.g. "cutting the phloem stops sugar moving down". Never the whole rule. If it survives, null.\n\n'
         + _json(
-            '{\n  "verdict": "survives" | "breaks",\n  "critique": string   // exactly ONE sentence, references the learner\'s own fix and this case, never the correct rule\n}'
+            '{\n  "verdict": "survives" | "breaks",\n  "critique": string,   // exactly ONE short sentence, references the learner\'s own rule and this case, never the correct rule\n  "piece": string | null  // breaks: the one missing piece, at most 70 chars, cause-and-effect; survives: null\n}'
         )
     )
 

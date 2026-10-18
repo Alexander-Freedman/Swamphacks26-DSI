@@ -6,6 +6,7 @@ from pathlib import Path
 
 import pytest
 from fastapi.testclient import TestClient
+from pydantic import ValidationError
 
 from app.learn import codex, router, schemas, topics
 from app.learn.schemas import Topic
@@ -164,7 +165,7 @@ def test_stress_shape_and_case_index() -> None:
         history=[],
     )
     assert res.status_code == 200
-    assert res.json() == {"verdict": "survives", "critique": res.json()["critique"]}
+    assert res.json() == {"verdict": "survives", "critique": res.json()["critique"], "piece": None}
     breaks = post(
         f"{SLUG}/stress",
         fix="add 70",
@@ -178,7 +179,97 @@ def test_stress_shape_and_case_index() -> None:
         ],
     ).json()
     assert breaks["verdict"] == "breaks" and breaks["critique"].count(".") <= 2
+    # A break names the case's own pre-authored piece, not the model's.
+    assert breaks["piece"] == _topic()["extremeCases"][1]["predict"]["piece"]
     assert post(f"{SLUG}/stress", fix="x", caseIndex=3, history=[]).status_code == 422
+
+
+def test_stress_piece_falls_back_to_the_model_without_predict(monkeypatch) -> None:
+    t = topics.get_topic(SLUG)
+    bare = t.model_copy(deep=True)
+    for c in bare.extremeCases:
+        c.predict = None
+    monkeypatch.setattr(router, "_require_topic", lambda slug: bare)
+    out = post(f"{SLUG}/stress", fix="add 70", caseIndex=0, history=[]).json()
+    assert out["verdict"] == "breaks"
+    assert out["piece"] == "each step builds on the amount there now"
+
+    def long_piece(task, prompt):
+        return {"verdict": "breaks", "critique": "No.", "piece": "x " * 60}
+
+    monkeypatch.setattr(codex, "fake_reply", long_piece)
+    out = post(f"{SLUG}/stress", fix="add 70", caseIndex=0, history=[]).json()
+    assert out["piece"] and len(out["piece"]) <= 70
+
+    def survives_with_piece(task, prompt):
+        return {"verdict": "survives", "critique": "Holds.", "piece": "stray"}
+
+    monkeypatch.setattr(codex, "fake_reply", survives_with_piece)
+    out = post(f"{SLUG}/stress", fix="add 70", caseIndex=0, history=[]).json()
+    assert out["piece"] is None
+
+
+def _card(**edit) -> dict:
+    card = {
+        "question": "What happens?",
+        "choices": [
+            {"text": "a", "correct": True, "misconceptionId": None},
+            {"text": "b", "correct": False, "misconceptionId": "simple-interest"},
+            {"text": "c", "correct": False, "misconceptionId": None},
+        ],
+        "piece": "more years means faster growth",
+    }
+    card.update(edit)
+    return card
+
+
+def test_fixture_cases_all_have_valid_predict_cards() -> None:
+    t = Topic.model_validate(_topic())
+    for c in t.extremeCases:
+        assert c.predict is not None
+        assert sum(ch.correct for ch in c.predict.choices) == 1
+
+
+@pytest.mark.parametrize(
+    "card",
+    [
+        _card(choices=_card()["choices"][:2]),
+        _card(choices=[*_card()["choices"], {"text": "d", "correct": False}]),
+        _card(choices=[{**ch, "correct": False} for ch in _card()["choices"]]),
+        _card(choices=[{**ch, "correct": True} for ch in _card()["choices"]]),
+        _card(piece="x" * 71),
+        _card(question="x" * 121),
+    ],
+)
+def test_bad_predict_cards_are_rejected(card) -> None:
+    with pytest.raises(ValidationError):
+        schemas.Predict.model_validate(card)
+
+
+def test_predict_misconception_id_must_be_the_topics() -> None:
+    data = _topic()
+    data["extremeCases"][0]["predict"]["choices"][0]["misconceptionId"] = "not-a-real-id"
+    with pytest.raises(ValidationError):
+        Topic.model_validate(data)
+
+
+def test_old_topics_without_predict_still_load() -> None:
+    data = _topic()
+    for c in data["extremeCases"]:
+        del c["predict"]
+    assert all(c.predict is None for c in Topic.model_validate(data).extremeCases)
+
+
+def test_authored_predict_is_checked_and_a_bad_card_is_dropped() -> None:
+    raw = codex.fake_authored("osmosis")
+    raw["extremeCases"][0]["predict"]["choices"][1]["correct"] = True  # two correct
+    raw["extremeCases"][1]["predict"]["choices"][1]["misconceptionId"] = "made-up"
+    raw["extremeCases"][2]["predict"]["piece"] = "word " * 30
+    authored = schemas.validate_clipped(schemas.Authored, raw)
+    t = schemas.topic_from_authored("osmosis", "osmosis", authored, checked=False)
+    assert t.extremeCases[0].predict is None
+    assert t.extremeCases[1].predict.choices[1].misconceptionId is None
+    assert len(t.extremeCases[2].predict.piece) <= 70
 
 
 def test_stress_prompt_uses_the_preauthored_case(monkeypatch) -> None:
@@ -195,6 +286,8 @@ def test_stress_prompt_uses_the_preauthored_case(monkeypatch) -> None:
     assert case["scenario"] in seen["stress"]
     assert case["correctBehavior"] in seen["stress"]
     assert "ONE-sentence" in seen["stress"]
+    assert "GENEROUSLY" in seen["stress"]
+    assert case["predict"]["piece"] in seen["stress"]
 
 
 def test_reveal_shape() -> None:
@@ -377,6 +470,7 @@ def test_fake_author_builds_a_valid_topic() -> None:
     authored = schemas.Authored.model_validate(codex.fake_authored("osmosis"))
     t = schemas.topic_from_authored("osmosis", "osmosis", authored, checked=False)
     assert t.slug == "osmosis" and not t.checked
+    assert all(c.predict is not None for c in t.extremeCases)
 
 
 def test_slug_for() -> None:

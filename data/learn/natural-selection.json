@@ -104,17 +104,80 @@
     {
       "dimension": "zero-heritability",
       "scenario": "On black lava, 90 white lizards are painted black with harmless paint and birds eat fewer of them that summer. Their hatchlings receive no paint and are born white.",
-      "correctBehavior": "The temporary black appearance does not become more common through natural selection because it was not inherited. White hatchlings remain the expected color unless inherited color variants differ in reproduction."
+      "correctBehavior": "The temporary black appearance does not become more common through natural selection because it was not inherited. White hatchlings remain the expected color unless inherited color variants differ in reproduction.",
+      "predict": {
+        "question": "What color will most hatchlings be in later generations?",
+        "choices": [
+          {
+            "text": "Black paint helps parents survive, so their hatchlings will become black.",
+            "correct": false,
+            "misconceptionId": "need-causes-traits"
+          },
+          {
+            "text": "They will stay mostly white unless inherited color differences affect offspring.",
+            "correct": true,
+            "misconceptionId": null
+          },
+          {
+            "text": "Natural selection will make the lizards black because black is needed on lava.",
+            "correct": false,
+            "misconceptionId": "selection-has-a-goal"
+          }
+        ],
+        "piece": "only inherited traits can become more common in descendants"
+      }
     },
     {
       "dimension": "no-reproductive-difference",
       "scenario": "A beetle population has inherited red and blue shell colors. In a laboratory, 100 red beetles and 100 blue beetles each leave an average of two surviving offspring.",
-      "correctBehavior": "Natural selection predicts no directional increase of either shell color in this setting. Their frequencies may still wander by chance, but neither color has a selection advantage."
+      "correctBehavior": "Natural selection predicts no directional increase of either shell color in this setting. Their frequencies may still wander by chance, but neither color has a selection advantage.",
+      "predict": {
+        "question": "What does natural selection predict for red and blue shells here?",
+        "choices": [
+          {
+            "text": "One color must take over, because selection always picks a winner.",
+            "correct": false,
+            "misconceptionId": "selection-has-a-goal"
+          },
+          {
+            "text": "The color whose beetles live longer will become more common.",
+            "correct": false,
+            "misconceptionId": "survival-is-the-whole-story"
+          },
+          {
+            "text": "Neither color has a directional advantage, though chance can change frequencies.",
+            "correct": true,
+            "misconceptionId": null
+          }
+        ],
+        "piece": "equal surviving offspring means neither color has an advantage"
+      }
     },
     {
       "dimension": "selection-direction-reversal",
       "scenario": "Before a drought, deep-beaked finches crack the common large seeds and leave more chicks than shallow-beaked finches. During a long drought, only small soft seeds remain, and shallow-beaked finches now leave more chicks.",
-      "correctBehavior": "The previous tendency for deep beaks to increase reverses under the drought conditions. Across later generations, shallow-beak variants tend to become more common if beak depth is heritable."
+      "correctBehavior": "The previous tendency for deep beaks to increase reverses under the drought conditions. Across later generations, shallow-beak variants tend to become more common if beak depth is heritable.",
+      "predict": {
+        "question": "What happens to beak depth across later drought generations?",
+        "choices": [
+          {
+            "text": "Shallow beaks tend to become more common, if beak depth is inherited.",
+            "correct": true,
+            "misconceptionId": null
+          },
+          {
+            "text": "Deep beaks keep increasing because they were best before the drought.",
+            "correct": false,
+            "misconceptionId": "selection-has-a-goal"
+          },
+          {
+            "text": "The finches grow shallow beaks because they need soft seeds.",
+            "correct": false,
+            "misconceptionId": "need-causes-traits"
+          }
+        ],
+        "piece": "when conditions change, the favored inherited trait can change too"
+      }
     }
   ],
   "visual": {

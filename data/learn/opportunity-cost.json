@@ -104,17 +104,80 @@
     {
       "dimension": "best-alternative-value",
       "scenario": "Lee spends one free hour playing a game. On one day, the best other use is scrolling social media worth almost nothing to Lee; on another day, the best other use is a paid tutoring session that would earn $50.",
-      "correctBehavior": "The game's opportunity cost is near zero on the first day and $50 on the second. The game itself did not change; the best forgone feasible alternative did."
+      "correctBehavior": "The game's opportunity cost is near zero on the first day and $50 on the second. The game itself did not change; the best forgone feasible alternative did.",
+      "predict": {
+        "question": "How does the game's opportunity cost change between the two days?",
+        "choices": [
+          {
+            "text": "It is near zero first, then $50 when tutoring is the best other use.",
+            "correct": true,
+            "misconceptionId": null
+          },
+          {
+            "text": "It stays the same because Lee plays the same game both days.",
+            "correct": false,
+            "misconceptionId": null
+          },
+          {
+            "text": "It is the price of buying or playing the game.",
+            "correct": false,
+            "misconceptionId": "price-is-the-cost"
+          }
+        ],
+        "piece": "a better option you give up raises the cost of your choice"
+      }
     },
     {
       "dimension": "feasibility-boundary",
       "scenario": "Rosa takes a day off to visit family. A $300 overtime shift is mentioned, but it requires certification Rosa does not have; her actual available alternative is a $120 regular shift.",
-      "correctBehavior": "The relevant opportunity cost is the value of the $120 regular shift, not $300. The overtime shift was never a feasible option for Rosa."
+      "correctBehavior": "The relevant opportunity cost is the value of the $120 regular shift, not $300. The overtime shift was never a feasible option for Rosa.",
+      "predict": {
+        "question": "Which shift sets the cost of Rosa taking the day off?",
+        "choices": [
+          {
+            "text": "The $300 overtime shift, because it pays the most.",
+            "correct": false,
+            "misconceptionId": "count-impossible-option"
+          },
+          {
+            "text": "The $120 regular shift, because overtime was not available to Rosa.",
+            "correct": true,
+            "misconceptionId": null
+          },
+          {
+            "text": "Both shifts together, so the cost is $420.",
+            "correct": false,
+            "misconceptionId": "add-all-rejected-options"
+          }
+        ],
+        "piece": "an option that is not possible cannot set the cost"
+      }
     },
     {
       "dimension": "alternative-ranking-switch",
       "scenario": "Sam uses one Saturday to repair a bicycle. At first, the best alternative is a $90 delivery shift, while a picnic is worth $40 to Sam. Later the delivery shift is cancelled, but Sam is invited to a workshop he values at $110.",
-      "correctBehavior": "Before cancellation, repairing the bicycle gives up the $90 delivery shift. After the workshop becomes the best feasible rejected option, the opportunity cost becomes $110; Sam does not add $90 and $110 together."
+      "correctBehavior": "Before cancellation, repairing the bicycle gives up the $90 delivery shift. After the workshop becomes the best feasible rejected option, the opportunity cost becomes $110; Sam does not add $90 and $110 together.",
+      "predict": {
+        "question": "After the cancellation and workshop invite, what is the cost of repairing the bicycle?",
+        "choices": [
+          {
+            "text": "$200, by adding the $90 shift and $110 workshop.",
+            "correct": false,
+            "misconceptionId": "add-all-rejected-options"
+          },
+          {
+            "text": "It remains $90 because that was the first best alternative.",
+            "correct": false,
+            "misconceptionId": null
+          },
+          {
+            "text": "It becomes $110, because the workshop is now the best other option.",
+            "correct": true,
+            "misconceptionId": null
+          }
+        ],
+        "piece": "when a better option appears, it becomes what you give up"
+      }
     }
   ],
   "visual": null
