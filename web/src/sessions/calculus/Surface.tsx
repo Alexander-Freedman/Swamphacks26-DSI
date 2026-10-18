@@ -270,12 +270,6 @@ export function SurfaceStep({ onDone, topic }: { onDone: () => void; topic: stri
                 ))}
               </div>
               {note && <p className="calc-wrong" role="status"><b>✗</b> {note}</p>}
-              {q === 1 && !note && (
-                <p className="calc-correct" role="status">
-                  <span className="calc-check" aria-hidden="true">✓</span>
-                  <span><b>Correct!</b> The slice along x is just a 2D curve. Its slope at the dot is the partial derivative ∂f/∂x = {fx(START.x, START.y).toFixed(2)}: negative, so downhill.</span>
-                </p>
-              )}
             </div>
           )}
 
@@ -318,6 +312,7 @@ export function SurfaceStep({ onDone, topic }: { onDone: () => void; topic: stri
               <div className="calc-k calc-pad">slice along x (y = {y0.toFixed(1)})</div>
               <SliceChart along="x" x0={x0} y0={y0} />
               <p className="calc-pair">∂f/∂x = <b className="calc-hl calc-num">{fx(x0, y0).toFixed(2)}</b> · {dirOf(fx(x0, y0))}</p>
+              {q === 1 && <p className="calc-small">The slice along x is just a 2D curve; its slope at the dot is the partial derivative.</p>}
             </div>
           ) : (
             <p className="calc-small">The slices show up here as you answer.</p>

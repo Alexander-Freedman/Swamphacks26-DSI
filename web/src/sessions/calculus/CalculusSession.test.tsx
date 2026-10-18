@@ -154,7 +154,7 @@ describe('calculus session', () => {
     fireEvent.click(screen.getByRole('button', { name: 'uphill' }))
     expect(screen.getByText(/Not quite/)).toBeTruthy()
     fireEvent.click(screen.getByRole('button', { name: 'downhill' }))
-    expect(screen.getByText(/∂f\/∂x = -0\.91/)).toBeTruthy()
+    expect(screen.getByRole('img', { name: /slice along x: slope -0\.91, downhill/ })).toBeTruthy()
     // +y from (1, −1) is uphill
     fireEvent.click(screen.getByRole('button', { name: 'uphill' }))
     expect(screen.getByText(/move the dot to where/)).toBeTruthy()

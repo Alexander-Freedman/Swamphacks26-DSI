@@ -204,7 +204,8 @@
 .calc-3d-side { display: grid; gap: 12px; min-width: 0; }
 .calc-3d-side > .calc-card { margin: 0; }
 .calc-3d-side .calc-slices { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
-.calc-3d-side .calc-slice { max-height: 18vh; }
+.calc-3d-side .calc-slice { max-height: 18vh; margin: 0 auto; }
+.calc-3d-side .calc-slices > .calc-card:only-child { grid-column: 1 / -1; } /* one slice so far: give it the whole width */
 .calc-3d-side .calc-pair { font-size: 13px; }
 .calc-3d-side .calc-picks-row { grid-template-columns: repeat(3, minmax(0, 1fr)); }
 .calc-3d-side .calc-rule { font-size: 16px; }
