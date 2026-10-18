@@ -3,6 +3,18 @@
 import type { StageProps } from './types'
 import './learn-contrast.css'
 
+/** A case's long text as short lines: one sentence each. */
+export const lines = (text: string): string[] =>
+  text
+    .split(/(?<=[.!?])\s+(?=[A-Z0-9$“"])/)
+    .map((l) => l.trim())
+    .filter(Boolean)
+
+/** Numbers (with $, %, units glued on) in bold, so a skim finds them. */
+function boldNumbers(line: string) {
+  return line.split(/(\$?\d[\d,.]*%?)/).map((part, i) => (i % 2 ? <strong key={i}>{part}</strong> : part))
+}
+
 export function ContrastScreen({ topic, state, update, next }: StageProps) {
   const cases = topic.rubric.contrastingCases.slice(0, 2)
   return (
@@ -17,7 +29,11 @@ export function ContrastScreen({ topic, state, update, next }: StageProps) {
             </p>
             <details className="lcs-more">
               <summary>Show the numbers</summary>
-              <p className="lcs-detail">{c.detail}</p>
+              <ul className="lcs-detail">
+                {lines(c.detail).map((l, j) => (
+                  <li key={j}>{boldNumbers(l)}</li>
+                ))}
+              </ul>
             </details>
           </article>
         ))}
