@@ -9,33 +9,43 @@ import App from '../App'
 afterEach(cleanup)
 
 describe('LearnSession shell', () => {
-  it('walks the stages after Anchor with Next, and Back steps back', async () => {
-    // Guess and Anchor are real screens with their own tests (GuessAnchor.test.tsx).
+  it('stacks each step under the last; finished ones fold to a summary', async () => {
     const onDone = vi.fn()
     render(<LearnSession slug="compound-interest" onDone={onDone} api={createMockLearnApi()} initial={{ stage: 'contrast' }} />)
     await screen.findByText('compound interest')
-    for (const stage of STAGES.slice(STAGES.indexOf('contrast'), -1)) {
+    const later = STAGES.slice(STAGES.indexOf('contrast'))
+    for (const stage of later.slice(0, -1)) {
       expect(screen.getByRole('region', { name: stage })).toBeTruthy()
       fireEvent.click(screen.getByRole('button', { name: 'Next' }))
+      expect(document.querySelectorAll('.learn-card').length).toBe(STAGES.indexOf(stage) + 2)
     }
     expect(screen.getByRole('region', { name: 'done' })).toBeTruthy()
-    fireEvent.click(screen.getByRole('button', { name: 'Back' }))
-    expect(screen.getByRole('region', { name: 'transfer' })).toBeTruthy()
-    fireEvent.click(screen.getByRole('button', { name: 'Next' }))
+    // finished steps are folded (their screens hidden) behind a one-line head
+    const heads = document.querySelectorAll('.learn-card.is-past .learn-card-head')
+    expect(heads.length).toBe(STAGES.length - 1)
+    expect(screen.queryByRole('region', { name: 'transfer' })).toBeNull()
     fireEvent.click(screen.getByRole('button', { name: 'Try another topic' }))
-    expect(onDone).toHaveBeenCalled()
+    expect(onDone).toHaveBeenCalledTimes(1)
+    expect(screen.queryByRole('button', { name: 'Home' })).toBeNull() // the top-bar logo goes home
   })
 
-  it('keeps typed answers in session state across stages', async () => {
+  it('a finished step keeps your answer and opens read-only on tap', async () => {
     render(<LearnSession slug="compound-interest" onDone={() => {}} api={createMockLearnApi()} />)
     await screen.findByText('compound interest')
     fireEvent.change(screen.getByLabelText('guess answer'), { target: { value: 'my guess' } })
     fireEvent.click(screen.getByRole('button', { name: 'Submit' }))
     fireEvent.click(await screen.findByRole('button', { name: 'Next' }))
     await screen.findByRole('region', { name: 'anchor' })
-    expect(screen.queryByText('thinking…')).toBeNull()
-    fireEvent.click(screen.getByRole('button', { name: 'Back' }))
-    expect((screen.getByLabelText('guess answer') as HTMLTextAreaElement).value).toBe('my guess')
+    const head = document.querySelector('.learn-card.is-past .learn-card-head') as HTMLButtonElement
+    expect(head.textContent).toContain('Guess first')
+    expect(head.textContent).toContain('my guess')
+    expect(head.getAttribute('aria-expanded')).toBe('false')
+    fireEvent.click(head)
+    expect(head.getAttribute('aria-expanded')).toBe('true')
+    const body = document.querySelector('.learn-card.is-past .learn-card-body') as HTMLElement
+    expect(body.hidden).toBe(false)
+    expect(body.hasAttribute('inert')).toBe(true)
+    expect((body.querySelector('textarea[aria-label="guess answer"]') as HTMLTextAreaElement).value).toBe('my guess')
   })
 
   it('shows a why-pane for the stage', async () => {

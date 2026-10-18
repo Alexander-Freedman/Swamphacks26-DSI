@@ -37,6 +37,7 @@ from app.learn.schemas import (
     WhyOut,
     schema_file,
     topic_from_authored,
+    validate_clipped,
 )
 
 log = logging.getLogger("mm.learn")
@@ -144,7 +145,7 @@ async def _author(name: str, slug: str) -> Topic:
         schema=schema_file(Authored),
         timeout_s=float(os.environ.get("MM_CODEX_AUTHOR_TIMEOUT_S", codex.AUTHOR_TIMEOUT_S)),
     )
-    authored = Authored.model_validate(raw)
+    authored = validate_clipped(Authored, raw)
     topic = topic_from_authored(slug, name, authored, checked=False)
     topics.save_cached(topic)
     return topic

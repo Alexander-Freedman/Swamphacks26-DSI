@@ -1,6 +1,6 @@
 // The Learn session shell: loads the topic, holds session state, walks the eight stages.
 // Each stage is its own file (StageProps from ./types), so screens can be built in parallel.
-import { useEffect, useState, type ComponentType } from 'react'
+import { useEffect, useRef, useState, type ComponentType } from 'react'
 import { learnApi } from '../learnApi'
 import { initialState } from './state'
 import { STAGES, type LearnApi, type LearnState, type Stage, type StageProps, type Topic } from './types'
@@ -13,6 +13,11 @@ import { DrawScreen } from './draw/DrawScreen'
 import { NeighborScreen } from './NeighborScreen'
 import { TransferScreen } from './TransferScreen'
 import { DoneScreen } from './DoneScreen'
+import { customScreen } from './custom/registry'
+import { summaryFor } from './summary'
+import { learnHelp } from './learnHelp'
+import { useReportSpot } from '../components/session/helpSpot'
+import { STEP_NAME } from './WhyPane'
 import './learn.css'
 
 const SCREENS: Record<Stage, ComponentType<StageProps>> = {
@@ -59,6 +64,20 @@ export function LearnSession({
 }) {
   const [topic, setTopic] = useState<Topic | null | undefined>(undefined)
   const [state, setState] = useState<LearnState>(() => ({ ...initialState(), ...initial }) as LearnState)
+  const [opened, setOpened] = useState<Partial<Record<Stage, boolean>>>({})
+  // Ask Onion (in the top bar) answers about this topic and this step.
+  useReportSpot(
+    topic
+      ? { step: STAGES.indexOf(state.stage) + 1, total: STAGES.length, label: STEP_NAME[state.stage], chip: `Learn · ${topic.topic}`, layer: learnHelp(topic, state) }
+      : {},
+  )
+  const nowCard = useRef<HTMLLIElement>(null)
+  const firstStage = useRef(state.stage)
+  // A new step lands below the last one: bring it into view (not on first load).
+  useEffect(() => {
+    if (state.stage === firstStage.current) return
+    nowCard.current?.scrollIntoView?.({ behavior: 'smooth', block: 'start' })
+  }, [state.stage])
 
   useEffect(() => {
     // The App keys this component by slug, so a new slug is a fresh mount (no reset needed here).
@@ -87,14 +106,17 @@ export function LearnSession({
     if (state.stage === 'done') return onDone()
     setState((s) => ({ ...s, stage: STAGES[Math.min(STAGES.indexOf(s.stage) + 1, STAGES.length - 1)] }))
   }
-  const back = () => (idx === 0 ? onDone() : setState((s) => ({ ...s, stage: STAGES[STAGES.indexOf(s.stage) - 1] })))
-  const Screen = SCREENS[state.stage]
+  const noop = () => {}
+  // Steps you've reached stay on the page, stacked down; only the newest one is live.
+  const reached = STAGES.slice(0, idx + 1)
 
   return (
     <div className="learn" data-stage={state.stage}>
-      <div className="learn-main sheet">
-        <div className="learn-bar">
-          <button className="learn-back" onClick={back}>Back</button>
+      <aside className="learn-why" aria-label="Why this step">
+        {WhyPaneComponent ? <WhyPaneComponent stage={state.stage} /> : <WhyFallback stage={state.stage} />}
+      </aside>
+      <div className="learn-main">
+        <div className="learn-bar sheet">
           <span className="learn-topic">
             {topic.topic}
             {!topic.checked && <span className="learn-auto"> · auto-checked</span>}
@@ -105,11 +127,29 @@ export function LearnSession({
             ))}
           </ol>
         </div>
-        <Screen key={state.stage} topic={topic} state={state} update={update} next={next} api={api} />
+        <ol className="learn-stack">
+          {reached.map((st, i) => {
+            const Screen = customScreen(slug, st) ?? SCREENS[st]
+            const past = i < idx
+            const open = past && !!opened[st]
+            return (
+              <li key={st} className={`learn-card sheet ${past ? 'is-past' : 'is-now'}${open ? ' is-open' : ''}`} ref={past ? undefined : nowCard}>
+                {past && (
+                  <button className="learn-card-head" aria-expanded={open} onClick={() => setOpened((o) => ({ ...o, [st]: !o[st] }))}>
+                    <span className="learn-card-num" aria-hidden="true">✓</span>
+                    <span className="learn-card-name">{STEP_NAME[st]}</span>
+                    <span className="learn-card-sum">{summaryFor(st, state, topic)}</span>
+                    <span className="learn-card-caret" aria-hidden="true">{open ? '▴' : '▾'}</span>
+                  </button>
+                )}
+                <div className="learn-card-body" hidden={past && !open} inert={past || undefined}>
+                  <Screen topic={topic} state={state} update={past ? noop : update} next={past ? noop : next} api={api} />
+                </div>
+              </li>
+            )
+          })}
+        </ol>
       </div>
-      <aside className="learn-why" aria-label="Why this step">
-        {WhyPaneComponent ? <WhyPaneComponent stage={state.stage} /> : <WhyFallback stage={state.stage} />}
-      </aside>
     </div>
   )
 }

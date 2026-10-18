@@ -119,4 +119,20 @@ describe('StressScreen', () => {
     expect(screen.getByText(/Lots of people are trying this right now/)).toBeTruthy()
     expect(screen.queryByText(/can't reach the server/)).toBeNull()
   })
+
+  it('a curve topic shows each card its curve at that extreme, with the watch line; a card without one stays text', () => {
+    render(<Harness api={createMockLearnApi()} fix="it grows on itself" />)
+    expect(within(card(1)).getByRole('img')).toBeTruthy()
+    expect(within(card(1)).getByText('yearly rate (%) = 1')).toBeTruthy()
+    expect(within(card(1)).getByText(/nearly a straight line/)).toBeTruthy()
+    expect(within(card(2)).getByText('yearly rate (%) = 15')).toBeTruthy()
+    expect(within(card(3)).queryByRole('img')).toBeNull()
+  })
+
+  it('a topic without a visual keeps plain text cards', () => {
+    const plain = { ...topic, visual: null }
+    render(<StressScreen topic={plain} state={{ ...initialState(), stage: 'stress', fix: 'x' }} update={() => {}} next={() => {}} api={createMockLearnApi()} />)
+    expect(screen.queryAllByRole('img')).toHaveLength(0)
+  })
 })
+

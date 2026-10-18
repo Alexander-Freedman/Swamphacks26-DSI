@@ -117,13 +117,16 @@ describe('Ask panel (#186)', () => {
     expect(screen.queryByText('thinking…')).toBeNull()
   })
 
-  it('caps the question at 300 characters with a counter', () => {
+  it('caps the question at 300 characters; the counter only shows near the limit', () => {
     render(<AskHelp slug="coin-streak" kind="session" />)
     open()
     const box = screen.getByLabelText('Your question') as HTMLTextAreaElement
+    expect(screen.queryByText(/characters left|\/300/)).toBeNull()
+    fireEvent.change(box, { target: { value: 'x'.repeat(260) } })
+    expect(screen.getByText('40 characters left')).toBeTruthy()
     fireEvent.change(box, { target: { value: 'x'.repeat(350) } })
     expect(box.value).toHaveLength(MAX_QUESTION)
-    expect(screen.getByText(`${MAX_QUESTION}/${MAX_QUESTION}`)).toBeTruthy()
+    expect(screen.getByText('0 characters left')).toBeTruthy()
     expect(helpBody({ slug: 'coin-streak', kind: 'session', screen: 'C1', locked: false, question: 'y'.repeat(400) }).question).toHaveLength(MAX_QUESTION)
   })
 

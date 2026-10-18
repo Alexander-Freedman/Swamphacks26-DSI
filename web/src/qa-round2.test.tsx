@@ -110,8 +110,7 @@ describe('notebook next step (#169)', () => {
     record({ session: 'birthday', at: new Date().toISOString(), guess: 23, confidence: 'certain', misconception: null, rematch: 'right' })
     history.replaceState(null, '', `${BASE}?notebook=1`)
     render(<App />)
-    expect(screen.queryByText('Start with organic chemistry')).toBeNull()
-    expect(screen.getByText('Next: Organic chemistry').closest('a')?.getAttribute('href')).toBe(`${BASE}?session=orgo`)
+    expect(screen.getByText('Try any topic').closest('a')?.getAttribute('href')).toBe(BASE)
   })
 })
 
