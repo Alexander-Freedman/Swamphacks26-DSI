@@ -60,6 +60,10 @@ const EXTRA_LABELS: Record<string, string> = {
   'gradient-points-at-peak': 'Steepest = straight at the top',
   'gradient-is-height': 'Steeper the higher you go',
   'more-columns-more-volume': 'More columns = more volume',
+  // programming (sessions/programming/stack.ts STACK_MISTAKES)
+  'stack-depth-off': 'Miscounting the call stack',
+  'returns-before-calls': 'The first call finishes first',
+  'base-case-optional': 'A base case is optional',
   // orgo (sessions/orgo/chem.ts MISTAKES)
   'carbon-five-bonds': 'A carbon with 5 bonds',
   'hydrogen-two-bonds': 'Hydrogen with 2 bonds',
