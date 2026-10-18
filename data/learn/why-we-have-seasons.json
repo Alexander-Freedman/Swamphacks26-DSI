@@ -245,12 +245,17 @@
         {
           "param": "T",
           "value": 0,
-          "watch": "With no tilt the noon Sun sits at 50° every day of the year: no seasons."
+          "watch": "With no tilt the noon Sun stands at 50° every day at 40° north: a flat line, no seasons."
         },
         {
           "param": "T",
-          "value": 40,
-          "watch": "At 40° of tilt the noon Sun swings from 10° in December to 90° in June."
+          "value": 23.5,
+          "watch": "At Earth's 23.5° tilt the noon Sun at 40° north reaches 73.5° on June 21 but only 26.5° in late December."
+        },
+        {
+          "param": "L",
+          "value": 71,
+          "watch": "At 71° north (Utqiagvik) the June noon Sun is only 42.5° high, and in December it stays below the horizon all day."
         }
       ],
       "answer_claimed": 73.5

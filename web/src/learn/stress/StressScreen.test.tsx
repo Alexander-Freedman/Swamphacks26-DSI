@@ -120,13 +120,13 @@ describe('StressScreen', () => {
     expect(screen.queryByText(/can't reach the server/)).toBeNull()
   })
 
-  it('a curve topic shows each card its curve at that extreme, with the watch line; a card without one stays text', () => {
+  it('a curve topic shows each card its curve at that extreme, with the watch line', () => {
     render(<Harness api={createMockLearnApi()} fix="it grows on itself" />)
-    expect(within(card(1)).getByRole('img')).toBeTruthy()
-    expect(within(card(1)).getByText('yearly rate (%) = 1')).toBeTruthy()
-    expect(within(card(1)).getByText(/nearly a straight line/)).toBeTruthy()
-    expect(within(card(2)).getByText('yearly rate (%) = 15')).toBeTruthy()
-    expect(within(card(3)).queryByRole('img')).toBeNull()
+    for (const n of [1, 2, 3]) expect(within(card(n)).getByRole('img')).toBeTruthy()
+    expect(within(card(1)).getByText('yearly rate (%) = 5')).toBeTruthy()
+    expect(within(card(1)).getByText(/grows to \$4,322 by year 30/)).toBeTruthy()
+    expect(within(card(2)).getByText('yearly rate (%) = 0')).toBeTruthy()
+    expect(within(card(3)).getByText('yearly rate (%) = 10')).toBeTruthy()
   })
 
   it('a topic without a visual keeps plain text cards', () => {

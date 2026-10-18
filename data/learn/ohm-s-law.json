@@ -232,13 +232,18 @@
       "extremes": [
         {
           "param": "R",
-          "value": 1,
-          "watch": "At 1 ohm, 12 volts drives 12 amperes."
+          "value": 10,
+          "watch": "At 10 ohms, current = volts ÷ 10: 0 amperes at 0 volts, 1.2 at 12 volts, 2 at 20 volts. A straight line through zero."
+        },
+        {
+          "param": "R",
+          "value": 1000000,
+          "watch": "At 1,000,000 ohms, 12 volts pushes just 0.000012 amperes; at 1 ohm the same 12 volts drives 12 amperes."
         },
         {
           "param": "R",
           "value": 24,
-          "watch": "At 24 ohms, the same 12 volts drives only 0.5 amperes."
+          "watch": "Hot, the filament's resistance climbs: at 24 ohms, 12 volts drives 0.5 amperes, a quarter of the 2 amperes at a cool 6 ohms."
         }
       ],
       "answer_claimed": 2.0

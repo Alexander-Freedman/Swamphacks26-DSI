@@ -234,12 +234,17 @@
         {
           "param": "s",
           "value": 0,
-          "watch": "With no edge, brown stays at 10% forever: no selection without a difference in young."
+          "watch": "Paint isn't inherited, so the young are no different: with no edge, brown stays at 10% after 20 generations."
         },
         {
           "param": "s",
-          "value": 50,
-          "watch": "With a 50% edge, brown passes 99% in about 10 generations."
+          "value": 0,
+          "watch": "Two colors leaving the same number of young means no edge: brown stays at 10% for all 20 generations."
+        },
+        {
+          "param": "s",
+          "value": -20,
+          "watch": "When the edge flips (green now leaves 20% more young), the trend reverses: brown falls from 10% to 0.3% in 20 generations."
         }
       ],
       "answer_claimed": 90.6

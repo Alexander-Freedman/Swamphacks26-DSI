@@ -221,13 +221,18 @@
       "extremes": [
         {
           "param": "r",
-          "value": 1,
-          "watch": "At 1% the curve is nearly a straight line: 30 years gives only $1,348."
+          "value": 5,
+          "watch": "At 5% a year, $1,000 grows to $4,322 by year 30 and doubles about every 14 years, so even $1 swells over 500 years."
         },
         {
           "param": "r",
-          "value": 15,
-          "watch": "At 15% the value passes $66,000 by year 30; the curve bends hard upward."
+          "value": 0,
+          "watch": "At 0% nothing is added: $1,000 is still $1,000 at year 30. A flat line, with no interest to earn interest."
+        },
+        {
+          "param": "r",
+          "value": 10,
+          "watch": "At 10% a year, $1,000 becomes $17,449 by year 30; the curve bends up harder each year, so one cent grows huge over 200 years."
         }
       ],
       "answer_claimed": 7612.26
