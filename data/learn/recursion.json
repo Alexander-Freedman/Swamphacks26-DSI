@@ -1,0 +1,133 @@
+{
+  "slug": "recursion",
+  "topic": "recursion",
+  "checked": true,
+  "rubric": {
+    "entities": [
+      "A recursive function or procedure: a set of instructions that can call itself.",
+      "The current input or current subproblem: the particular, smaller piece being handled on one call.",
+      "A base case: an input simple enough to answer directly without another self-call.",
+      "A recursive case: an input that is not yet simple enough, so the procedure creates one or more smaller subproblems.",
+      "A progress measure: a quantity such as remaining items or a nonnegative whole number that must move toward a base-case value on every recursive call.",
+      "The call stack: the ordered record of unfinished calls and the information each must remember until its smaller call returns.",
+      "A return value or completed action: the result passed back from a base case through the waiting calls."
+    ],
+    "causalLinks": [
+      "When the current input satisfies the base-case condition, the procedure stops making self-calls and produces its direct result; this prevents another stack frame from being added.",
+      "When the current input does not satisfy the base-case condition, the recursive case makes self-call(s) on smaller subproblem(s), increasing the number of unfinished calls on the call stack.",
+      "Each recursive self-call must decrease a well-founded progress measure toward a base-case value; repeated decreases make reaching the base case inevitable for a finite starting measure.",
+      "As each smaller call returns, the immediately older waiting call receives that result and combines or uses it to finish its own result; returns therefore unwind in the reverse order in which single calls were made.",
+      "If a self-call leaves the progress measure unchanged, increases it, or can cycle among inputs without reaching a base case, calls continue until the available call-stack space is exhausted rather than completing normally.",
+      "If a base case is reached but gives the wrong direct result, every waiting call can still unwind, but the wrong result propagates outward through the entire computation."
+    ],
+    "coreRule": "A correct recursive procedure has (1) a base case that directly solves at least one input and (2) a recursive case that reduces every remaining input to one or more strictly smaller instances under a progress measure that cannot decrease forever; after those instances return, it combines their results to solve the original input.",
+    "whyRuleMatters": "Calling the same instructions again does not by itself solve anything. The smaller input is what changes the state of the problem, the base case is where actual direct work happens, and the saved call-stack information lets each earlier call finish after the smaller answer is known. Without guaranteed progress toward a base case, the procedure merely repeats calls; without the combine step, it never turns the smaller answer into the answer for the original input.",
+    "whyRuleQuestion": "Why must each self-call make measurable progress toward a base case, rather than simply call itself again on the same input?",
+    "anchorDescription": "A recursive instruction can pause its current work, ask the same instruction to handle a smaller version of the task, and resume when that smaller task has an answer. For example, to count down from 3, it can first ask itself to count down from 2.",
+    "anchorPrompt": "If the instruction is counting down from 3 and first asks itself to count down from 2, what must eventually happen for the original count from 3 to finish?",
+    "contrastingCases": [
+      {
+        "label": "Countdown that finishes",
+        "detail": "An instruction says: if the number is 0, say “done.” Otherwise, first run the same instruction on the number one lower, then say the current number. Starting at 3 creates calls for 3, then 2, then 1, then 0. The call at 0 stops, and the waiting calls can finish by saying 1, then 2, then 3.",
+        "oneLine": "Each call lowers 3 toward the stopping number 0."
+      },
+      {
+        "label": "Countdown that never gets smaller",
+        "detail": "An instruction says: if the number is 0, say “done.” Otherwise, first run the same instruction on the same number, then say the current number. Starting at 3 keeps creating another call for 3. No call reaches 0, so none gets to say a number before the call stack eventually runs out of space.",
+        "oneLine": "Calling again on 3 never reaches the stopping case."
+      },
+      {
+        "label": "Correct stopping, wrong rebuilding",
+        "detail": "An instruction is meant to add the numbers from 1 through a given number. For 0 it directly returns 0. For 3 it asks for the answer for 2, but then returns only that smaller answer instead of adding 3 to it. It stops normally, but returns 0 for every starting number because it discarded each current number while returning.",
+        "oneLine": "It stops, but fails to add each current number back."
+      },
+      {
+        "label": "Two smaller branches",
+        "detail": "An instruction counts ways to climb stairs when each move is either 1 or 2 steps. At 0 remaining steps it returns 1 valid way; with fewer than 0 remaining steps it returns 0. With 4 remaining steps, it must ask itself about both 3 and 2 remaining steps, then add those two answers; one smaller call alone would miss valid paths.",
+        "oneLine": "Some recursive tasks need two smaller calls, then combine."
+      }
+    ],
+    "extremeCaseDimensions": [
+      {
+        "key": "base-case-boundary",
+        "description": "Push the starting input exactly to a stated stopping condition, such as 0 remaining items. The correct behavior is a direct result with no further self-call and no additional call-stack growth."
+      },
+      {
+        "key": "input-size",
+        "description": "Increase a finite starting input while each call decreases it by one. The correct behavior is one additional nested call per extra unit before reaching the base case, followed by the same number of returns; sufficiently large inputs can exceed a system's finite call-stack limit."
+      },
+      {
+        "key": "no-progress",
+        "description": "Make the recursive call use the same input or an input that does not move toward any base case. The correct behavior is nontermination in principle and eventual stack overflow or recursion-depth failure in a finite runtime."
+      },
+      {
+        "key": "branching-factor",
+        "description": "Increase the number of recursive subcalls made by each non-base call while all branches still terminate. The correct behavior is that total calls can grow very rapidly with input size, even though every individual branch reaches a base case."
+      },
+      {
+        "key": "base-case-result",
+        "description": "Change only the direct value returned at the base case while retaining termination and reduction. The correct behavior is that execution still terminates, but the altered value is propagated through the combination steps and changes the final result."
+      }
+    ],
+    "confusableNeighbors": [
+      {
+        "key": "iteration",
+        "label": "Iteration (a loop)",
+        "question": "A loop can also count down from 3 to 0. How is that different from recursion, and when do they interact?",
+        "correctDistinction": "Iteration repeats a block by updating loop state in one active control flow; recursion creates nested invocations of the same procedure, with earlier invocations waiting on the call stack. Either can solve many of the same problems: a recursive process can often be rewritten as a loop with an explicit stack, while recursion is often clearer when the problem naturally breaks into nested subproblems."
+      },
+      {
+        "key": "infinite-loop",
+        "label": "Infinite loop",
+        "question": "Is every recursive program that fails to stop just an infinite loop? What is specifically going wrong in recursion?",
+        "correctDistinction": "Both can repeat forever, but faulty recursion specifically keeps creating nested calls without reaching a base case, so it consumes call-stack space and commonly fails with a recursion-depth or stack-overflow error. A loop usually repeats within one active call and need not grow the call stack."
+      }
+    ],
+    "transferStructuralRequirements": [
+      "There must be a task that can be represented as a current instance plus one or more smaller instances of the same kind.",
+      "There must be an explicit simple boundary instance that can be handled directly without creating another instance.",
+      "Every reduction path must move according to a measure that cannot decrease indefinitely, so it reaches a boundary instance.",
+      "The result or action from each smaller instance must be returned or carried back to complete the larger instance.",
+      "If the analogy has multiple smaller instances, it must specify how their completed results are combined; merely repeating a similar action is not enough."
+    ],
+    "referenceTransferExample": "A folder-organizing clerk processes a folder. If it contains no subfolders, the clerk directly lists its files. Otherwise, for each subfolder the clerk asks another clerk following the same instructions to list that subfolder's files, waits for those lists, and combines them with the files in the current folder. The number of folders remaining below any branch decreases until a folder with no subfolders is reached; the returned lists then build back up to the top folder."
+  },
+  "misconceptions": [
+    {
+      "id": "self-call-is-enough",
+      "label": "“Recursion just means a function calls itself.”",
+      "tell": "The learner says a procedure is recursive and correct merely because it contains a call to itself, even if that call uses unchanged input.",
+      "fix": "A self-call is only the mechanism. Correct recursion also needs a reachable base case and a call that makes progress toward it."
+    },
+    {
+      "id": "base-case-is-optional",
+      "label": "“It will know when to stop.”",
+      "tell": "The learner predicts that repeatedly subtracting or recursing will automatically stop without a stated direct case.",
+      "fix": "The computer follows the written cases; it does not infer a stopping point. A base case must explicitly handle the stopping input before another self-call is made."
+    },
+    {
+      "id": "smaller-answer-is-final-answer",
+      "label": "“Once the smaller call returns, we are done.”",
+      "tell": "The learner can trace calls down to a base case but omits the work each waiting call performs on the returned answer.",
+      "fix": "The base case answers only the smallest instance. Each suspended call must use or combine the returned smaller answer to produce the answer for its own larger instance."
+    }
+  ],
+  "extremeCases": [
+    {
+      "dimension": "base-case-boundary",
+      "scenario": "A sum instruction adds the whole numbers from 1 up to a given number. When given 0, it returns 0 immediately.",
+      "correctBehavior": "It makes no further self-call. The call stack does not grow, because 0 is the direct stopping case."
+    },
+    {
+      "dimension": "no-progress",
+      "scenario": "A search instruction says that if there are no boxes left, return “not found”; otherwise it asks itself to search the same 5 boxes again.",
+      "correctBehavior": "It never reaches the no-boxes stopping case because it always still has 5 boxes. It keeps nesting calls until the runtime reports excessive recursion depth or stack overflow."
+    },
+    {
+      "dimension": "branching-factor",
+      "scenario": "A stair-counting instruction may take 1 or 2 steps at a time. For 20 steps remaining, each non-stopping call asks about both one fewer and two fewer remaining steps.",
+      "correctBehavior": "Every branch eventually reaches 0 or fewer remaining steps, so it terminates. But many subproblems are recomputed, so the total number of calls grows rapidly as the number of steps increases."
+    }
+  ],
+  "visual": null
+}
