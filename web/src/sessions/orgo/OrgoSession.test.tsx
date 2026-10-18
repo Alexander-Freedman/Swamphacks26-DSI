@@ -355,6 +355,25 @@ describe('orgo session', () => {
     expect(entries()[0]).toMatchObject({ session: 'orgo', orgoTopic: 'build-ethanol', misconception: null })
   })
 
+  it('a finished run reports what it caught; embedded in Learn it never points at a next orgo topic', () => {
+    const onDone = vi.fn()
+    const { unmount } = render(<OrgoSession onDone={onDone} topic={topicFor(/^Build ethanol/)} />)
+    buildEthanol()
+    fireEvent.click(screen.getByText('Check it'))
+    fireEvent.click(screen.getByText('Finish ✓'))
+    expect(screen.getByText(/Next: push the electrons/)).toBeTruthy()
+    fireEvent.click(screen.getByRole('button', { name: 'Done' }))
+    expect(onDone).toHaveBeenCalledWith({ mistakes: [] })
+    unmount()
+
+    render(<OrgoSession onDone={() => {}} topic={topicFor(/^Build ethanol/)} embedded />)
+    buildEthanol()
+    fireEvent.click(screen.getByText('Check it'))
+    fireEvent.click(screen.getByText('Finish ✓'))
+    expect(screen.getByText('✓ mastered')).toBeTruthy()
+    expect(screen.queryByText(/Next: push the electrons/)).toBeNull()
+  })
+
   it('Mechanisms > SN2 works it out before the arrows', () => {
     render(<OrgoSession onDone={() => {}} topic={topicFor(/^SN2 One/)} />)
     expect(screen.getByText('Find the parts')).toBeTruthy()
