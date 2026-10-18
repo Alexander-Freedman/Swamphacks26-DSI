@@ -79,6 +79,17 @@ const EXTRA_LABELS: Record<string, string> = {
   'e2-base-hits-carbon': 'Base attacks the carbon',
   'e2-not-anti': 'Not the H across from Br',
   'ch-bond-lost': 'The C–H electrons go nowhere',
+  // biology (sessions/biology/mistakes.ts BIO_MISTAKES)
+  'rna-has-thymine': 'Putting T in RNA',
+  'copied-not-paired': 'Copying the base instead of pairing it',
+  'mispaired-base': 'Pairing the wrong bases',
+  'too-few-bases-per-codon': 'Too few bases per codon',
+  'starts-at-first-base': 'Starting at the first base',
+  'read-anticodon': 'Reading the anticodon',
+  'stop-has-amino-acid': 'A stop codon with an amino acid',
+  'every-change-breaks-protein': 'Every change breaks the protein',
+  'frameshift-one-change': 'An extra base changes just one amino acid',
+  'new-stop-missed': 'Missing a new stop codon',
 }
 
 function store(): Storage | null {
