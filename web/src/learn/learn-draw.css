@@ -1,0 +1,19 @@
+/* Draw, Neighbor, Transfer, Done: plain paper, 4px corners. */
+.ldf-pad { position: relative; border: 1.5px solid var(--ink-soft, currentColor); border-radius: 4px; background: var(--card, transparent); margin-bottom: 12px; }
+.ldf-canvas { display: block; width: 100%; height: auto; aspect-ratio: 800 / 420; touch-action: none; cursor: crosshair; color: var(--ink, #222); }
+.ldf-hint { position: absolute; inset: 0; display: grid; place-items: center; margin: 0; opacity: 0.45; pointer-events: none; }
+.ldf .ldf-clear { position: absolute; top: 6px; right: 6px; margin: 0; font-size: 0.85rem; }
+.ldf-label { display: block; font-size: 0.9rem; margin: 8px 0 4px; }
+.ldf-rows { list-style: none; padding: 0; margin: 12px 0 0; display: grid; gap: 6px; }
+.ldf-row { display: grid; grid-template-columns: 1.5em 7.5em minmax(0, 1fr); gap: 8px; align-items: baseline; border-top: 1px solid var(--ink-soft, currentColor); padding-top: 6px; }
+.ldf-mark { font-weight: 700; text-align: center; }
+.ldf-row.is-contradicted .ldf-mark { color: var(--off, #c2362f); }
+.ldf-name { font-weight: 600; }
+.ldf-note { min-width: 0; }
+.ldf-follow { margin-top: 12px; }
+.ldf-actions { display: flex; gap: 12px; align-items: baseline; flex-wrap: wrap; }
+@media (max-width: 480px) {
+  .ldf-row { grid-template-columns: 1.5em minmax(0, 1fr); }
+  .ldf-note { grid-column: 2; }
+}
+.ldf-row.is-demonstrated .ldf-mark { color: var(--called, #1f8a4c); }
