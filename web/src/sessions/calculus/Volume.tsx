@@ -40,7 +40,7 @@ function Columns({ P, n }: { P: Project; n: number }) {
       {boxes.map((b, i) => (
         <g key={i}>
           {b.sides.map((s, k) => (
-            <polygon key={k} className="calc-3d-side" points={pts(s)} />
+            <polygon key={k} className="calc-3d-face" points={pts(s)} />
           ))}
           <polygon className="calc-3d-top" points={pts(b.top)} />
         </g>

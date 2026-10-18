@@ -72,8 +72,8 @@ export function GradientStep({ onDone, topic }: { onDone: () => void; topic: str
 
   return (
     <section className="calc-surface">
-      <div className="calc-two calc-3d-wrap">
-        <div className="calc-card calc-tight">
+      <div className="calc-3d-layout">
+        <div className="calc-card calc-tight calc-3d-main">
           <div className="calc-k calc-pad">a long hill · drag to turn it</div>
           <SurfaceView
             view={view}
@@ -105,19 +105,90 @@ export function GradientStep({ onDone, topic }: { onDone: () => void; topic: str
             dot at x = <b className="calc-num">{p.x.toFixed(2)}</b>, y = <b className="calc-num">{p.y.toFixed(2)}</b> · height <b className="calc-box calc-num">{gz(p.x, p.y).toFixed(2)}</b>
           </p>
         </div>
-        <div className="calc-side calc-slices">
+        <div className="calc-3d-side">
+          {phase === 'pick' && (
+            <div className="calc-card">
+              <div className="calc-k">question 1 of 2</div>
+              <p className="calc-ask">Three arrows start under the dot. If you stand on the dot, which one points the steepest way up the hill?</p>
+              <div className="calc-picks calc-picks-row" role="group" aria-label="which arrow is steepest uphill">
+                {ARROWS.map((a) => (
+                  <button key={a.id} className={'calc-pick' + (wrongArrows.includes(a.id) ? ' wrong' : '')} disabled={wrongArrows.includes(a.id)} onClick={() => pick(a.id)}>
+                    {wrongArrows.includes(a.id) && <span className="calc-mark" aria-hidden="true">✗</span>}
+                    arrow {a.name}
+                  </button>
+                ))}
+              </div>
+              {note && <p className="calc-wrong" role="status"><b>✗ Not quite.</b> {note} Try another arrow.</p>}
+            </div>
+          )}
+
+          {phase === 'grow' && (
+            <div className="calc-card">
+              <p className="calc-correct" role="status">
+                <span className="calc-check" aria-hidden="true">✓</span>
+                <span>
+                  <b>Correct!</b> B climbs {len(grad(START)).toFixed(2)} per step, faster than any other direction (A climbs {climb(START, ARROWS[0].dir).toFixed(2)}, C stays level). That arrow is the <b>gradient</b>, ∇f. It’s built from the two slices: go ∂f/∂x along x, then ∂f/∂y along y.
+                </span>
+              </p>
+              <div className="calc-k">question 2 of 2</div>
+              <p className="calc-ask">Next you’ll walk uphill by following the arrow. As you climb, what happens to the arrow?</p>
+              <div className="calc-picks" role="group" aria-label="what happens to the arrow">
+                {GROW.map((c) => (
+                  <button key={c.id} className={'calc-pick' + (wrongGrow.includes(c.id) ? ' wrong' : '')} disabled={wrongGrow.includes(c.id)} onClick={() => guessGrow(c)}>
+                    {wrongGrow.includes(c.id) && <span className="calc-mark" aria-hidden="true">✗</span>}
+                    {c.text}
+                  </button>
+                ))}
+              </div>
+              {note && <p className="calc-wrong" role="status"><b>✗ Not quite.</b> {note} Try another one.</p>}
+            </div>
+          )}
+
+          {phase === 'walk' && (
+            <div className="calc-card">
+              {!top ? (
+                <>
+                  <p className="calc-correct" role="status">
+                    <span className="calc-check" aria-hidden="true">✓</span>
+                    <span><b>Correct!</b> The arrow’s length is how steep the hill is. At the very top nothing goes up, so it shrinks to nothing.</span>
+                  </p>
+                  <p className="calc-ask">Now walk: each step moves the dot along the arrow. Keep stepping until the arrow is gone.</p>
+                  <div className="calc-row">
+                    <button className="calc-btn calc-go" onClick={() => setPath((a) => [...a, walk(a[a.length - 1])])}>Take a step along the arrow</button>
+                    <span className="calc-small">
+                      {path.length - 1} {path.length === 2 ? 'step' : 'steps'} · arrow length <b className="calc-num">{n2(len(g))}</b>
+                    </span>
+                  </div>
+                </>
+              ) : (
+                <>
+                  <p className="calc-correct" role="status">
+                    <span className="calc-check" aria-hidden="true">✓</span>
+                    <span>
+                      <b>Correct!</b> You’re on top: the arrow has shrunk to almost nothing (length {n2(len(g))}), and right at the peak ∇f = (0, 0), so no direction goes up. Look at your path: it curved. It cut across to the ridge first, then ran along it, because the arrow points steepest uphill, not straight at the top.
+                    </span>
+                  </p>
+                  <p className="calc-rule">
+                    <span><span className="calc-hl">∇f</span> = (∂f/∂x, ∂f/∂y): the two slopes, put together.</span>
+                    <span>It points the steepest way uphill.</span>
+                    <span>Its length is how steep. At the top it’s 0.</span>
+                  </p>
+                </>
+              )}
+            </div>
+          )}
           {shown ? (
             <>
-              <div className="calc-card calc-grad-read" aria-live="polite">
-                <div className="calc-k">the gradient under the dot</div>
-                <p className="calc-grad-eq">
-                  ∇f = (<b className="calc-num calc-gx">{n2(g.x)}</b>, <b className="calc-num calc-gy">{n2(g.y)}</b>)
-                </p>
-                <p className="calc-pair">
-                  length <b className="calc-hl calc-num">{n2(len(g))}</b> = how steep it is here
-                </p>
-              </div>
-              <div className="calc-slice-pair">
+                <div className="calc-card calc-grad-read" aria-live="polite">
+                  <div className="calc-k">the gradient under the dot</div>
+                  <p className="calc-grad-eq">
+                    ∇f = (<b className="calc-num calc-gx">{n2(g.x)}</b>, <b className="calc-num calc-gy">{n2(g.y)}</b>)
+                  </p>
+                  <p className="calc-pair">
+                    length <b className="calc-hl calc-num">{n2(len(g))}</b> = how steep it is here
+                  </p>
+                </div>
+              <div className="calc-slices">
                 <div className="calc-card calc-tight">
                   <div className="calc-k calc-pad">slice along x</div>
                   <SliceChart along="x" x0={p.x} y0={p.y} surf={RIDGE} />
@@ -135,78 +206,6 @@ export function GradientStep({ onDone, topic }: { onDone: () => void; topic: str
           )}
         </div>
       </div>
-
-      {phase === 'pick' && (
-        <div className="calc-card">
-          <div className="calc-k">question 1 of 2</div>
-          <p className="calc-ask">Three arrows start under the dot. If you stand on the dot, which one points the steepest way up the hill?</p>
-          <div className="calc-picks calc-picks-row" role="group" aria-label="which arrow is steepest uphill">
-            {ARROWS.map((a) => (
-              <button key={a.id} className={'calc-pick' + (wrongArrows.includes(a.id) ? ' wrong' : '')} disabled={wrongArrows.includes(a.id)} onClick={() => pick(a.id)}>
-                {wrongArrows.includes(a.id) && <span className="calc-mark" aria-hidden="true">✗</span>}
-                arrow {a.name}
-              </button>
-            ))}
-          </div>
-          {note && <p className="calc-wrong" role="status"><b>✗ Not quite.</b> {note} Try another arrow.</p>}
-        </div>
-      )}
-
-      {phase === 'grow' && (
-        <div className="calc-card">
-          <p className="calc-correct" role="status">
-            <span className="calc-check" aria-hidden="true">✓</span>
-            <span>
-              <b>Correct!</b> B climbs {len(grad(START)).toFixed(2)} per step, faster than any other direction (A climbs {climb(START, ARROWS[0].dir).toFixed(2)}, C stays level). That arrow is the <b>gradient</b>, ∇f. It’s built from the two slices: go ∂f/∂x along x, then ∂f/∂y along y.
-            </span>
-          </p>
-          <div className="calc-k">question 2 of 2</div>
-          <p className="calc-ask">Next you’ll walk uphill by following the arrow. As you climb, what happens to the arrow?</p>
-          <div className="calc-picks" role="group" aria-label="what happens to the arrow">
-            {GROW.map((c) => (
-              <button key={c.id} className={'calc-pick' + (wrongGrow.includes(c.id) ? ' wrong' : '')} disabled={wrongGrow.includes(c.id)} onClick={() => guessGrow(c)}>
-                {wrongGrow.includes(c.id) && <span className="calc-mark" aria-hidden="true">✗</span>}
-                {c.text}
-              </button>
-            ))}
-          </div>
-          {note && <p className="calc-wrong" role="status"><b>✗ Not quite.</b> {note} Try another one.</p>}
-        </div>
-      )}
-
-      {phase === 'walk' && (
-        <div className="calc-card">
-          {!top ? (
-            <>
-              <p className="calc-correct" role="status">
-                <span className="calc-check" aria-hidden="true">✓</span>
-                <span><b>Correct!</b> The arrow’s length is how steep the hill is. At the very top nothing goes up, so it shrinks to nothing.</span>
-              </p>
-              <p className="calc-ask">Now walk: each step moves the dot along the arrow. Keep stepping until the arrow is gone.</p>
-              <div className="calc-row">
-                <button className="calc-btn calc-go" onClick={() => setPath((a) => [...a, walk(a[a.length - 1])])}>Take a step along the arrow</button>
-                <span className="calc-small">
-                  {path.length - 1} {path.length === 2 ? 'step' : 'steps'} · arrow length <b className="calc-num">{n2(len(g))}</b>
-                </span>
-              </div>
-            </>
-          ) : (
-            <>
-              <p className="calc-correct" role="status">
-                <span className="calc-check" aria-hidden="true">✓</span>
-                <span>
-                  <b>Correct!</b> You’re on top: the arrow has shrunk to almost nothing (length {n2(len(g))}), and right at the peak ∇f = (0, 0), so no direction goes up. Look at your path: it curved. It cut across to the ridge first, then ran along it, because the arrow points steepest uphill, not straight at the top.
-                </span>
-              </p>
-              <p className="calc-rule">
-                <span><span className="calc-hl">∇f</span> = (∂f/∂x, ∂f/∂y): the two slopes, put together.</span>
-                <span>It points the steepest way uphill.</span>
-                <span>Its length is how steep. At the top it’s 0.</span>
-              </p>
-            </>
-          )}
-        </div>
-      )}
       {top && (
         <div className="calc-end" role="status">
           <p>
