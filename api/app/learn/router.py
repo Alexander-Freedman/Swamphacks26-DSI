@@ -18,7 +18,7 @@ import time
 from collections import defaultdict, deque
 from typing import Literal
 
-from fastapi import APIRouter, HTTPException, Request
+from fastapi import APIRouter, Depends, HTTPException, Request
 from pydantic import BaseModel, Field, ValidationError
 
 from app.learn import codex, prompts, topics
@@ -65,6 +65,37 @@ def _rate_limited(ip: str, limit: int | None = None) -> bool:
 
 def _ip(request: Request) -> str:
     return request.client.host if request.client else "unknown"
+
+
+# Graded calls (guess, anchor, stress, why, reveal, draw, neighbor, transfer) also spend Codex:
+# a per-IP hourly cap (one full session is ~10 calls) and a site-wide daily cap.
+GRADED_PER_IP_PER_HOUR = int(os.environ.get("MM_LEARN_GRADED_PER_IP_PER_HOUR", "60"))
+GRADED_DAILY_CAP = int(os.environ.get("MM_LEARN_DAILY_CAP", "800"))
+_graded_hits: dict[str, deque[float]] = defaultdict(deque)
+_graded_day: dict[str, int] = {}
+
+
+def _graded_limited(ip: str) -> str | None:
+    now = time.monotonic()
+    q = _graded_hits[ip]
+    while q and now - q[0] > 3600:
+        q.popleft()
+    if len(q) >= GRADED_PER_IP_PER_HOUR:
+        return "slow down: too many answers this hour"
+    day = time.strftime("%Y-%m-%d", time.gmtime())
+    if _graded_day.get(day, 0) >= GRADED_DAILY_CAP:
+        return "daily limit reached: prebuilt answers still work offline"
+    q.append(now)
+    if day not in _graded_day:
+        _graded_day.clear()  # new day: drop yesterday's count
+    _graded_day[day] = _graded_day.get(day, 0) + 1
+    return None
+
+
+def graded_limit(request: Request) -> None:
+    reason = _graded_limited(_ip(request))
+    if reason:
+        raise HTTPException(status_code=429, detail=reason)
 
 
 def _require_topic(slug: str) -> Topic:
@@ -210,7 +241,7 @@ class TransferIn(BaseModel):
     wasPushed: bool = False
 
 
-@router.post("/{slug}/guess")
+@router.post("/{slug}/guess", dependencies=[Depends(graded_limit)])
 async def guess(slug: str, body: GuessIn) -> GuessOut:
     t = _require_topic(slug)
     out = await _judge("guess", prompts.guess(t, body.text.strip()), GuessOut)
@@ -221,7 +252,7 @@ async def guess(slug: str, body: GuessIn) -> GuessOut:
     return out
 
 
-@router.post("/{slug}/anchor")
+@router.post("/{slug}/anchor", dependencies=[Depends(graded_limit)])
 async def anchor(slug: str, body: AnswerIn) -> AnchorOut:
     t = _require_topic(slug)
     out = await _judge("anchor", prompts.anchor(t, body.answer.strip()), AnchorOut)
@@ -230,7 +261,7 @@ async def anchor(slug: str, body: AnswerIn) -> AnchorOut:
     return out
 
 
-@router.post("/{slug}/stress")
+@router.post("/{slug}/stress", dependencies=[Depends(graded_limit)])
 async def stress(slug: str, body: StressIn) -> StressOut:
     t = _require_topic(slug)
     history = [h.model_dump() for h in body.history]
@@ -240,7 +271,7 @@ async def stress(slug: str, body: StressIn) -> StressOut:
     return out
 
 
-@router.post("/{slug}/why")
+@router.post("/{slug}/why", dependencies=[Depends(graded_limit)])
 async def why(slug: str, body: AnswerIn) -> WhyOut:
     t = _require_topic(slug)
     out = await _judge("why", prompts.why(t, body.answer.strip()), WhyOut)
@@ -249,7 +280,7 @@ async def why(slug: str, body: AnswerIn) -> WhyOut:
     return out
 
 
-@router.post("/{slug}/reveal")
+@router.post("/{slug}/reveal", dependencies=[Depends(graded_limit)])
 async def reveal(slug: str, body: RevealIn) -> RevealOut:
     t = _require_topic(slug)
     history = [h.model_dump() for h in body.history]
@@ -273,7 +304,7 @@ def _png_bytes(data_url: str | None) -> bytes | None:
     return raw if raw.startswith(b"\x89PNG") else None
 
 
-@router.post("/{slug}/draw")
+@router.post("/{slug}/draw", dependencies=[Depends(graded_limit)])
 async def draw(slug: str, body: DrawIn) -> DrawOut:
     t = _require_topic(slug)
     image = _png_bytes(body.image)
@@ -285,7 +316,7 @@ async def draw(slug: str, body: DrawIn) -> DrawOut:
     return out
 
 
-@router.post("/{slug}/neighbor")
+@router.post("/{slug}/neighbor", dependencies=[Depends(graded_limit)])
 async def neighbor(slug: str, body: NeighborIn) -> NeighborOut:
     t = _require_topic(slug)
     if t.neighbor(body.key) is None:
@@ -295,7 +326,7 @@ async def neighbor(slug: str, body: NeighborIn) -> NeighborOut:
     return await _judge("neighbor", prompt, NeighborOut)
 
 
-@router.post("/{slug}/transfer")
+@router.post("/{slug}/transfer", dependencies=[Depends(graded_limit)])
 async def transfer(slug: str, body: TransferIn) -> TransferOut:
     t = _require_topic(slug)
     prompt = prompts.transfer(t, body.analogy.strip(), body.wasPushed)

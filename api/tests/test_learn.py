@@ -26,6 +26,8 @@ def fake_codex(monkeypatch, tmp_path):
     topics.prebuilt_topics.cache_clear()
     codex.reset_status_cache()
     router._hits.clear()
+    router._graded_hits.clear()
+    router._graded_day.clear()
     router._authoring.clear()
     yield
     topics.prebuilt_topics.cache_clear()
@@ -385,3 +387,17 @@ def test_slug_for() -> None:
 
 def _topic() -> dict:
     return client.get(f"/api/learn/topics/{SLUG}").json()
+
+
+def test_graded_calls_are_rate_limited(monkeypatch) -> None:
+    monkeypatch.setattr(router, "GRADED_PER_IP_PER_HOUR", 2)
+    codes = [
+        post(f"{SLUG}/guess", text="interest is the same every year").status_code for _ in range(3)
+    ]
+    assert codes == [200, 200, 429]
+
+
+def test_graded_daily_cap(monkeypatch) -> None:
+    monkeypatch.setattr(router, "GRADED_DAILY_CAP", 1)
+    assert post(f"{SLUG}/guess", text="interest is the same every year").status_code == 200
+    assert post(f"{SLUG}/guess", text="interest is the same every year").status_code == 429
