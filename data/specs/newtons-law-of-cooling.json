@@ -1,0 +1,116 @@
+{
+  "aliases": [
+    "newtons law of cooling",
+    "newton's law of cooling",
+    "cooling",
+    "how coffee cools",
+    "cooling coffee",
+    "why hot things cool"
+  ],
+  "spec": {
+    "spec_version": 4,
+    "slug": "newtons-law-of-cooling",
+    "topic": "Newton's law of cooling",
+    "concept": "exponential decay toward ambient temperature",
+    "definition": "Newton's law of cooling states that the rate of heat loss of a body is directly proportional to the difference in temperatures between the body and its surroundings.",
+    "case": {
+      "widget": "curve",
+      "approximate": false,
+      "variables": [
+        {
+          "name": "T_room",
+          "meaning": "ambient room temperature",
+          "unit": "degrees C",
+          "value": 20.0
+        },
+        {
+          "name": "T_initial",
+          "meaning": "starting temperature of the object",
+          "unit": "degrees C",
+          "value": 100.0
+        }
+      ],
+      "curve": {
+        "expr": "T_room + (T_initial - T_room) * 2.71828^(-k * x)",
+        "mode": "value",
+        "x_min": 0.0,
+        "x_max": 60.0,
+        "x_label": "minutes",
+        "y_label": "temperature (degrees C)",
+        "ask_x": 30.0,
+        "ask_y": null,
+        "area_from": null,
+        "area_to": null,
+        "knob": {
+          "param": "k",
+          "label": "cooling rate constant",
+          "min": 0.01,
+          "max": 0.1,
+          "step": 0.01,
+          "default": 0.05
+        }
+      },
+      "sampler": null,
+      "prediction": {
+        "prompt": "Coffee at 100 C sits in a 20 C room. At first it loses about 4 C per minute. What's its temperature after 30 minutes?",
+        "input": "slider",
+        "slider": {
+          "min": 20.0,
+          "max": 100.0,
+          "step": 1.0,
+          "unit": "degrees C"
+        },
+        "options": []
+      },
+      "bands": [
+        {
+          "min": 20,
+          "max": 34,
+          "misconception_id": "linear-cooling"
+        },
+        {
+          "min": 35,
+          "max": 41,
+          "misconception_id": null
+        },
+        {
+          "min": 42,
+          "max": 100,
+          "misconception_id": "steady-slow"
+        }
+      ],
+      "extremes": [
+        {
+          "param": "k",
+          "value": 0.01,
+          "watch": "Lower cooling rate makes the object stay much hotter for longer."
+        },
+        {
+          "param": "k",
+          "value": 0.1,
+          "watch": "Higher cooling rate causes the temperature to plunge quickly toward room temperature."
+        }
+      ],
+      "answer_claimed": 37.85
+    },
+    "misconceptions": [
+      {
+        "id": "linear-cooling",
+        "label": "Keeps cooling at the starting rate",
+        "why_tempting": "4 C a minute for 30 minutes would bring it to room temperature.",
+        "refutation": "It cools in proportion to how much hotter it is than the room, so it slows down as it gets closer.",
+        "source_url": "https://en.wikipedia.org/wiki/Newton%27s_law_of_cooling",
+        "source_note": "Page states the correct model; that this mistake is common is unverified"
+      },
+      {
+        "id": "steady-slow",
+        "label": "Cools slowly the whole time",
+        "why_tempting": "Hot drinks seem to stay warm a long time.",
+        "refutation": "The first minutes are the fastest: the gap to room temp shrinks by the same fraction each minute.",
+        "source_url": "https://en.wikipedia.org/wiki/Newton%27s_law_of_cooling",
+        "source_note": "Page states the correct model; that this mistake is common is unverified"
+      }
+    ],
+    "compare": null
+  }
+}

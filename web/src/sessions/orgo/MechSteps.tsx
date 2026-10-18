@@ -5,11 +5,9 @@ import {
   type AnalysisMistake, type CarbonKind, type Case, type Mech, type Question, type Strength,
 } from './analysis'
 import { Scene } from './Scene'
-import { RX, sceneAt } from './sn2'
 
 // Working out the mechanism before drawing it: find the parts, size them up, read the chart.
 
-const NAMES: Record<string, string> = { back: 'H of hydroxide', nu: 'O of hydroxide', c: 'carbon of CH₃Br', h1: 'H on carbon', h2: 'H on carbon', h3: 'H on carbon', lg: 'Br' }
 const PART_NAME: Record<Part, string> = { nucleophile: 'nucleophile', electrophile: 'substrate carbon', leaving: 'leaving group' }
 
 type StepProps = { onNext: () => void; nextLabel: string; c?: Case }
@@ -17,34 +15,38 @@ type StepProps = { onNext: () => void; nextLabel: string; c?: Case }
 /* ---------- find the parts ---------- */
 
 export function PartsStep({ onNext, nextLabel, c = SN2_CASE }: StepProps) {
-  const rx = RX[c.rx]
+  const pic = c.picture()
+  // each part's wording: a base in the eliminations, a nucleophile otherwise
+  const asks = PART_ASK.map((p) => ({ ...p, tag: PART_TAG[p.part], name: PART_NAME[p.part], ...c.words?.[p.part] }))
   const [found, setFound] = useState<Part[]>([])
   const [hint, setHint] = useState<string | null>(null)
-  const cur = PART_ASK.find((p) => !found.includes(p.part))
-  const marks = Object.fromEntries(found.map((p) => [rx.parts[p], PART_TAG[p]]))
+  const cur = asks.find((p) => !found.includes(p.part))
+  const marks = Object.fromEntries(asks.filter((p) => found.includes(p.part)).map((p) => [c.parts[p.part], p.tag]))
   const tap = (atom: string) => {
     if (!cur) return
-    if (tapVerdict(rx.parts, cur.part, atom).ok) {
+    if (tapVerdict(c.parts, cur.part, atom).ok) {
       setFound((f) => [...f, cur.part])
       setHint(null)
     } else setHint(`Not that one. ${cur.hint}`)
   }
   return (
     <section className="og-step og-analyze">
+      <div className="og-size">
+      <figure className="og-fig">
+        <figcaption>{c.name}</figcaption>
+        <Scene scene={pic.scene} vh={pic.vh} label={c.name} marks={marks} onAtom={cur ? tap : undefined} atomName={(id) => c.names[id] ?? id} />
+      </figure>
+      <div className="og-col">
       <p className="og-ask" aria-live="polite">
         {cur ? cur.ask : 'All three found.'}
         {cur && <span className="og-where">{found.length} of 3 found</span>}
       </p>
-      <figure className="og-fig">
-        <figcaption>{rx.text.reactants}</figcaption>
-        <Scene scene={sceneAt(rx, 0)} label={rx.text.reactants} marks={marks} onAtom={cur ? tap : undefined} atomName={(id) => NAMES[id]} />
-      </figure>
       {hint && <p className="og-hint" role="status">{hint}</p>}
       <ul className="og-found">
-        {PART_ASK.map((p) => (
+        {asks.map((p) => (
           <li key={p.part} className={found.includes(p.part) ? 'on' : ''}>
-            <span className="og-chip">{PART_TAG[p.part]}</span> {PART_NAME[p.part]}
-            {found.includes(p.part) && <b> · {NAMES[rx.parts[p.part]]} ✓</b>}
+            <span className="og-chip">{p.tag}</span> {p.name}
+            {found.includes(p.part) && <b> · {c.names[c.parts[p.part]]} ✓</b>}
           </li>
         ))}
       </ul>
@@ -53,6 +55,8 @@ export function PartsStep({ onNext, nextLabel, c = SN2_CASE }: StepProps) {
           <button className="og-btn og-go" onClick={onNext}>{nextLabel}</button>
         </div>
       )}
+      </div>
+      </div>
     </section>
   )
 }
@@ -62,7 +66,7 @@ export function PartsStep({ onNext, nextLabel, c = SN2_CASE }: StepProps) {
 type AnyQ = Question<string>
 
 export function SizeStep({ onNext, nextLabel, onMistake, c = SN2_CASE }: StepProps & { onMistake: (m: AnalysisMistake) => void }) {
-  const rx = RX[c.rx]
+  const pic = c.picture()
   const qs = [c.nu, c.carbon, c.lg] as AnyQ[]
   const [i, setI] = useState(0)
   const [wrong, setWrong] = useState<string[]>([])
@@ -83,13 +87,13 @@ export function SizeStep({ onNext, nextLabel, onMistake, c = SN2_CASE }: StepPro
       setNote(ANALYSIS_MISTAKES[m])
     } else setNote({ label: 'Not quite', line: q.retry || 'Try another one.' })
   }
-  const TITLE: Record<AnyQ['id'], string> = { nu: 'Nucleophile', carbon: 'Substrate carbon', lg: 'Leaving group' }
+  const TITLE: Record<AnyQ['id'], string> = { nu: c.nuWord[0].toUpperCase() + c.nuWord.slice(1), carbon: 'Substrate carbon', lg: 'Leaving group' }
   return (
     <section className="og-step og-analyze">
       <div className="og-size">
         <figure className="og-fig">
-          <figcaption>{rx.text.reactants}</figcaption>
-          <Scene scene={sceneAt(rx, 0)} label={rx.text.reactants} marks={done ? {} : { [q.atom]: q.tag }} />
+          <figcaption>{c.name}</figcaption>
+          <Scene scene={pic.scene} vh={pic.vh} label={c.name} marks={done ? {} : { [q.atom]: q.tag }} />
         </figure>
         <ol className="og-sheet" aria-label="what you've worked out">
           {qs.map((x, k) => (
@@ -154,13 +158,18 @@ export function DecideStep({ onNext, nextLabel, onMistake, c = SN2_CASE }: StepP
   }
   return (
     <section className="og-step og-analyze">
+      <div className="og-size og-decide">
+      <div className="og-col">
       <p className="og-ask">
-        Your answers: a <span className="og-hl">{c.nu.answer} nucleophile</span> on a <span className="og-hl">{CARBON_SHORT[row]} carbon</span>, with a {c.lg.answer} leaving group.
+        Your answers: a <span className="og-hl">{c.nu.answer} {c.nuWord}</span> on a <span className="og-hl">{CARBON_SHORT[row]} carbon</span>, with a {c.lg.answer} leaving group.
+        {c.cue && (
+          <> Conditions: <span className="og-hl og-cue">{c.cue}</span>.</>
+        )}
         <span className="og-where">Find your row and column on the chart. Which mechanism belongs where they meet?</span>
       </p>
       <div className="og-chart" role="table" aria-label="mechanism chart: carbon type by nucleophile strength">
         <div role="row" className="og-chart-row">
-          <span role="columnheader" className="og-chart-corner">carbon ↓ · nucleophile →</span>
+          <span role="columnheader" className="og-chart-corner">carbon ↓ · nucleophile/base →</span>
           {STRENGTHS.map((s) => (
             <span key={s} role="columnheader" className={'og-chart-h' + (s === col ? ' hl' : '')}>{s}</span>
           ))}
@@ -181,6 +190,8 @@ export function DecideStep({ onNext, nextLabel, onMistake, c = SN2_CASE }: StepP
           </div>
         ))}
       </div>
+      </div>
+      <div className="og-col">
       <div className="og-choices og-mechs">
         {MECHS.map((m) => (
           <button key={m.id} className={'og-choice' + (right && m.id === c.mech ? ' right' : '')} disabled={right || wrong.includes(m.id)} onClick={() => pick(m.id)} aria-pressed={right && m.id === c.mech}>
@@ -198,12 +209,14 @@ export function DecideStep({ onNext, nextLabel, onMistake, c = SN2_CASE }: StepP
       )}
       {right && (
         <div className="og-principle" role="status">
-          <p className="og-ink-big">{c.why}</p>
+          <p className="og-why-big">{c.why}</p>
           <div className="og-row">
             <button className="og-btn og-go" onClick={onNext}>{nextLabel}</button>
           </div>
         </div>
       )}
+      </div>
+      </div>
     </section>
   )
 }

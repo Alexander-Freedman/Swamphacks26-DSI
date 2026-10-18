@@ -1,7 +1,7 @@
 // @vitest-environment jsdom
 import { cleanup, fireEvent, render, screen } from '@testing-library/react'
 import { afterEach, beforeAll, describe, expect, it, vi } from 'vitest'
-import { entries } from '../../notebook'
+import { entries, notebook } from '../../notebook'
 import { session } from './index'
 import { f, fPrime } from './math'
 import { boxes } from './slopeGeo'
@@ -154,7 +154,7 @@ describe('calculus session', () => {
     fireEvent.click(screen.getByRole('button', { name: 'uphill' }))
     expect(screen.getByText(/Not quite/)).toBeTruthy()
     fireEvent.click(screen.getByRole('button', { name: 'downhill' }))
-    expect(screen.getByText(/∂f\/∂x = -0\.91/)).toBeTruthy()
+    expect(screen.getByRole('img', { name: /slice along x: slope -0\.91, downhill/ })).toBeTruthy()
     // +y from (1, −1) is uphill
     fireEvent.click(screen.getByRole('button', { name: 'uphill' }))
     expect(screen.getByText(/move the dot to where/)).toBeTruthy()
@@ -163,5 +163,120 @@ describe('calculus session', () => {
     fireEvent.change(screen.getByLabelText('move the dot in y'), { target: { value: '0' } })
     expect(screen.getByText(/you’re on top of the hill/)).toBeTruthy()
     expect(entries()[0]).toMatchObject({ session: 'calculus', misconception: 'partial-wrong-way', calcTopic: 'surface' })
+  })
+
+  it('Calc 3 > The gradient: "straight at the top" and "steeper higher up" are named; walking the arrow reaches the top', () => {
+    localStorage.clear()
+    render(<Session onDone={() => {}} />)
+    pickTopic(/^The gradient/)
+    expect(screen.getByText('The gradient.')).toBeTruthy()
+    expect(screen.getByRole('img', { name: /3D surface z = f\(x, y\), a long hill/ })).toBeTruthy()
+    // A points at the top: named, with how much it climbs; try again
+    fireEvent.click(screen.getByRole('button', { name: 'arrow A' }))
+    expect(screen.getByText(/Not quite/)).toBeTruthy()
+    expect(screen.getByText(/A points straight at the top, but walking that way climbs only 0\.99/)).toBeTruthy()
+    expect((screen.getByRole('button', { name: /arrow A/ }) as HTMLButtonElement).disabled).toBe(true)
+    // C runs level: wrong, but not a named idea
+    fireEvent.click(screen.getByRole('button', { name: 'arrow C' }))
+    expect(screen.getByText(/your height stays the same/)).toBeTruthy()
+    fireEvent.click(screen.getByRole('button', { name: 'arrow B' }))
+    expect(screen.getByText('Correct!')).toBeTruthy()
+    expect(screen.getByText(/B climbs 1\.23 per step/)).toBeTruthy()
+    // the gradient and its two parts, tied to the slices
+    expect(screen.getByText(/∂f\/∂x =/)).toBeTruthy()
+    expect(screen.getAllByText('-0.55').length).toBeGreaterThan(1)
+    expect(screen.getAllByText('-1.10').length).toBeGreaterThan(1)
+    expect(screen.getByRole('img', { name: /slice along y: slope -1\.10/ })).toBeTruthy()
+
+    fireEvent.click(screen.getByRole('button', { name: /It gets longer/ }))
+    expect(screen.getByText(/Height isn’t steepness/)).toBeTruthy()
+    fireEvent.click(screen.getByRole('button', { name: /It shrinks to nothing/ }))
+    expect(screen.getByText(/Keep stepping until the arrow is gone/)).toBeTruthy()
+    expect(screen.queryByText(/Saved to your notebook/)).toBeNull()
+    for (let k = 0; k < 20 && !screen.queryByText(/You’re on top/); k++) fireEvent.click(screen.getByRole('button', { name: 'Take a step along the arrow' }))
+    expect(screen.getByText(/You’re on top/)).toBeTruthy()
+    expect(screen.getByText(/Saved to your notebook/)).toBeTruthy()
+    expect(screen.getByText(/Caught: “Steepest = straight at the top” and “Steeper the higher you go”/)).toBeTruthy()
+    expect(screen.queryByText('✓ mastered')).toBeNull()
+    expect(entries()).toHaveLength(1)
+    expect(entries()[0]).toMatchObject({ session: 'calculus', misconception: 'gradient-points-at-peak', calcTopic: 'gradient' })
+    expect((entries()[0] as unknown as { mastered: boolean }).mastered).toBe(false)
+    expect(notebook()[0].label).toBe('Steepest = straight at the top')
+  })
+
+  it('Calc 3 > The gradient: right first time is mastered', () => {
+    localStorage.clear()
+    render(<Session onDone={() => {}} />)
+    pickTopic(/^The gradient/)
+    fireEvent.click(screen.getByRole('button', { name: 'arrow B' }))
+    fireEvent.click(screen.getByRole('button', { name: /It shrinks to nothing/ }))
+    let steps = 0
+    while (!screen.queryByText(/You’re on top/) && steps < 20) {
+      fireEvent.click(screen.getByRole('button', { name: 'Take a step along the arrow' }))
+      steps++
+    }
+    expect(steps).toBeLessThanOrEqual(10)
+    expect(screen.getByText('✓ mastered')).toBeTruthy()
+    expect(entries()[0]).toMatchObject({ misconception: null, calcTopic: 'gradient' })
+    expect((entries()[0] as unknown as { mastered: boolean }).mastered).toBe(true)
+  })
+
+  // the volume bar is 0..14 over 640 − 28 px starting at 14 (jsdom measures 0 wide)
+  const guessVolume = (v: number) => {
+    const bar = screen.getByLabelText('your volume guess, in cubic units')
+    fireEvent.pointerDown(bar, { clientX: 14 + (v / 14) * 612, clientY: 40, pointerId: 4 })
+    fireEvent.pointerUp(bar, { pointerId: 4 })
+  }
+
+  it('Calc 3 > Volume under a surface: "more columns = more volume" is named; the sums close in on 8', () => {
+    localStorage.clear()
+    render(<Session onDone={() => {}} />)
+    pickTopic(/^Volume under a surface/)
+    expect(screen.getByText('Volume under a surface.')).toBeTruthy()
+    expect(screen.getByText('10.50')).toBeTruthy()
+    expect((screen.getByText('Drag the pencil on the bar first') as HTMLButtonElement).disabled).toBe(true)
+    guessVolume(11)
+    expect(screen.getByText('11.0')).toBeTruthy()
+    fireEvent.click(screen.getByText('Use thinner columns →'))
+
+    // thinner columns: "bigger" is the named idea; try again
+    fireEvent.click(screen.getByRole('button', { name: 'Bigger' }))
+    expect(screen.getByText(/Not quite/)).toBeTruthy()
+    expect(screen.getByText(/they trim that extra/)).toBeTruthy()
+    fireEvent.click(screen.getByRole('button', { name: 'Smaller' }))
+    expect(screen.getByText('Correct!')).toBeTruthy()
+    expect(screen.getByText('4 × 4 = 16 columns')).toBeTruthy()
+    expect(screen.getAllByText('9.38').length).toBeGreaterThan(0)
+    expect(screen.queryByText(/exact volume is/)).toBeNull()
+
+    // every grid you try shows its number; 40 × 40 brings out the exact volume and reads the guess
+    const slider = screen.getByLabelText(/Columns per side/)
+    fireEvent.change(slider, { target: { value: '5' } })
+    expect(screen.getByText('10 × 10 = 100 columns')).toBeTruthy()
+    expect(screen.getAllByText('8.58').length).toBeGreaterThan(0)
+    expect(screen.queryByText(/Saved to your notebook/)).toBeNull()
+    fireEvent.change(slider, { target: { value: '9' } })
+    expect(screen.getByText('40 × 40 = 1600 columns')).toBeTruthy()
+    expect(screen.getAllByText('8.15').length).toBeGreaterThan(0)
+    expect(screen.getByText('exact', { selector: '.calc-chip' })).toBeTruthy()
+    expect(screen.getByText(/at or above even the 2 × 2 total/)).toBeTruthy()
+    expect(screen.getByText(/Caught: “More columns = more volume”/)).toBeTruthy()
+    expect(entries()).toHaveLength(1)
+    expect(entries()[0]).toMatchObject({ session: 'calculus', misconception: 'more-columns-more-volume', calcTopic: 'double', guess: 11 })
+    expect(notebook()[0].label).toBe('More columns = more volume')
+  })
+
+  it('Calc 3 > Volume under a surface: a close guess and the right prediction are mastered', () => {
+    localStorage.clear()
+    render(<Session onDone={() => {}} />)
+    pickTopic(/^Volume under a surface/)
+    guessVolume(8.6)
+    fireEvent.click(screen.getByText('Use thinner columns →'))
+    fireEvent.click(screen.getByRole('button', { name: 'Smaller' }))
+    fireEvent.change(screen.getByLabelText(/Columns per side/), { target: { value: '9' } })
+    expect(screen.getByText(/within 15% of the exact volume/)).toBeTruthy()
+    expect(screen.getByText('✓ mastered')).toBeTruthy()
+    expect(entries()[0]).toMatchObject({ misconception: null, calcTopic: 'double' })
+    expect((entries()[0] as unknown as { mastered: boolean }).mastered).toBe(true)
   })
 })
