@@ -6,6 +6,15 @@ import { useGraded } from './useGraded'
 import { offlineLine } from './learn-guess-anchor'
 import './learn-guess-anchor.css'
 
+/** "why we have seasons" is already a question; "compound interest" needs one. */
+function guessQuestion(topic: string) {
+  const t = topic.trim()
+  if (/^(why|how|what|when|where|which|who|does|do|is|are|can)\s/i.test(t)) {
+    return `${t.charAt(0).toUpperCase()}${t.slice(1).replace(/[?.]+$/, '')}? Say it in your own words.`
+  }
+  return `In your own words: what is ${t}, and what makes it happen?`
+}
+
 export function GuessScreen({ topic, state, update, next, api }: StageProps) {
   const call = useCallback((b: GuessRequest) => api.guess(topic.slug, b), [api, topic.slug])
   const { run, busy, offline } = useGraded(call)
@@ -24,7 +33,7 @@ export function GuessScreen({ topic, state, update, next, api }: StageProps) {
   return (
     <section className="learn-step lga" aria-label="guess">
       <p className="learn-instruction">Guess first. No looking anything up.</p>
-      <label className="lga-q" htmlFor="lga-guess">In your own words: what is {topic.topic}, and what makes it happen?</label>
+      <label className="lga-q" htmlFor="lga-guess">{guessQuestion(topic.topic)}</label>
       <textarea
         id="lga-guess"
         className="lga-pencil"
