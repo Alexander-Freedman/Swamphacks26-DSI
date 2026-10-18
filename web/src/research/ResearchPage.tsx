@@ -47,7 +47,7 @@ function Cites({ ids }: { ids: string[] }) {
   )
 }
 
-function HomeLink({ onHome, className }: { onHome?: () => void; className: string }) {
+export function HomeLink({ onHome, className }: { onHome?: () => void; className: string }) {
   return (
     <a
       className={className}

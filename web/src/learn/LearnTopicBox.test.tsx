@@ -63,7 +63,7 @@ describe('LearnTopicBox', () => {
     await screen.findByRole('button', { name: 'compound interest' })
     fireEvent.change(screen.getByLabelText('topic to learn'), { target: { value: 'photosynthesis' } })
     fireEvent.click(screen.getByRole('button', { name: 'Learn it' }))
-    expect(await screen.findByText(/needs the live backend/)).toBeTruthy()
+    expect(await screen.findByText(/AI server, which is now retired/)).toBeTruthy()
     expect(onOpen).not.toHaveBeenCalled()
     expect(screen.getByRole('button', { name: 'compound interest' })).toBeTruthy()
   })

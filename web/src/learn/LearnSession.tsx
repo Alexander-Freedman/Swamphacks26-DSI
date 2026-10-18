@@ -1,5 +1,6 @@
 // The Learn session shell: loads the topic, holds session state, walks the eight stages.
 // Each stage is its own file (StageProps from ./types), so screens can be built in parallel.
+import { DemoBar } from '../demo/DemoBar'
 import { useEffect, useRef, useState, type ComponentType } from 'react'
 import { learnApi } from '../learnApi'
 import { initialState } from './state'
@@ -132,6 +133,7 @@ export function LearnSession({
             ))}
           </ol>
         </div>
+        <DemoBar slug={slug} />
         <ol className="learn-stack">
           {reached.map((st, i) => {
             const Screen = customScreen(slug, st) ?? SCREENS[st]

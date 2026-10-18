@@ -247,5 +247,26 @@
    ],
    "followUpQuestion": "If the output change stays the same while the input interval doubles, what happens to the size of the average rate, and why?"
   }
+ },
+ "sn2-reaction/guess": {
+  "request": {
+   "text": "The leaving group falls off first, then the nucleophile comes in and takes its place."
+  },
+  "reply": {
+   "classification": "concrete",
+   "misconceptionId": "leaving-group-first",
+   "message": "Your guess names a testable sequence: the leaving group falls off first, then the nucleophile takes its place. Next, we’ll test that sequence against what happens in the real system."
+  }
+ },
+ "sn2-reaction/transfer": {
+  "request": {
+   "analogy": "A revolving door: you only get in as the person ahead is pushed out, both in one motion, and the door swings around the way the carbon flips.",
+   "wasPushed": false
+  },
+  "reply": {
+   "verdict": "partial",
+   "critique": "Your revolving door gives concrete people moving together, but leaves the effect of their numbers, a required entry side, blockage, and an actual reversed arrangement unclear; “swings around” only describes rotation. How would adding either waiting entrants or occupied door spaces increase completed exchanges per minute?",
+   "missingPiece": "More of either participant increases the exchange rate"
+  }
  }
 }

@@ -10,6 +10,8 @@ import { SessionHowItWorks } from './components/SessionHowItWorks'
 import { sessionHowItWorks } from './components/sessionSpecs'
 import { NotebookLink, NotebookScreen } from './components/Notebook'
 import { ResearchPage } from './research/ResearchPage'
+import { BuiltPage } from './built/BuiltPage'
+import { isStatic } from './demo/demo'
 import { record, upsert } from './notebook'
 import { useReset } from './reset'
 import { Predict, type Answer } from './components/Predict'
@@ -46,7 +48,7 @@ function Home({
   return (
     <div className="home sheet">
       <h1>See your thinking in layers.</h1>
-      <p className="concept">Type any topic. Watch it come alive.</p>
+      <p className="concept">{isStatic() ? 'Guess first, then watch reality draw over your idea.' : 'Type any topic. Watch it come alive.'}</p>
       <LearnTopicBox onOpen={onLearn} />
       {homeSessions.length > 0 && <p className="demos-label">Or try a guided demo</p>}
       {homeSessions.length > 0 && (
@@ -247,7 +249,7 @@ export default function App() {
         <header className="topbar">
           <button className="logo" style={{ border: 0, background: 'none', padding: 0 }} onClick={home}>Onionskin</button>
           <div className="topbar-actions">
-            <AskHelp key={screen.slug} slug={screen.slug} kind="session" subject={screen.slug.replace(/-/g, ' ')} docked />
+            {!isStatic() && <AskHelp key={screen.slug} slug={screen.slug} kind="session" subject={screen.slug.replace(/-/g, ' ')} docked />}
           </div>
         </header>
         <LearnSession key={screen.slug} slug={screen.slug} onDone={home} />
@@ -260,7 +262,7 @@ export default function App() {
         <header className="topbar">
           <button className="logo" style={{ border: 0, background: 'none', padding: 0 }} onClick={home}>Onionskin</button>
           <div className="topbar-actions">
-            <AskHelp key={session.slug} slug={session.slug} kind="session" subject={session.title} />
+            {!isStatic() && <AskHelp key={session.slug} slug={session.slug} kind="session" subject={session.title} />}
             {sessionHowItWorks[session.slug] && <SessionDrawer key={session.slug} slug={session.slug} />}
           </div>
         </header>
@@ -279,10 +281,15 @@ export default function App() {
                 <strong>Research:</strong> why it works
               </button>
             )}
+            {screen.kind === 'home' && (
+              <button className="brand-tab" onClick={() => go({ kind: 'built' })}>
+                <strong>How we built it</strong>
+              </button>
+            )}
           </span>
         {round && <CheckedTag reviewed={round.reviewed} />}
         {screen.kind === 'home' && <BackendDot />}
-        {screen.kind === 'research' && (
+        {screen.kind === 'research' && !isStatic() && (
           <div className="topbar-actions">
             <AskHelp slug="research" kind="session" subject="the research behind Onionskin" docked />
           </div>
@@ -294,6 +301,8 @@ export default function App() {
         <NotebookScreen onHome={home} />
       ) : screen.kind === 'research' ? (
         <ResearchPage onHome={home} />
+      ) : screen.kind === 'built' ? (
+        <BuiltPage onHome={home} onLearn={(slug) => go({ kind: 'learn', slug })} />
       ) : round ? (
         <Player key={round.slug} round={round} onDone={home} />
       ) : loading ? (

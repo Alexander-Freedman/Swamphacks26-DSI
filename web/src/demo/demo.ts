@@ -1,9 +1,10 @@
-// Demo mode, for recording the demo by hand. Open the site with ?demo=1 (it stays on for the tab;
-// ?demo=0 turns it off). Then:
+// Demo mode. On the static site (no AI server, which is retired) it is always on. On a build with a
+// server it is for recording: open with ?demo=1 (it stays on for the tab; ?demo=0 turns it off). Then:
 //  - Shift+W fills the current step's empty answer boxes with the demo script (script.json).
 //  - A scripted answer gets its reply at once: the real reply the live AI gave to that exact answer,
 //    saved ahead of time (replies.json, from demo-video/recapture.py). Anything off-script still goes
 //    to the live AI as usual.
+import { apiBase } from '../extras'
 import replies from './replies.json'
 import script from './script.json'
 
@@ -12,7 +13,14 @@ type Saved = { request: Record<string, unknown>; reply: unknown }
 const REPLIES = replies as Record<string, Saved | { answer: string; hint_only?: boolean }>
 const SCRIPT = script as unknown as Record<string, Record<string, string>> & { home: string }
 
+/** No AI server in this build: the recorded replies are the only AI there is. */
+export const isStatic = () => apiBase() === null
+
+/** This topic has a demo script (and recorded replies for it). */
+export const hasScript = (slug: string) => slug !== 'home' && !!SCRIPT[slug]
+
 export function demoOn(): boolean {
+  if (isStatic()) return true
   try {
     const p = new URLSearchParams(location.search).get('demo')
     if (p !== null) sessionStorage.setItem(KEY, p === '0' ? '0' : '1')

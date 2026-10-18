@@ -26,6 +26,7 @@ describe('Ask Onion on Learn steps', () => {
     const BASE = import.meta.env.BASE_URL
     beforeEach(() => {
       vi.stubEnv('VITE_LEARN_MOCK', '1')
+    vi.stubEnv('VITE_API_BASE', 'https://api.test') // Ask Onion needs a live server
       history.replaceState(null, '', `${BASE}?learn=compound-interest`)
     })
     afterEach(() => {
@@ -46,6 +47,7 @@ describe('Ask Onion docks on the right on Learn pages', () => {
   const BASE = import.meta.env.BASE_URL
   beforeEach(() => {
     vi.stubEnv('VITE_LEARN_MOCK', '1')
+    vi.stubEnv('VITE_API_BASE', 'https://api.test') // Ask Onion needs a live server
     history.replaceState(null, '', `${BASE}?learn=compound-interest`)
   })
   afterEach(() => {

@@ -1,6 +1,6 @@
 // @vitest-environment jsdom
 import { cleanup, render, screen } from '@testing-library/react'
-import { afterEach, describe, expect, it } from 'vitest'
+import { afterEach, describe, expect, it, vi } from 'vitest'
 import data from './research.json'
 import { ONION_FACTS, ResearchPage } from './ResearchPage'
 import App from '../App'
@@ -71,10 +71,24 @@ describe('research page: FAQ and Ask Onion', () => {
     expect(ONION_FACTS.some((f) => /^Guess first \(Richland/.test(f))).toBe(true) // the citation comes first
   })
 
-  it('the research page has Ask Onion in its top bar', () => {
+  it('the research page has Ask Onion in its top bar when there is a live server', () => {
+    vi.stubEnv('VITE_API_BASE', 'https://api.test')
     history.replaceState(null, '', `${import.meta.env.BASE_URL}?research=1`)
     render(<App />)
     expect(screen.getByRole('button', { name: 'Ask Onion' })).toBeTruthy()
+    history.replaceState(null, '', import.meta.env.BASE_URL)
+    vi.unstubAllEnvs()
+  })
+
+  it('the static site (no server) has no Ask Onion, and Home links to how we built it', () => {
+    history.replaceState(null, '', `${import.meta.env.BASE_URL}?research=1`)
+    render(<App />)
+    expect(screen.queryByRole('button', { name: 'Ask Onion' })).toBeNull()
+    cleanup()
+    history.replaceState(null, '', import.meta.env.BASE_URL)
+    render(<App />)
+    screen.getByRole('button', { name: 'How we built it' }).click()
+    expect(location.search).toBe('?built=1')
     history.replaceState(null, '', import.meta.env.BASE_URL)
   })
 })
