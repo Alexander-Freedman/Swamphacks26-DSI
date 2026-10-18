@@ -1,0 +1,28 @@
+/* Stress test: the fix as a pencil chip, three case cards, a stamp per verdict. */
+.st-title { font: 800 clamp(22px, 4vw, 28px) var(--font-display); color: var(--ink); }
+
+.st-fix { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; padding: 10px 12px; margin: 0 0 16px; border: 1.5px dashed var(--ink-soft); border-radius: 4px; background: var(--paper); }
+.st-fix-k, .st-after-k { font: 700 11px var(--font-mono); text-transform: uppercase; letter-spacing: 0.08em; color: var(--ink-soft); }
+.st-fix-text { flex: 1; min-width: 0; font: 16px/1.35 var(--font-hand); color: var(--ink); }
+.st-fix input { flex: 1; min-width: 180px; }
+
+.st-cases { list-style: none; margin: 0 0 16px; padding: 0; display: grid; gap: 12px; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); }
+.st-card { position: relative; display: flex; flex-direction: column; gap: 10px; align-items: flex-start; padding: 14px; border: 1.5px solid var(--ink); border-radius: 4px; background: var(--card); box-shadow: var(--shadow); }
+.st-card.st-survives { border-color: var(--called); }
+.st-card.st-breaks { border-color: var(--off); }
+.st-scenario { margin: 0; font-weight: 700; color: var(--ink); line-height: 1.35; }
+.st-critique { margin: 0; font-size: 14px; line-height: 1.4; color: var(--ink-soft); }
+
+.st-stamp { display: inline-block; font: 800 15px var(--font-display); text-transform: uppercase; letter-spacing: 0.06em; border: 3px solid currentColor; border-radius: 4px; padding: 1px 10px; transform: rotate(-5deg); background: var(--paper); animation: st-slam 0.28s cubic-bezier(0.2, 1.6, 0.4, 1) both; }
+.st-stamp-survives { color: var(--called); }
+.st-stamp-breaks { color: var(--off); }
+.st-stamp-open { color: var(--close); }
+@keyframes st-slam { from { transform: scale(1.9) rotate(-12deg); opacity: 0; } to { transform: scale(1) rotate(-5deg); opacity: 1; } }
+@media (prefers-reduced-motion: reduce) { .st-stamp { animation: none; } }
+
+.learn-step .st-go, .learn-step .st-small { margin-top: 0; }
+.st-after { margin: 0 0 16px; padding: 14px; border-left: 4px solid var(--marker); background: var(--card); border-radius: 4px; }
+.st-after p { margin: 6px 0; line-height: 1.4; }
+.st-q { font-weight: 700; color: var(--ink); }
+.st-rule { font: 700 17px/1.35 var(--font-body); color: var(--ink); background: var(--marker-soft); padding: 2px 4px; }
+.st-result { margin-top: 10px; }
