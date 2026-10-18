@@ -290,6 +290,11 @@ export default function App() {
           </span>
         {round && <CheckedTag reviewed={round.reviewed} />}
         {screen.kind === 'home' && <BackendDot />}
+        {screen.kind === 'research' && (
+          <div className="topbar-actions">
+            <AskHelp slug="research" kind="session" subject="the research behind Onionskin" docked />
+          </div>
+        )}
       </header>
       {cleared && <p className="nb-toast" role="status">Notebook cleared</p>}
       {screen.kind !== 'home' && <BuildReady onOpen={(slug) => go({ kind: 'round', slug })} />}
