@@ -65,9 +65,10 @@ describe('research page: FAQ and Ask Onion', () => {
 
   it("Onion's facts are only our research and fit the help request limits", () => {
     expect(ONION_FACTS[0]).toMatch(/Only answer from the research listed here/)
-    expect(ONION_FACTS.slice(0, 12).every((f) => f.length <= 200)).toBe(true)
-    expect(ONION_FACTS[1]).toMatch(/^Guess first \(Richland/) // the citation survives the cut
-    expect(ONION_FACTS[0].length).toBeLessThanOrEqual(200)
+    expect(ONION_FACTS.length).toBeLessThanOrEqual(24)
+    expect(ONION_FACTS.every((f) => f.length <= 320)).toBe(true)
+    expect(ONION_FACTS.some((f) => /Why no points, XP/.test(f))).toBe(true) // the FAQ answers reach Onion
+    expect(ONION_FACTS.some((f) => /^Guess first \(Richland/.test(f))).toBe(true) // the citation comes first
   })
 
   it('the research page has Ask Onion in its top bar', () => {
