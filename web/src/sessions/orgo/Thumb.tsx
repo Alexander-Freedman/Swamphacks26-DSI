@@ -35,6 +35,7 @@ const PICTURE: Record<string, () => { scene: S; vh: number }> = {
   'build-ethanol': () => ({ scene: ETHANOL, vh: VH }),
   full: () => ({ scene: ETHANOL, vh: VH }),
   sn2: () => ({ scene: sceneAt(RX['oh-mebr'], 0), vh: VH }),
+  'sn2-layers': () => ({ scene: sceneAt(RX['oh-mebr'], 0.5), vh: VH }),
   sn1: () => ({ scene: mechScene(MECHS.sn1, 0), vh: MECHS.sn1.vh }),
   e2: () => ({ scene: mechScene(MECHS.e2, 0), vh: MECHS.e2.vh }),
   e1: () => ({ scene: mechScene(MECHS.e1, 0), vh: MECHS.e1.vh }),

@@ -9,6 +9,7 @@ import { DecideStep, PartsStep, SizeStep } from './MechSteps'
 import { ContrastStep } from './ContrastStep'
 import { MechStep } from './MechStep'
 import { MECHS } from './mechs'
+import { PeelRun } from './Peel'
 import { PushStep } from './PushStep'
 import { Thumb } from './Thumb'
 import { SECTIONS, type OrgoStep, type OrgoTopic } from './topics'
@@ -17,9 +18,10 @@ import { sn2Layer } from './help'
 import './orgo.css'
 
 export const SLUG = 'orgo'
-const LABEL: Record<OrgoStep, string> = { build: 'Build', parts: 'Parts', size: 'Size up', decide: 'Mechanism', push: 'Arrows', compare: 'Compare', contrast: 'Contrast' }
+const LABEL: Record<OrgoStep, string> = { build: 'Build', layers: 'Layers', parts: 'Parts', size: 'Size up', decide: 'Mechanism', push: 'Arrows', compare: 'Compare', contrast: 'Contrast' }
 // Short captions only: the pictures do the explaining.
 const TITLES: Record<OrgoStep, [string, string]> = {
+  layers: ['Peel SN2', 'One picture, five layers.'],
   build: ['Build ethanol', 'Ethanol (C₂H₆O) is the alcohol in drinks. Drag atoms onto the paper and connect them until each one has its full set of bonds: carbon 4, oxygen 2, hydrogen 1.'],
   parts: ['Find the parts', 'Every substitution has three players: the nucleophile brings electrons, the substrate carbon receives them, and the leaving group breaks off with its bond’s electrons. Tap each one in HO⁻ + CH₃Br.'],
   size: ['Size them up', 'Three questions decide the mechanism: how strong is the nucleophile, what kind of carbon is it, and does the leaving group leave easily?'],
@@ -50,6 +52,7 @@ export function OrgoSession({ onDone }: { onDone: () => void }) {
     setPlay((p) => p + 1)
   }
   if (!topic) return <OrgoMenu onPick={start} />
+  if (topic.steps[0] === 'layers') return <PeelRun key={play} slug={SLUG} onTopics={() => setTopic(null)} onDone={onDone} />
   return <OrgoTopicRun key={play} topic={topic} onTopics={() => setTopic(null)} onDone={onDone} />
 }
 

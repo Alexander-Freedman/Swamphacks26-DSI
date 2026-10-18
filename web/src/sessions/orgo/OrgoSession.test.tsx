@@ -212,7 +212,7 @@ describe('orgo session', () => {
     render(<session.Component onDone={() => {}} />)
     expect(screen.getByText('What do you want to practice?')).toBeTruthy()
     for (const sec of ['Molecules', 'Mechanisms', 'Guided path']) expect(screen.getByRole('heading', { name: sec })).toBeTruthy()
-    for (const t of [/^SN2 One/, /^SN1/, /^E2 One/, /^E1/, /^SN2 vs E2/]) expect((screen.getByRole('button', { name: t }) as HTMLButtonElement).disabled).toBe(false)
+    for (const t of [/^Peel SN2/, /^SN2 step by step/, /^SN1/, /^E2 One/, /^E1/, /^SN2 vs E2/]) expect((screen.getByRole('button', { name: t }) as HTMLButtonElement).disabled).toBe(false)
     expect(screen.queryByText('coming next')).toBeNull()
   })
 
@@ -363,7 +363,7 @@ describe('orgo session', () => {
 
   it('Mechanisms > SN2 works it out before the arrows, and the topics link goes back to the menu', () => {
     render(<session.Component onDone={() => {}} />)
-    pickTopic(/^SN2 One/)
+    pickTopic(/^SN2 step by step/)
     expect(screen.getByText('Find the parts')).toBeTruthy()
     expect(screen.getByText('1 of 4')).toBeTruthy()
     expect(screen.queryByText('Build ethanol')).toBeNull()
@@ -374,7 +374,7 @@ describe('orgo session', () => {
   it('SN2 step by step: parts, size up (wrong answers named), the chart, then arrows and Finish', () => {
     vi.useFakeTimers()
     render(<session.Component onDone={() => {}} />)
-    pickTopic(/^SN2 One/)
+    pickTopic(/^SN2 step by step/)
     // parts: a wrong tap gets a hint, not a pass
     expect(screen.getByText(/Tap the nucleophile/)).toBeTruthy()
     fireEvent.click(screen.getByRole('button', { name: 'H of hydroxide' }))
