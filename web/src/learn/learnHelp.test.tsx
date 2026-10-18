@@ -39,3 +39,26 @@ describe('Ask Onion on Learn steps', () => {
     })
   })
 })
+
+describe('Ask Onion docks on the right on Learn pages', () => {
+  const BASE = import.meta.env.BASE_URL
+  beforeEach(() => {
+    vi.stubEnv('VITE_LEARN_MOCK', '1')
+    history.replaceState(null, '', `${BASE}?learn=compound-interest`)
+  })
+  afterEach(() => {
+    vi.unstubAllEnvs()
+    cleanup()
+    history.replaceState(null, '', BASE)
+  })
+  it('opens as a docked panel and the page makes room until it closes', async () => {
+    const { fireEvent } = await import('@testing-library/react')
+    render(<App />)
+    await screen.findByRole('region', { name: 'guess' })
+    fireEvent.click(screen.getByRole('button', { name: 'Ask Onion' }))
+    expect(document.querySelector('.ask-panel.ask-docked')).toBeTruthy()
+    expect(document.body.classList.contains('onion-docked')).toBe(true)
+    fireEvent.click(screen.getByRole('button', { name: 'Close Ask Onion' }))
+    expect(document.body.classList.contains('onion-docked')).toBe(false)
+  })
+})

@@ -22,10 +22,30 @@ function typing(el: Element | null): boolean {
  * reports a LayerHelp (or any session but the 3 probability ones) uses the generic request; the
  * round player stays hidden without a backend or for a topic the help API doesn't know.
  */
-export function AskHelp({ slug, kind, spot: given, subject = '' }: { slug: string; kind: 'session' | 'round'; spot?: HelpSpot | null; subject?: string }) {
+/** `docked`: open as a full-height panel on the right that the page makes room for (Learn pages). */
+export function AskHelp({
+  slug,
+  kind,
+  spot: given,
+  subject = '',
+  docked = false,
+}: {
+  slug: string
+  kind: 'session' | 'round'
+  spot?: HelpSpot | null
+  subject?: string
+  docked?: boolean
+}) {
   const reported = useHelpSpot()
   const topic = HELP_TOPICS[slug]
   const [open, setOpen] = useState(false)
+  // Docked: tell the page to make room on the right while the panel is open.
+  useEffect(() => {
+    if (!docked) return
+    document.body.classList.toggle('onion-docked', open)
+    return () => document.body.classList.remove('onion-docked')
+  }, [docked, open])
+
   const [text, setText] = useState('')
   const [turns, setTurns] = useState<Turn[]>([])
   const [busy, setBusy] = useState(false)
@@ -116,7 +136,7 @@ export function AskHelp({ slug, kind, spot: given, subject = '' }: { slug: strin
         Ask Onion
       </button>
       {open && (
-        <div className="ask-panel" id={`${titleId}-panel`} role="dialog" aria-modal="false" aria-labelledby={titleId} ref={panel}>
+        <div className={`ask-panel${docked ? ' ask-docked' : ''}`} id={`${titleId}-panel`} role="dialog" aria-modal="false" aria-labelledby={titleId} ref={panel}>
           <header className="ask-head">
             <h2 id={titleId}>Ask Onion</h2>
             <button className="hiw-close" onClick={close} aria-label="Close Ask Onion">
@@ -165,7 +185,10 @@ export function AskHelp({ slug, kind, spot: given, subject = '' }: { slug: strin
               onKeyDown={onBoxKey}
             />
             <div className="ask-row">
-              <span id={`${titleId}-count`} className={'ask-count' + (text.length >= MAX_QUESTION ? ' full' : '')}>{text.length}/{MAX_QUESTION}</span>
+              {/* only near the limit: a bare 0/300 reads like a lesson score */}
+              <span id={`${titleId}-count`} className={'ask-count' + (text.length >= MAX_QUESTION ? ' full' : '')}>
+                {text.length > MAX_QUESTION - 50 ? `${MAX_QUESTION - text.length} characters left` : ''}
+              </span>
               <button type="submit" className="ask-send" disabled={busy || !text.trim()}>{busy ? 'Onion is thinking…' : 'Send'}</button>
             </div>
           </form>

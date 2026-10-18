@@ -53,3 +53,15 @@
 @media (prefers-reduced-motion: reduce) {
   .ask-panel, .ask-dots i { animation: none; }
 }
+
+/* Docked (Learn pages, desktop): a full-height panel on the right; the Learn columns make room. */
+@media (min-width: 721px) {
+  .ask-panel.ask-docked {
+    top: 0; right: 0; bottom: 0; width: 360px; max-height: none; overflow-y: auto; box-sizing: border-box;
+    border-radius: 0; border-width: 0 0 0 2px; box-shadow: -4px 0 0 var(--ink-soft); padding: 20px 20px 24px;
+  }
+  body.onion-docked .learn {
+    width: min(1100px, calc(100vw - 408px));
+    margin-left: calc(50% - 50vw + max(16px, (100vw - 376px - min(1100px, 100vw - 408px)) / 2));
+  }
+}

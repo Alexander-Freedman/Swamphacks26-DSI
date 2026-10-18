@@ -246,7 +246,7 @@ export default function App() {
         <header className="topbar">
           <button className="logo" style={{ border: 0, background: 'none', padding: 0 }} onClick={home}>Onionskin</button>
           <div className="topbar-actions">
-            <AskHelp key={screen.slug} slug={screen.slug} kind="session" subject={screen.slug.replace(/-/g, ' ')} />
+            <AskHelp key={screen.slug} slug={screen.slug} kind="session" subject={screen.slug.replace(/-/g, ' ')} docked />
           </div>
         </header>
         <LearnSession key={screen.slug} slug={screen.slug} onDone={home} />
