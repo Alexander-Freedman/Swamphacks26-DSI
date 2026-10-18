@@ -1,0 +1,16 @@
+/* General chemistry: ink atoms on paper, lone pairs as marker clouds. */
+.chem .ch-viewcard { display: grid; }
+.chem .ch-svg { max-height: 44vh; margin: 0 auto; }
+.chem .ch-model { cursor: grab; }
+.chem .ch-model:active { cursor: grabbing; }
+.chem .ch-model:focus-visible { outline: 2px dashed var(--ink); outline-offset: 2px; }
+.chem .ch-bond { stroke: var(--ink); stroke-width: 5; stroke-linecap: round; }
+.chem .ch-atom { stroke: var(--ink); stroke-width: 2.5; }
+.chem .ch-atom.c { fill: var(--ink); }
+.chem .ch-atom.c + .ch-el { fill: var(--paper); }
+.chem .ch-atom.h { fill: var(--card); }
+.chem .ch-el { font: 700 16px var(--font-display); fill: var(--ink); text-anchor: middle; dominant-baseline: central; pointer-events: none; }
+.chem .ch-lp ellipse { fill: var(--marker); fill-opacity: 0.45; stroke: var(--ink); stroke-width: 1.2; stroke-dasharray: 3 3; }
+.chem .ch-lp circle, .chem .ch-dots circle { fill: var(--ink); }
+.chem .ch-finish { margin-top: 10px; }
+.chem .ch-mastered { font-weight: 700; color: var(--called); }
