@@ -1,103 +1,77 @@
-# Demo script: the table demo (Learn flow, seasons + 20 s of orgo)
+# Demo script: the table demo (Learn flow, seasons + orgo)
 
-What the judge sees and hears, click by click, for the **current** flow: Home → a Learn topic → 8 steps (guess, one true fact, compare, stress, draw, tell it apart, carry it over, what you caught) with the why rail. Matched to main @ 480310b and the live API, walked Sun Oct 18 ~2-3 AM at 1440 px and 390 px.
+What the judge sees and hears, click by click, for the current flow: Home → a Learn topic → 8 steps with the why rail. Follows [SOURCE_OF_TRUTH.md](SOURCE_OF_TRUTH.md) (it wins if anything here disagrees). The demo-link path was walked end to end in a browser on a production build of #318 (main @ 72e011b + #318), Sun Oct 18 ~4 AM.
 
-**Time budget:** judges spend ~3 min at the table, so **1:45 of demo, ~1:15 of questions**. Keep a 60-second cut for rushed judges.
+**Format:** at most 3:00 of demo plus 1 minute of judges' questions. Plan **1:45 of talk and demo** for slack, and keep a 60-second cut for rushed judges.
 
-Live: https://onionskin.study (old link https://alexander-freedman.github.io/Swamphacks26-DSI/ redirects there). API: https://45-77-118-201.sslip.io.
+## The demo link
 
-## Why not run it all live (measured)
+**https://onionskin.study/?learn=why-we-have-seasons&demo=1**
 
-| Call | Live time |
-|---|---|
-| Guess (`POST /api/learn/why-we-have-seasons/guess`) | 4.3 s |
-| Anchor | 4.9 s |
-| Stress, per card | 4.5 s |
-| Transfer | 6.1 s |
-| A new typed topic (Bernoulli, Doppler) | 1 to 2.5 min |
+- With `?demo=1` (#318), the scripted answers below get the **real** model replies recorded from the live API (Sun ~3:40 AM), back in about 0.6 s instead of 4-6 s. Anything else, such as a judge's own guess, goes to the live API as normal. Draw always goes live.
+- It latches for the browser tab, including when opened on Home: `https://onionskin.study/?demo=1`. `?demo=0` turns it off.
+- **Check before each block:** open the link, paste guess 1, Submit. If the reply takes more than about a second, #318 isn't deployed yet: say the line below and keep talking over the waits.
+- If asked whether it's live, or say it once to a technical judge: "To fit two minutes, the AI's replies on this path were recorded from the live system tonight. Type your own answer and it goes live, about five seconds a step."
 
-Measured Sun Oct 18 ~2:45 AM, one run each. A full live session spends ~40 s waiting on the model, so **only the guess runs live**. Everything else is pre-run.
+## Paste sheet (exact text; a different word loses the replay)
 
-## Demo mode = pre-staged tabs (no code)
-
-There is no `?demo` mode. These tabs do the same job:
-
-| Tab | URL | State | Between judges |
+| Step | Do | Paste | Expect |
 |---|---|---|---|
-| 1 Live | `?learn=why-we-have-seasons` | Fresh guess screen ("Why we have seasons? Say it in your own words.") | Reload (state is in memory, so a reload is fresh) |
-| 2 Played | `?learn=why-we-have-seasons` | Played start to finish beforehand with good answers. All 8 steps stay stacked on the page, including one stress card that BREAKS and the done card | **Never reload.** Keep a spare copy (2b) |
-| 3 Orgo | Home → Organic chemistry card (`?learn=sn2-reaction`) | Guess submitted; sitting on *Build ethanol* | Press *Clear* |
-| 4 Research | `?research=1` | Scrolled to "Why no points, XP, streaks…" | — |
-| Phone | Backup video, downloaded | For a dead laptop or dead wifi | — |
+| 1 Guess first | Guess box → **Submit** → Next | `summer is when Earth is closer to the Sun` | *sounds like: Summer is when Earth is closer* |
+| 2 One true fact | Drag the pencil near the top of the curve (truth: 73.5° on June 21), answer box → **Submit** → Next | `In June the northern half is tilted toward the Sun, so the noon Sun is high and the days are long.` | **SPOT ON**. The reply also says the fact alone doesn't establish "74°" (a grader quirk); point at the ink curve instead. |
+| 3 Compare two cases | Three blanks → Next. Don't tap the chips (they add words). | When: `a hemisphere is tilted toward the Sun` · then: `it has summer` · because: `the noon Sun is higher in the sky` | Preview: *"When a hemisphere is tilted toward the Sun, it has summer, because the noon Sun is higher in the sky."* |
+| 4 Stress test | Tap the **right** prediction on each card: (1) *It would mostly vanish…* (2) *June brings the longest days…* (3) *In June, the Sun stays up about 24 hours…*. Don't add the suggested piece. Then Next. | (no typing) | Cards 1-2: **✓ Your rule covered this.** Card 3 (Utqiagvik, 71° N): **Your rule didn't cover this**, "leaves out what controls daylight length", with **+ add to your rule: near a pole, tilt can keep the Sun above or below the horizon** |
+| 5-7 Draw, Tell it apart, Carry it over | **Next** on each (skip) | (optional, recorded) Tell it apart: `Distance barely changes; in January the north is tilted away from the Sun, so it is winter there and summer in the south.` Carry it over: `A flashlight aimed straight down makes a small bright spot; tilt it and the same light spreads over a bigger, dimmer patch.` | — |
+| 8 What you caught | Leave it on screen | — | *Summer is when Earth is closer* + the fix; "Stress test: 2 of 3 cases survived"; "Sketch: skipped" (honest) |
 
-If asked why it isn't all live: "Live, each step takes about five seconds because a model reads your free-text answer. We ran this one earlier so you can see the whole arc. Tab one is live."
+**Orgo tab:** `https://onionskin.study/?learn=sn2-reaction&demo=1`, guess `the nucleophile hits the carbon from the back and kicks the leaving group out in one step` (recorded). Then *Build ethanol*: *add carbon*, *add hydrogen* ×5. The 5th H has no room and lands loose; **drag it onto the carbon** (keyboard: Enter on the H, then Enter on the C) → **"A carbon with 5 bonds"** → Undo.
 
-## The 1:45 script
+## The 1:45 talk
 
-**Roles:** narrator talks and keeps time; driver clicks and takes technical questions. Both learn both.
+**A** speaks, **B** drives. Both learn both roles.
 
-| Time | Screen / driver | Narrator says |
+| Time | Who | Say / do |
 |---|---|---|
-| 0:00 | Tab 1, seasons guess screen | "Before we show you anything: why is it hotter in summer?" Let the judge answer. (Most say "Earth is closer". Harvard graduates said the same in the documentary *A Private Universe*.) |
-| 0:12 | Type the judge's answer, or "summer is when Earth is closer to the Sun" → Submit. ~4 s wait | "It starts with your guess, not a lecture. It's checking your answer against the misconceptions documented for this topic." Lands on **sounds like: Summer is when Earth is closer**. |
-| 0:25 | Tab 2 → *One true fact*: the noon-Sun curve over the year at 40° N | "Pencil is your guess, ink is reality, the gap is the lesson. June 21: 73.5°. Computed in code, never by the AI." |
-| 0:40 | Scroll to *Compare two cases* | "Same distance from the Sun, opposite seasons: New York summer, Buenos Aires winter. Distance can't explain it." |
-| 0:50 | Scroll to *Stress test*; point at the card that BREAKS | "Then we push your rule to extremes. No tilt: the curve goes flat, no seasons. A rule that only works in easy cases breaks here." |
-| 1:05 | Point at the why rail (*What you're doing / Why it works* + citation) | "Every step has a reason and the paper behind it. And there are no points or streaks, on purpose: rewards change your goal from understanding to scoring." |
-| 1:20 | Tab 3: *add carbon*, then *add hydrogen* ×5. The 5th H lands loose: **drag it onto the carbon** (keyboard: Enter on the H, Enter on the C) | "Same engine for organic chemistry. Give carbon a fifth bond and it names the mistake as you make it." **"A carbon with 5 bonds"** → Undo. |
-| 1:35 | Tab 2, done card (*What you caught*) | "It ends by naming the wrong idea you started with and saves it to your notebook. Type any topic and it builds all this in about a minute. The AI grades, code keeps the facts true, you do the thinking." |
-| 1:45 | Hands off | Stop. "What would you like to see?" |
+| 0:00 | A | "Quick question before we show you anything: **why is it hotter in summer?**" Let them answer. Most say "Earth is closer to the Sun." |
+| 0:10 | A | "That wrong idea survives school because nobody made you **test it**. Now an AI hands you the right answer in a second, and a week later you'd still guess wrong. In a PNAS study, students who leaned on a chatbot scored **17% worse** once it was gone." |
+| 0:25 | A | "Onionskin works the other way around: **you do the thinking**, the AI checks it. Type any topic and it builds a short lesson where your guess gets tested against reality." |
+| 0:30 | B | Step 1 (paste, or type the judge's own answer: live, ~4 s). "It starts with your guess, and it recognizes the classic wrong idea: **'summer is when Earth is closer.'**" |
+| 0:40 | B | Step 2. "You place your guess in **pencil**, reality draws on top in **ink**, and the gap is the lesson. That curve is **computed in code**, not written by the AI." |
+| 0:52 | B | Step 3. "Two cases side by side: **same distance from the Sun, opposite seasons**. So you write a rule." |
+| 1:00 | B | Step 4. "Then we push your rule to **extremes**. No tilt: covered. Chicago: covered. Alaska, 71° north: **it misses**. The Sun there is low in June but never sets. It tells you **the one piece your rule is missing**." Then Next ×3. |
+| 1:15 | A | Point at the why rail. "Every step you just saw is a **published learning-science result**, and the reason is beside every screen." |
+| 1:25 | A | "Some choices are about what we **left out**: no points, no streaks, no leaderboard. Across 128 studies, expected rewards **lowered** people's interest in the task itself. Points change your goal from **understanding** to **scoring**." |
+| 1:38 | A | Done card. "It ends by **naming the wrong idea you started with**, and keeps it in your notebook. The AI checks, code keeps the numbers true, and you do the thinking." |
+| 1:45 | A | "What would you like to try?" **Stop talking.** Offer the Orgo tab, or typing their own topic ("it takes one to two minutes to build"). |
 
-**Save for questions:** Ask Onion (hints not answers; doesn't cave when you push), the Calculus card, the Research page (Tab 4), typing a new topic (only if they can wait 1-2 min).
+## 60-second cut
 
-**Never say:** "proven to make you learn faster", "revolutionizes learning", "personalized AI tutor", "gamified", or that a typed topic is instant.
-
-## 60-second cut (rushed judge, or API down)
-
-1. **0:00** "Why is it hotter in summer?" Skip Tab 1 and go straight to Tab 2.
-2. **0:10** The guess, its named misconception, the pencil-vs-ink curve.
-3. **0:25** The stress card that breaks: "No tilt, no seasons."
-4. **0:40** The why rail: "Every step is a learning-science result, and there are no points on purpose."
-5. **0:50** The done card: "The AI grades, code keeps it true, you do the thinking." Stop.
-
-## Research lines (decision first, paper second; all on the Research page)
-
-| Decision | Paper | Line |
-|---|---|---|
-| No points / XP / streaks / leaderboards | Deci, Koestner & Ryan 1999 (128 experiments); Hanus & Fox 2015 | "Expected rewards lowered people's own interest across 128 experiments. In a semester class, badges and a leaderboard lowered motivation and final-exam scores." |
-| The AI never just hands over the answer | Bastani et al. 2025, PNAS | "Students with a plain chatbot scored 17% worse once it was taken away; hint-only tutoring removed most of that." |
-| Guess first | Richland, Kornell & Kao 2009; Sinha & Kapur 2021 | "Trying first, even wrong, makes the answer stick, as long as the answer follows." |
-| Compare two cases | Gentner, Loewenstein & Thompson 2003 | "Comparing two cases side by side carries over to new problems far better." |
-| Extremes | Clement 2009 | "Experts test a model at the extremes." |
-| Holds its ground when you push back | Kasneci & Kasneci 2026 (**preprint**) | "AI tutors tend to cave under pushback; ours keeps its verdict." |
-| Feels harder | Deslauriers et al. 2019, PNAS | "Active learners learned more but felt they learned less." |
-
-Say this before they ask: "These are effects from the literature; we haven't run our own study yet. A pre/post test is first."
+1. **0:00 A:** "Why is it hotter in summer? Most people say we're closer to the Sun."
+2. **0:08 B:** Step 1 → names the misconception.
+3. **0:18 B:** Step 2 → "Pencil is you, ink is reality, computed in code."
+4. **0:30 B:** Steps 3-4 → card 3 misses at 71° north.
+5. **0:45 A:** "Every step is a learning-science result, and there are no points, on purpose. The AI checks, code keeps the numbers true, you do the thinking." Stop.
 
 ## Short answers to likely questions
 
-1. **vs ChatGPT:** "It tells you the answer. Onionskin makes you guess first, runs reality on top, and the model can't write the facts."
-2. **vs Khan Academy / Brilliant:** "Those are hand-authored. Type any topic and you get the same eight research-backed steps, starting from *your* wrong idea, with no streaks."
-3. **Does it work?** "No data of our own yet; each step is a published effect. A pre/post test is next."
-4. **AI vs code:** "For a new topic the model writes the cases and misconceptions as schema-checked JSON; curves and numbers come from mathjs. In a session the model only grades free text."
-5. **Model / speed:** "Grading runs on an OpenAI model via the Codex CLI with JSON schemas (Ask Onion falls back to Gemini). ~5 s per graded step, 1-2.5 min per new topic; prebuilt topics are instant."
-6. **Wrong grading?** "It happens; we've seen it. That's why the truth on the curve never comes from the model."
-7. **No points, won't people quit?** "Rewards change what people come back for. Spaced review is the research-backed way to bring them back."
+1. **"I could ask ChatGPT to quiz me."** "You could, if you already know how to teach yourself and don't skip ahead when it gets hard. Onionskin is the lesson a learning scientist would design, built so you can't fudge it. The numbers can't be talked out of it: they come from code, and the grader keeps its verdict under pushback. It goes after your specific wrong idea, with the misconceptions and extreme cases already chosen. And you work it with your hands: draw, build, drag."
+2. **vs Khan Academy / Brilliant:** "Those are hand-authored. Type any topic and you get the same eight research-backed steps, starting from your wrong idea, with no streaks."
+3. **Does it work?** "No recorded user tests yet. Every step is a published effect, and the app cites it. A pre/post test is next."
+4. **How it's built:** the paragraph in SOURCE_OF_TRUTH §5: Codex CLI on our server writes lessons and grades under a fixed contract; graphs only ship if code recomputes every number.
+5. **Did you use AI to build it?** "We made the decisions; the agents wrote most of the code. They reviewed each other's PRs under rules we set, and we tested the live site."
+6. **Wrong grading?** "It can happen. That's why every number in a graph is computed by code, never by the model."
+7. **No points, won't people quit?** "Rewards change what people come back for. Spaced review brings them back, and the notebook is built for it."
 8. **Who's it for?** "A college STEM student the week before an exam." One person, not "everyone".
 
-## Fallbacks (driver decides, no discussion)
+**Say this, not this:** see SOURCE_OF_TRUTH §7. In particular: "Codex CLI on our server" (not "the OpenAI API"), "every number in a graph is computed by code" (not "every answer is checked by code"), and "No recorded user tests yet".
+
+## Fallbacks
 
 | Breaks | Do | Say |
 |---|---|---|
-| Live guess slow or API down | Skip Tab 1; start on Tab 2 | "Here's one we ran earlier." |
-| Tab 2 lost (reloaded) | Tab 2b | — |
-| The 5th-bond drag fails | Keyboard: Enter on the loose H, Enter on the C; or skip orgo | — |
-| Site down | Local `vite preview` build opened before the expo, then the phone video | "Here's the two-minute cut." |
+| Replies take ~5 s (#318 not deployed, or a typed answer) | Keep talking over the wait | "This one's live." |
+| API down | The 10 reviewed topics still open; graded steps show an offline check | "The server's down, but the lesson still runs." |
+| 5th-bond drag fails | Keyboard: Enter on the loose H, Enter on the C; or skip orgo | — |
+| Site down | Backup video on a phone | "Here's the two-minute cut." |
 
-Never show a raw error or a spinner.
-
-## Before each judging block
-
-- [ ] https://onionskin.study loads (not blank) and the header says *backend online*.
-- [ ] Tabs 1-4 staged as above; Tab 2 shows all 8 steps and one BREAKS card.
-- [ ] One full run of the 1:45 with a stopwatch, both roles.
+Don't type a brand-new topic during the 3 minutes (1 to 2.5 minutes to build). If a judge asks, start it, keep demoing, and come back.
