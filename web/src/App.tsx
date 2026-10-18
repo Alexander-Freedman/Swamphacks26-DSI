@@ -248,7 +248,7 @@ export default function App() {
           <span className="brand">
             <button className="logo" style={{ border: 0, background: 'none', padding: 0 }} onClick={home}>Onionskin</button>
             <button className="brand-tab" onClick={() => go({ kind: 'research' })}>
-              Why it works
+              <strong>Research:</strong> why it works
             </button>
           </span>
           <div className="topbar-actions">
@@ -266,7 +266,7 @@ export default function App() {
           <span className="brand">
             <button className="logo" style={{ border: 0, background: 'none', padding: 0 }} onClick={home}>Onionskin</button>
             <button className="brand-tab" onClick={() => go({ kind: 'research' })}>
-              Why it works
+              <strong>Research:</strong> why it works
             </button>
           </span>
           <div className="topbar-actions">
@@ -285,7 +285,7 @@ export default function App() {
         <span className="brand">
             <button className="logo" style={{ border: 0, background: 'none', padding: 0 }} onClick={home}>Onionskin</button>
             <button className={`brand-tab${screen.kind === 'research' ? ' is-on' : ''}`} onClick={() => go({ kind: 'research' })}>
-              Why it works
+              <strong>Research:</strong> why it works
             </button>
           </span>
         {round && <CheckedTag reviewed={round.reviewed} />}

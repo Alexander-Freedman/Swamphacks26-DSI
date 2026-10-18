@@ -35,11 +35,11 @@ describe('research page', () => {
     expect(links.every((a) => a.target === '_blank' && a.rel.includes('noopener'))).toBe(true)
   })
 
-  it('a "Why it works" tab next to the logo opens it, and ?research=1 opens it directly', async () => {
+  it('a "Research: why it works" tab next to the logo opens it, and ?research=1 opens it directly', async () => {
     const { fireEvent } = await import('@testing-library/react')
     history.replaceState(null, '', import.meta.env.BASE_URL)
     render(<App />)
-    fireEvent.click(screen.getByRole('button', { name: 'Why it works' }))
+    fireEvent.click(screen.getByRole('button', { name: 'Research: why it works' }))
     expect(screen.getByRole('heading', { name: 'The research behind Onionskin' })).toBeTruthy()
     expect(location.search).toBe('?research=1')
     expect(screen.getAllByText('← Home').length).toBe(2) // top and bottom

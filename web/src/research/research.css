@@ -7,27 +7,50 @@
 .rs-home { justify-self: start; font-weight: 600; color: var(--ink); }
 .rs-summary .concept { margin-bottom: 8px; }
 .rs-short { margin: 0; padding-left: 20px; display: grid; gap: 4px; }
-.rs-cols { display: grid; grid-template-columns: minmax(0, 1.25fr) minmax(0, 1fr); gap: 16px; align-items: start; }
-@media (max-width: 720px) { .rs-cols { grid-template-columns: minmax(0, 1fr); } }
 .rs-col .rs-h:first-child, .rs-bottom .rs-h:first-child { margin-top: 0; }
 .rs-note { margin: 0 0 10px; color: var(--ink-soft); font-size: 0.9rem; }
 .rs-home-bottom { display: inline-block; margin-top: 16px; }
 .rs-title { margin: 0 0 8px; }
 .rs-h { margin: 28px 0 12px; font-size: 1.2rem; }
-.rs-steps { list-style: none; margin: 0; padding: 0; display: grid; gap: 14px; counter-reset: rs; }
-.rs-step { padding: 12px 14px; border: 1.5px solid var(--ink-soft); border-radius: 4px; background: var(--paper); }
-.rs-step h3 { margin: 0 0 4px; font-size: 1.02rem; }
 .rs-what { margin: 0 0 4px; font-weight: 600; }
 .rs-why { margin: 0 0 6px; color: var(--ink-soft); }
 .rs-cites { margin: 0; display: flex; flex-wrap: wrap; gap: 6px 10px; font-size: 0.85rem; }
 .rs-cite { color: var(--ink); text-decoration: underline; text-underline-offset: 2px; }
-.rs-faq { display: grid; gap: 8px; }
-.rs-q { border: 1.5px solid var(--ink-soft); border-radius: 4px; padding: 10px 14px; background: var(--paper); }
-.rs-q summary { cursor: pointer; font-weight: 700; }
-.rs-q p { margin: 8px 0 0; }
 .rs-sources { margin: 0; padding-left: 26px; display: grid; gap: 10px; font-size: 0.92rem; }
 .rs-sources li { scroll-margin-top: 16px; }
 .rs-sources li:target { background: var(--marker-soft); border-radius: 4px; }
 .rs-ref { display: block; }
 .rs-finding { display: block; color: var(--ink-soft); }
 .rs-link { margin-top: 10px; }
+
+/* FAQ first: answers showing, a two-column grid of equal cards */
+.rs-faq { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
+.rs-q { border: 1.5px solid var(--ink-soft); border-radius: 4px; padding: 12px 14px; background: var(--paper); display: flex; flex-direction: column; gap: 6px; }
+.rs-q h3 { margin: 0; font-size: 1rem; }
+.rs-q p { margin: 0; }
+.rs-q .rs-cites { margin-top: auto; }
+
+/* the steps: a compact three-column grid; the longer reason opens on tap */
+.rs-steps { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; }
+.rs-step { padding: 12px 14px; border: 1.5px solid var(--ink-soft); border-radius: 4px; background: var(--paper); display: flex; flex-direction: column; gap: 6px; }
+.rs-step h3 { margin: 0; font-size: 0.98rem; display: flex; align-items: center; gap: 8px; }
+.rs-num { flex: none; display: inline-grid; place-items: center; width: 22px; height: 22px; border-radius: 4px; background: var(--ink); color: var(--paper); font: 700 12px var(--font-mono); }
+.rs-step .rs-what { margin: 0; font-weight: 500; font-size: 0.93rem; }
+.rs-more { margin-top: auto; font-size: 0.88rem; }
+.rs-more summary { cursor: pointer; color: var(--ink-soft); font-weight: 600; }
+.rs-more .rs-why { margin: 6px 0 0; }
+
+@media (max-width: 960px) { .rs-steps { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+@media (max-width: 720px) { .rs-faq, .rs-steps { grid-template-columns: minmax(0, 1fr); } }
+
+/* no lonely last card: a leftover card stretches across its row */
+@media (min-width: 721px) {
+  .rs-q:last-child:nth-child(odd) { grid-column: 1 / -1; }
+}
+@media (min-width: 961px) {
+  .rs-step:last-child:nth-child(3n + 1) { grid-column: 1 / -1; }
+  .rs-step:last-child:nth-child(3n + 2) { grid-column: span 2; }
+}
+@media (min-width: 721px) and (max-width: 960px) {
+  .rs-step:last-child:nth-child(odd) { grid-column: 1 / -1; }
+}

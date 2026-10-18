@@ -64,38 +64,42 @@ export function ResearchPage({ onHome }: { onHome?: () => void }) {
         </ul>
       </header>
 
-      <div className="rs-cols">
-        <section className="sheet rs-col" aria-labelledby="rs-steps-h">
-          <h2 className="rs-h" id="rs-steps-h">
-            Every step, and why it works
-          </h2>
-          <ol className="rs-steps">
-            {decisions.map((d) => (
-              <li key={d.step} className="rs-step">
-                <h3>{d.step}</h3>
-                <p className="rs-what">{d.what}</p>
-                <p className="rs-why">{d.why}</p>
-                <Cites ids={d.sources} />
-              </li>
-            ))}
-          </ol>
-        </section>
+      <section className="sheet" aria-labelledby="rs-faq-h">
+        <h2 className="rs-h" id="rs-faq-h">
+          Questions people ask
+        </h2>
+        <div className="rs-faq">
+          {faq.map((f) => (
+            <article key={f.q} className="rs-q">
+              <h3>{f.q}</h3>
+              <p>{f.a}</p>
+              <Cites ids={f.sources} />
+            </article>
+          ))}
+        </div>
+      </section>
 
-        <section className="sheet rs-col" aria-labelledby="rs-faq-h">
-          <h2 className="rs-h" id="rs-faq-h">
-            Questions
-          </h2>
-          <div className="rs-faq">
-            {faq.map((f) => (
-              <details key={f.q} className="rs-q">
-                <summary>{f.q}</summary>
-                <p>{f.a}</p>
-                <Cites ids={f.sources} />
+      <section className="sheet" aria-labelledby="rs-steps-h">
+        <h2 className="rs-h" id="rs-steps-h">
+          Every step, and the research behind it
+        </h2>
+        <p className="rs-note">Each lesson also shows these reasons beside the step you're on.</p>
+        <ol className="rs-steps">
+          {decisions.map((d, i) => (
+            <li key={d.step} className="rs-step">
+              <h3>
+                <span className="rs-num">{i + 1}</span> {d.step}
+              </h3>
+              <p className="rs-what">{d.what}</p>
+              <Cites ids={d.sources} />
+              <details className="rs-more">
+                <summary>Why it works</summary>
+                <p className="rs-why">{d.why}</p>
               </details>
-            ))}
-          </div>
-        </section>
-      </div>
+            </li>
+          ))}
+        </ol>
+      </section>
 
       <section className="sheet rs-bottom" aria-labelledby="rs-src-h">
         <h2 className="rs-h" id="rs-src-h">

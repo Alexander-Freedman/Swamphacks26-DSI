@@ -69,6 +69,10 @@ input[type='range'] { width: 100%; accent-color: var(--pencil); height: 28px; }
 
 /* top bar: the logo plus a "Why it works" tab, easy to find from every page */
 .brand { display: inline-flex; align-items: center; gap: 14px; }
-.brand-tab { padding: 4px 10px; border: 1.5px solid var(--ink-soft); border-radius: 4px; background: none; font: 600 0.9rem var(--font-body); color: var(--ink); cursor: pointer; }
-.brand-tab:hover { background: var(--marker-soft); border-color: var(--ink); }
-.brand-tab.is-on { background: var(--marker); border-color: var(--ink); }
+.brand-tab {
+  padding: 5px 12px; border: 2px solid var(--ink); border-radius: 4px; background: var(--marker); box-shadow: 2px 2px 0 var(--ink);
+  font: 500 0.92rem var(--font-body); color: var(--ink); cursor: pointer;
+}
+.brand-tab strong { font-weight: 800; }
+.brand-tab:hover { transform: translate(-1px, -1px); box-shadow: 3px 3px 0 var(--ink); }
+.brand-tab.is-on { box-shadow: none; transform: translate(2px, 2px); }
