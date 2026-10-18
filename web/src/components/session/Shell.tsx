@@ -1,7 +1,7 @@
 import type { ReactNode, Ref } from 'react'
 import { NOTEBOOK_HREF } from '../../notebook'
 import { endLine, STAMP, type RematchResult } from './copy'
-import { useReportSpot, type HelpSpot } from './helpSpot'
+import { useReportSpot, type HelpSpot, type LayerReport } from './helpSpot'
 import type { Verdict } from '../../verdict'
 import './shell.css'
 
@@ -24,10 +24,12 @@ export function SessionHead(p: {
   onGo?: (i: number) => void
   /** Optional: the storyboard screen, lock state and guess, for the Ask panel (#186). */
   help?: Pick<HelpSpot, 'screen' | 'locked' | 'guess'>
+  /** Optional: this layer's help (#243). Without it the panel derives one from the title and guidance line. */
+  layer?: LayerReport
   children?: ReactNode
 }) {
   const { chip, step, total, labels, canGo, onGo, children } = p
-  useReportSpot({ ...p.help, step, total, label: labels?.[step - 1] })
+  useReportSpot({ ...p.help, layer: p.layer, step, total, chip, label: labels?.[step - 1] })
   return (
     <div className="ss-head">
       <span className="ss-chip">{chip}</span>
