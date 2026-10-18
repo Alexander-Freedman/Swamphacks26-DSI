@@ -100,6 +100,9 @@ const EXTRA_LABELS: Record<string, string> = {
   'sideways-falls-slower': 'Moving sideways slows the fall',
   'zero-speed-at-top': 'A ball stops at the top of its arc',
   'steeper-goes-farther': 'Aiming higher always goes farther',
+  // linear algebra (sessions/linear-algebra/linalg.ts LIN_MISTAKES)
+  'rows-vs-columns': 'Reading a matrix by rows',
+  'squash-undoable': 'A squashed plane can be unsquashed',
 }
 
 function store(): Storage | null {
