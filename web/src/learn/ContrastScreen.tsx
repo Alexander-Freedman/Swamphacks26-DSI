@@ -1,6 +1,8 @@
 // Stage 3, Contrast: two pre-authored cases side by side, the one difference highlighted.
 // The learner writes a one-line "fix" for why they turn out differently. No model call.
+import { useState } from 'react'
 import { CaseCurve } from './contrast-visual/CaseCurve'
+import { composeRule, shortPiece, splitRule } from './rule'
 import type { StageProps } from './types'
 import './learn-contrast.css'
 
@@ -16,8 +18,23 @@ function boldNumbers(line: string) {
   return line.split(/(\$?\d[\d,.]*%?)/).map((part, i) => (i % 2 ? <strong key={i}>{part}</strong> : part))
 }
 
+const FRAME = [
+  { word: 'When', hint: 'what changes?' },
+  { word: 'then', hint: 'what happens?' },
+  { word: 'because', hint: 'why does it happen?' },
+] as const
+
 export function ContrastScreen({ topic, state, update, next }: StageProps) {
   const cases = topic.rubric.contrastingCases.slice(0, 2)
+  const [parts, setParts] = useState<[string, string, string]>(() => splitRule(state.fix))
+  const [focus, setFocus] = useState(0)
+  const chips = [...new Set(topic.rubric.entities.map(shortPiece))].filter(Boolean).slice(0, 8)
+  const set = (k: number, v: string) => {
+    const p = [...parts] as [string, string, string]
+    p[k] = v
+    setParts(p)
+    update({ fix: composeRule(p) })
+  }
   return (
     <section className="learn-step lcs" aria-label="contrast">
       <p className="learn-instruction">Two cases, one difference. Why do they turn out differently?</p>
@@ -40,17 +57,30 @@ export function ContrastScreen({ topic, state, update, next }: StageProps) {
           </article>
         ))}
       </div>
-      <label className="lcs-label" htmlFor="lcs-fix">
-        Your rule, in one line
-      </label>
-      <textarea
-        id="lcs-fix"
-        aria-label="contrast answer"
-        rows={2}
-        placeholder="They differ because…"
-        value={state.fix}
-        onChange={(e) => update({ fix: e.target.value })}
-      />
+      <p className="lcs-label">Your rule: what makes them turn out differently?</p>
+      <div className="lcs-frame">
+        {FRAME.map((f, k) => (
+          <label key={f.word} className="lcs-slot">
+            <span className="lcs-word">{f.word}</span>
+            <input
+              type="text"
+              aria-label={`rule ${f.word}`}
+              placeholder={f.hint}
+              value={parts[k]}
+              onFocus={() => setFocus(k)}
+              onChange={(e) => set(k, e.target.value)}
+            />
+          </label>
+        ))}
+      </div>
+      <div className="lcs-chips" role="group" aria-label="pieces you can use">
+        {chips.map((c) => (
+          <button key={c} type="button" className="lcs-chip" onClick={() => set(focus, parts[focus] ? `${parts[focus]} ${c}` : c)}>
+            {c}
+          </button>
+        ))}
+      </div>
+      {state.fix && <p className="lcs-preview">“{state.fix}”</p>}
       <button onClick={next}>Next</button>
     </section>
   )

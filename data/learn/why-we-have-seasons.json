@@ -108,17 +108,80 @@
     {
       "dimension": "axial-tilt-zero",
       "scenario": "Imagine Earth with no axial tilt at all, but with the same 365-day orbit around the Sun. A city at 40 degrees north would have nearly the same daylight length and noon Sun height on every date.",
-      "correctBehavior": "The usual annual summer and winter pattern would largely vanish. The city could still have weather and climate differences, but not strong tilt-driven seasons."
+      "correctBehavior": "The usual annual summer and winter pattern would largely vanish. The city could still have weather and climate differences, but not strong tilt-driven seasons.",
+      "predict": {
+        "question": "What would happen to the city's usual summer and winter pattern?",
+        "choices": [
+          {
+            "text": "It would mostly vanish, though weather and climate differences could still happen.",
+            "correct": true,
+            "misconceptionId": null
+          },
+          {
+            "text": "Strong seasons would continue because Earth gets closer to the Sun each year.",
+            "correct": false,
+            "misconceptionId": "closer-means-summer"
+          },
+          {
+            "text": "The Northern Hemisphere would stay warmer because it is the tilted side.",
+            "correct": false,
+            "misconceptionId": "tilt-means-one-side-always-hot"
+          }
+        ],
+        "piece": "no tilt means little yearly change in sunlight and day length"
+      }
     },
     {
       "dimension": "hemisphere-orientation",
       "scenario": "At the June solstice, the Northern Hemisphere is tilted most toward the Sun; about six months later at the December solstice, it is tilted most away. Consider the same place, such as Chicago.",
-      "correctBehavior": "Near the June solstice, Chicago has its longest days and most direct yearly sunlight; near the December solstice, it has its shortest days and least direct yearly sunlight. Temperature usually lags these sunlight extremes by several weeks because land and water take time to warm and cool."
+      "correctBehavior": "Near the June solstice, Chicago has its longest days and most direct yearly sunlight; near the December solstice, it has its shortest days and least direct yearly sunlight. Temperature usually lags these sunlight extremes by several weeks because land and water take time to warm and cool.",
+      "predict": {
+        "question": "How do sunlight and temperature change between these two solstices in Chicago?",
+        "choices": [
+          {
+            "text": "Chicago is warmest right on the June solstice and coldest right on the December one.",
+            "correct": false,
+            "misconceptionId": null
+          },
+          {
+            "text": "Both solstices have similar sunlight because Earth stays the same distance away.",
+            "correct": false,
+            "misconceptionId": null
+          },
+          {
+            "text": "June brings the longest days and most direct sun, December the least. Warmth lags weeks.",
+            "correct": true,
+            "misconceptionId": null
+          }
+        ],
+        "piece": "more direct sunlight and longer days add more daily energy"
+      }
     },
     {
       "dimension": "latitude-near-pole",
       "scenario": "At the June solstice, Utqiagvik, Alaska, is about 71 degrees north of the equator. It lies north of the Arctic Circle.",
-      "correctBehavior": "The Sun stays above the horizon for about 24 hours, giving continuous daylight. Near the December solstice, the same place has a period when the Sun does not rise, the opposite seasonal extreme."
+      "correctBehavior": "The Sun stays above the horizon for about 24 hours, giving continuous daylight. Near the December solstice, the same place has a period when the Sun does not rise, the opposite seasonal extreme.",
+      "predict": {
+        "question": "What happens to daylight there near the June and December solstices?",
+        "choices": [
+          {
+            "text": "In June, it has about 12 hours of daylight, like most places.",
+            "correct": false,
+            "misconceptionId": null
+          },
+          {
+            "text": "In June, the Sun stays up about 24 hours. Near December, it does not rise for a time.",
+            "correct": true,
+            "misconceptionId": null
+          },
+          {
+            "text": "December stays light all day because Earth is closer to the Sun then.",
+            "correct": false,
+            "misconceptionId": "closer-means-summer"
+          }
+        ],
+        "piece": "near a pole, tilt can keep the Sun above or below the horizon"
+      }
     }
   ],
   "visual": {
@@ -182,12 +245,17 @@
         {
           "param": "T",
           "value": 0,
-          "watch": "With no tilt the noon Sun sits at 50° every day of the year: no seasons."
+          "watch": "With no tilt the noon Sun stands at 50° every day at 40° north: a flat line, no seasons."
         },
         {
           "param": "T",
-          "value": 40,
-          "watch": "At 40° of tilt the noon Sun swings from 10° in December to 90° in June."
+          "value": 23.5,
+          "watch": "At Earth's 23.5° tilt the noon Sun at 40° north reaches 73.5° on June 21 but only 26.5° in late December."
+        },
+        {
+          "param": "L",
+          "value": 71,
+          "watch": "At 71° north (Utqiagvik) the June noon Sun is only 42.5° high, and in December it stays below the horizon all day."
         }
       ],
       "answer_claimed": 73.5

@@ -37,10 +37,14 @@ const REMIX: Record<string, string> = {
   path: 'Next: try any topic from Home.',
 }
 
+const caughtLabels = (slope: SlopeRead | null, area: AreaRead | null) =>
+  [slope?.mistake, area?.mistake].filter((m): m is NonNullable<typeof m> => m != null).map((m) => `“${LABELS[m]}”`)
+
 const slopeWord = (s: number) => (Math.abs(s) < 0.05 ? 'flat' : s > 0 ? 'uphill' : 'downhill')
 
 /** Calculus is one guided path straight from Home: sketch the slope, drag the tangent, fill the area, see what your pencil got wrong. */
-/** `embedded`: inside a Learn step, so don't scroll the whole page to the top between steps. */
+/** `embedded`: inside a Learn step, so don't scroll the whole page to the top between steps,
+ * and don't point at a next calculus topic (the Learn session decides what comes next). */
 export function CalculusSession({ onDone, topic = GUIDED, embedded = false }: { onDone: () => void; topic?: CalcTopic; embedded?: boolean }) {
   return <CalcRun topic={topic} onDone={onDone} embedded={embedded} />
 }
@@ -55,8 +59,11 @@ function CalcRun({ topic, onDone, embedded }: { topic: CalcTopic; onDone: () => 
   }
   const cur = steps[step - 1]
   const at = (s: CalcStep) => steps.indexOf(s) + 1
-  const next = (s: CalcStep) => go(at(s) + 1)
   const isLast = (s: CalcStep) => at(s) === steps.length
+  // a topic can end on any step (Learn uses ['area'] alone): the last one finishes on the end bar, never past the end
+  const [ended, setEnded] = useState(false)
+  const next = (s: CalcStep) => (isLast(s) ? setEnded(true) : go(at(s) + 1))
+  const remix = embedded ? '' : (REMIX[topic.id] ?? '')
   const nextLabel = (s: CalcStep, fallback: string) => (isLast(s) ? 'Finish ✓' : steps[at(s)] === 'card' ? 'What did my pencil get wrong? →' : fallback)
   const [stroke, setStroke] = useState<Pt[]>([])
   const [sketch, setSketch] = useState<number[] | null>(null)
@@ -76,7 +83,7 @@ function CalcRun({ topic, onDone, embedded }: { topic: CalcTopic; onDone: () => 
   // Saved when the mistake card is reached, so leaving early still keeps it.
   const saved = useRef(false)
   useEffect(() => {
-    if (cur !== 'card' || saved.current || (!slope && !area)) return
+    if ((cur !== 'card' && !ended) || saved.current || (!slope && !area)) return
     saved.current = true
     record({
       session: 'calculus',
@@ -89,7 +96,7 @@ function CalcRun({ topic, onDone, embedded }: { topic: CalcTopic; onDone: () => 
       mastered: (!slope || slope.mistake === null) && (!area || area.close),
       calcTopic: topic.id,
     })
-  }, [cur, slope, area, guess, topic.id])
+  }, [cur, ended, slope, area, guess, topic.id])
   // the fundamental-theorem chapter has no card: it's saved when you pick what's the same
   const savePick = (right: boolean) => {
     if (saved.current) return
@@ -118,7 +125,12 @@ function CalcRun({ topic, onDone, embedded }: { topic: CalcTopic; onDone: () => 
       {cur === 'tangent' && sketch && <TangentStep sketch={sketch} onNext={() => next('tangent')} nextLabel={nextLabel('tangent', 'Now the area →')} />}
       {cur === 'area' && <AreaStep guess={guess} setGuess={setGuess} onNext={() => next('area')} nextLabel={nextLabel('area', 'What did my pencil get wrong? →')} />}
       {cur === 'card' && (slope || area) && (
-        <CardStep slope={slope} area={area} guess={guess} sketch={sketch} onNext={() => next('card')} end={isLast('card') ? { remix: REMIX[topic.id] ?? '', onDone } : null} />
+        <CardStep slope={slope} area={area} guess={guess} sketch={sketch} onNext={() => next('card')} end={isLast('card') ? { remix, onDone } : null} />
+      )}
+      {ended && cur !== 'card' && (
+        <div className="calc-endwrap" ref={(el) => el?.scrollIntoView?.({ behavior: reducedMotion() ? 'auto' : 'smooth', block: 'center' })}>
+          <CalcEnd caught={caughtLabels(slope, area)} mastered={(!slope || slope.mistake === null) && (!area || area.close)} remix={remix} onDone={onDone} />
+        </div>
       )}
       {cur === 'compare' && <CompareStep slope={slope} area={area} onDone={onDone} onPick={savePick} />}
       {cur === 'surface' && <SurfaceStep onDone={onDone} topic={topic.id} />}
@@ -349,7 +361,7 @@ type End = { remix: string; onDone: () => void }
 function CardStep(p: { slope: SlopeRead | null; area: AreaRead | null; guess: number | null; sketch: number[] | null; onNext: () => void; end: End | null }) {
   const { slope, area, guess, sketch, onNext, end } = p
   const exact = exactArea()
-  const caught = [slope?.mistake, area?.mistake].filter((m): m is NonNullable<typeof m> => m != null).map((m) => `“${LABELS[m]}”`)
+  const caught = caughtLabels(slope, area)
   return (
     <section>
       <div className={slope && sketch && area && guess != null ? 'calc-two' : 'calc-one'}>
@@ -441,7 +453,7 @@ function CompareStep({ slope, area, onDone, onPick }: { slope: SlopeRead | null;
       onPick?.(wrong.length === 0)
     } else setWrong((w) => (w.includes(p.id) ? w : [...w, p.id]))
   }
-  const caught = [slope?.mistake, area?.mistake].filter((m): m is NonNullable<typeof m> => m != null).map((m) => `“${LABELS[m]}”`)
+  const caught = caughtLabels(slope, area)
   // alone (its own chapter) it's mastered on a first-try right pick; on the guided path, by the sketch and the guess
   const done = slope && area ? mastered(slope, area) : wrong.length === 0
   return (

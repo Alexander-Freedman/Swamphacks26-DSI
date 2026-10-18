@@ -256,8 +256,8 @@ class HelpGenericIn(BaseModel):
     layer: HelpLayerIn
     on_screen: Annotated[str, _cut(600)] = ""
     facts: Annotated[
-        list[Annotated[str, _cut(200)]],
-        BeforeValidator(lambda v: v[:10] if isinstance(v, list) else v),
+        list[Annotated[str, _cut(320)]],
+        BeforeValidator(lambda v: v[:24] if isinstance(v, list) else v),
     ] = []
     last_action: Annotated[str, _cut(200)] | None = None
     history: Annotated[

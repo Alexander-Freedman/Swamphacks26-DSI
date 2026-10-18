@@ -43,7 +43,7 @@ describe('Draw it', () => {
     const rows = await screen.findByRole('list', { name: 'how your drawing did' })
     const items = within(rows).getAllByRole('listitem')
     expect(items.map((li) => li.querySelector('.dr-label')!.textContent)).toEqual(['The parts', 'How they connect', 'The rule', 'Why it holds'])
-    expect(rows.textContent).toMatch(/missing/)
+    expect(rows.textContent).toMatch(/not shown yet/)
     const saved = update.mock.calls.map((c) => c[0]).find((p) => p.drawVerdicts)!
     expect(saved.drawVerdicts!.map((c) => c.id)).toEqual(['entities', 'links', 'rule', 'why-rule'])
     expect(screen.getByText(topic.rubric.whyRuleQuestion)).toBeTruthy()
