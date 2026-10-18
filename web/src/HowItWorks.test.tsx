@@ -99,7 +99,8 @@ describe('How it works drawer', () => {
     expect(document.activeElement).not.toBe(close)
   })
 
-  it('a generated round shows its check report in plain words, honest about the blind check', async () => {
+  // Retired with the Learn plan (Sat 11:45 PM): Home's topic box now opens Learn sessions (learn/LearnTopicBox.test.tsx).
+  it.skip('a generated round shows its check report in plain words, honest about the blind check', async () => {
     vi.stubEnv('VITE_API_BASE', 'http://api.test')
     const built = { ...dice, slug: 'tides', topic: 'Tides', reviewed: false }
     const checks: ChecksReport = {
@@ -198,7 +199,7 @@ describe('How it works drawer', () => {
 describe('backend status dot', () => {
   it('is hidden with no backend (no "offline mode" on the public site), and asks nothing (#173)', async () => {
     render(<App />)
-    await screen.findByRole('button', { name: 'Sums of dice' })
+    await screen.findByRole('heading', { name: 'See your thinking in layers.' })
     expect(screen.queryByTestId('backend-dot')).toBeNull()
     expect(screen.queryByText(/offline/)).toBeNull()
     expect(apiCalls()).toEqual([])

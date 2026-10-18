@@ -1,6 +1,8 @@
 /* "How it works": a side drawer on desktop, a bottom sheet on phones. */
-.hiw-btn { padding: 4px 12px; font: inherit; font-size: 0.85rem; font-weight: 600; color: var(--ink); background: var(--card); border: 1.5px solid var(--ink); border-radius: var(--radius-ui); }
-.hiw-btn:hover { background: var(--marker-soft); }
+/* A quiet text link, not a box: the screen's one visual and one instruction come first. */
+.hiw-btn { padding: 4px 2px; font: inherit; font-size: 0.85rem; font-weight: 600; color: var(--ink-soft); background: none; border: 0; border-radius: var(--radius-ui); text-decoration: underline; text-underline-offset: 3px; text-decoration-color: var(--ink-soft); }
+.hiw-btn:hover { color: var(--ink); background: none; }
+.hiw-btn kbd { display: none; }
 .hiw-btn kbd, .hiw-close kbd { font-family: var(--font-mono); font-size: 0.75rem; padding: 0 4px; margin-left: 4px; border: 1px solid var(--ink-soft); border-radius: var(--radius-ui); color: var(--ink-soft); }
 .player-bar { display: flex; align-items: center; justify-content: space-between; gap: 8px; flex-wrap: wrap; }
 

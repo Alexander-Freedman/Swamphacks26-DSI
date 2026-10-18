@@ -38,7 +38,8 @@ describe('Try any topic', () => {
     expect(normalizeTopic('C++')).toBe('c++')
   })
 
-  it('a chip opens the reviewed round in the player, with its label', async () => {
+  // Retired with the Learn plan (Sat 11:45 PM): Home's topic box now opens Learn sessions (learn/LearnTopicBox.test.tsx).
+  it.skip('a chip opens the reviewed round in the player, with its label', async () => {
     render(<App />)
     fireEvent.click(await screen.findByRole('button', { name: 'Sums of dice' }))
     expect(here()).toBe(`${BASE}?round=dice-sums`)
@@ -53,7 +54,8 @@ describe('Try any topic', () => {
     expect(await screen.findByText(/The Monty Hall problem · 1 of 3/)).toBeTruthy()
   })
 
-  it('typed text matching a cached topic or alias opens that round', async () => {
+  // Retired with the Learn plan (Sat 11:45 PM): Home's topic box now opens Learn sessions (learn/LearnTopicBox.test.tsx).
+  it.skip('typed text matching a cached topic or alias opens that round', async () => {
     render(<App />)
     await screen.findByRole('button', { name: 'Sums of dice' })
     fireEvent.change(screen.getByLabelText(/topic you want/), { target: { value: 'Goats and a car' } })
@@ -62,7 +64,8 @@ describe('Try any topic', () => {
     expect(posts()).toHaveLength(0)
   })
 
-  it('with no backend, an unknown topic gets a friendly line and the chips, no POST', async () => {
+  // Retired with the Learn plan (Sat 11:45 PM): Home's topic box now opens Learn sessions (learn/LearnTopicBox.test.tsx).
+  it.skip('with no backend, an unknown topic gets a friendly line and the chips, no POST', async () => {
     render(<App />)
     await screen.findByRole('button', { name: 'Sums of dice' })
     fireEvent.change(screen.getByLabelText(/topic you want/), { target: { value: 'quantum tunnelling' } })
@@ -73,7 +76,8 @@ describe('Try any topic', () => {
     expect(posts()).toHaveLength(0)
   })
 
-  it('on Pages (no backend) the box says nothing about auto-checking', async () => {
+  // Retired with the Learn plan (Sat 11:45 PM): Home's topic box now opens Learn sessions (learn/LearnTopicBox.test.tsx).
+  it.skip('on Pages (no backend) the box says nothing about auto-checking', async () => {
     render(<App />)
     await screen.findByRole('button', { name: 'Sums of dice' })
     expect(screen.queryByText('auto-checked')).toBeNull()
@@ -106,7 +110,8 @@ describe('Try any topic', () => {
     expect(fetchMock.mock.calls.some(([u]) => String(u).includes('/api/'))).toBe(false)
   })
 
-  it('backend-only deploy (no static files): chips come from the bundle, rounds from the API', async () => {
+  // Retired with the Learn plan (Sat 11:45 PM): Home's topic box now opens Learn sessions (learn/LearnTopicBox.test.tsx).
+  it.skip('backend-only deploy (no static files): chips come from the bundle, rounds from the API', async () => {
     vi.stubEnv('VITE_API_BASE', 'http://api.test')
     fetchMock.mockImplementation(async (url: string) =>
       url === 'http://api.test/api/rounds/monty-hall' ? json(monty) : json({}, 404),
@@ -172,7 +177,8 @@ describe('Try any topic', () => {
     expect(chips[0].textContent).toBe('The Monty Hall problem')
   })
 
-  it('a built round opens labelled auto-checked', async () => {
+  // Retired with the Learn plan (Sat 11:45 PM): Home's topic box now opens Learn sessions (learn/LearnTopicBox.test.tsx).
+  it.skip('a built round opens labelled auto-checked', async () => {
     vi.stubEnv('VITE_API_BASE', 'http://api.test')
     const built = { ...dice, slug: 'tides', topic: 'Tides', reviewed: false }
     fetchMock.mockImplementation(async (url: string, init?: RequestInit) =>
@@ -207,7 +213,8 @@ describe('Try any topic', () => {
     }
   })
 
-  it('playing a chip while it builds: the finished topic is offered, not forced', async () => {
+  // Retired with the Learn plan (Sat 11:45 PM): Home's topic box now opens Learn sessions (learn/LearnTopicBox.test.tsx).
+  it.skip('playing a chip while it builds: the finished topic is offered, not forced', async () => {
     vi.stubEnv('VITE_API_BASE', 'http://api.test')
     const built = { ...dice, slug: 'tides', topic: 'Tides', reviewed: false }
     let finish: () => void = () => {}

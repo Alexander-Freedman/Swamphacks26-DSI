@@ -45,9 +45,20 @@ function WhyFallback({ stage }: { stage: Stage }) {
   )
 }
 
-export function LearnSession({ slug, onDone, api = learnApi }: { slug: string; onDone: () => void; api?: LearnApi }) {
+export function LearnSession({
+  slug,
+  onDone,
+  api = learnApi,
+  initial,
+}: {
+  slug: string
+  onDone: () => void
+  api?: LearnApi
+  /** Start part-way through (tests, demo links); defaults to a fresh session at Guess. */
+  initial?: Partial<LearnState>
+}) {
   const [topic, setTopic] = useState<Topic | null | undefined>(undefined)
-  const [state, setState] = useState<LearnState>(initialState)
+  const [state, setState] = useState<LearnState>(() => ({ ...initialState(), ...initial }) as LearnState)
 
   useEffect(() => {
     // The App keys this component by slug, so a new slug is a fresh mount (no reset needed here).
