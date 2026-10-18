@@ -29,6 +29,9 @@ export type Entry = {
   play?: string
   /** 'round' for the round player (its card links to ?round=); sessions leave it out. */
   kind?: 'round'
+  /** Learn sessions (session 'learn'): the topic slug, and the one-line fix for the caught idea. */
+  slug?: string
+  fix?: string
 }
 
 export type Card = {
@@ -36,6 +39,8 @@ export type Card = {
   id: string
   label: string
   topic: string
+  /** Learn: what's actually true, in one or two lines */
+  fix?: string
   status: 'caught' | 'busted'
   /** times this mistake was caught */
   caught: number
@@ -229,14 +234,24 @@ function topicFor(session: string): string {
  * (its own rematch included). Two right answers since the last catch bust it; getting caught again
  * puts it back to pencil.
  */
+/** Learn entries all say session 'learn'; each topic is its own session for the notebook. */
+const sessionOf = (e: Entry) => (e.session === 'learn' && e.slug ? `learn:${e.slug}` : e.session)
+
+function hrefFor(e: Entry): string {
+  const base = import.meta.env.BASE_URL
+  if (e.session === 'learn' && e.slug) return `${base}?learn=${encodeURIComponent(e.slug)}`
+  return `${base}?${e.kind === 'round' ? 'round' : 'session'}=${encodeURIComponent(e.session)}`
+}
+
 export function notebook(list: Entry[] = entries()): Card[] {
   const cards = new Map<string, Card>()
   const sorted = [...list].sort((a, b) => a.at.localeCompare(b.at))
   for (const e of sorted) {
+    const session = sessionOf(e)
     const id = caughtId(e)
     const right = !id || e.rematch === 'right'
     for (const c of cards.values()) {
-      if (c.session !== e.session || c.id === id) continue
+      if (c.session !== session || c.id === id) continue
       c.last = right ? 'right' : 'missed'
       c.lastSeen = e.at
       if (right) c.wins += 1
@@ -252,16 +267,17 @@ export function notebook(list: Entry[] = entries()): Card[] {
       c.lastSeen = e.at
     } else {
       cards.set(key, {
-        session: e.session,
+        session,
         id,
         label: labelFor(e.session, id, e.label),
         topic: e.topic ?? topicFor(e.session),
+        fix: e.fix,
         status: 'caught',
         caught: 1,
         wins: 0,
         last: own,
         lastSeen: e.at,
-        href: `${import.meta.env.BASE_URL}?${e.kind === 'round' ? 'round' : 'session'}=${encodeURIComponent(e.session)}`,
+        href: hrefFor(e),
       })
     }
   }

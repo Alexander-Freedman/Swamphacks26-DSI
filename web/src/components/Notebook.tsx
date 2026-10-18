@@ -1,6 +1,6 @@
 import type { MouseEvent } from 'react'
 import { BUST_AFTER, NOTEBOOK_HREF, entries, notebook, plays, type Card } from '../notebook'
-import { homeSessions, sessionFor } from '../sessions/registry'
+import { sessionFor } from '../sessions/registry'
 import './Notebook.css'
 
 const BASE = import.meta.env.BASE_URL
@@ -43,6 +43,7 @@ function MistakeCard({ c }: { c: Card }) {
       <span className="nb-stamp" aria-hidden="true">{busted ? 'busted' : 'caught'}</span>
       <p className="nb-topic">{sessionFor(c.session)?.title ?? c.topic}</p>
       <h3 className="nb-label">“{c.label}”</h3>
+      {c.fix && <p className="nb-fix">{c.fix}</p>}
       <p className="nb-meta">
         <span className="sr-only">{busted ? 'Busted. ' : 'Caught. '}</span>
         Fell for it {c.caught === 1 ? 'once' : `${c.caught} times`} · last seen {when(c.lastSeen)}
@@ -84,14 +85,13 @@ export function NotebookScreen({ onHome }: { onHome?: () => void }) {
   const played = plays(all)
   // Empty state (#162): count missed rematches honestly and point at a session not played yet.
   const missed = all.filter((e) => e.rematch === 'wrong').length
-  const next = homeSessions.find((s) => !all.some((e) => e.session === s.slug)) ?? homeSessions[0]
   const caught = cards.filter((c) => c.status === 'caught')
   const busted = cards.filter((c) => c.status === 'busted')
   return (
     <div className="sheet nb">
       <h1 className="nb-title">Your notebook</h1>
       <p className="concept">
-        Every wrong idea a session caught lands here in pencil. Get it right twice later and it's inked in: busted.
+        The wrong ideas your guesses showed, each with the fix. Learn the topic again and get it right twice to cross it off.
       </p>
       {cards.length === 0 ? (
         <div className="nb-empty">
@@ -99,13 +99,11 @@ export function NotebookScreen({ onHome }: { onHome?: () => void }) {
           <p>
             {played > 0
               ? `You've played ${played} ${played === 1 ? 'session' : 'sessions'} and your first guess called ${played === 1 ? 'it' : 'every one'}${missed ? ` (${missed} ${missed === 1 ? 'rematch' : 'rematches'} missed)` : ''}. Try another one: the mistakes worth catching are the confident ones.`
-              : 'Play a session: guess first, watch reality, and if your guess misses, the idea behind it shows up here.'}
+              : 'Learn a topic: guess first, and if your guess was a wrong idea, it shows up here with the fix.'}
           </p>
-          {next && (
-            <a className="nb-btn" href={`${BASE}?session=${next.slug}`}>
-              {played > 0 ? `Next: ${next.title}` : `Start with ${next.title.toLowerCase()}`}
-            </a>
-          )}
+          <a className="nb-btn" href={BASE} onClick={via(onHome)}>
+            Try any topic
+          </a>
         </div>
       ) : (
         <>

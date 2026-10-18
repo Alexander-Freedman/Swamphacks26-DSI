@@ -58,3 +58,4 @@
 }
 @media (prefers-reduced-motion: reduce) { .nb-card.busted .nb-stamp { animation: none; } }
 .nb-link-inline { color: var(--ink); font-weight: 700; padding: 12px 4px; }
+.nb-fix { margin: 0 0 10px; font-size: 0.95rem; line-height: 1.4; color: var(--ink); }
