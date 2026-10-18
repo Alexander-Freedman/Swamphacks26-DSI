@@ -17,9 +17,10 @@ const click = (name: string | RegExp) => fireEvent.click(screen.getByRole('butto
 describe('statistics session', () => {
   it('opens on a chapter menu of statistics topics', () => {
     render(<session.Component onDone={() => {}} />)
-    for (const h of ['Describing data', 'The normal curve', 'Sampling', 'Relationships', 'Testing ideas']) expect(screen.getByRole('heading', { name: h })).toBeTruthy()
+    expect(screen.getByRole('heading', { name: 'Sampling' })).toBeTruthy()
     expect((screen.getByRole('button', { name: /^Averages pile into a bell curve/ }) as HTMLButtonElement).disabled).toBe(false)
-    expect((screen.getByRole('button', { name: /^A p-value is an area/ }) as HTMLButtonElement).disabled).toBe(true)
+    expect(screen.queryByRole('button', { name: /^A p-value is an area/ })).toBeNull()
+    expect(screen.queryByText(/coming next/i)).toBeNull()
     expect(screen.queryByText(/birthday/i)).toBeNull()
   })
 

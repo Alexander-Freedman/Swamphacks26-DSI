@@ -115,14 +115,15 @@ describe('calculus session', () => {
     for (const w of [/\bbet(s|ting)?\b/, /lock it in/, /called it/, /how sure/, /\bxp\b/, /\d+\s*(pts|points?)\b/, /\bscore\b/]) expect(text).not.toMatch(w) // scores, not "a point on the curve"
   })
 
-  it('opens on a course menu: Calc 1, 2 and 3, with the topics not built yet marked', () => {
+  it('opens on a course menu that lists only the built topics', () => {
     localStorage.clear()
     render(<Session onDone={() => {}} />)
     expect(screen.getByText('What do you want to practice?')).toBeTruthy()
-    for (const c of ['Calc 1', 'Calc 2', 'Calc 3']) expect(screen.getByRole('heading', { name: c })).toBeTruthy()
-    expect((screen.getByRole('button', { name: /^Slices of a surface/ }) as HTMLButtonElement).disabled).toBe(false)
-    expect((screen.getByRole('button', { name: /^Taylor polynomials/ }) as HTMLButtonElement).disabled).toBe(true)
-    expect(screen.getAllByText('coming next').length).toBeGreaterThan(5)
+    for (const c of ['Calc 1', 'Calc 3']) expect(screen.getByRole('heading', { name: c })).toBeTruthy()
+    expect(screen.queryByRole('heading', { name: 'Calc 2' })).toBeNull() // nothing built there yet
+    for (const t of [/^The slope of a curve/, /^Area under a curve/, /^Slices of a surface/, /^The gradient/, /^Volume under a surface/]) expect((screen.getByRole('button', { name: t }) as HTMLButtonElement).disabled).toBe(false)
+    expect(screen.queryByRole('button', { name: /^Taylor polynomials/ })).toBeNull()
+    expect(screen.queryByText(/coming next/i)).toBeNull()
   })
 
   it('Derivatives > The slope of a curve ends on its own mistake card with Finish', () => {
