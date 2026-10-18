@@ -68,7 +68,14 @@ export type Item = {
   truth_value?: number | null
   computed?: boolean | null
   approximate?: boolean | null
+  // Engine v4: named numbers in the model, and settings worth trying after the reveal (truth_value =
+  // the answer recomputed by the server at that setting).
+  variables?: { name: string; meaning: string; unit: string; value: number }[] | null
+  extremes?: { param: string; value: number; watch: string; truth_value?: number | null }[] | null
 }
+
+// Engine v4: a second case that works the same way (item_id = its item, if it has one).
+export type RoundCompare = { topic: string; item_id?: string | null; prompt?: string | null; shared_principle: string }
 
 export type Round = {
   schema_version: number
@@ -78,6 +85,8 @@ export type Round = {
   reviewed: boolean
   misconceptions: Misconception[]
   items: Item[]
+  spec_version?: number | null
+  compare?: RoundCompare | null
 }
 
 export type Confidence = 'guessing' | 'pretty sure' | 'certain'

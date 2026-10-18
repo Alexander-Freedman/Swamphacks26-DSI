@@ -5,6 +5,8 @@ import { leftSum, shareAtLeast } from '../truth'
 import type { CurveTruth, Item, Round } from '../types'
 import { fmt, misconceptionFor, verdictFor, verdictText } from '../verdict'
 import { Curve } from './Curve'
+import { CurveReveal, SamplerExplore } from './CurvePlay'
+import { isV4, playMode } from './curveMode'
 import { Distribution } from './Distribution'
 import { IconArray } from './IconArray'
 import { MisconceptionCard } from './MisconceptionCard'
@@ -167,6 +169,7 @@ export function Reveal({ item, round, answer, truth, signals }: Props) {
   const verdictRef = useRef<HTMLDivElement>(null)
   // Focus lands on the verdict after lock-in instead of falling back to <body>.
   useEffect(() => verdictRef.current?.focus({ preventScroll: true }), [])
+  const v4 = isV4(round, item) && playMode(item) !== null
   const pointLabel =
     truth.kind === 'curve' && truth.point && truth.value != null && t.widget === 'curve' && !t.preset ? withUnit(truth.value, unit) : undefined
 
@@ -175,17 +178,19 @@ export function Reveal({ item, round, answer, truth, signals }: Props) {
       {truth.kind === 'distribution' && t.widget === 'distribution' && (
         <Distribution hist={truth.hist} xLabel={t.x_label} guess={guess} range={item.slider ? { min: item.slider.min, max: item.slider.max } : undefined} />
       )}
+      {truth.kind === 'distribution' && item.extremes && item.extremes.length > 0 && <SamplerExplore item={item} guess={guess} />}
       {truth.kind === 'icons' && <IconArray counts={truth.counts} />}
-      {truth.kind === 'curve' && t.widget === 'curve' && truth.show === 'tangent' && t.ask_x != null && (
+      {v4 && <CurveReveal item={item} guess={guess} truth={truth} />}
+      {!v4 && truth.kind === 'curve' && t.widget === 'curve' && truth.show === 'tangent' && t.ask_x != null && (
         <Curve t={t} f={truth.f} tangent={{ x: t.ask_x, slope: truth.value }} guessSlope={guess} point={truth.point} pointLabel={truth.value != null ? `slope ${num(truth.value)}` : ''} />
       )}
-      {truth.kind === 'curve' && t.widget === 'curve' && truth.show === 'riemann' && t.area_from != null && t.area_to != null && (
+      {!v4 && truth.kind === 'curve' && t.widget === 'curve' && truth.show === 'riemann' && t.area_from != null && t.area_to != null && (
         <RiemannPicture t={t} f={truth.f} from={t.area_from} to={t.area_to} guess={guess} exact={truth.value} />
       )}
-      {truth.kind === 'curve' && t.widget === 'curve' && truth.show === 'limit' && (
+      {!v4 && truth.kind === 'curve' && t.widget === 'curve' && truth.show === 'limit' && (
         <Curve t={t} f={truth.f} mark={t.ask_x} point={truth.point} pointLabel={truth.value != null ? `limit ${num(truth.value)}` : ''} hole />
       )}
-      {truth.kind === 'curve' && t.widget === 'curve' && !truth.show && <Curve t={t} f={truth.f} guess={guess} point={truth.point} pointLabel={pointLabel} />}
+      {!v4 && truth.kind === 'curve' && t.widget === 'curve' && !truth.show && <Curve t={t} f={truth.f} guess={guess} point={truth.point} pointLabel={pointLabel} />}
       {item.approximate && <p className="approx-tag hand">approximate picture, not a full model</p>}
 
       <div className="verdict-row" ref={verdictRef} tabIndex={-1}>

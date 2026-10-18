@@ -13,6 +13,8 @@ import { record, upsert } from './notebook'
 import { useReset } from './reset'
 import { Predict, type Answer } from './components/Predict'
 import { Reveal } from './components/Reveal'
+import { isV4 } from './components/curveMode'
+import { RoundCompare } from './components/RoundCompare'
 import { showcaseRound, showcaseSlugs } from './rounds'
 import { homeSessions, sessionFor } from './sessions/registry'
 import { artFor } from './sessionArt'
@@ -76,7 +78,11 @@ function Home({ onPick, onSession, onNotebook }: { onPick: (slug: string) => voi
   )
 }
 
-type Phase = { kind: 'predict' } | { kind: 'locked'; answer: Answer } | { kind: 'revealed'; answer: Answer; truth: Computed }
+type Phase =
+  | { kind: 'predict' }
+  | { kind: 'locked'; answer: Answer }
+  | { kind: 'revealed'; answer: Answer; truth: Computed }
+  | { kind: 'compare' }
 
 function Player({ round, onDone }: { round: Round; onDone: () => void }) {
   const [idx, setIdx] = useState(0)
@@ -94,6 +100,8 @@ function Player({ round, onDone }: { round: Round; onDone: () => void }) {
   // Notebook (#172): this play's id and the entry time of each mistake it caught (one entry per mistake).
   const [play] = useState(() => `${round.slug}@${new Date().toISOString()}`)
   const caught = useRef<Record<string, string>>({})
+  // Each item's computed answer, for the compare screen (engine v4 round.compare).
+  const [answers, setAnswers] = useState<Record<string, number | null>>({})
 
   const save = (answer: Answer, mid: string | null) => {
     const base = { session: round.slug, kind: 'round' as const, topic: round.topic, play, rematch: null }
@@ -118,10 +126,19 @@ function Player({ round, onDone }: { round: Round; onDone: () => void }) {
     if (mid) save(answer, mid)
     // The truth is only computed after lock-in. The beat hides the simulation time.
     clearTimeout(beat.current)
-    beat.current = setTimeout(() => setPhase({ kind: 'revealed', answer, truth: computeTruth(item) }), BEAT_MS)
+    beat.current = setTimeout(() => {
+      const truth = computeTruth(item)
+      setAnswers((a) => ({ ...a, [item.id]: truth.value }))
+      setPhase({ kind: 'revealed', answer, truth })
+    }, BEAT_MS)
   }
 
   const next = () => {
+    if (last && round.compare && phase.kind === 'revealed') {
+      if (!Object.keys(caught.current).length) save(phase.answer, null)
+      return setPhase({ kind: 'compare' })
+    }
+    if (last && phase.kind === 'compare') return onDone()
     if (last) {
       // A round with no miss counts as one right answer toward busting its earlier catches.
       if (phase.kind === 'revealed' && !Object.keys(caught.current).length) save(phase.answer, null)
@@ -142,7 +159,7 @@ function Player({ round, onDone }: { round: Round; onDone: () => void }) {
             spot={{
               screen: ITEM_SCREENS[item.id],
               locked: phase.kind !== 'predict',
-              guess: phase.kind === 'predict' ? null : (phase.answer.value ?? phase.answer.optionId),
+              guess: phase.kind === 'predict' || phase.kind === 'compare' ? null : (phase.answer.value ?? phase.answer.optionId),
               step: idx + 1,
               total: round.items.length,
               label: round.topic,
@@ -154,17 +171,19 @@ function Player({ round, onDone }: { round: Round; onDone: () => void }) {
         </div>
       </div>
       {drawer && <HowItWorks round={round} item={item} locked={phase.kind !== 'predict'} onClose={closeDrawer} />}
-      {phase.kind === 'predict' && <Predict key={item.id} item={item} onLock={lock} />}
-      {phase.kind !== 'predict' && <h2 className="prompt">{item.prompt}</h2>}
-      {phase.kind !== 'predict' && (
+      {phase.kind === 'predict' && <Predict key={item.id} item={item} onLock={lock} v4={isV4(round, item)} />}
+      {phase.kind === 'compare' && round.compare && <RoundCompare round={round} compare={round.compare} answers={answers} onDone={onDone} />}
+      {(phase.kind === 'locked' || phase.kind === 'revealed') && <h2 className="prompt">{item.prompt}</h2>}
+      {(phase.kind === 'locked' || phase.kind === 'revealed') && (
         <span className="locked-stamp">
-          locked: {phase.answer.value != null ? withUnit(phase.answer.value, item.slider?.unit ?? '') : item.options?.find((o) => o.id === phase.answer.optionId)?.text} · {phase.answer.confidence}
+          {isV4(round, item) ? 'your guess' : 'locked'}: {phase.answer.value != null ? withUnit(phase.answer.value, item.slider?.unit ?? '') : item.options?.find((o) => o.id === phase.answer.optionId)?.text}
+          {!isV4(round, item) && ` · ${phase.answer.confidence}`}
         </span>
       )}
       {phase.kind === 'revealed' && (
         <>
           <Reveal item={item} round={round} answer={phase.answer} truth={phase.truth} signals={signals} />
-          <button className="next" onClick={next}>{last ? 'Done' : 'Next'}</button>
+          <button className="next" onClick={next}>{last ? (round.compare ? 'Compare' : 'Done') : 'Next'}</button>
         </>
       )}
     </div>

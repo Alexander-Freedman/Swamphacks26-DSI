@@ -1,4 +1,4 @@
-import { useId } from 'react'
+import { useId, type KeyboardEvent as RKE, type PointerEvent as RPE } from 'react'
 import type { CurvePoint } from '../truth'
 import type { CurveTruth } from '../types'
 import './Curve.css'
@@ -22,6 +22,19 @@ type Props = {
   // A dashed guide at the x the question asks about; the limit's point as a hollow dot.
   mark?: number | null
   hole?: boolean
+  // Play mode (#184). yRange fixes the y scale (so it doesn't jump while you drag); hideInk draws the
+  // axes only (the curve is the answer); skip leaves a gap in the curve around a limit; known is a
+  // given point in ink (the start, or a tangent's pivot); pencil is your guessed point; hguide a dashed
+  // level line; onPick gets the pointer in data coordinates while you press or drag.
+  yRange?: [number, number] | null
+  hideInk?: boolean
+  skip?: [number, number] | null
+  known?: { x: number; y: number } | null
+  pencil?: { x: number; y: number } | null
+  hguide?: number | null
+  onPick?: (p: { x: number; y: number }) => void
+  // The svg as a keyboard slider while picking (aria + arrow keys).
+  slider?: { label: string; valueText: string; onKey: (dir: number, big: boolean) => void } | null
 }
 
 const H = 280
@@ -34,7 +47,7 @@ const short = (v: number) => {
   return String(Number(v.toPrecision(3)))
 }
 
-export function Curve({ t, f, guess, point, pointLabel, tangent, guessSlope, area, mark, hole }: Props) {
+export function Curve({ t, f, guess, point, pointLabel, tangent, guessSlope, area, mark, hole, yRange, hideInk, skip, known, pencil, hguide, onPick, slider }: Props) {
   const narrow = useNarrow()
   const W = narrow ? 360 : 640
   const { x_min: lo, x_max: hi } = t
@@ -49,12 +62,36 @@ export function Curve({ t, f, guess, point, pointLabel, tangent, guessSlope, are
   const guessY = guess != null && axis === 'y' ? guess : null
   // your area drawn as one rectangle over the same base needs to fit too
   const areaH = area?.guess != null && area.to !== area.from ? area.guess / (area.to - area.from) : null
-  const yLo = Math.min(0, ...ys, guessY ?? 0, areaH ?? 0)
-  let yHi = Math.max(prob ? 1 : -Infinity, ...ys, guessY ?? -Infinity, areaH ?? -Infinity)
+  const yLo = yRange ? yRange[0] : Math.min(0, ...ys, guessY ?? 0, areaH ?? 0)
+  let yHi = yRange ? yRange[1] : Math.max(prob ? 1 : -Infinity, ...ys, guessY ?? -Infinity, areaH ?? -Infinity)
   if (!(yHi > yLo)) yHi = yLo + 1
   const xAt = (x: number) => PAD.l + ((Math.min(Math.max(x, lo), hi) - lo) / (hi - lo)) * (W - PAD.l - PAD.r)
   const yAt = (y: number) => H - PAD.b - ((y - yLo) / (yHi - yLo)) * (H - PAD.t - PAD.b)
-  const d = pts.map(([x, y], i) => `${i ? 'L' : 'M'}${xAt(x).toFixed(1)},${yAt(y).toFixed(1)}`).join('')
+  // A new segment after a skipped stretch (a limit's gap) or a point that isn't defined.
+  let gap = true
+  const d = xs
+    .map((x) => {
+      const y = f(x)
+      if (!Number.isFinite(y) || (skip && x > skip[0] && x < skip[1])) {
+        gap = true
+        return ''
+      }
+      const seg = `${gap ? 'M' : 'L'}${xAt(x).toFixed(1)},${yAt(y).toFixed(1)}`
+      gap = false
+      return seg
+    })
+    .join('')
+  const toData = (e: RPE<SVGSVGElement>) => {
+    const r = e.currentTarget.getBoundingClientRect()
+    if (!r.width || !r.height) return null
+    const vx = ((e.clientX - r.left) / r.width) * W
+    const vy = ((e.clientY - r.top) / r.height) * H
+    return { x: lo + ((vx - PAD.l) / (W - PAD.l - PAD.r)) * (hi - lo), y: yLo + ((H - PAD.b - vy) / (H - PAD.t - PAD.b)) * (yHi - yLo) }
+  }
+  const pick = (e: RPE<SVGSVGElement>) => {
+    const p = toData(e)
+    if (p && onPick) onPick(p)
+  }
   const xGuess = guess != null && axis === 'x' ? guess : null
   const offRight = xGuess != null && xGuess > hi
   const offLeft = xGuess != null && xGuess < lo
@@ -82,10 +119,31 @@ export function Curve({ t, f, guess, point, pointLabel, tangent, guessSlope, are
 
   return (
     <svg
-      className="curve"
+      className={`curve${onPick ? ' curve-play' : ''}`}
       viewBox={`0 0 ${W} ${H}`}
-      role="img"
-      aria-label={`${t.y_label} vs ${t.x_label}${point ? (prob ? `; reaches 50% at ${point.x}` : `; reality: ${label}`) : ''}`}
+      {...(slider
+        ? {
+            role: 'slider',
+            tabIndex: 0,
+            'aria-label': slider.label,
+            'aria-valuetext': slider.valueText,
+            onKeyDown: (e: RKE) => {
+              const dir = e.key === 'ArrowUp' || e.key === 'ArrowRight' || e.key === 'PageUp' ? 1 : e.key === 'ArrowDown' || e.key === 'ArrowLeft' || e.key === 'PageDown' ? -1 : 0
+              if (!dir) return
+              e.preventDefault()
+              slider.onKey(dir, e.key.startsWith('Page') || e.shiftKey)
+            },
+          }
+        : { role: 'img', 'aria-label': `${t.y_label} vs ${t.x_label}${point ? (prob ? `; reaches 50% at ${point.x}` : `; reality: ${label}`) : ''}` })}
+      onPointerDown={
+        onPick
+          ? (e) => {
+              e.currentTarget.setPointerCapture?.(e.pointerId)
+              pick(e)
+            }
+          : undefined
+      }
+      onPointerMove={onPick ? (e) => e.buttons && pick(e) : undefined}
     >
       {xGuess != null && point && (
         <rect className="curve-gap" x={Math.min(xAt(xGuess), px)} y={PAD.t} width={Math.abs(xAt(xGuess) - px)} height={H - PAD.t - PAD.b} />
@@ -132,9 +190,18 @@ export function Curve({ t, f, guess, point, pointLabel, tangent, guessSlope, are
         </g>
       )}
       {mark != null && <line className="curve-mark" x1={xAt(mark)} x2={xAt(mark)} y1={PAD.t} y2={H - PAD.b} />}
-      <path className="curve-ink" d={d} pathLength={1} />
+      {hguide != null && <line className="curve-mark" x1={PAD.l} x2={W - PAD.r} y1={yAt(hguide)} y2={yAt(hguide)} />}
+      {!hideInk && <path className="curve-ink" d={d} pathLength={1} />}
       {tangent && (
         <g clipPath={`url(#${clip})`}>
+          {guessSlope != null && tangent.slope != null && Math.abs(guessSlope - tangent.slope) > 1e-9 && (() => {
+            // the gap: the wedge between your tangent and the real one
+            const g = line(tangent.x, guessSlope)
+            const r = line(tangent.x, tangent.slope)
+            const cx = xAt(tangent.x)
+            const cy = yAt(f(tangent.x))
+            return <path className="curve-gap" d={`M${cx},${cy}L${g.x2},${g.y2}L${r.x2},${r.y2}ZM${cx},${cy}L${g.x1},${g.y1}L${r.x1},${r.y1}Z`} />
+          })()}
           {guessSlope != null && <line className="curve-tangent-pencil" {...line(tangent.x, guessSlope)} />}
           {tangent.slope != null && <line className="curve-tangent" {...line(tangent.x, tangent.slope)} />}
         </g>
@@ -151,6 +218,12 @@ export function Curve({ t, f, guess, point, pointLabel, tangent, guessSlope, are
         <g className="curve-guess">
           <line x1={PAD.l} x2={W - PAD.r} y1={yAt(guessY)} y2={yAt(guessY)} />
           <text x={W - PAD.r} y={yAt(guessY) - 8} textAnchor="end">your guess</text>
+        </g>
+      )}
+      {known && Number.isFinite(known.y) && <circle className="curve-known" cx={xAt(known.x)} cy={yAt(known.y)} r={5} />}
+      {pencil && (
+        <g className="curve-pencil">
+          <circle cx={xAt(pencil.x)} cy={yAt(pencil.y)} r={9} />
         </g>
       )}
       {point && (

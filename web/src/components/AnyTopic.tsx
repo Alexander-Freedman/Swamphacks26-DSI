@@ -1,5 +1,5 @@
 import { useEffect, useId, useRef, useState, type FormEvent } from 'react'
-import { apiBase, clearBuild, loadExtraIndex, matchTopic, startBuild, useBuild, type ExtraTopic } from '../extras'
+import { NO_FIT, apiBase, clearBuild, loadExtraIndex, matchTopic, startBuild, useBuild, type ExtraTopic } from '../extras'
 import { showcaseRound } from '../rounds'
 import { homeSessions, sessionFor } from '../sessions/registry'
 import './AnyTopic.css'
@@ -63,7 +63,9 @@ export function AnyTopic({
     void startBuild(topic, timeoutMs)
   }
 
-  const topicName = (slug: string) => extras.find((x) => x.slug === slug)?.topic ?? sessionFor(slug)?.title ?? showcaseRound(slug)?.topic
+  const nearest = build.kind === 'failed' ? (build.nearest ?? []) : []
+  const topicName = (slug: string) =>
+    extras.find((x) => x.slug === slug)?.topic ?? sessionFor(slug)?.title ?? showcaseRound(slug)?.topic ?? nearest.find((n) => n.slug === slug)?.topic
   const missed = offline !== null || build.kind === 'failed'
   const suggested = build.kind === 'failed' && offline === null ? build.suggestions.filter((s) => topicName(s)) : []
   // After a miss the three sessions come first (#167): they're the site's best-built rounds.
@@ -114,9 +116,9 @@ export function AnyTopic({
         {offline !== null ? (
           <>No round on “{offline}” yet on this site. Pick one of these, each one hand-checked:</>
         ) : build.kind === 'building' ? (
-          <>Building your round on “{build.topic}” (can take up to a minute). Play a hand-checked one while you wait:</>
+          <>Building a model of “{build.topic}” (up to 45 seconds). Play a hand-checked one while you wait:</>
         ) : build.kind === 'failed' ? (
-          <>Couldn't build “{build.topic}” right now. Try one of these instead:</>
+          <>{build.reason || NO_FIT} Closest ones ready now:</>
         ) : build.kind === 'ready' ? (
           <>
             Your topic's ready:{' '}

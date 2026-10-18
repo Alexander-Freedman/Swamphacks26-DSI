@@ -21,3 +21,9 @@
 .curve-guess-rect { fill: none; stroke: var(--pencil); stroke-width: 2.5; stroke-dasharray: 7 6; }
 .curve-mark { stroke: var(--pencil); stroke-width: 1.5; stroke-dasharray: 3 4; }
 .curve-target circle.curve-hole { fill: var(--card); stroke: var(--ink); stroke-width: 3; }
+
+/* Play mode (#184): you press and drag on the picture itself. */
+.curve-play { cursor: crosshair; touch-action: none; user-select: none; -webkit-user-select: none; }
+.curve-play:focus-visible { outline: 3px solid var(--marker); outline-offset: 4px; border-radius: 4px; }
+.curve-known { fill: var(--ink); }
+.curve-pencil circle { fill: var(--card); stroke: var(--pencil); stroke-width: 3; stroke-dasharray: 4 3; }

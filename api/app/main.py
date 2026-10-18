@@ -98,7 +98,8 @@ def list_rounds() -> list[dict[str, str | bool]]:
 
 @app.get("/api/rounds/{slug}")
 def get_round(slug: str) -> Round:
-    r = showcase_rounds().get(slug) or extra_rounds().get(slug)
+    # A generated round too, so a ?round=<slug> link to a built topic opens it (#184).
+    r = showcase_rounds().get(slug) or extra_rounds().get(slug) or generated_round(slug)
     if r is None:
         raise HTTPException(status_code=404, detail="no such round")
     return r
