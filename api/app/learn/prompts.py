@@ -14,9 +14,14 @@ Two changes from the prototype, for the six-screen contract:
 - stress() tests the learner's fix against the PRE-AUTHORED extreme case at caseIndex
   (not a freshly constructed one) and wants a one-sentence critique; guess() also picks
   the closest pre-authored misconception.
+
+visual() is new here: an optional second authoring call that asks for one curve for the
+Anchor step (or fits=false). The router checks every number before attaching it.
 """
 
 from __future__ import annotations
+
+import json
 
 from app.learn.schemas import Topic
 
@@ -300,3 +305,175 @@ def transfer(topic: Topic, analogy: str, was_pushed: bool) -> str:
             '{\n  "verdict": "maps" | "partial" | "too-abstract" | "fails",  // "partial" = has some structure but is missing/vague on a specific requirement\n  "critique": string,   // 2-4 sentences, specific to what THIS example does or doesn\'t preserve\n  "missingPiece": string | null  // if "partial" or "fails", name which structural requirement above is missing, else null\n}'
         )
     )
+
+
+# ---------------------------------------------------------------------------
+# Optional second authoring call: one curve for the Anchor step, or fits=false.
+# Code checks every number it returns (router._vet_visual); this only asks.
+# ---------------------------------------------------------------------------
+def _curve_example(
+    topic: str, ids: str, variables: list, expr: str, x: tuple, ask_x: float, knob: dict,
+    prompt: str, slider: dict, bands: list, extremes: list, answer: float,
+) -> str:  # fmt: skip
+    spec = {
+        "widget": "curve",
+        "approximate": False,
+        "variables": variables,
+        "curve": {
+            "expr": expr,
+            "mode": "value",
+            "x_min": x[0],
+            "x_max": x[1],
+            "x_label": x[2],
+            "y_label": x[3],
+            "ask_x": ask_x,
+            "ask_y": None,
+            "area_from": None,
+            "area_to": None,
+            "knob": knob,
+        },
+        "sampler": None,
+        "prediction": {"prompt": prompt, "input": "slider", "slider": slider, "options": []},
+        "bands": bands,
+        "extremes": extremes,
+        "answer_claimed": answer,
+    }
+    reply = {"fits": True, "visual": {"widget": "curve", "spec": spec}}
+    return f'Topic "{topic}" (misconception ids: {ids}):\n{json.dumps(reply, ensure_ascii=False)}'
+
+
+# Three hand-checked visuals from data/learn. Ohm's last watch line says "0.5 amperes"
+# instead of "half an ampere" so the example follows the number rule the checker applies.
+VISUAL_EXAMPLES = [
+    _curve_example(
+        "compound interest",
+        "simple-interest, interest-paid-once, rate-is-all-that-matters",
+        [{"name": "P", "meaning": "money put in at the start", "unit": "$", "value": 1000}],
+        "P*(1+r/100)^x",
+        (0, 40, "years", "value ($)"),
+        30,
+        {"param": "r", "label": "yearly rate (%)", "min": 1, "max": 15, "step": 0.5, "default": 7},
+        "You put $1,000 in an account paying 7% a year on the current balance. After 30 years, how much is in the account?",
+        {"min": 1000, "max": 9000, "step": 100, "unit": "$"},
+        [
+            {"min": 1000, "max": 1200, "misconception_id": "interest-paid-once"},
+            {"min": 1300, "max": 6900, "misconception_id": "simple-interest"},
+            {"min": 7000, "max": 9000, "misconception_id": None},
+        ],
+        [
+            {
+                "param": "r",
+                "value": 1,
+                "watch": "At 1% the curve is nearly a straight line: 30 years gives only $1,348.",
+            },
+            {
+                "param": "r",
+                "value": 15,
+                "watch": "At 15% the value passes $66,000 by year 30; the curve bends hard upward.",
+            },
+        ],
+        7612.26,
+    ),
+    _curve_example(
+        "why we have seasons",
+        "closer-means-summer, tilt-means-one-side-always-hot, hot-temperature-is-the-season",
+        [{"name": "L", "meaning": "how far north the city is", "unit": "°", "value": 40}],
+        "90 - L + T*sin(6.2832*(x - 80)/365)",
+        (0, 365, "day of the year", "noon Sun height (°)"),
+        172,
+        {
+            "param": "T",
+            "label": "Earth's tilt (°)",
+            "min": 0,
+            "max": 40,
+            "step": 0.5,
+            "default": 23.5,
+        },
+        "A city 40° north of the equator. How high above the horizon is the Sun at noon on June 21?",
+        {"min": 0, "max": 90, "step": 1, "unit": "°"},
+        [
+            {"min": 0, "max": 62, "misconception_id": "closer-means-summer"},
+            {"min": 63, "max": 90, "misconception_id": None},
+        ],
+        [
+            {
+                "param": "T",
+                "value": 0,
+                "watch": "With no tilt the noon Sun sits at 50° every day of the year: no seasons.",
+            },
+            {
+                "param": "T",
+                "value": 40,
+                "watch": "At 40° of tilt the noon Sun swings from 10° in December to 90° in June.",
+            },
+        ],
+        73.5,
+    ),
+    _curve_example(
+        "Ohm's law",
+        "voltage-is-current, resistance-consumes-current, ohms-law-always-applies",
+        [],
+        "x/R",
+        (0, 24, "voltage (volts)", "current (amperes)"),
+        12,
+        {"param": "R", "label": "resistance (ohms)", "min": 1, "max": 24, "step": 1, "default": 6},
+        "A 6-ohm resistor has 12 volts across it. How much current flows through it?",
+        {"min": 0, "max": 12, "step": 0.5, "unit": "A"},
+        [
+            {"min": 0, "max": 1, "misconception_id": "resistance-consumes-current"},
+            {"min": 1.5, "max": 2.5, "misconception_id": None},
+            {"min": 3, "max": 12, "misconception_id": "voltage-is-current"},
+        ],
+        [
+            {"param": "R", "value": 1, "watch": "At 1 ohm, 12 volts drives 12 amperes."},
+            {
+                "param": "R",
+                "value": 24,
+                "watch": "At 24 ohms, the same 12 volts drives only 0.5 amperes.",
+            },
+        ],
+        2.0,
+    ),
+]
+
+
+def visual(topic: Topic) -> str:
+    r = topic.rubric
+    misconceptions = "\n".join(
+        f"  - {m.id}: {m.label} — tell: {m.tell}" for m in topic.misconceptions
+    )
+    extremes = "\n".join(
+        f"  - {c.dimension}: {c.scenario} -> {c.correctBehavior}" for c in topic.extremeCases
+    )
+    examples = "\n\n".join(VISUAL_EXAMPLES)
+    return f"""You are adding ONE optional interactive graph to a lesson on "{topic.topic}". The learner sees it on the Anchor step: they read one true fact, predict a number with a slider, then see the real curve and can move one knob to watch its shape change. Respond with ONLY raw JSON matching the schema given — no markdown fences, no commentary, no tool use.
+
+A missing graph is fine. A wrong graph is not: code recomputes every number you give from your formula and throws the graph away if anything disagrees. So if this idea has no honest single curve, say so (fits=false, visual=null). Ideas like recursion, opportunity cost, or a definition with no measured quantity do not fit. Do not force one.
+
+The lesson (ground truth; do not contradict it):
+- Entities: {"; ".join(r.entities)}.
+- Causal links: {" | ".join(r.causalLinks)}.
+- The correct rule (do not state it in learner-facing text): {r.coreRule}.
+- Anchor fact shown on this step: {r.anchorDescription}
+- Anchor question: {r.anchorPrompt}
+Misconception ids (use these exact ids in bands):
+{misconceptions}
+Extreme cases already in the lesson:
+{extremes}
+
+If a curve fits, write a visual exactly like the examples below:
+1. One curve y = f(x). x and y are real, measurable quantities from this topic (units in x_label and y_label). widget "curve", curve.mode "value", ask_y null, area_from null, area_to null, sampler null, approximate false unless the formula is a simplified picture rather than an established law (then true).
+2. ONE knob (curve.knob): a named parameter of the formula that changes the curve's SHAPE when moved (never x itself). knob.default is the value the question uses; knob.min < knob.default < knob.max; the step divides the range sensibly.
+3. curve.expr uses only x, the knob's param name, names declared in variables, numbers, + - * / ^ ( ), and these functions: sin cos tan exp log log2 log10 sqrt abs min max pow. No constants: write 3.14159 for pi, 6.28318 for 2*pi, exp(1) for e. No ** (use ^), no other functions (no acos, no floor). Variable names are short letters (e.g. P, L, S). The curve must stay finite across x_min..x_max at every knob setting from knob.min to knob.max.
+4. prediction: input "slider", options []. The prompt (at most 300 characters, plain words, real numbers, every quantity named in words) asks for the y value at x = ask_x with the knob at its default. It must not contain the answer number.
+5. bands: contiguous ranges that together cover the whole slider from slider.min to slider.max. Each band's min and max sit on slider stops (slider.min plus a whole number of steps), and each band starts exactly one slider step after the previous band's max. Exactly one band has misconception_id null: the correct range, which contains the true answer. Every other band names one of the misconception ids above: the range someone holding that wrong model would pick.
+6. answer_claimed: the number your expr gives at x = ask_x with the knob at its default (variables at their values). Work it out carefully; it is checked to within 2%.
+7. extremes: 2 or 3, each setting the knob (param = the knob's param name) to a value inside the knob's range. Each watch line (at most 160 characters) says what the learner sees at that setting and states, as a plain number in digits, what y is at x = ask_x there (e.g. "At 24 ohms, 12 volts drives only 0.5 amperes."). Every number you write must be true: it is recomputed from your expr.
+8. Plain words everywhere a learner reads (prompt, labels, watch lines). Never use the words bet, wager, lock in, called it, or confident. Labels at most 60 characters.
+
+Examples (each one passes the same checks):
+
+{examples}
+
+Respond with ONLY raw JSON matching this shape (no other keys, no prose outside the JSON):
+{{ "fits": boolean, "visual": {{ "widget": "curve", "spec": {{ ...exactly the fields in the examples... }} }} | null }}"""

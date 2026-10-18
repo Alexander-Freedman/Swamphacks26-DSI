@@ -187,7 +187,7 @@
         {
           "param": "F",
           "value": 0.1,
-          "watch": "Cut false alarms to 0.1% and a positive becomes about a coin flip."
+          "watch": "Cut false alarms to 0.1% and a positive means about a 50% chance, a coin flip."
         },
         {
           "param": "F",

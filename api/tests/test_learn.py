@@ -92,7 +92,7 @@ def test_post_new_topic_authors_live_and_caches(tmp_path) -> None:
     assert res.status_code == 200, res.text
     body = res.json()
     assert body["slug"] == "boyle-s-law" and body["checked"] is False
-    assert body["visual"] is None
+    assert body["visual"]["widget"] == "curve"  # the fake visual passes every check
     assert (tmp_path / "learn-cache" / "boyle-s-law.json").exists()
     # Served from the cache now, listed as unchecked, and gradeable.
     assert client.get("/api/learn/topics/boyle-s-law").status_code == 200
@@ -424,3 +424,140 @@ def test_other_validation_errors_still_raise() -> None:
     del data["coreRule"]
     with pytest.raises(ValidationError):
         validate_clipped(Rubric, data)
+
+
+# ---------------------------------------------------------------------------
+# the optional curve visual on a live-authored topic
+# ---------------------------------------------------------------------------
+def _with_visual(monkeypatch, edit) -> None:
+    """Fake codex, but the visual reply goes through edit(spec) first."""
+    real = codex.fake_reply
+
+    def reply(task, prompt):
+        out = real(task, prompt)
+        if task == "visual":
+            edit(out["visual"]["spec"])
+        return out
+
+    monkeypatch.setattr(codex, "fake_reply", reply)
+
+
+def test_live_topic_gets_a_checked_visual(tmp_path) -> None:
+    from app.spec import compute_truth
+
+    res = post("topics", topic="Newton's law of cooling")
+    assert res.status_code == 200, res.text
+    t = Topic.model_validate(res.json())
+    assert t.visual is not None and t.visual.widget == "curve"
+    case = t.visual.spec
+    assert abs(compute_truth(case) - case.answer_claimed) < 0.01 * case.answer_claimed
+    assert {b.misconception_id for b in case.bands} - {None} <= {m.id for m in t.misconceptions}
+    cached = json.loads(
+        (tmp_path / "learn-cache" / "newton-s-law-of-cooling.json").read_text(encoding="utf-8")
+    )
+    assert cached["visual"]["spec"]["curve"]["expr"] == case.curve.expr
+
+
+def test_visual_prompt_carries_the_rubric_and_examples(monkeypatch) -> None:
+    seen = {}
+    real = codex.fake_reply
+
+    def spy(task, prompt):
+        seen[task] = prompt
+        return real(task, prompt)
+
+    monkeypatch.setattr(codex, "fake_reply", spy)
+    t = Topic.model_validate(post("topics", topic="radioactive decay").json())
+    prompt = seen["visual"]
+    assert t.rubric.anchorDescription in prompt
+    assert all(m.id in prompt for m in t.misconceptions)
+    assert all(c.scenario in prompt for c in t.extremeCases)
+    assert '"fits"' in prompt and "P*(1+r/100)^x" in prompt and "fits=false" in prompt
+
+
+def test_fits_false_keeps_visual_null(monkeypatch) -> None:
+    monkeypatch.setenv("MM_CODEX_FAKE_VISUAL", "none")
+    res = post("topics", topic="recursion")
+    assert res.status_code == 200 and res.json()["visual"] is None
+
+
+def test_spec_failing_compile_case_keeps_null_and_topic_still_200(monkeypatch) -> None:
+    def edit(spec):
+        spec["curve"]["expr"] = "A*(1+r/pi)^x"  # pi is not an allowed name
+
+    _with_visual(monkeypatch, edit)
+    res = post("topics", topic="exponential growth")
+    assert res.status_code == 200, res.text
+    assert res.json()["visual"] is None and res.json()["rubric"]["coreRule"]
+
+
+def test_bad_visual_shape_or_codex_failure_keeps_null(monkeypatch) -> None:
+    real = codex.fake_reply
+
+    def reply(task, prompt):
+        if task == "visual":
+            raise codex.CodexTimeout("slow")
+        return real(task, prompt)
+
+    monkeypatch.setattr(codex, "fake_reply", reply)
+    assert post("topics", topic="half life").json()["visual"] is None
+    monkeypatch.setattr(
+        codex,
+        "fake_reply",
+        lambda task, prompt: {"fits": True} if task == "visual" else real(task, prompt),
+    )
+    assert post("topics", topic="doubling time").json()["visual"] is None
+
+
+@pytest.mark.parametrize(
+    "edit",
+    [
+        pytest.param(lambda s: s.update(answer_claimed=200.0), id="wrong-answer-claimed"),
+        pytest.param(
+            lambda s: s["extremes"][1].update(watch="At 30% a step, 10 steps reach about 900."),
+            id="watch-number-wrong",
+        ),
+        pytest.param(
+            lambda s: s["bands"][2].update(misconception_id="made-up-id"), id="unknown-band-id"
+        ),
+        pytest.param(lambda s: s["bands"].pop(1), id="bands-leave-a-gap"),
+        pytest.param(lambda s: s["extremes"][1].update(value=80), id="extreme-off-the-knob"),
+        pytest.param(lambda s: s["curve"].update(expr="A*(1+3/100)^x"), id="knob-does-nothing"),
+    ],
+)
+def test_bad_visual_is_rejected(monkeypatch, edit) -> None:
+    _with_visual(monkeypatch, edit)
+    res = post("topics", topic="population growth")
+    assert res.status_code == 200 and res.json()["visual"] is None
+
+
+def test_vet_visual_rejects_wrong_answer_claimed_directly() -> None:
+    from app.learn.schemas import VisualReply
+    from app.spec import SpecRejected
+
+    t = Topic.model_validate(_topic())
+    reply = codex.fake_visual([m.id for m in t.misconceptions])
+    good = VisualReply.model_validate(reply)
+    assert router._vet_visual(t, good) is not None
+    reply["visual"]["spec"]["answer_claimed"] = 280.0  # computed is 259.37: 8% off
+    with pytest.raises(SpecRejected):
+        router._vet_visual(t, VisualReply.model_validate(reply))
+
+
+def test_hand_checked_visual_passes_the_vetting() -> None:
+    from app.learn.schemas import VisualReply
+
+    t = Topic.model_validate(_topic())
+    assert t.visual is not None
+    assert router._vet_visual(t, VisualReply(fits=True, visual=t.visual)) is not None
+
+
+def test_watch_numbers() -> None:
+    assert router._watch_numbers("At 1% only $1,348 after 30 years; 0.5 A, -3 C") == [
+        1,
+        1348,
+        30,
+        0.5,
+        -3,
+    ]
+    assert router._watch_numbers("CO2 at 10-20 ppm") == [10, 20]

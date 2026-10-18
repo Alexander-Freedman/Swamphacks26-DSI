@@ -186,6 +186,17 @@ def topic_from_authored(slug: str, name: str, authored: Authored, *, checked: bo
     )
 
 
+class VisualReply(Strict):
+    """What the visual prompt returns: does one honest curve fit, and that curve if so.
+
+    Shape only. The router still runs the spec checks (app/spec.py) and recomputes the
+    answer and every extreme before a visual is attached to a topic.
+    """
+
+    fits: bool
+    visual: Visual | None
+
+
 class TopicSummary(Strict):
     slug: str
     topic: str

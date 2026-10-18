@@ -175,7 +175,7 @@
         {
           "param": "R",
           "value": 24,
-          "watch": "At 24 ohms, the same 12 volts drives only half an ampere."
+          "watch": "At 24 ohms, the same 12 volts drives only 0.5 amperes."
         }
       ],
       "answer_claimed": 2.0
