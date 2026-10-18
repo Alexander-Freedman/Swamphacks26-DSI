@@ -56,6 +56,10 @@ const EXTRA_LABELS: Record<string, string> = {
   'too-few': 'A handful of people is enough',
   // calculus, Calc 3 (sessions/calculus/Surface.tsx)
   'partial-wrong-way': 'Walking a slice the wrong way',
+  // calculus, Calc 3 (sessions/calculus/gradientMath.ts, volumeMath.ts)
+  'gradient-points-at-peak': 'Steepest = straight at the top',
+  'gradient-is-height': 'Steeper the higher you go',
+  'more-columns-more-volume': 'More columns = more volume',
   // orgo (sessions/orgo/chem.ts MISTAKES)
   'carbon-five-bonds': 'A carbon with 5 bonds',
   'hydrogen-two-bonds': 'Hydrogen with 2 bonds',
