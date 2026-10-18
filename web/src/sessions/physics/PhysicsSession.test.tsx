@@ -17,9 +17,10 @@ const click = (name: string | RegExp) => fireEvent.click(screen.getByRole('butto
 describe('physics session', () => {
   it('opens on a chapter menu', () => {
     render(<session.Component onDone={() => {}} />)
-    for (const h of ['Motion', 'Forces', 'Energy and momentum', 'Waves', 'Electricity', 'Gravity and orbits']) expect(screen.getByRole('heading', { name: h })).toBeTruthy()
+    expect(screen.getByRole('heading', { name: 'Motion' })).toBeTruthy()
     expect((screen.getByRole('button', { name: /^Projectile motion/ }) as HTMLButtonElement).disabled).toBe(false)
-    expect((screen.getByRole('button', { name: /^Orbits/ }) as HTMLButtonElement).disabled).toBe(true)
+    expect(screen.queryByRole('button', { name: /^Orbits/ })).toBeNull()
+    expect(screen.queryByText(/coming next/i)).toBeNull()
   })
 
   it('projectile: drop vs fired, hit the target, speed at the top, best angle', () => {

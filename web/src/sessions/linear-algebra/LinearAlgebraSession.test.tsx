@@ -19,8 +19,9 @@ const keys = (arrow: 'î' | 'ĵ', ...ks: string[]) => {
 describe('linear algebra session', () => {
   it('opens on a chapter menu', () => {
     render(<session.Component onDone={() => {}} />)
-    for (const h of ['Vectors', 'Matrices', 'Eigenvectors', 'Systems of equations']) expect(screen.getByRole('heading', { name: h })).toBeTruthy()
+    expect(screen.getByRole('heading', { name: 'Matrices' })).toBeTruthy()
     expect((screen.getByRole('button', { name: /^A matrix moves the whole grid/ }) as HTMLButtonElement).disabled).toBe(false)
+    expect(screen.queryByText(/coming next/i)).toBeNull()
   })
 
   it('predict the stretch, build a quarter turn, squash the plane, and know it can’t be undone', () => {

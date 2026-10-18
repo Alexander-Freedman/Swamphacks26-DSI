@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { NOTEBOOK_HREF, record } from '../../notebook'
+import { readyTopics } from '../../components/subject/ready'
 import { Frame, SessionHead, Title } from '../../components/session/Shell'
 import { STACK_MISTAKES as MISTAKES, trace, type StackMistake } from './stack'
 import { SECTIONS, type ProgStep, type ProgTopic } from './topics'
@@ -36,16 +37,15 @@ function ProgMenu({ onPick }: { onPick: (t: ProgTopic) => void }) {
       </div>
       <Title h="What do you want to practice?" sub="Pick a chapter, then a topic." headingRef={title} />
       <div className="pg-menu">
-        {SECTIONS.map((s) => (
+        {readyTopics(SECTIONS).map((s) => (
           <section key={s.id} aria-labelledby={`pg-sec-${s.id}`}>
             <h3 id={`pg-sec-${s.id}`} className="pg-sec-title">{s.title}</h3>
             <p className="pg-sec-blurb">{s.blurb}</p>
             <div className="pg-topics">
               {s.topics.map((t) => (
-                <button key={t.id} className="pg-topic" disabled={!t.ready} onClick={() => onPick(t)} aria-describedby={`pg-t-${t.id}`}>
+                <button key={t.id} className="pg-topic" onClick={() => onPick(t)} aria-describedby={`pg-t-${t.id}`}>
                   <span className="pg-topic-title">{t.title}</span>
                   <span id={`pg-t-${t.id}`} className="pg-topic-blurb">{t.blurb}</span>
-                  {!t.ready && <span className="pg-soon">coming next</span>}
                 </button>
               ))}
             </div>
