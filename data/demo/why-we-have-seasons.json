@@ -1,0 +1,41 @@
+{
+  "slug": "why-we-have-seasons",
+  "recorded": "2026-10-18 03:18",
+  "responses": {
+    "guess|summer is when earth is closer to the sun": {
+      "classification": "concrete",
+      "misconceptionId": "closer-means-summer",
+      "message": "Your guess that summer happens when Earth is closer to the Sun already names something we can test. Next, we'll test that idea against what happens in the real system."
+    },
+    "anchor|in june the northern half is tilted toward the sun, so the noon sun is high and the days are long": {
+      "verdict": "demonstrated",
+      "feedback": "You correctly connect the northern half’s tilt toward the Sun with longer daylight in June. The anchor fact alone does not establish your predicted angle of 74° on day 172.",
+      "followUpQuestion": null
+    },
+    "stress|when a hemisphere is tilted toward the sun, it has summer, because the noon sun is higher in the sky|0": {
+      "verdict": "survives",
+      "critique": "Your link between being “tilted toward the Sun” and a higher noon Sun handles this case, where neither changes through the year.",
+      "piece": null
+    },
+    "stress|when a hemisphere is tilted toward the sun, it has summer, because the noon sun is higher in the sky|1": {
+      "verdict": "survives",
+      "critique": "Your “noon Sun is higher in the sky” explains why Chicago gets more direct sunlight when tilted toward the Sun in June.",
+      "piece": null
+    },
+    "stress|when a hemisphere is tilted toward the sun, it has summer, because the noon sun is higher in the sky|2": {
+      "verdict": "breaks",
+      "critique": "Your “noon Sun is higher” explains its height, but leaves out what controls daylight length at Utqiagvik, 71 degrees north.",
+      "piece": "near a pole, tilt can keep the Sun above or below the horizon"
+    },
+    "neighbor|earth-sun-distance|distance barely changes; in january the north is tilted away from the sun, so it is winter there and summer in the south": {
+      "verdict": "partial",
+      "feedback": "Your January explanation correctly connects the north tilting away with winter there and summer in the south. “Distance barely changes” leaves out how January’s closer distance affects sunlight in both halves of Earth.",
+      "followUpQuestion": "How does being closer to the Sun in January affect the sunlight both halves receive while their seasons are opposite?"
+    },
+    "transfer|a flashlight aimed straight down makes a small bright spot; tilt it and the same light spreads over a bigger, dimmer patch|false": {
+      "verdict": "partial",
+      "critique": "Your flashlight shows light spreading out, but no fixed lean carried around a cycle, two receivers trading brightness and exposure time at equal distance, or an outcome building over time. How could two receivers trade brighter, longer exposure as the cycle repeats?",
+      "missingPiece": "A cycle making two receivers trade stronger, longer exposure"
+    }
+  }
+}
