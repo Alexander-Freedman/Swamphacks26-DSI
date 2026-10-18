@@ -33,6 +33,9 @@ const LAST: Record<string, string> = {
   missed: 'Last time: missed. No credit yet.',
 }
 
+/** The notebook is about Learn topics; older demo sessions (birthday, coin...) stay saved but aren't shown. */
+const learnOnly = () => entries().filter((e) => e.session === 'learn')
+
 function MistakeCard({ c }: { c: Card }) {
   const busted = c.status === 'busted'
   const left = Math.max(0, BUST_AFTER - c.wins)
@@ -72,7 +75,7 @@ function MistakeCard({ c }: { c: Card }) {
       </p>
       {!busted && (
         <a className="nb-again" href={c.href}>
-          Try it again →
+          {c.session.startsWith('learn:') ? 'Learn it again →' : 'Try it again →'}
         </a>
       )}
     </li>
@@ -80,8 +83,8 @@ function MistakeCard({ c }: { c: Card }) {
 }
 
 export function NotebookScreen({ onHome }: { onHome?: () => void }) {
-  const cards = notebook()
-  const all = entries()
+  const all = learnOnly()
+  const cards = notebook(all)
   const played = plays(all)
   // Empty state (#162): count missed rematches honestly and point at a session not played yet.
   const missed = all.filter((e) => e.rematch === 'wrong').length
@@ -124,11 +127,11 @@ export function NotebookScreen({ onHome }: { onHome?: () => void }) {
 
 /** The Home link, with a count so it's worth tapping. */
 export function NotebookLink({ onOpen }: { onOpen?: () => void }) {
-  const n = notebook().filter((c) => c.status === 'caught').length
+  const n = notebook(learnOnly()).filter((c) => c.status === 'caught').length
   return (
     <a className="nb-link" href={NOTEBOOK_HREF} onClick={via(onOpen)}>
       <span className="nb-link-title">Notebook</span>
-      <span className="nb-link-sub">{n > 0 ? `${n} ${n === 1 ? 'mistake' : 'mistakes'} caught, waiting to be busted` : 'Your caught → busted mistakes'}</span>
+      <span className="nb-link-sub">{n > 0 ? `${n} ${n === 1 ? 'mistake' : 'mistakes'} caught, waiting to be busted` : 'The wrong ideas your guesses showed, with the fix'}</span>
     </a>
   )
 }

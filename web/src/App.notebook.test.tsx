@@ -6,8 +6,9 @@ import { KEY, entries, record } from './notebook'
 import { consumeResetParam } from './reset'
 
 const BASE = import.meta.env.BASE_URL
-const caught = () =>
-  record({ session: 'birthday', at: new Date().toISOString(), guess: 180, confidence: 'certain', misconception: 'half-of-365', rematch: 'wrong' })
+// The notebook shows Learn topics (Sat 1:30 AM); older demo-session entries stay saved but hidden.
+const SEASONS = { session: 'learn', slug: 'why-we-have-seasons', topic: 'why we have seasons', label: 'Summer is when Earth is closer', fix: 'Tilt, not distance, makes seasons.' }
+const caught = (at = new Date().toISOString()) => record({ ...SEASONS, at, guess: 'closer in summer', misconception: 'closer-means-summer', rematch: null })
 
 beforeEach(() => {
   localStorage.clear()
@@ -46,11 +47,12 @@ describe('notebook screen', () => {
     expect(screen.getByText('Try any topic').closest('a')?.getAttribute('href')).toBe(BASE)
   })
 
-  it('empty state counts missed rematches and points at Try any topic (#162)', () => {
-    record({ session: 'birthday', at: new Date().toISOString(), guess: 23, misconception: null, rematch: 'wrong' })
+  it('empty state counts topics played and points at Try any topic (#162)', () => {
+    record({ ...SEASONS, at: new Date().toISOString(), guess: 'tilt', misconception: null, rematch: null })
+    record({ session: 'birthday', at: new Date().toISOString(), guess: 23, misconception: 'half-of-365', rematch: 'wrong' }) // hidden
     history.replaceState(null, '', `${BASE}?notebook=1`)
     render(<App />)
-    expect(screen.getByText(/You've played 1 session and your first guess called it \(1 rematch missed\)/)).toBeTruthy()
+    expect(screen.getByText(/You've played 1 session and your first guess called it/)).toBeTruthy()
     expect(screen.getByText('Try any topic').closest('a')?.getAttribute('href')).toBe(BASE)
   })
 
@@ -58,19 +60,22 @@ describe('notebook screen', () => {
     caught()
     history.replaceState(null, '', `${BASE}?notebook=1`)
     render(<App />)
-    expect(screen.getByText('“You need about half of 365”').closest('li')?.className).toContain('caught')
+    expect(screen.getByText('“Summer is when Earth is closer”').closest('li')?.className).toContain('caught')
+    expect(screen.getByText('Tilt, not distance, makes seasons.')).toBeTruthy()
+    expect(screen.getByText('Learn it again →').getAttribute('href')).toBe(`${BASE}?learn=why-we-have-seasons`)
     expect(screen.getByText(/Get it right 2 times to bust it/)).toBeTruthy()
   })
 
   const open = () => {
     history.replaceState(null, '', `${BASE}?notebook=1`)
     render(<App />)
-    return screen.getByText('“You need about half of 365”').closest('li') as HTMLElement
+    return screen.getByText('“Summer is when Earth is closer”').closest('li') as HTMLElement
   }
   const at = (d: string) => `2026-10-${d}T12:00:00.000Z`
   const pips = (li: HTMLElement) => [...li.querySelectorAll('.nb-pips i')].map((i) => i.className)
 
-  it('a right rematch gets a nod, not a pip (#176)', () => {
+  // Learn sessions have no rematch; retired with the Learn-only notebook (Sat 1:30 AM).
+  it.skip('a right rematch gets a nod, not a pip (#176)', () => {
     record({ session: 'birthday', at: at('10'), guess: 180, misconception: 'half-of-365', rematch: 'right' })
     const li = open()
     expect(li.textContent).toContain('Last time: rematch right. It counts from your next session.')
@@ -79,7 +84,8 @@ describe('notebook screen', () => {
     expect(li.textContent).toContain('Get it right 2 times to bust it.')
   })
 
-  it('a missed rematch gets a pencil x and no credit (#176)', () => {
+  // Learn sessions have no rematch; retired with the Learn-only notebook (Sat 1:30 AM).
+  it.skip('a missed rematch gets a pencil x and no credit (#176)', () => {
     record({ session: 'birthday', at: at('10'), guess: 180, misconception: 'half-of-365', rematch: 'wrong' })
     const li = open()
     expect(li.textContent).toContain('Last time: rematch missed. No credit yet.')
@@ -89,8 +95,8 @@ describe('notebook screen', () => {
   })
 
   it('a later right answer fills a pip and counts down (#176)', () => {
-    record({ session: 'birthday', at: at('10'), guess: 180, misconception: 'half-of-365', rematch: 'wrong' })
-    record({ session: 'birthday', at: at('11'), guess: 23, misconception: null, rematch: null })
+    caught(at('10'))
+    record({ ...SEASONS, at: at('11'), guess: 'tilt', misconception: null, rematch: null })
     const li = open()
     expect(li.textContent).toContain('Last time: right. That one counts.')
     expect(pips(li)).toEqual(['on', ''])
@@ -132,7 +138,7 @@ describe('reset shortcut', () => {
       fireEvent.keyDown(window, { key: 'R', shiftKey: true })
     })
     expect(entries()).toEqual([])
-    expect(screen.getByText('Your caught → busted mistakes')).toBeTruthy()
+    expect(screen.getByText('The wrong ideas your guesses showed, with the fix')).toBeTruthy()
   })
 
   it('Shift+R on the notebook returns Home', () => {
