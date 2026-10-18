@@ -9,7 +9,7 @@ import App from '../App'
 afterEach(cleanup)
 
 describe('LearnSession shell', () => {
-  it('stacks each step under the last; finished ones fold to a summary, Home leaves', async () => {
+  it('stacks each step under the last; finished ones fold to a summary', async () => {
     const onDone = vi.fn()
     render(<LearnSession slug="compound-interest" onDone={onDone} api={createMockLearnApi()} initial={{ stage: 'contrast' }} />)
     await screen.findByText('compound interest')
@@ -26,8 +26,7 @@ describe('LearnSession shell', () => {
     expect(screen.queryByRole('region', { name: 'transfer' })).toBeNull()
     fireEvent.click(screen.getByRole('button', { name: 'Try another topic' }))
     expect(onDone).toHaveBeenCalledTimes(1)
-    fireEvent.click(screen.getByRole('button', { name: 'Home' }))
-    expect(onDone).toHaveBeenCalledTimes(2)
+    expect(screen.queryByRole('button', { name: 'Home' })).toBeNull() // the top-bar logo goes home
   })
 
   it('a finished step keeps your answer and opens read-only on tap', async () => {

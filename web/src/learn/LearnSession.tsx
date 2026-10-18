@@ -15,6 +15,8 @@ import { TransferScreen } from './TransferScreen'
 import { DoneScreen } from './DoneScreen'
 import { customScreen } from './custom/registry'
 import { summaryFor } from './summary'
+import { learnHelp } from './learnHelp'
+import { useReportSpot } from '../components/session/helpSpot'
 import { STEP_NAME } from './WhyPane'
 import './learn.css'
 
@@ -63,6 +65,12 @@ export function LearnSession({
   const [topic, setTopic] = useState<Topic | null | undefined>(undefined)
   const [state, setState] = useState<LearnState>(() => ({ ...initialState(), ...initial }) as LearnState)
   const [opened, setOpened] = useState<Partial<Record<Stage, boolean>>>({})
+  // Ask Onion (in the top bar) answers about this topic and this step.
+  useReportSpot(
+    topic
+      ? { step: STAGES.indexOf(state.stage) + 1, total: STAGES.length, label: STEP_NAME[state.stage], chip: `Learn · ${topic.topic}`, layer: learnHelp(topic, state) }
+      : {},
+  )
   const nowCard = useRef<HTMLLIElement>(null)
   const firstStage = useRef(state.stage)
   // A new step lands below the last one: bring it into view (not on first load).
@@ -109,7 +117,6 @@ export function LearnSession({
       </aside>
       <div className="learn-main">
         <div className="learn-bar sheet">
-          <button className="learn-back" onClick={onDone}>Home</button>
           <span className="learn-topic">
             {topic.topic}
             {!topic.checked && <span className="learn-auto"> · auto-checked</span>}
