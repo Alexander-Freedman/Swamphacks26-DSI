@@ -27,6 +27,9 @@ export function demoOn(search: string = typeof location === 'undefined' ? '' : l
   }
 }
 
+// Latch as soon as the app loads, so ?demo=1 on Home still holds after the URL moves to ?learn=…
+demoOn()
+
 export const norm = (s: string) =>
   s
     .trim()
