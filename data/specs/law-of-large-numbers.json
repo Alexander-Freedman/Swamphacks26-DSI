@@ -1,0 +1,88 @@
+{
+  "aliases": [
+    "law of large numbers",
+    "lln",
+    "averages over many trials",
+    "large samples",
+    "law of averages"
+  ],
+  "spec": {
+    "spec_version": 4,
+    "slug": "law-of-large-numbers",
+    "topic": "The law of large numbers",
+    "concept": "Probability convergence",
+    "definition": "The law of large numbers is a theorem that describes the result of performing the same experiment a large number of times, stating that the average of the results obtained from a large number of trials should be close to the expected value.",
+    "case": {
+      "widget": "sampler",
+      "approximate": false,
+      "variables": [],
+      "curve": null,
+      "sampler": {
+        "sampler": "binomial_count",
+        "params": {
+          "n": 100,
+          "p": 0.5,
+          "population": null,
+          "base_rate": null,
+          "sensitivity": null,
+          "false_positive_rate": null,
+          "group_size": null,
+          "dice": null,
+          "trials": 10000
+        },
+        "stat": "p_at_least",
+        "k": 60,
+        "x_label": ""
+      },
+      "prediction": {
+        "prompt": "Flip a fair coin 10 times and you get 6 or more heads about 38% of the time. Flip it 100 times: how often do you get 60 or more heads?",
+        "input": "slider",
+        "slider": {
+          "min": 0,
+          "max": 100,
+          "step": 1,
+          "unit": "%"
+        },
+        "options": []
+      },
+      "bands": [
+        {
+          "min": 0,
+          "max": 10,
+          "misconception_id": null
+        },
+        {
+          "min": 11,
+          "max": 30,
+          "misconception_id": "big-samples-swing-too"
+        },
+        {
+          "min": 31,
+          "max": 100,
+          "misconception_id": "same-ratio-same-chance"
+        }
+      ],
+      "extremes": [],
+      "answer_claimed": 2.84
+    },
+    "misconceptions": [
+      {
+        "id": "same-ratio-same-chance",
+        "label": "Same 60%, same chance",
+        "why_tempting": "60% heads is 60% heads whether it's 10 flips or 100.",
+        "refutation": "Big samples stay close to the true 50%: 60+ heads in 100 flips happens only about 3% of the time.",
+        "source_url": "https://en.wikipedia.org/wiki/Law_of_large_numbers",
+        "source_note": "Page states the correct model; that this mistake is common is unverified"
+      },
+      {
+        "id": "big-samples-swing-too",
+        "label": "A bit less likely",
+        "why_tempting": "It's clear more flips help, but not how much.",
+        "refutation": "The spread shrinks with the square root of the flip count, so 60% becomes rare fast: about 2.8%.",
+        "source_url": "https://en.wikipedia.org/wiki/Law_of_large_numbers",
+        "source_note": "Page states the correct model; that this mistake is common is unverified"
+      }
+    ],
+    "compare": null
+  }
+}

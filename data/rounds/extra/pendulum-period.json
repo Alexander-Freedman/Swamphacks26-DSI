@@ -1,0 +1,113 @@
+{
+  "schema_version": 1,
+  "slug": "pendulum-period",
+  "topic": "Pendulum swing time",
+  "concept": "Pendulum period depends on length and gravity, but not on the mass; the formula T = 2\u03c0\u221a(L/g) is the small-angle approximation.",
+  "reviewed": true,
+  "misconceptions": [
+    {
+      "id": "linear-length",
+      "label": "4x the length, 4x the time",
+      "why_tempting": "Longer should mean proportionally slower.",
+      "refutation": "Swing time grows with the square root of length: 4x longer is only 2x slower.",
+      "source_url": "https://en.wikipedia.org/wiki/Pendulum_(mechanics)",
+      "source_note": "Page states the correct model; that this mistake is common is unverified"
+    },
+    {
+      "id": "length-doesnt-matter",
+      "label": "Length barely matters",
+      "why_tempting": "Swings seem to keep a steady beat, like a clock.",
+      "refutation": "Length sets the beat: T = 2 pi sqrt(L/g), so a 4 m pendulum takes 4 s.",
+      "source_url": "https://en.wikipedia.org/wiki/Pendulum_(mechanics)",
+      "source_note": "Page states the correct model; that this mistake is common is unverified"
+    }
+  ],
+  "items": [
+    {
+      "id": "model",
+      "prompt": "A 1-meter pendulum takes about 2 seconds per swing (there and back, small swings). How long does a 4-meter pendulum take?",
+      "input_type": "slider",
+      "slider": {
+        "min": 1.0,
+        "max": 10.0,
+        "step": 0.5,
+        "unit": "s"
+      },
+      "options": [],
+      "bands": [
+        {
+          "min": 1.0,
+          "max": 3.0,
+          "misconception_id": "length-doesnt-matter"
+        },
+        {
+          "min": 3.5,
+          "max": 5.0,
+          "misconception_id": null
+        },
+        {
+          "min": 5.5,
+          "max": 10.0,
+          "misconception_id": "linear-length"
+        }
+      ],
+      "sketch_rules": [],
+      "truth": {
+        "widget": "curve",
+        "expr": "2 * 3.14159 * sqrt(x / g)",
+        "preset": null,
+        "x_min": 0.1,
+        "x_max": 4.0,
+        "x_label": "length (m)",
+        "y_label": "period (s)",
+        "ask_x": 4.0,
+        "ask_y": null,
+        "show": null,
+        "area_from": null,
+        "area_to": null
+      },
+      "answer_expr": "4.012129972517223",
+      "answer_claimed": 4.01,
+      "explore": {
+        "param": "g",
+        "label": "gravity (m/s^2)",
+        "min": 1.0,
+        "max": 20.0,
+        "step": 0.01,
+        "default": 9.81
+      },
+      "targets": [
+        "length-doesnt-matter",
+        "linear-length"
+      ],
+      "variables": [],
+      "extremes": [
+        {
+          "param": "g",
+          "value": 1.6,
+          "watch": "On the Moon, gravity is weaker, making the swing much slower.",
+          "truth_value": 9.93457987440838
+        },
+        {
+          "param": "g",
+          "value": 20.0,
+          "watch": "Higher gravity pulls the bob back faster, shortening the period.",
+          "truth_value": 2.8099235189734255
+        }
+      ],
+      "truth_value": 4.012129972517223,
+      "computed": true,
+      "approximate": true
+    }
+  ],
+  "spec_version": 4,
+  "compare": null,
+  "aliases": [
+    "pendulum",
+    "pendulums",
+    "pendulum period",
+    "simple pendulum",
+    "how a pendulum works",
+    "swing period"
+  ]
+}

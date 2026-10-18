@@ -1,0 +1,102 @@
+{
+  "aliases": [
+    "kinetic energy",
+    "energy of motion",
+    "speed and energy",
+    "why speeding is dangerous",
+    "ke"
+  ],
+  "spec": {
+    "spec_version": 4,
+    "slug": "kinetic-energy",
+    "topic": "Kinetic energy and speed",
+    "concept": "energy",
+    "definition": "Kinetic energy is the energy an object possesses due to its motion, calculated as half its mass times the square of its speed.",
+    "case": {
+      "widget": "curve",
+      "approximate": false,
+      "variables": [],
+      "curve": {
+        "expr": "0.5 * m * x^2",
+        "mode": "value",
+        "x_min": 0.0,
+        "x_max": 30.0,
+        "x_label": "speed (m/s)",
+        "y_label": "kinetic energy (J)",
+        "ask_x": 20.0,
+        "ask_y": null,
+        "area_from": null,
+        "area_to": null,
+        "knob": {
+          "param": "m",
+          "label": "mass (kg)",
+          "min": 1.0,
+          "max": 5.0,
+          "step": 1.0,
+          "default": 2.0
+        }
+      },
+      "sampler": null,
+      "prediction": {
+        "prompt": "A 2 kg ball moving at 10 m/s carries 100 joules of energy. How many joules does it carry at 20 m/s?",
+        "input": "slider",
+        "slider": {
+          "min": 0,
+          "max": 1000,
+          "step": 10,
+          "unit": "J"
+        },
+        "options": []
+      },
+      "bands": [
+        {
+          "min": 0,
+          "max": 290,
+          "misconception_id": "linear-speed-dependence"
+        },
+        {
+          "min": 300,
+          "max": 500,
+          "misconception_id": null
+        },
+        {
+          "min": 510,
+          "max": 1000,
+          "misconception_id": "faster-than-square"
+        }
+      ],
+      "extremes": [
+        {
+          "param": "m",
+          "value": 1.0,
+          "watch": "Halving the mass halves the energy for any given speed."
+        },
+        {
+          "param": "m",
+          "value": 5.0,
+          "watch": "Higher mass shifts the parabolic curve steeper."
+        }
+      ],
+      "answer_claimed": 400.0
+    },
+    "misconceptions": [
+      {
+        "id": "linear-speed-dependence",
+        "label": "Double speed, double energy",
+        "why_tempting": "Most things we know scale in step with speed.",
+        "refutation": "Energy is 1/2 m v squared: double the speed means 4 times the energy.",
+        "source_url": "https://en.wikipedia.org/wiki/Kinetic_energy",
+        "source_note": "Page states the correct model; that this mistake is common is unverified"
+      },
+      {
+        "id": "faster-than-square",
+        "label": "It explodes even faster",
+        "why_tempting": "Once you know it's not linear, it's tempting to overshoot.",
+        "refutation": "It grows with the square of speed: 2x speed is 4x energy, not 8x.",
+        "source_url": "https://en.wikipedia.org/wiki/Kinetic_energy",
+        "source_note": "Page states the correct model; that this mistake is common is unverified"
+      }
+    ],
+    "compare": null
+  }
+}

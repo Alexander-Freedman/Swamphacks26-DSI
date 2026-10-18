@@ -1,0 +1,104 @@
+{
+  "aliases": [
+    "margin of error",
+    "polls",
+    "poll margin of error",
+    "survey sample size",
+    "how many people to survey",
+    "polling",
+    "standard error"
+  ],
+  "spec": {
+    "spec_version": 4,
+    "slug": "margin-of-error",
+    "topic": "Margin of error",
+    "concept": "A poll's margin of error shrinks with the square root of the sample size, so halving it costs 4x the people.",
+    "definition": "The margin of error is how far a poll's result is likely to be from the true value, usually stated at the 95% level.",
+    "case": {
+      "widget": "curve",
+      "approximate": false,
+      "variables": [],
+      "curve": {
+        "expr": "100 * z * sqrt(0.25 / x)",
+        "mode": "value",
+        "x_min": 100,
+        "x_max": 10000,
+        "x_label": "people surveyed",
+        "y_label": "margin of error (+/- %)",
+        "ask_x": null,
+        "ask_y": 1.55,
+        "area_from": null,
+        "area_to": null,
+        "knob": {
+          "param": "z",
+          "label": "z multiplier (1.96 is usual)",
+          "min": 1.0,
+          "max": 3.0,
+          "step": 0.01,
+          "default": 1.96
+        }
+      },
+      "sampler": null,
+      "prediction": {
+        "prompt": "A poll of 1,000 people has a margin of error of about 3.1%. About how many people do you need for 1.55%?",
+        "input": "slider",
+        "slider": {
+          "min": 1000,
+          "max": 8000,
+          "step": 100,
+          "unit": "people"
+        },
+        "options": []
+      },
+      "bands": [
+        {
+          "min": 1000,
+          "max": 2900,
+          "misconception_id": "linear-sample"
+        },
+        {
+          "min": 3000,
+          "max": 5000,
+          "misconception_id": null
+        },
+        {
+          "min": 5100,
+          "max": 8000,
+          "misconception_id": "way-more"
+        }
+      ],
+      "extremes": [
+        {
+          "param": "z",
+          "value": 1.0,
+          "watch": "With z = 1 (a looser ±1 standard error) you need only about 1,041 people for ±1.55%."
+        },
+        {
+          "param": "z",
+          "value": 3.0,
+          "watch": "With z = 3 (3 standard errors wide) you need about 9,365 people."
+        }
+      ],
+      "answer_claimed": 3998
+    },
+    "misconceptions": [
+      {
+        "id": "linear-sample",
+        "label": "Twice the people, half the error",
+        "why_tempting": "More data should shrink error in step.",
+        "refutation": "Error shrinks with the square root of sample size: half the error takes 4x the people (about 4,000).",
+        "source_url": "https://en.wikipedia.org/wiki/Margin_of_error",
+        "source_note": "Page states the correct model; that this mistake is common is unverified"
+      },
+      {
+        "id": "way-more",
+        "label": "Precision needs huge samples",
+        "why_tempting": "Polls of millions seem necessary for precision.",
+        "refutation": "Going from 1,000 to 4,000 people already halves the error.",
+        "source_url": "https://en.wikipedia.org/wiki/Margin_of_error",
+        "source_note": "Page states the correct model; that this mistake is common is unverified"
+      }
+    ],
+    "compare": null
+  }
+}
