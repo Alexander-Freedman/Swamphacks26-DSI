@@ -17,3 +17,13 @@
 .lcs-more[open] > summary { margin-bottom: 6px; }
 .lcs-detail { margin: 0; padding-left: 18px; display: grid; gap: 4px; font-size: 0.85rem; line-height: 1.35; }
 .lcs-detail strong { font-weight: 700; }
+
+/* The rule as a frame: When ___, then ___, because ___, with the topic's pieces as chips. */
+.lcs-frame { display: grid; gap: 8px; margin: 6px 0 10px; }
+.lcs-slot { display: grid; grid-template-columns: 76px minmax(0, 1fr); align-items: center; gap: 8px; }
+.lcs-word { font: 700 15px var(--font-hand); color: var(--ink); text-align: right; }
+.lcs-slot input { width: 100%; box-sizing: border-box; min-height: 40px; padding: 8px 10px; border: 1.5px solid var(--ink); border-radius: 4px; background: var(--paper); font: 16px var(--font-body); color: var(--ink); }
+.lcs-chips { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 10px; }
+.lcs-chip { padding: 5px 10px; border: 1.5px dashed var(--ink-soft); border-radius: 4px; background: none; font: 0.85rem var(--font-body); color: var(--ink); cursor: pointer; }
+.lcs-chip:hover { border-style: solid; background: var(--marker-soft); }
+.lcs-preview { margin: 0 0 10px; font: 17px/1.4 var(--font-hand); color: var(--ink-soft); }
