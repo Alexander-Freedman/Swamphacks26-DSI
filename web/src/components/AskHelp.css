@@ -60,8 +60,9 @@
     top: 0; right: 0; bottom: 0; width: 360px; max-height: none; overflow-y: auto; box-sizing: border-box;
     border-radius: 0; border-width: 0 0 0 2px; box-shadow: -4px 0 0 var(--ink-soft); padding: 20px 20px 24px;
   }
-  body.onion-docked .learn {
-    width: min(1100px, calc(100vw - 408px));
-    margin-left: calc(50% - 50vw + max(16px, (100vw - 376px - min(1100px, 100vw - 408px)) / 2));
+  body.onion-docked .learn,
+  body.onion-docked .app:has(.learn) .topbar {
+    width: min(1100px, calc(100vw - 424px));
+    margin-left: calc(50% - 50vw + max(32px, (100vw - 360px - min(1100px, 100vw - 424px)) / 2));
   }
 }
