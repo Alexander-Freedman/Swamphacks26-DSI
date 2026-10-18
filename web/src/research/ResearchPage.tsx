@@ -15,13 +15,18 @@ const number = new Map(sources.map((s, i) => [s.id, i + 1]))
 const byId = new Map(sources.map((s) => [s.id, s]))
 
 // What Ask Onion may use on this page: our own research, nothing else.
+const cite = (ids: string[]) =>
+  ids
+    .map((id) => byId.get(id))
+    .filter(Boolean)
+    .map((s) => `${s!.authors.split(/,| &| and/)[0]} ${s!.year}`)
+    .join('; ')
+const fit = (line: string) => (line.length <= 320 ? line : `${line.slice(0, 319).replace(/\s+\S*$/, '')}…`)
+
 export const ONION_FACTS = [
   "Only answer from the research listed here. If asked about a study that isn't listed, say it isn't part of Onionskin's research and point to the Sources list.",
-  ...decisions.map((d) => {
-    const who = d.sources.map((id) => byId.get(id)).filter(Boolean).map((s) => `${s!.authors.split(/,| &| and/)[0]} ${s!.year}`)
-    const line = `${d.step} (${who.join('; ')}): ${d.why}`
-    return line.length <= 200 ? line : `${line.slice(0, 199).replace(/\s+\S*$/, '')}…`
-  }),
+  ...faq.map((f) => fit(`Q: ${f.q} A (${cite(f.sources)}): ${f.a}`)),
+  ...decisions.map((d) => fit(`${d.step} (${cite(d.sources)}): ${d.why}`)),
 ]
 const ONION_ON_SCREEN = `The research page: why each Onionskin step works, with ${sources.length} cited papers. Questions answered here: ${faq.map((f) => f.q).join(' ')}`
 
@@ -68,7 +73,7 @@ export function ResearchPage({ onHome }: { onHome?: () => void }) {
       layerN: 1,
       title: 'The research',
       onScreen: ONION_ON_SCREEN.slice(0, 590),
-      facts: ONION_FACTS.slice(0, 12),
+      facts: ONION_FACTS.slice(0, 24),
       suggested: ['Why no points or streaks?', 'What does the research say about guessing first?', 'Is this backed by real studies?'],
       hint: 'Open a question above, or check the Sources list: every paper is linked.',
     },

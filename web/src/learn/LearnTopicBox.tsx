@@ -33,6 +33,7 @@ export function LearnTopicBox({ onOpen, api = learnApi }: { onOpen: (slug: strin
 
   useEffect(() => {
     let live = true
+    // all topics count for matching typed text; only the reviewed ones show as chips
     api.listTopics().then((list) => live && setTopics(list)).catch(() => {})
     return () => {
       live = false
@@ -82,9 +83,9 @@ export function LearnTopicBox({ onOpen, api = learnApi }: { onOpen: (slug: strin
       <p className="anytopic-status" aria-live="polite">
         {busy ? 'Building your lesson: cases, extreme tests and common mistakes. About a minute.' : note}
       </p>
-      {topics.length > 0 && (
+      {topics.some((t) => t.checked) && (
         <div className="anytopic-chips" role="group" aria-label="Ready-made topics">
-          {topics.map((t) => (
+          {topics.filter((t) => t.checked).map((t) => (
             <button key={t.slug} type="button" className="anytopic-chip" onClick={() => onOpen(t.slug)} disabled={busy}>
               {t.topic}
             </button>

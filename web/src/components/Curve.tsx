@@ -1,7 +1,8 @@
-import { useId } from 'react'
+import { useId, useLayoutEffect, useRef, type SVGProps } from 'react'
 import type { CurvePoint } from '../truth'
 import type { CurveTruth } from '../types'
 import './Curve.css'
+import { labelFits } from './labelFits'
 import { niceTicks } from './ticks'
 import { useNarrow } from './useNarrow'
 
@@ -32,6 +33,32 @@ const short = (v: number) => {
   if (a >= 1e6) return `${Number((v / 1e6).toPrecision(3))}M`
   if (a >= 1e3) return `${Number((v / 1e3).toPrecision(3))}k`
   return String(Number(v.toPrecision(3)))
+}
+
+/**
+ * An axis label that never runs off the picture: on a phone, or in the tiny stress and contrast pictures
+ * where the text is drawn big, a long generated label ("source velocity toward observer (meters per
+ * second)") is measured after layout and shortened until it fits. The full label stays in its <title>.
+ */
+function FitText({ text, max, ...rest }: { text: string; max: number } & SVGProps<SVGTextElement>) {
+  const ref = useRef<SVGTextElement>(null)
+  // layout is the outside system here: measure, then shorten the drawn text node in place
+  useLayoutEffect(() => {
+    const node = ref.current?.firstChild
+    const el = ref.current
+    if (!el || !node || typeof el.getComputedTextLength !== 'function') return
+    const fits = labelFits(text)
+    for (const candidate of fits) {
+      node.textContent = candidate
+      if (el.getComputedTextLength() <= max) return
+    }
+  }, [text, max])
+  return (
+    <text ref={ref} {...rest}>
+      {text}
+      <title>{text}</title>
+    </text>
+  )
 }
 
 export function Curve({ t, f, guess, point, pointLabel, tangent, guessSlope, area, mark, hole }: Props) {
@@ -106,12 +133,12 @@ export function Curve({ t, f, guess, point, pointLabel, tangent, guessSlope, are
         <text key={y} className="curve-tick" x={PAD.l - 6} y={yAt(y) + 5} textAnchor="end">{short(y)}</text>
       ))}
       {!prob && t.y_label && (
-        <text className="curve-tick curve-ylabel" x={PAD.l} y={PAD.t - 14}>{t.y_label}</text>
+        <FitText className="curve-tick curve-ylabel" x={PAD.l} y={PAD.t - 14} text={t.y_label} max={W - PAD.l - 4} />
       )}
       {ticks.map((x) => (
         <text key={x} className="curve-tick" x={xAt(x)} y={H - PAD.b + 20} textAnchor="middle">{short(x)}</text>
       ))}
-      <text className="curve-tick" x={(W + PAD.l) / 2} y={H - 4} textAnchor="middle">{t.x_label}</text>
+      <FitText className="curve-tick" x={(W + PAD.l) / 2} y={H - 4} textAnchor="middle" text={t.x_label} max={W - PAD.l - 8} />
       <defs>
         <clipPath id={clip}>
           <rect x={PAD.l} y={PAD.t - 6} width={W - PAD.l - PAD.r} height={H - PAD.t - PAD.b + 6} />

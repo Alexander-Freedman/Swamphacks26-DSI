@@ -399,12 +399,12 @@ def test_generic_length_caps(glive) -> None:
     assert gask(question="").status_code == 422
     assert gask(layer={"title": "no n"}).status_code == 422
     assert gask(history=[{"role": "system", "text": "hi"}]).status_code == 422
-    res = gask(on_screen="o" * 900, facts=["f" * 300] * 15, last_action="a" * 500)
+    res = gask(on_screen="o" * 900, facts=["f" * 400] * 30, last_action="a" * 500)
     assert res.status_code == 200
     p = calls[-1]["prompt"]
     assert "o" * 600 in p and "o" * 601 not in p
-    assert p.count("- " + "f" * 200) == 10
-    assert "f" * 201 not in p and "a" * 201 not in p
+    assert p.count("- " + "f" * 320) == 24
+    assert "f" * 321 not in p and "a" * 201 not in p
 
 
 def test_legacy_shape_still_routes_to_screens(glive) -> None:

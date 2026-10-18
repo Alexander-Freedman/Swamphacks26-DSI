@@ -68,3 +68,20 @@ describe('LearnTopicBox', () => {
     expect(screen.getByRole('button', { name: 'compound interest' })).toBeTruthy()
   })
 })
+
+describe('LearnTopicBox chips', () => {
+  it('shows only reviewed topics as chips, but still matches typed text to live-built ones', async () => {
+    const onOpen = vi.fn()
+    const api = createMockLearnApi()
+    api.listTopics = async () => [
+      { slug: 'compound-interest', topic: 'compound interest', checked: true },
+      { slug: 'hooke-s-law', topic: "Hooke's law", checked: false },
+    ]
+    render(<LearnTopicBox onOpen={onOpen} api={api} />)
+    await screen.findByRole('button', { name: 'compound interest' })
+    expect(screen.queryByRole('button', { name: "Hooke's law" })).toBeNull()
+    fireEvent.change(screen.getByLabelText('topic to learn'), { target: { value: "Hooke's law" } })
+    fireEvent.click(screen.getByRole('button', { name: 'Learn it' }))
+    expect(onOpen).toHaveBeenCalledWith('hooke-s-law')
+  })
+})

@@ -76,6 +76,8 @@ describe('sn2-reaction: orgo tools inside the Learn steps', () => {
     fireEvent.click(within(step).getByText('Finish ✓'))
     fireEvent.click(within(step).getByRole('button', { name: 'Done' }))
     expect(await screen.findByRole('region', { name: 'contrast' })).toBeTruthy()
+    // the finished step says what was done, not just "done" (the done card and notebook read the same state)
+    expect(screen.getByText('“built ethanol, C₂H₆O”')).toBeTruthy()
   })
 })
 
