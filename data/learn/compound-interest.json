@@ -25,17 +25,20 @@
       {
         "label": "Interest on interest",
         "detail": "Alex puts $1,000 in an account that pays 7% a year on the current balance. Year 1 adds $70 (balance $1,070). Year 2 adds 7% of $1,070, which is $74.90 (balance $1,144.90). After 30 years: about $7,612.",
-        "oneLine": "$1,000 at 7% on the current balance: $7,612 after 30 years"
+        "oneLine": "$1,000 at 7% on the current balance: $7,612 after 30 years",
+        "curve": { "knobs": { "r": 7 }, "label": "7% on the current balance" }
       },
       {
         "label": "Same $70 every year",
         "detail": "Sam puts $1,000 in an account that pays $70 every year, always 7% of the original $1,000. Year 1 adds $70, year 2 adds $70. After 30 years: $1,000 + 30 x $70 = $3,100.",
-        "oneLine": "$1,000 plus a flat $70 a year: $3,100 after 30 years"
+        "oneLine": "$1,000 plus a flat $70 a year: $3,100 after 30 years",
+        "curve": { "expr": "P + 70*x", "label": "a flat $70 a year" }
       },
       {
         "label": "Monthly instead of yearly",
         "detail": "Jo's account pays 7% a year but splits it into twelve monthly payments of about 0.58% each, every one on the current balance. After 30 years: about $8,116, more than yearly compounding's $7,612, because interest starts earning interest sooner.",
-        "oneLine": "7% split into monthly payments: $8,116 after 30 years"
+        "oneLine": "7% split into monthly payments: $8,116 after 30 years",
+        "curve": { "expr": "P*(1+r/1200)^(12*x)", "knobs": { "r": 7 }, "label": "7% paid monthly" }
       }
     ],
     "extremeCaseDimensions": [
