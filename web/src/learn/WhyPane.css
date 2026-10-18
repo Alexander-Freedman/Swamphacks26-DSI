@@ -10,7 +10,8 @@
 .why-source { margin: 0; padding-top: 10px; border-top: 1px solid var(--grid); font: 13px/1.35 var(--font-hand); color: var(--ink-soft); }
 
 /* phone: the pane moves above the screen as a one-line strip that opens on tap */
-@media (max-width: 760px) {
+/* same breakpoint as learn.css, so the rail and the strip never mix */
+@media (max-width: 720px) {
   .why-layout { grid-template-columns: minmax(0, 1fr); gap: 10px; }
   .why-pane { order: -1; position: static; padding: 0; }
   .why-toggle { display: flex; width: 100%; justify-content: space-between; align-items: center; min-height: 44px; padding: 8px 14px; background: none; border: 0; font: 700 15px var(--font-body); color: var(--ink); cursor: pointer; }
