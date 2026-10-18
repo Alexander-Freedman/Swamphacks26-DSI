@@ -15,7 +15,10 @@ export function ContrastScreen({ topic, state, update, next }: StageProps) {
             <p className="lcs-diff">
               <mark>{c.oneLine}</mark>
             </p>
-            <p className="lcs-detail">{c.detail}</p>
+            <details className="lcs-more">
+              <summary>Show the numbers</summary>
+              <p className="lcs-detail">{c.detail}</p>
+            </details>
           </article>
         ))}
       </div>

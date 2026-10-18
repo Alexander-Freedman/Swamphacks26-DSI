@@ -12,3 +12,6 @@
 @media (max-width: 600px) {
   .lcs-pair { grid-template-columns: 1fr; }
 }
+.lcs-more { margin-top: 8px; font-size: 0.85rem; }
+.lcs-more > summary { cursor: pointer; color: var(--ink-soft); }
+.lcs-more[open] > summary { margin-bottom: 6px; }
