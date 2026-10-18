@@ -219,21 +219,36 @@ def _vet_visual(topic: Topic, reply: VisualReply) -> Visual | None:
 
 
 async def _author_visual(topic: Topic) -> Visual | None:
-    """Ask codex for one curve and keep it only if it passes every check. Never raises."""
-    try:
-        raw = await codex.run_json(
-            prompts.visual(topic),
-            task="visual",
-            schema=schema_file(VisualReply),
-            timeout_s=float(os.environ.get("MM_CODEX_VISUAL_TIMEOUT_S", VISUAL_TIMEOUT_S)),
-        )
-        visual = _vet_visual(topic, VisualReply.model_validate(raw))
-    except Exception as err:  # any failure: keep the text-only topic
-        log.warning("visual %s: dropped: %s", topic.slug, str(err)[:300])
-        return None
-    if visual is None:
-        log.info("visual %s: no single curve fits", topic.slug)
-    return visual
+    """Ask codex for one curve and keep it only if it passes every check. Never raises.
+
+    A rejected curve gets one retry with the exact reason it failed; then the topic stays text-only.
+    """
+    timeout = float(os.environ.get("MM_CODEX_VISUAL_TIMEOUT_S", VISUAL_TIMEOUT_S))
+    reason = ""
+    for attempt in (1, 2):
+        prompt = prompts.visual(topic)
+        if reason:
+            prompt += (
+                "\n\nYour previous curve was REJECTED by the checker for this reason: "
+                f"{reason}\nFix exactly that problem "
+                "(or answer fits=false if no honest single curve exists)."
+            )
+        try:
+            raw = await codex.run_json(
+                prompt, task="visual", schema=schema_file(VisualReply), timeout_s=timeout
+            )
+            visual = _vet_visual(topic, VisualReply.model_validate(raw))
+        except codex.CodexError as err:  # timeout or bad reply: no second try, keep the text topic
+            log.warning("visual %s: dropped: %s", topic.slug, str(err)[:300])
+            return None
+        except Exception as err:  # failed a check: retry once with the reason
+            reason = str(err)[:300]
+            log.warning("visual %s: attempt %d rejected: %s", topic.slug, attempt, reason)
+            continue
+        if visual is None:
+            log.info("visual %s: no single curve fits", topic.slug)
+        return visual
+    return None
 
 
 @router.get("/status")
