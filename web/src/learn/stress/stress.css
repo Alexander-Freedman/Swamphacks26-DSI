@@ -32,7 +32,7 @@
 .st-result { margin-top: 10px; }
 
 /* a curve topic: each card carries a small picture of the curve at its extreme */
-.st-pic { margin: 8px 0 4px; }
+.st-pic { margin: 8px 0 4px; max-width: 460px; }
 .st-pic .curve { display: block; width: 100%; height: auto; }
 /* the chart is drawn 640 wide and shown ~200 wide here, so lines and labels are scaled up to stay legible */
 .st-pic .curve-ink { stroke-width: 11; }
