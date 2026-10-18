@@ -13,7 +13,11 @@ const H = 280
 const PAD = { l: 52, r: 20, t: 30, b: 44 }
 
 const money = (unit: string | undefined, v: number) =>
-  unit === '$' ? `$${Math.round(v).toLocaleString('en-US')}` : `${Number(v.toPrecision(4)).toLocaleString('en-US')}${unit ? ` ${unit}` : ''}`
+  unit === '$'
+    ? `$${Math.round(v).toLocaleString('en-US')}`
+    : unit === '%'
+      ? `${Number(v < 10 ? v.toFixed(v < 1 ? 1 : 0) : Math.round(v))}%`
+      : `${Number(v.toPrecision(3)).toLocaleString('en-US')}${unit ? ` ${unit}` : ''}`
 
 /** Empty axes with a pencil mark you drag up and down at the x the question asks about. */
 function PredictPad({
