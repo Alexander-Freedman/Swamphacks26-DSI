@@ -40,12 +40,15 @@ const REMIX: Record<string, string> = {
 type M = keyof typeof MISTAKES
 const SIZE_SUB = (nu: string) => `Three questions decide the mechanism: how strong is the ${nu}, what kind of carbon holds the leaving group, and does the leaving group leave easily?`
 
-/** Orgo is one guided path straight from Home: build ethanol, then draw the SN2 arrows and scrub the reaction. */
-export function OrgoSession({ onDone, topic = GUIDED }: { onDone: () => void; topic?: OrgoTopic }) {
-  return <OrgoTopicRun topic={topic} onDone={onDone} />
+/**
+ * Orgo is one guided path straight from Home: build ethanol, then draw the SN2 arrows and scrub the reaction.
+ * `embedded`: inside a Learn step, so don't scroll the whole page to the top between steps.
+ */
+export function OrgoSession({ onDone, topic = GUIDED, embedded = false }: { onDone: () => void; topic?: OrgoTopic; embedded?: boolean }) {
+  return <OrgoTopicRun topic={topic} onDone={onDone} embedded={embedded} />
 }
 
-function OrgoTopicRun({ topic, onDone }: { topic: OrgoTopic; onDone: () => void }) {
+function OrgoTopicRun({ topic, onDone, embedded }: { topic: OrgoTopic; onDone: () => void; embedded: boolean }) {
   const steps = topic.steps
   const [step, setStep] = useState(1)
   const [reached, setReached] = useState(1)
@@ -67,9 +70,9 @@ function OrgoTopicRun({ topic, onDone }: { topic: OrgoTopic; onDone: () => void 
   const first = useRef(true)
   useEffect(() => {
     if (first.current) return void (first.current = false)
-    window.scrollTo?.({ top: 0 })
+    if (!embedded) window.scrollTo?.({ top: 0 })
     title.current?.focus({ preventScroll: true })
-  }, [step])
+  }, [step, embedded])
 
   const finish = useCallback(() => setFinished(true), [])
   // the end bar lands below the picture, so bring it into view: otherwise Finish looks like it did nothing

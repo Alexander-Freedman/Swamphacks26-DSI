@@ -1,5 +1,6 @@
 // Stage 3, Contrast: two pre-authored cases side by side, the one difference highlighted.
 // The learner writes a one-line "fix" for why they turn out differently. No model call.
+import { CaseCurve } from './contrast-visual/CaseCurve'
 import type { StageProps } from './types'
 import './learn-contrast.css'
 
@@ -27,6 +28,7 @@ export function ContrastScreen({ topic, state, update, next }: StageProps) {
             <p className="lcs-diff">
               <mark>{c.oneLine}</mark>
             </p>
+            <CaseCurve topic={topic} index={i} />
             <details className="lcs-more">
               <summary>Show the numbers</summary>
               <ul className="lcs-detail">
