@@ -25,10 +25,14 @@
 
 /* FAQ first: answers showing, a two-column grid of equal cards */
 .rs-faq { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
-.rs-q { border: 1.5px solid var(--ink-soft); border-radius: 4px; padding: 12px 14px; background: var(--paper); display: flex; flex-direction: column; gap: 6px; }
-.rs-q h3 { margin: 0; font-size: 1rem; }
-.rs-q p { margin: 0; }
-.rs-q .rs-cites { margin-top: auto; }
+.rs-faq { align-items: start; }
+.rs-q { border: 1.5px solid var(--ink-soft); border-radius: 4px; padding: 12px 14px; background: var(--paper); }
+.rs-q summary { cursor: pointer; font-weight: 700; list-style: none; display: flex; justify-content: space-between; gap: 10px; }
+.rs-q summary::-webkit-details-marker { display: none; }
+.rs-q summary::after { content: '+'; font: 700 1.1rem var(--font-mono); color: var(--ink-soft); }
+.rs-q[open] summary::after { content: '−'; }
+.rs-q[open] { background: var(--card); border-color: var(--ink); }
+.rs-q p { margin: 8px 0 6px; }
 
 /* the steps: a compact three-column grid; the longer reason opens on tap */
 .rs-steps { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; }
@@ -53,4 +57,11 @@
 }
 @media (min-width: 721px) and (max-width: 960px) {
   .rs-step:last-child:nth-child(odd) { grid-column: 1 / -1; }
+}
+
+@media (min-width: 721px) {
+  body.onion-docked .rs-page, body.onion-docked .app:has(.rs-page) .topbar {
+    width: min(1100px, calc(100vw - 424px));
+    margin-left: calc(50% - 50vw + max(32px, (100vw - 360px - min(1100px, 100vw - 424px)) / 2));
+  }
 }
