@@ -12,6 +12,7 @@ from __future__ import annotations
 import asyncio
 import base64
 import logging
+import math
 import os
 import re
 import time
@@ -34,11 +35,15 @@ from app.learn.schemas import (
     Topic,
     TopicSummary,
     TransferOut,
+    Visual,
+    VisualReply,
     WhyOut,
     schema_file,
     topic_from_authored,
     validate_clipped,
 )
+from app.schema import SpecWidget
+from app.spec import SpecRejected, compile_case, compute_truth
 
 log = logging.getLogger("mm.learn")
 
@@ -147,8 +152,88 @@ async def _author(name: str, slug: str) -> Topic:
     )
     authored = validate_clipped(Authored, raw)
     topic = topic_from_authored(slug, name, authored, checked=False)
+    visual = await _author_visual(topic)
+    if visual is not None:
+        topic = Topic.model_validate(
+            {**topic.model_dump(mode="json"), "visual": visual.model_dump(mode="json")}
+        )
     topics.save_cached(topic)
     return topic
+
+
+# ---------------------------------------------------------------------------
+# the optional curve for a live topic: a bad graph never ships, a missing one is fine
+# ---------------------------------------------------------------------------
+VISUAL_TIMEOUT_S = 60
+ANSWER_TOLERANCE = 0.02  # answer_claimed vs the computed truth
+WATCH_TOLERANCE = 0.05  # a number in a watch line vs the computed value there
+_WATCH_NUMBER = re.compile(r"(?<![\w.])-?(?:\d{1,3}(?:,\d{3})+|\d+)(?:\.\d+)?|(?<![\w.])\.\d+")
+
+
+def _watch_numbers(text: str) -> list[float]:
+    return [float(m.replace(",", "")) for m in _WATCH_NUMBER.findall(text or "")]
+
+
+def _vet_visual(topic: Topic, reply: VisualReply) -> Visual | None:
+    """The reply's visual if every check passes, None if it says no curve fits.
+
+    Raises SpecRejected (or ValueError) with the reason on any failed check.
+    """
+    if not reply.fits or reply.visual is None:
+        return None
+    visual = reply.visual
+    case = visual.spec
+    c = case.curve
+    if visual.widget != "curve" or case.widget is not SpecWidget.curve or c is None:
+        raise SpecRejected("not a curve")
+    if c.mode != "value" or c.ask_x is None:
+        raise SpecRejected("the curve must ask for y at ask_x")
+    if case.prediction.input != "slider":
+        raise SpecRejected("the prediction must be a slider")
+    known = {m.id for m in topic.misconceptions}
+    unknown = {b.misconception_id for b in case.bands if b.misconception_id} - known
+    if unknown:
+        raise SpecRejected(f"bands name unknown misconceptions {sorted(unknown)}")
+    if case.answer_claimed is None:
+        raise SpecRejected("no answer_claimed")
+    item_id = f"{topic.slug[:52].rstrip('-')}-anchor"  # item ids are slugs, max 60 chars
+    compile_case(case, item_id, known)  # bands cover the slider, knob moves, expr names, ...
+    truth = compute_truth(case)
+    if not math.isclose(case.answer_claimed, truth, rel_tol=ANSWER_TOLERANCE, abs_tol=1e-6):
+        raise SpecRejected(f"answer_claimed {case.answer_claimed:g} but computed {truth:.4g}")
+    if not 2 <= len(case.extremes) <= 3:
+        raise SpecRejected("needs 2 or 3 extremes")
+    settable = {c.knob.param, *(v.name for v in case.variables)}
+    for ex in case.extremes:
+        if ex.param not in settable:
+            raise SpecRejected(f"extreme sets {ex.param}, which is not in the formula")
+        if ex.param == c.knob.param and not c.knob.min <= ex.value <= c.knob.max:
+            raise SpecRejected(f"extreme {ex.param}={ex.value:g} is off the knob's range")
+        at = compute_truth(case, {ex.param: ex.value})
+        numbers = _watch_numbers(ex.watch)
+        if numbers and not any(
+            math.isclose(n, at, rel_tol=WATCH_TOLERANCE, abs_tol=0.005) for n in numbers
+        ):
+            raise SpecRejected(f"watch line for {ex.param}={ex.value:g} misstates {at:.4g}")
+    return Visual(widget="curve", spec=case)
+
+
+async def _author_visual(topic: Topic) -> Visual | None:
+    """Ask codex for one curve and keep it only if it passes every check. Never raises."""
+    try:
+        raw = await codex.run_json(
+            prompts.visual(topic),
+            task="visual",
+            schema=schema_file(VisualReply),
+            timeout_s=float(os.environ.get("MM_CODEX_VISUAL_TIMEOUT_S", VISUAL_TIMEOUT_S)),
+        )
+        visual = _vet_visual(topic, VisualReply.model_validate(raw))
+    except Exception as err:  # any failure: keep the text-only topic
+        log.warning("visual %s: dropped: %s", topic.slug, str(err)[:300])
+        return None
+    if visual is None:
+        log.info("visual %s: no single curve fits", topic.slug)
+    return visual
 
 
 @router.get("/status")
