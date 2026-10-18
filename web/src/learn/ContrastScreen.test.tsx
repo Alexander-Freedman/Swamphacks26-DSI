@@ -50,6 +50,7 @@ describe('ContrastScreen', () => {
     fireEvent.click(chips[0])
     expect((screen.getByLabelText('rule then') as HTMLInputElement).value).toBe(chips[0].textContent)
     expect(last!.fix).toContain(chips[0].textContent!)
+    expect(document.activeElement).toBe(screen.getByLabelText('rule then')) // focus went back into the blank
   })
 })
 
