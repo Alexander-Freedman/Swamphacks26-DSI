@@ -204,7 +204,44 @@
 .calc-3d-side { display: grid; gap: 12px; min-width: 0; }
 .calc-3d-side > .calc-card { margin: 0; }
 .calc-3d-side .calc-slices { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
-.calc-3d-side .calc-slice { max-height: 18vh; }
+.calc-3d-side .calc-slice { max-height: 18vh; margin: 0 auto; }
+.calc-3d-side .calc-slices > .calc-card:only-child { grid-column: 1 / -1; } /* one slice so far: give it the whole width */
 .calc-3d-side .calc-pair { font-size: 13px; }
 .calc-3d-side .calc-picks-row { grid-template-columns: repeat(3, minmax(0, 1fr)); }
 .calc-3d-side .calc-rule { font-size: 16px; }
+
+/* Calc 3: the gradient (arrows lying on the floor) */
+.calc-3d-arrow line { stroke-width: 4; stroke-linecap: round; }
+.calc-3d-arrow polygon { stroke-width: 1.5; stroke-linejoin: round; }
+.calc-3d-arrow.pick line { stroke: var(--ink-soft); stroke-dasharray: 7 5; }
+.calc-3d-arrow.pick polygon { fill: var(--card); stroke: var(--ink-soft); }
+.calc-3d-arrow.pick.out { opacity: 0.3; }
+.calc-3d-arrow.sx line { stroke: var(--ink); stroke-width: 3; }
+.calc-3d-arrow.sx polygon { fill: var(--ink); stroke: var(--ink); }
+.calc-3d-arrow.sy line { stroke: var(--called); stroke-width: 3; }
+.calc-3d-arrow.sy polygon { fill: var(--called); stroke: var(--called); }
+.calc-3d-arrow.grad line { stroke: var(--off); stroke-width: 5; }
+.calc-3d-arrow.grad polygon { fill: var(--off); stroke: var(--off); }
+.calc-3d-alab { font: 700 16px var(--font-mono); fill: var(--ink); paint-order: stroke; stroke: var(--paper); stroke-width: 4px; stroke-linejoin: round; }
+.calc-3d-trail { fill: none; stroke: var(--ink-soft); stroke-width: 2; stroke-dasharray: 3 4; }
+.calc-3d-trail.on { stroke: var(--off); stroke-width: 3; stroke-dasharray: none; stroke-linecap: round; stroke-linejoin: round; }
+.calc-grad-eq { font: 700 22px var(--font-mono); margin: 6px 0 0; }
+.calc-gx { color: var(--ink); }
+.calc-gy { color: var(--called); }
+
+/* Calc 3: volume under a surface (columns, then the roof as a net) */
+@media (min-width: 761px) { .calc-volsplit { grid-template-columns: minmax(0, 1fr) 250px; } }
+.calc-3d-wire .calc-3d-quad { fill: none; stroke: var(--ink); stroke-width: 1; stroke-opacity: 0.8; }
+/* coarse columns are glass, so the roof shows inside them; fine ones are solid (they hug the roof anyway) */
+.calc-3d-face { fill: #d9d5e8; fill-opacity: 0.55; stroke: var(--ink); stroke-width: 1; stroke-linejoin: round; }
+.calc-3d-top { fill: var(--marker); fill-opacity: 0.6; stroke: var(--ink); stroke-width: 1; stroke-linejoin: round; }
+.calc-3d-cols.fine .calc-3d-face { fill: #e7e4f0; fill-opacity: 1; stroke-width: 0.3; }
+.calc-3d-cols.fine .calc-3d-top { fill-opacity: 1; stroke-width: 0.3; }
+.calc-l.col { height: 12px; background: var(--marker); border: 1.5px solid var(--ink); }
+.calc-l.roof { border-top: 2px solid var(--ink); }
+.calc-sums { width: 100%; border-collapse: collapse; margin-top: 12px; font-size: 14px; }
+.calc-sums caption { text-align: left; padding-bottom: 4px; }
+.calc-sums th, .calc-sums td { padding: 2px 6px; border-top: 1px solid var(--grid); text-align: left; font-weight: 400; }
+.calc-sums td { text-align: right; }
+.calc-sums tr.on { background: var(--marker-soft); font-weight: 700; }
+.calc-correct + .calc-k { margin-top: 14px; }
