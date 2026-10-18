@@ -1,0 +1,116 @@
+/* Biology session. Notebook Arcade: ink = truth, pencil = you, marker = the gap. Scoped to .bio.
+   No pills: 4px corners on boxes and buttons; circles only for amino-acid beads. */
+.bio {
+  --bio-a: #9fd8a8;
+  --bio-t: #f2a7a0;
+  --bio-u: #f2a7a0;
+  --bio-g: #ffe08a;
+  --bio-c: #a9c8f5;
+}
+.bio .ss-chip, .bio .ss-end, .bio .ss-btn { border-radius: 4px; }
+
+/* buttons */
+.bio .bio-btn { font: 700 16px var(--font-body); background: var(--ink); color: var(--paper); border: 2px solid var(--ink); border-radius: 4px; padding: 10px 16px; min-height: 46px; box-shadow: 0 3px 0 #000; touch-action: manipulation; cursor: pointer; }
+.bio .bio-btn:active:not(:disabled) { transform: translateY(2px); box-shadow: 0 1px 0 #000; }
+.bio .bio-btn:disabled { opacity: 0.45; cursor: not-allowed; }
+.bio .bio-ghost { background: var(--card); color: var(--ink); }
+.bio .bio-go { background: var(--marker); color: var(--ink); }
+.bio .bio-back { min-height: 36px; padding: 4px 10px; font-size: 14px; margin: 6px 0 2px; }
+.bio .bio-row { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 14px; }
+
+/* menu */
+.bio .bio-menu { display: grid; gap: 22px; max-width: 980px; }
+.bio .bio-ch-title { font: 700 22px var(--font-display); margin: 0; }
+.bio .bio-ch-blurb { margin: 2px 0 10px; color: var(--ink-soft); }
+.bio .bio-topics { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 12px; }
+.bio .bio-topic { display: grid; gap: 4px; text-align: left; padding: 14px 16px; background: var(--card); color: var(--ink); border: 2px solid var(--ink); border-radius: 4px; box-shadow: 0 3px 0 var(--ink); cursor: pointer; font: inherit; }
+.bio .bio-topic:hover:not(:disabled) { background: var(--marker-soft); }
+.bio .bio-topic:active:not(:disabled) { transform: translateY(2px); box-shadow: 0 1px 0 var(--ink); }
+.bio .bio-topic:disabled { cursor: default; opacity: 0.55; box-shadow: none; border-style: dashed; }
+.bio .bio-topic-title { font: 700 18px var(--font-display); }
+.bio .bio-topic-blurb { font-size: 14px; color: var(--ink-soft); }
+.bio .bio-soon { justify-self: start; font: 700 11px var(--font-mono); text-transform: uppercase; letter-spacing: 0.06em; color: var(--pencil); border: 1.5px dashed var(--pencil); border-radius: 4px; padding: 1px 6px; }
+
+/* a step: picture centered, questions under it */
+.bio .bio-step { display: grid; gap: 14px; max-width: 760px; margin: 0 auto; }
+.bio .bio-fig { margin: 0; }
+.bio .bio-svg { display: block; width: 100%; height: auto; max-width: 720px; margin: 0 auto; background-color: var(--card); background-image: linear-gradient(var(--grid) 1px, transparent 1px), linear-gradient(90deg, var(--grid) 1px, transparent 1px); background-size: 20px 20px; border: 2px solid var(--ink); border-radius: 4px; }
+.bio .bio-cap { font: 15px/1.4 var(--font-hand); color: var(--ink); margin: 8px 0 0; text-align: center; }
+.bio .bio-seq { font: 700 15px var(--font-mono); letter-spacing: 0.04em; }
+.bio .bio-lab { font: 12px var(--font-hand); fill: var(--ink-soft); }
+
+/* bases */
+.bio .bio-base rect { stroke: var(--ink); stroke-width: 1.5; }
+.bio .bio-base text { font: 700 14px var(--font-mono); fill: var(--ink); pointer-events: none; }
+.bio .bio-b-A rect, .bio .bio-key.bio-b-A { fill: var(--bio-a); background: var(--bio-a); }
+.bio .bio-b-T rect, .bio .bio-key.bio-b-T { fill: var(--bio-t); background: var(--bio-t); }
+.bio .bio-b-U rect, .bio .bio-key.bio-b-U { fill: var(--bio-u); background: var(--bio-u); }
+.bio .bio-b-G rect, .bio .bio-key.bio-b-G { fill: var(--bio-g); background: var(--bio-g); }
+.bio .bio-b-C rect, .bio .bio-key.bio-b-C { fill: var(--bio-c); background: var(--bio-c); }
+.bio .bio-faint { opacity: 0.4; }
+.bio .bio-mark rect { stroke: var(--off); stroke-width: 3.5; }
+.bio .bio-slot { fill: none; stroke: var(--pencil); stroke-width: 2; stroke-dasharray: 4 3; }
+.bio .bio-pol { fill: var(--marker-soft); stroke: var(--ink); stroke-width: 1.5; stroke-dasharray: 5 4; transition: transform 160ms ease-out; }
+.bio .bio-pop { animation: bio-pop 260ms ease-out both; transform-box: fill-box; }
+@keyframes bio-pop { from { opacity: 0; translate: 0 -10px; } to { opacity: 1; translate: 0 0; } }
+.bio .bio-tap { cursor: pointer; outline: none; }
+.bio .bio-tap:hover rect, .bio .bio-tap:focus-visible rect { stroke-width: 3.5; }
+.bio .bio-codon path { fill: none; stroke: var(--ink); stroke-width: 2; }
+.bio .bio-codon text { font: 700 13px var(--font-mono); fill: var(--ink); }
+.bio .bio-codon { animation: bio-pop 260ms ease-out both; }
+
+/* ribosome, tRNA, protein beads */
+.bio .bio-ribo { transition: transform 300ms ease-out; }
+.bio .bio-ribo > rect { fill: rgba(27, 35, 64, 0.08); stroke: var(--ink); stroke-width: 2; }
+.bio .bio-trna path { fill: var(--card); stroke: var(--ink); stroke-width: 1.5; }
+.bio .bio-trna text { font: 700 12px var(--font-mono); fill: var(--ink-soft); }
+.bio .bio-aa { stroke: var(--ink); stroke-width: 2; }
+.bio .bio-aa-0 { fill: #ffe08a; }
+.bio .bio-aa-1 { fill: #a9c8f5; }
+.bio .bio-aa-2 { fill: #9fd8a8; }
+.bio .bio-aa-3 { fill: #f2a7a0; }
+.bio .bio-aa-diff { stroke: var(--off); stroke-width: 4; }
+.bio .bio-aa-ghost { fill: none; stroke: var(--pencil); stroke-width: 2; stroke-dasharray: 4 3; }
+.bio .bio-ghost .bio-aa-t { fill: var(--pencil); }
+.bio .bio-aa-t { font: 700 11px var(--font-mono); fill: var(--ink); }
+.bio .bio-peptide { stroke: var(--ink); stroke-width: 3; }
+
+/* questions */
+.bio .bio-q { display: grid; gap: 10px; }
+.bio .bio-ask { font: 700 17px/1.4 var(--font-body); margin: 0; }
+.bio .bio-choices { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 10px; }
+.bio .bio-choice { display: grid; gap: 2px; text-align: left; padding: 10px 12px; min-height: 52px; background: var(--card); color: var(--ink); border: 2px solid var(--ink); border-radius: 4px; box-shadow: 0 3px 0 var(--ink); cursor: pointer; font: inherit; }
+.bio .bio-choice b { font: 700 17px var(--font-display); }
+.bio .bio-choice span { font-size: 13px; color: var(--ink-soft); }
+.bio .bio-choice:hover:not(:disabled) { background: var(--marker-soft); }
+.bio .bio-choice.right { background: var(--called); color: var(--paper); border-color: var(--called); }
+.bio .bio-choice.right span { color: var(--paper); }
+.bio .bio-choice.wrong { text-decoration: line-through; opacity: 0.5; }
+.bio .bio-choice:disabled { cursor: default; }
+.bio .bio-palette { display: flex; gap: 10px; flex-wrap: wrap; }
+.bio .bio-key { width: 56px; height: 56px; font: 700 22px var(--font-mono); color: var(--ink); border: 2px solid var(--ink); border-radius: 4px; box-shadow: 0 3px 0 var(--ink); cursor: pointer; }
+.bio .bio-key:active { transform: translateY(2px); box-shadow: 0 1px 0 var(--ink); }
+
+/* verdicts: a clear ✓ Correct! or ✗ Not quite every time */
+.bio .bio-verdict { border: 2px solid var(--ink); border-radius: 4px; padding: 10px 12px; font-size: 15px; line-height: 1.4; }
+.bio .bio-verdict > b { font: 700 18px var(--font-display); margin-right: 6px; }
+.bio .bio-ok { background: #e5f4ea; border-color: var(--called); }
+.bio .bio-ok > b { color: var(--called); }
+.bio .bio-no { background: #fbeceb; border-color: var(--off); }
+.bio .bio-no > b { color: var(--off); }
+.bio .bio-no p { margin: 6px 0 0; }
+.bio .bio-mname { display: inline-block; font: 700 15px var(--font-body); background: var(--marker); padding: 2px 6px; border-radius: 4px; margin-top: 6px; }
+.bio .bio-mastered { font-weight: 700; }
+
+/* codon table */
+.bio .bio-table { border-collapse: collapse; font: 12px var(--font-mono); width: 100%; max-width: 640px; background: var(--card); }
+.bio .bio-table th, .bio .bio-table td { border: 1.5px solid var(--ink); padding: 4px 6px; text-align: left; vertical-align: top; }
+.bio .bio-table th { font-weight: 700; background: var(--paper); }
+.bio .bio-table .hl { background: var(--marker-soft); }
+.bio .bio-table td div { white-space: nowrap; }
+@media (max-width: 520px) { .bio .bio-table { font-size: 10px; } .bio .bio-table th, .bio .bio-table td { padding: 2px 3px; } }
+
+@media (prefers-reduced-motion: reduce) {
+  .bio .bio-pop, .bio .bio-codon { animation: none; }
+  .bio .bio-pol, .bio .bio-ribo { transition: none; }
+}

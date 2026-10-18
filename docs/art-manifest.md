@@ -47,3 +47,12 @@ Not generated: drawn as SVG in code (the session's own curve f(x) = (x³ − 6x�
 | session-orgo-512.webp | 512x512 | 9130 |
 
 Source: `docs/art/session-orgo.svg`, drawn by hand in the Notebook Arcade palette (a nucleophile with its lone pair, an ink curved arrow onto an ink carbon, a pencil leaving group). Rasterized to WebP (quality 82) in headless Chromium via canvas. No image service involved; doesn't count toward the image budget.
+
+## session-biology (hand-built SVG, not generated)
+
+| file | size | bytes |
+|---|---|---|
+| session-biology-256.webp | 256x256 | 5146 |
+| session-biology-512.webp | 512x512 | 11574 |
+
+Source: `docs/art/session-biology.svg`, drawn in the Notebook Arcade palette: a DNA double helix in ink with base-pair rungs in the session's A/T/G/C colors, a new RNA strand (pencil, dashed) peeling off over a marker swash, and two protein beads at its end. The helix is generated from a sine so the rungs meet the strands. Rasterized with resvg and encoded to WebP (quality 82). No image service involved, so it doesn't count toward the image budget.
