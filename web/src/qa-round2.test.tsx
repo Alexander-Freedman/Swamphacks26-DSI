@@ -81,7 +81,8 @@ describe('topic matching (#167)', () => {
       for (const n of names) expect(matchTopic(n, extras), n).toBe(slug)
   })
 
-  it('typing the first card\'s title on Home opens the session at ?session=', async () => {
+  // Retired with the Learn plan (Sat 11:45 PM): Home's topic box now opens Learn sessions (learn/LearnTopicBox.test.tsx).
+  it.skip('typing the first card\'s title on Home opens the session at ?session=', async () => {
     render(<App />)
     await screen.findByRole('button', { name: 'Sums of dice' })
     fireEvent.change(screen.getByLabelText(/topic you want/), { target: { value: 'birthday problem' } })
@@ -89,7 +90,8 @@ describe('topic matching (#167)', () => {
     await waitFor(() => expect(here()).toBe(`${BASE}?session=birthday`))
   }, 15000)
 
-  it('a miss offers the subject sessions first, and a session chip opens the session', async () => {
+  // Retired with the Learn plan (Sat 11:45 PM): Home's topic box now opens Learn sessions (learn/LearnTopicBox.test.tsx).
+  it.skip('a miss offers the subject sessions first, and a session chip opens the session', async () => {
     render(<App />)
     await screen.findByRole('button', { name: 'Sums of dice' })
     fireEvent.change(screen.getByLabelText(/topic you want/), { target: { value: 'quantum tunnelling' } })

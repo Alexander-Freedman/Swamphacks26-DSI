@@ -1,0 +1,5 @@
+/* "Try any topic" leads Home: solid ink border instead of the old dashed secondary box. */
+.anytopic.learn-box { margin-top: 18px; border-style: solid; border-color: var(--ink); background: var(--card); }
+.learn-box .anytopic-title { font-size: 1.25rem; }
+.learn-box .anytopic-status:empty { display: none; }
+.home .demos-label { margin: 26px 0 8px; font-size: 0.95rem; color: var(--ink-soft); }

@@ -1,5 +1,5 @@
 // What you can practice in statistics, grouped by chapter so you pick on purpose. Topics not
-// built yet stay on the menu as "coming next" so the whole map of the subject is visible.
+// built yet are listed here (the map of the subject) but stay off the menu until built.
 
 export type StatTopic = {
   id: string

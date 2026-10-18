@@ -9,11 +9,12 @@ import App from '../App'
 afterEach(cleanup)
 
 describe('LearnSession shell', () => {
-  it('walks all eight stages with the stubs, and Back steps back', async () => {
+  it('walks the stages after Anchor with Next, and Back steps back', async () => {
+    // Guess and Anchor are real screens with their own tests (GuessAnchor.test.tsx).
     const onDone = vi.fn()
-    render(<LearnSession slug="compound-interest" onDone={onDone} api={createMockLearnApi()} />)
+    render(<LearnSession slug="compound-interest" onDone={onDone} api={createMockLearnApi()} initial={{ stage: 'contrast' }} />)
     await screen.findByText('compound interest')
-    for (const stage of STAGES.slice(0, -1)) {
+    for (const stage of STAGES.slice(STAGES.indexOf('contrast'), -1)) {
       expect(screen.getByRole('region', { name: stage })).toBeTruthy()
       fireEvent.click(screen.getByRole('button', { name: 'Next' }))
     }
@@ -21,7 +22,7 @@ describe('LearnSession shell', () => {
     fireEvent.click(screen.getByRole('button', { name: 'Back' }))
     expect(screen.getByRole('region', { name: 'transfer' })).toBeTruthy()
     fireEvent.click(screen.getByRole('button', { name: 'Next' }))
-    fireEvent.click(screen.getByRole('button', { name: 'Finish' }))
+    fireEvent.click(screen.getByRole('button', { name: 'Try another topic' }))
     expect(onDone).toHaveBeenCalled()
   })
 
@@ -29,7 +30,8 @@ describe('LearnSession shell', () => {
     render(<LearnSession slug="compound-interest" onDone={() => {}} api={createMockLearnApi()} />)
     await screen.findByText('compound interest')
     fireEvent.change(screen.getByLabelText('guess answer'), { target: { value: 'my guess' } })
-    fireEvent.click(screen.getByRole('button', { name: 'Next' }))
+    fireEvent.click(screen.getByRole('button', { name: 'Submit' }))
+    fireEvent.click(await screen.findByRole('button', { name: 'Next' }))
     await screen.findByRole('region', { name: 'anchor' })
     expect(screen.queryByText('thinking…')).toBeNull()
     fireEvent.click(screen.getByRole('button', { name: 'Back' }))

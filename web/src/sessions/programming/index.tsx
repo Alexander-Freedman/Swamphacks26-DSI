@@ -6,5 +6,7 @@ export const session: SessionDef = {
   title: 'Programming',
   blurb: 'Step through code and watch what the computer actually does.',
   order: 3,
+  // Off Home until more of its topics are built; ?session= still opens it.
+  home: false,
   Component: ProgrammingSession,
 }

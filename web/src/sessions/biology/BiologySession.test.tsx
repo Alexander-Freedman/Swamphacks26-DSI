@@ -18,12 +18,13 @@ const click = (name: RegExp | string) => fireEvent.click(screen.getByRole('butto
 const label = (m: keyof typeof BIO_MISTAKES) => screen.getByText(BIO_MISTAKES[m].label)
 
 describe('biology session', () => {
-  it('opens on a chapter menu: DNA → RNA → protein is ready, the rest are coming next', () => {
+  it('opens on a chapter menu that lists only DNA → RNA → protein, the one built topic', () => {
     render(<session.Component onDone={() => {}} />)
-    for (const ch of ['Cells', 'Genetics', 'Cell division', 'Physiology']) expect(screen.getByRole('heading', { name: ch })).toBeTruthy()
+    expect(screen.getByRole('heading', { name: 'Genetics' })).toBeTruthy()
+    for (const ch of ['Cells', 'Cell division', 'Physiology']) expect(screen.queryByRole('heading', { name: ch })).toBeNull()
     expect((screen.getByRole('button', { name: /^DNA → RNA → protein/ }) as HTMLButtonElement).disabled).toBe(false)
-    for (const t of [/^Cell respiration/, /^Punnett squares/, /^Mitosis vs meiosis/, /^Action potential/]) expect((screen.getByRole('button', { name: t }) as HTMLButtonElement).disabled).toBe(true)
-    expect(screen.getAllByText('coming next')).toHaveLength(4)
+    for (const t of [/^Cell respiration/, /^Punnett squares/, /^Mitosis vs meiosis/, /^Action potential/]) expect(screen.queryByRole('button', { name: t })).toBeNull()
+    expect(screen.queryByText(/coming next/i)).toBeNull()
   })
 
   it('DNA → RNA → protein: predict, pair, read, translate, mutate; wrong answers named and saved', () => {

@@ -14,12 +14,13 @@ afterEach(() => {
 const click = (name: string | RegExp) => fireEvent.click(screen.getByRole('button', { name }))
 
 describe('programming session', () => {
-  it('opens on a chapter menu with the topics not built yet marked', () => {
+  it('opens on a chapter menu that lists only the built topics', () => {
     render(<session.Component onDone={() => {}} />)
     expect(screen.getByText('What do you want to practice?')).toBeTruthy()
-    for (const h of ['Recursion', 'Algorithms', 'Data structures']) expect(screen.getByRole('heading', { name: h })).toBeTruthy()
+    expect(screen.getByRole('heading', { name: 'Recursion' })).toBeTruthy()
     expect((screen.getByRole('button', { name: /^Watch the call stack/ }) as HTMLButtonElement).disabled).toBe(false)
-    expect((screen.getByRole('button', { name: /^Binary search Halve/ }) as HTMLButtonElement).disabled).toBe(true)
+    expect(screen.queryByRole('button', { name: /^Binary search/ })).toBeNull()
+    expect(screen.queryByText(/coming next/i)).toBeNull()
   })
 
   it('call stack: predict the depth, step up and back down, then crash it without a base case', () => {
