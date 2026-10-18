@@ -123,86 +123,85 @@ export function OptimizeStep({ onDone, topic }: { onDone: () => void; topic: str
 
   return (
     <section>
-      <div className="calc-two">
-        <div className="calc-card calc-tight">
-          <div className="calc-k calc-pad">a 12 × 12 sheet · cut x from each corner, fold the sides up</div>
-          <Sheet x={x} />
+      <div className="calc-3d-layout">
+        <div className="calc-card calc-tight calc-3d-main">
+          <div className="calc-k calc-pad">a 12 × 12 sheet · cut x from each corner, fold the sides up · V = x(12 − 2x)²</div>
+          <div className="calc-two calc-boxpics">
+            <Sheet x={x} />
+            {guess != null ? <VolumeChart x={x} seen={seen} /> : <p className="calc-small">The volume curve draws itself here as you slide the cut.</p>}
+          </div>
+          <p className="calc-pair">
+            box <b className="calc-num">{(SHEET - 2 * x).toFixed(1)} × {(SHEET - 2 * x).toFixed(1)} × {x.toFixed(1)}</b> · volume <b className="calc-box calc-num">{V(x).toFixed(0)}</b>
+            {guess != null && <> · slope <b className="calc-hl calc-num">{Vp(x).toFixed(0)}</b></>}
+          </p>
           <label className="calc-range">
             <span>cut {x.toFixed(1)}</span>
             <input type="range" min={0} max={X_MAX} step={0.1} value={x} onChange={(e) => move(+e.target.value)} disabled={guess == null} aria-label="the cut, x" />
           </label>
         </div>
-        <div className="calc-card calc-tight">
-          <div className="calc-k calc-pad">volume of the box, V = x(12 − 2x)²</div>
-          {guess != null ? <VolumeChart x={x} seen={seen} /> : <p className="calc-small">The volume curve draws itself here as you slide the cut.</p>}
-          <p className="calc-pair">
-            box <b className="calc-num">{(SHEET - 2 * x).toFixed(1)} × {(SHEET - 2 * x).toFixed(1)} × {x.toFixed(1)}</b> · volume <b className="calc-box calc-num">{V(x).toFixed(0)}</b>
-            {guess != null && <> · slope <b className="calc-hl calc-num">{Vp(x).toFixed(0)}</b></>}
-          </p>
+        <div className="calc-3d-side">
+          <div className="calc-card">
+            {guess == null && (
+              <>
+                <div className="calc-k">question 1 of 2 · predict</div>
+                <p className="calc-ask">Cutting bigger corners makes the box taller but its floor smaller. Which cut do you think holds the most?</p>
+                <div className="calc-picks calc-picks-row" role="group" aria-label="which cut">
+                  {CUTS.map((c) => (
+                    <button key={c} className={'calc-pick' + (wrongCut.includes(c) ? ' wrong' : '')} disabled={wrongCut.includes(c)} onClick={() => guessCut(c)}>
+                      {wrongCut.includes(c) && <span className="calc-mark" aria-hidden="true">✗</span>}
+                      cut {c}
+                    </button>
+                  ))}
+                </div>
+                {note && <p className="calc-wrong" role="status"><b>✗ Not quite.</b> {note} Try another cut.</p>}
+              </>
+            )}
+            {guess != null && !explored && (
+                <p className="calc-correct" role="status">
+                  <span className="calc-check" aria-hidden="true">✓</span>
+                  <span><b>Correct!</b> A cut of 2 makes an 8 × 8 × 2 box: {V_BEST}. Now slide the cut all the way from 0 to 6 and watch the slope on the volume curve.</span>
+                </p>
+            )}
+            {explored && !picked && (
+              <>
+                <div className="calc-k">question 2 of 2</div>
+                <p className="calc-ask">The tangent went flat twice: at x = 2 and at x = 6 (the two marked dots). Which flat spot is the biggest box?</p>
+                <div className="calc-picks" role="group" aria-label="which flat spot">
+                  {Q2.map((p) => (
+                    <button key={p.id} className={'calc-pick' + (wrong.includes(p.id) ? ' wrong' : '')} disabled={wrong.includes(p.id)} onClick={() => choose(p)}>
+                      {wrong.includes(p.id) && <span className="calc-mark" aria-hidden="true">✗</span>}
+                      {p.text}
+                    </button>
+                  ))}
+                </div>
+                {note && <p className="calc-wrong" role="status"><b>✗ Not quite.</b> {note} Try another one.</p>}
+              </>
+            )}
+            {picked && !done && (
+              <>
+                <p className="calc-correct" role="status">
+                  <span className="calc-check" aria-hidden="true">✓</span>
+                  <span><b>Correct!</b> Slope 0 finds the candidates; you still have to look. At x = 2 the curve rises, flattens, then falls: a top. At x = 6 it falls to 0 and flattens: a bottom.</span>
+                </p>
+                <p className="calc-ask">Last step: slide the cut back to the top of the hill.</p>
+              </>
+            )}
+            {done && (
+              <>
+                <p className="calc-correct" role="status">
+                  <span className="calc-check" aria-hidden="true">✓</span>
+                  <span><b>Correct!</b> Cut {x.toFixed(1)}: the biggest box, {V(x).toFixed(0)}, right where the slope is 0 and the curve turns from rising to falling.</span>
+                </p>
+                <p className="calc-rule">
+                  <span>To find the biggest (or smallest): find where <span className="calc-hl">slope = 0</span>.</span>
+                  <span>Then check each one: rising then falling = a max, falling then rising = a min.</span>
+                </p>
+              </>
+            )}
+          </div>
+          {done && <CalcEnd caught={caught.map((m) => `“${BOX_LABELS[m]}”`)} mastered={missed === 0} remix="Next: two speeds tied together by a ladder." onDone={onDone} />}
         </div>
       </div>
-      <div className="calc-card">
-        {guess == null && (
-          <>
-            <div className="calc-k">question 1 of 2 · predict</div>
-            <p className="calc-ask">Cutting bigger corners makes the box taller but its floor smaller. Which cut do you think holds the most?</p>
-            <div className="calc-picks calc-picks-row" role="group" aria-label="which cut">
-              {CUTS.map((c) => (
-                <button key={c} className={'calc-pick' + (wrongCut.includes(c) ? ' wrong' : '')} disabled={wrongCut.includes(c)} onClick={() => guessCut(c)}>
-                  {wrongCut.includes(c) && <span className="calc-mark" aria-hidden="true">✗</span>}
-                  cut {c}
-                </button>
-              ))}
-            </div>
-            {note && <p className="calc-wrong" role="status"><b>✗ Not quite.</b> {note} Try another cut.</p>}
-          </>
-        )}
-        {guess != null && !explored && (
-          <>
-            <p className="calc-correct" role="status">
-              <span className="calc-check" aria-hidden="true">✓</span>
-              <span><b>Correct!</b> A cut of 2 makes an 8 × 8 × 2 box: {V_BEST}. Now slide the cut all the way from 0 to 6 and watch the slope on the volume curve.</span>
-            </p>
-          </>
-        )}
-        {explored && !picked && (
-          <>
-            <div className="calc-k">question 2 of 2</div>
-            <p className="calc-ask">The tangent went flat twice: at x = 2 and at x = 6 (the two marked dots). Which flat spot is the biggest box?</p>
-            <div className="calc-picks" role="group" aria-label="which flat spot">
-              {Q2.map((p) => (
-                <button key={p.id} className={'calc-pick' + (wrong.includes(p.id) ? ' wrong' : '')} disabled={wrong.includes(p.id)} onClick={() => choose(p)}>
-                  {wrong.includes(p.id) && <span className="calc-mark" aria-hidden="true">✗</span>}
-                  {p.text}
-                </button>
-              ))}
-            </div>
-            {note && <p className="calc-wrong" role="status"><b>✗ Not quite.</b> {note} Try another one.</p>}
-          </>
-        )}
-        {picked && !done && (
-          <>
-            <p className="calc-correct" role="status">
-              <span className="calc-check" aria-hidden="true">✓</span>
-              <span><b>Correct!</b> Slope 0 finds the candidates; you still have to look. At x = 2 the curve rises, flattens, then falls: a top. At x = 6 it falls to 0 and flattens: a bottom.</span>
-            </p>
-            <p className="calc-ask">Last step: slide the cut back to the top of the hill.</p>
-          </>
-        )}
-        {done && (
-          <>
-            <p className="calc-correct" role="status">
-              <span className="calc-check" aria-hidden="true">✓</span>
-              <span><b>Correct!</b> Cut {x.toFixed(1)}: the biggest box, {V(x).toFixed(0)}, right where the slope is 0 and the curve turns from rising to falling.</span>
-            </p>
-            <p className="calc-rule">
-              <span>To find the biggest (or smallest): find where <span className="calc-hl">slope = 0</span>.</span>
-              <span>Then check each one: rising then falling = a max, falling then rising = a min.</span>
-            </p>
-          </>
-        )}
-      </div>
-      {done && <CalcEnd caught={caught.map((m) => `“${BOX_LABELS[m]}”`)} mastered={missed === 0} remix="Next: two speeds tied together by a ladder." onDone={onDone} />}
     </section>
   )
 }

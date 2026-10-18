@@ -30,7 +30,7 @@ function Lens({ c, z, done }: { c: Curve; z: number; done: boolean }) {
   const fmt = (t: number) => (w >= 0.05 ? t.toFixed(2) : t.toFixed(4))
   const ticks = [A - w, A, A + w]
   return (
-    <svg className="calc-svg calc-lens" viewBox={`0 0 ${W} ${H}`} role="img" aria-label={`zoom lens on x = ${A}, window ${fmt(A - w)} to ${fmt(A + w)}: left walker at height ${fmt(yl)}, right walker at ${fmt(yr)}`}>
+    <svg className="calc-svg calc-lens calc-fit" viewBox={`0 0 ${W} ${H}`} role="img" aria-label={`zoom lens on x = ${A}, window ${fmt(A - w)} to ${fmt(A + w)}: left walker at height ${fmt(yl)}, right walker at ${fmt(yr)}`}>
       <rect className="calc-lens-glass" x={PAD.l} y={PAD.t} width={W - PAD.l - PAD.r} height={H - PAD.t - PAD.b} />
       {/* the height both sides head for, once you've said so */}
       {done && lim != null && <line className="calc-lens-target" x1={PAD.l} x2={W - PAD.r} y1={sy(lim)} y2={sy(lim)} />}
@@ -51,7 +51,7 @@ function Lens({ c, z, done }: { c: Curve; z: number; done: boolean }) {
       <line className="calc-link" x1={sx(l)} x2={PAD.l} y1={sy(yl)} y2={sy(yl)} />
       <line className="calc-link" x1={sx(r)} x2={PAD.l} y1={sy(yr)} y2={sy(yr)} />
       <circle className="calc-handle" cx={sx(l)} cy={sy(yl)} r={8} />
-      <circle className="calc-handle right" cx={sx(r)} cy={sy(yr)} r={8} />
+      <circle className="calc-handle" cx={sx(r)} cy={sy(yr)} r={8} />
       <text className="calc-note" x={sx(l)} y={sy(yl) - 14} textAnchor="middle">from the left</text>
       <text className="calc-note" x={sx(r)} y={sy(yr) + (c === 'jump' ? -14 : 26)} textAnchor="middle">from the right</text>
       <text className="calc-axis" x={PAD.l - 4} y={sy(yl) + 4} textAnchor="end">{fmt(yl)}</text>
@@ -120,25 +120,27 @@ export function LimitStep({ onDone, topic }: { onDone: () => void; topic: string
 
   return (
     <section>
-      <div className="calc-split">
-        <div className="calc-card calc-tight calc-main">
+      <div className="calc-3d-layout">
+        <div className="calc-card calc-tight calc-3d-main">
           <div className="calc-k calc-pad">{c === 'hole' ? 'a curve with a hole at x = 2' : 'a curve that jumps at x = 2'} · zoom in on the point</div>
           <Lens c={c} z={z} done={c === 'hole' ? done1 : done2} />
           <label className="calc-range calc-zoom">
-            <span>zoom {z === 0 ? '1×' : `${Math.round(1 / zoomToWidth(z) * 2)}×`}</span>
+            <span>zoom {z === 0 ? '1×' : `${Math.round((1 / zoomToWidth(z)) * 2)}×`}</span>
             <input type="range" min={0} max={100} value={z} onChange={(e) => zoom(+e.target.value)} aria-label="zoom in on x = 2" />
           </label>
         </div>
-        <div className="calc-side">
-          <div className="calc-card calc-readout" aria-live="polite">
-            <div className="calc-tag">walking in from the left</div>
-            <div className="calc-big">{yl.toFixed(z > 60 ? 3 : 2)}</div>
-            <div className="calc-tag">walking in from the right</div>
-            <div className="calc-big">{yr.toFixed(z > 60 ? 3 : 2)}</div>
-            <div className="calc-sub">{zoomed ? (limitOf(c) != null ? 'closing in on the same height' : 'they never meet') : 'zoom in and watch these two'}</div>
+        <div className="calc-3d-side">
+          <div className="calc-card calc-readout calc-twin" aria-live="polite">
+            <div>
+              <div className="calc-tag">from the left</div>
+              <div className="calc-big">{yl.toFixed(z > 60 ? 3 : 2)}</div>
+            </div>
+            <div>
+              <div className="calc-tag">from the right</div>
+              <div className="calc-big">{yr.toFixed(z > 60 ? 3 : 2)}</div>
+            </div>
+            <div className="calc-sub calc-span">{zoomed ? (limitOf(c) != null ? 'closing in on the same height' : 'they never meet') : 'zoom in and watch these two'}</div>
           </div>
-        </div>
-        <div className="calc-after">
           <div className="calc-card">
             <div className="calc-k">{c === 'hole' ? 'question 1 of 2' : 'question 2 of 2'}</div>
             {!zoomed ? (
@@ -178,9 +180,9 @@ export function LimitStep({ onDone, topic }: { onDone: () => void; topic: string
               </>
             )}
           </div>
+          {done2 && <CalcEnd caught={caught.map((m) => `“${LIMIT_LABELS[m]}”`)} mastered={missed === 0} remix="Next: the slope of a curve." onDone={onDone} />}
         </div>
       </div>
-      {done2 && <CalcEnd caught={caught.map((m) => `“${LIMIT_LABELS[m]}”`)} mastered={missed === 0} remix="Next: the slope of a curve." onDone={onDone} />}
     </section>
   )
 }

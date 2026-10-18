@@ -99,10 +99,10 @@ export function ChainStep({ onDone, topic }: { onDone: () => void; topic: string
 
   return (
     <section>
-      <div className="calc-split">
-        <div className="calc-card calc-tight calc-main">
+      <div className="calc-3d-layout">
+        <div className="calc-card calc-tight calc-3d-main">
           <div className="calc-k calc-pad">{phase === 'warm' ? 'u = 2x + 1, then y = 3u − 2' : 'u = x², then y = sin u'} · a step in x fans down into u, then into y</div>
-          <svg className="calc-svg" viewBox={`0 0 ${W} ${H}`} role="img" aria-label={`x = ${x.toFixed(2)}; a step of ${h} in x becomes ${(g(b) - g(a)).toFixed(2)} in u${showY ? ` and ${(f(g(b)) - f(g(a))).toFixed(2)} in y` : ''}`}>
+          <svg className="calc-svg calc-fit" viewBox={`0 0 ${W} ${H}`} role="img" aria-label={`x = ${x.toFixed(2)}; a step of ${h} in x becomes ${(g(b) - g(a)).toFixed(2)} in u${showY ? ` and ${(f(g(b)) - f(g(a))).toFixed(2)} in y` : ''}`}>
             <Fan y1={ROWS.x} y2={ROWS.u} l1={lx} l2={lu} a={a} b={b} fa={g(a)} fb={g(b)} />
             {showY && <Fan y1={ROWS.u} y2={ROWS.y} l1={lu} l2={ly} a={g(a)} b={g(b)} fa={f(g(a))} fb={f(g(b))} />}
             <NumberLine y={ROWS.x} line={lx} name="x" a={a} b={b} ticks={phase === 'warm' ? [0, 1, 2, 3] : [0, 0.5, 1, 1.5, 2]} />
@@ -122,23 +122,27 @@ export function ChainStep({ onDone, topic }: { onDone: () => void; topic: string
             )}
           </label>
         </div>
-        <div className="calc-side">
-          <div className="calc-card calc-readout" aria-live="polite">
-            <div className="calc-tag">x → u: the inside stretch</div>
-            <div className="calc-big">{phase === 'warm' ? `×${G1}` : `×${n2(inner)}`}</div>
-            <div className="calc-sub">{phase === 'warm' ? 'every 1 of x is 2 of u' : `du/dx = 2x at x = ${x.toFixed(2)}`}</div>
+        <div className="calc-3d-side">
+          <div className="calc-card calc-readout calc-twin" aria-live="polite">
+            <div>
+              <div className="calc-tag">inside, x → u</div>
+              <div className="calc-big">{phase === 'warm' ? `×${G1}` : `×${n2(inner)}`}</div>
+              <div className="calc-sub">{phase === 'warm' ? '1 of x is 2 of u' : 'du/dx = 2x'}</div>
+            </div>
             {showY && (
-              <>
-                <div className="calc-tag">u → y: the outside stretch</div>
+              <div>
+                <div className="calc-tag">outside, u → y</div>
                 <div className="calc-big">{phase === 'warm' ? `×${F1}` : `×${n2(outer)}`}</div>
-                <div className="calc-sub">{phase === 'warm' ? 'every 1 of u is 3 of y' : `dy/du = cos u at u = ${g(x).toFixed(2)}`}</div>
-                <div className="calc-tag">x → y, all together</div>
-                <div className="calc-big calc-hl">{phase === 'warm' ? `×${G1 * F1}` : `×${n2(chain2(x))}`}</div>
-              </>
+                <div className="calc-sub">{phase === 'warm' ? '1 of u is 3 of y' : `dy/du = cos u, u = ${g(x).toFixed(2)}`}</div>
+              </div>
+            )}
+            {showY && (
+              <div className="calc-span">
+                <div className="calc-tag">together, x → y</div>
+                <div className="calc-big"><span className="calc-hl">{phase === 'warm' ? `×${G1 * F1}` : `×${n2(chain2(x))}`}</span></div>
+              </div>
             )}
           </div>
-        </div>
-        <div className="calc-after">
           <div className="calc-card">
             {phase === 'warm' && !answered && (
               <>
@@ -186,9 +190,9 @@ export function ChainStep({ onDone, topic }: { onDone: () => void; topic: string
               </>
             )}
           </div>
+          {still && <CalcEnd caught={caught.map((m) => `“${CHAIN_LABELS[m]}”`)} mastered={missed === 0} remix="Next: use slope 0 to find the biggest box." onDone={onDone} />}
         </div>
       </div>
-      {still && <CalcEnd caught={caught.map((m) => `“${CHAIN_LABELS[m]}”`)} mastered={missed === 0} remix="Next: use slope 0 to find the biggest box." onDone={onDone} />}
     </section>
   )
 }

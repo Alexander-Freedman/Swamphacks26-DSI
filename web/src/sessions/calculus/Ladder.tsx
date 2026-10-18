@@ -21,7 +21,7 @@ function Scene({ x, showTop }: { x: number; showTop: boolean }) {
   const head = { x: X(0), y: Y(y) }
   const ts = Math.min(topSpeed(x), 3.5)
   return (
-    <svg className="calc-svg calc-ladder" viewBox={`0 0 ${W} ${H}`} role="img" aria-label={`ladder ${L} m long, foot ${x.toFixed(2)} m out moving at ${FOOT_SPEED} m/s, top ${y.toFixed(2)} m up${showTop ? ` falling at ${topSpeed(x).toFixed(2)} m/s` : ''}`}>
+    <svg className="calc-svg calc-ladder calc-fit" viewBox={`0 0 ${W} ${H}`} role="img" aria-label={`ladder ${L} m long, foot ${x.toFixed(2)} m out moving at ${FOOT_SPEED} m/s, top ${y.toFixed(2)} m up${showTop ? ` falling at ${topSpeed(x).toFixed(2)} m/s` : ''}`}>
       <line className="calc-ladder-wall" x1={X(0)} x2={X(0)} y1={Y(L + 0.3)} y2={Y(0)} />
       <line className="calc-ladder-wall" x1={X(0)} x2={X(L + 0.3)} y1={Y(0)} y2={Y(0)} />
       {[1, 2, 3, 4, 5].map((m) => (
@@ -95,8 +95,8 @@ export function LadderStep({ onDone, topic }: { onDone: () => void; topic: strin
 
   return (
     <section>
-      <div className="calc-split">
-        <div className="calc-card calc-tight calc-main">
+      <div className="calc-3d-layout">
+        <div className="calc-card calc-tight calc-3d-main">
           <div className="calc-k calc-pad">a {L} m ladder · the foot is pulled out at {FOOT_SPEED} m/s</div>
           <Scene x={x} showTop={answered} />
           <label className="calc-range">
@@ -104,23 +104,25 @@ export function LadderStep({ onDone, topic }: { onDone: () => void; topic: strin
             <input type="range" min={0.5} max={4.95} step={0.05} value={x} onChange={(e) => setX(+e.target.value)} disabled={!answered} aria-label="how far out the foot is" />
           </label>
         </div>
-        <div className="calc-side">
-          <div className="calc-card calc-readout" aria-live="polite">
-            <div className="calc-tag">foot, moving out</div>
-            <div className="calc-big">{FOOT_SPEED.toFixed(2)}</div>
-            <div className="calc-sub">m/s, steady</div>
-            <div className="calc-tag">top, sliding down</div>
-            <div className={'calc-big' + (answered ? '' : ' calc-dim')}>{answered ? topSpeed(x).toFixed(2) : '?'}</div>
-            <div className="calc-sub">{answered ? `m/s = (x / y) × 1 = ${x.toFixed(2)} / ${y.toFixed(2)}` : 'm/s'}</div>
+        <div className="calc-3d-side">
+          <div className="calc-card calc-readout calc-twin" aria-live="polite">
+            <div>
+              <div className="calc-tag">foot, moving out</div>
+              <div className="calc-big">{FOOT_SPEED.toFixed(2)}</div>
+              <div className="calc-sub">m/s, steady</div>
+            </div>
+            <div>
+              <div className="calc-tag">top, sliding down</div>
+              <div className={'calc-big' + (answered ? '' : ' calc-dim')}>{answered ? <span className="calc-hl">{topSpeed(x).toFixed(2)}</span> : '?'}</div>
+              <div className="calc-sub">{answered ? `m/s = (x / y) × 1 = ${x.toFixed(2)} / ${y.toFixed(2)}` : 'm/s'}</div>
+            </div>
           </div>
-        </div>
-        <div className="calc-after">
           <div className="calc-card">
             {!answered && (
               <>
                 <div className="calc-k">question 1 of 2 · predict</div>
                 <p className="calc-ask">The foot is {ASK_X} m from the wall, so the top is {top(ASK_X)} m up. The foot moves out at 1 m/s. Right now, is the top sliding down faster than that, slower, or at the same speed?</p>
-                <div className="calc-picks calc-picks-row" role="group" aria-label="faster, slower or the same">
+                <div className="calc-picks" role="group" aria-label="faster, slower or the same">
                   {Q1.map((p) => (
                     <button key={p.id} className={'calc-pick' + (wrong.includes(p.id) ? ' wrong' : '')} disabled={wrong.includes(p.id)} onClick={() => choose(p)}>
                       {wrong.includes(p.id) && <span className="calc-mark" aria-hidden="true">✗</span>}
@@ -155,9 +157,9 @@ export function LadderStep({ onDone, topic }: { onDone: () => void; topic: strin
               </>
             )}
           </div>
+          {faster && <CalcEnd caught={caught.map((m) => `“${LADDER_LABELS[m]}”`)} mastered={missed === 0} remix="Next: the area under a curve." onDone={onDone} />}
         </div>
       </div>
-      {faster && <CalcEnd caught={caught.map((m) => `“${LADDER_LABELS[m]}”`)} mastered={missed === 0} remix="Next: the area under a curve." onDone={onDone} />}
     </section>
   )
 }
