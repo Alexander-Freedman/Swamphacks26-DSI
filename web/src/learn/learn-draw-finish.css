@@ -1,0 +1,19 @@
+/* Draw, Neighbor, Transfer, Done: plain paper, 4px corners. */
+.ldf-label { display: block; font-size: 0.9rem; margin: 8px 0 4px; }
+.ldf-pair { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 12px; }
+.ldf-card, .ldf-mcard { border: 1.5px solid var(--ink-soft, currentColor); border-radius: 4px; padding: 12px; background: var(--card, transparent); }
+.ldf-card strong { display: block; margin-top: 4px; }
+.ldf-kicker { display: block; font-size: 0.8rem; opacity: 0.7; }
+.ldf-question { margin: 0 0 4px; font-weight: 600; }
+.ldf-verdict { margin-top: 12px; border-left: 3px solid var(--ink-soft, currentColor); padding: 4px 0 4px 10px; }
+.ldf-verdict .learn-offline { display: block; margin-top: 4px; }
+.ldf-missing { margin: 6px 0 0; font-style: italic; }
+.ldf-mcard h2 { margin: 4px 0 8px; font-size: 1.15rem; }
+.ldf-mcard p { margin: 0; }
+.ldf-summary { padding-left: 1.2em; margin: 12px 0 4px; }
+.ldf-saved { font-size: 0.85rem; opacity: 0.7; margin: 4px 0 0; }
+.ldf-actions { display: flex; gap: 12px; align-items: baseline; flex-wrap: wrap; }
+.ldf-link { margin-top: 12px; }
+@media (max-width: 480px) {
+  .ldf-pair { grid-template-columns: 1fr; }
+}

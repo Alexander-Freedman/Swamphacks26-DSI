@@ -16,8 +16,9 @@ const click = (name: string | RegExp) => fireEvent.click(screen.getByRole('butto
 describe('general chemistry session', () => {
   it('opens on a chapter menu', () => {
     render(<session.Component onDone={() => {}} />)
-    for (const h of ['Atoms', 'Bonding', 'Gases', 'Reactions', 'Acids and bases']) expect(screen.getByRole('heading', { name: h })).toBeTruthy()
+    expect(screen.getByRole('heading', { name: 'Bonding' })).toBeTruthy()
     expect((screen.getByRole('button', { name: /^Molecule shapes in 3D/ }) as HTMLButtonElement).disabled).toBe(false)
+    expect(screen.queryByText(/coming next/i)).toBeNull()
   })
 
   it('shapes: flat drawing first, then the 3D model; lone pairs change the shape', () => {

@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useRef, useState, type ReactNode } from 'react'
+import { readyTopics } from '../../components/subject/ready'
 import { EndBar, Frame, SessionHead, Title } from '../../components/session/Shell'
 import { record } from '../../notebook'
 import { BIO_MISTAKES, type BioMistake } from './mistakes'
@@ -39,16 +40,15 @@ function BioMenu({ onPick }: { onPick: (t: BioTopic) => void }) {
       </div>
       <Title h="What do you want to practice?" sub="Pick a chapter, then a topic." headingRef={title} />
       <div className="bio-menu">
-        {CHAPTERS.map((c) => (
+        {readyTopics(CHAPTERS).map((c) => (
           <section key={c.id} aria-labelledby={`bio-ch-${c.id}`}>
             <h3 id={`bio-ch-${c.id}`} className="bio-ch-title">{c.title}</h3>
             <p className="bio-ch-blurb">{c.blurb}</p>
             <div className="bio-topics">
               {c.topics.map((t) => (
-                <button key={t.id} className="bio-topic" disabled={!t.ready} onClick={() => onPick(t)} aria-describedby={`bio-t-${t.id}`}>
+                <button key={t.id} className="bio-topic" onClick={() => onPick(t)} aria-describedby={`bio-t-${t.id}`}>
                   <span className="bio-topic-title">{t.title}</span>
                   <span id={`bio-t-${t.id}`} className="bio-topic-blurb">{t.blurb}</span>
-                  {!t.ready && <span className="bio-soon">coming next</span>}
                 </button>
               ))}
             </div>

@@ -6,5 +6,7 @@ export const session: SessionDef = {
   title: 'Physics',
   blurb: 'Launch, push and spin things, then watch the laws behind them.',
   order: 5,
+  // Off Home until more of its topics are built; ?session= still opens it.
+  home: false,
   Component: PhysicsSession,
 }

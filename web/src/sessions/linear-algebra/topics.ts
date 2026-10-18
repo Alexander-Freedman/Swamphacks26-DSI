@@ -1,5 +1,5 @@
 // What you can practice in linear algebra, grouped by chapter so you pick on purpose. Topics not
-// built yet stay on the menu as "coming next" so the whole map of the subject is visible.
+// built yet are listed here (the map of the subject) but stay off the menu until built.
 
 export type LinTopic = { id: string; title: string; blurb: string; ready: boolean; step?: 'transform' }
 export type LinSection = { id: string; title: string; blurb: string; topics: LinTopic[] }

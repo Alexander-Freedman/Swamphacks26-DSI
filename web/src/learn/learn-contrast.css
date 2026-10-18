@@ -1,0 +1,14 @@
+/* Contrast screen: plain paper cards, 4px corners, a highlighter for the one difference. */
+.lcs-pair { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 16px; }
+.lcs-card {
+  background: var(--card, #fff); border: 1px solid var(--ink, #1b2340); border-radius: 4px; padding: 12px 14px;
+}
+.lcs-card-label { margin: 0 0 8px; font-size: 1rem; }
+.lcs-diff { margin: 0 0 8px; font-weight: 600; }
+.lcs-diff mark { background: var(--marker-soft, rgba(255, 216, 77, 0.45)); color: inherit; padding: 0 2px; }
+.lcs-detail { margin: 0; font-size: 0.85rem; color: var(--ink-soft, #4a5170); }
+.lcs-label { display: block; font-weight: 600; margin: 4px 0 6px; }
+
+@media (max-width: 600px) {
+  .lcs-pair { grid-template-columns: 1fr; }
+}
