@@ -1,7 +1,7 @@
 // Stage 3, Contrast: two pre-authored cases side by side, the one difference highlighted.
 // The learner writes a one-line "fix" for why they turn out differently. No model call.
 import type { StageProps } from './types'
-import './learn-contrast-stress.css'
+import './learn-contrast.css'
 
 export function ContrastScreen({ topic, state, update, next }: StageProps) {
   const cases = topic.rubric.contrastingCases.slice(0, 2)
