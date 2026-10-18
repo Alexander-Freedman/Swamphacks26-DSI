@@ -60,6 +60,10 @@ const EXTRA_LABELS: Record<string, string> = {
   'gradient-points-at-peak': 'Steepest = straight at the top',
   'gradient-is-height': 'Steeper the higher you go',
   'more-columns-more-volume': 'More columns = more volume',
+  // programming (sessions/programming/stack.ts STACK_MISTAKES)
+  'stack-depth-off': 'Miscounting the call stack',
+  'returns-before-calls': 'The first call finishes first',
+  'base-case-optional': 'A base case is optional',
   // orgo (sessions/orgo/chem.ts MISTAKES)
   'carbon-five-bonds': 'A carbon with 5 bonds',
   'hydrogen-two-bonds': 'Hydrogen with 2 bonds',
@@ -100,6 +104,12 @@ const EXTRA_LABELS: Record<string, string> = {
   'sideways-falls-slower': 'Moving sideways slows the fall',
   'zero-speed-at-top': 'A ball stops at the top of its arc',
   'steeper-goes-farther': 'Aiming higher always goes farther',
+  // linear algebra (sessions/linear-algebra/linalg.ts LIN_MISTAKES)
+  'rows-vs-columns': 'Reading a matrix by rows',
+  'squash-undoable': 'A squashed plane can be unsquashed',
+  // general chemistry (sessions/chemistry/vsepr.ts SHAPE_MISTAKES)
+  'flat-drawing-is-shape': 'The flat drawing is the real shape',
+  'lone-pairs-ignored': 'Ignoring the lone pairs',
   // biology (sessions/biology/mistakes.ts BIO_MISTAKES)
   'rna-has-thymine': 'Putting T in RNA',
   'copied-not-paired': 'Copying the base instead of pairing it',
