@@ -96,6 +96,10 @@ const EXTRA_LABELS: Record<string, string> = {
   'averages-keep-shape': 'Averages keep the original shape',
   'averages-flat': 'Every average is equally likely',
   'bigger-sample-wider': 'Bigger samples spread out more',
+  // physics (sessions/physics/projectile.ts PROJ_MISTAKES)
+  'sideways-falls-slower': 'Moving sideways slows the fall',
+  'zero-speed-at-top': 'A ball stops at the top of its arc',
+  'steeper-goes-farther': 'Aiming higher always goes farther',
 }
 
 function store(): Storage | null {
