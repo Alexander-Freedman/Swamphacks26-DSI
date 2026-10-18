@@ -38,7 +38,7 @@ function setup(Screen: ComponentType<StageProps>, topic: Topic, over: Partial<Le
 describe('GuessScreen', () => {
   it('asks about the topic, grades the guess, tags a known wrong idea, saves it all', async () => {
     const { next, state } = setup(GuessScreen, ci)
-    expect(screen.getByText(/What do you think makes compound interest work\?/)).toBeTruthy()
+    expect(screen.getByText(/In your own words: what is compound interest, and what makes it happen\?/)).toBeTruthy()
     expect(screen.getByRole('button', { name: 'Submit' }).hasAttribute('disabled')).toBe(true)
     fireEvent.change(screen.getByLabelText('guess answer'), { target: { value: 'you add 7% a single time and stop at $1,070' } })
     fireEvent.change(screen.getByLabelText('how sure'), { target: { value: '80' } })

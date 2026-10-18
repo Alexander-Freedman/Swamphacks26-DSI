@@ -24,7 +24,7 @@ export function GuessScreen({ topic, state, update, next, api }: StageProps) {
   return (
     <section className="learn-step lga" aria-label="guess">
       <p className="learn-instruction">Guess first. No looking anything up.</p>
-      <label className="lga-q" htmlFor="lga-guess">What do you think makes {topic.topic} work?</label>
+      <label className="lga-q" htmlFor="lga-guess">In your own words: what is {topic.topic}, and what makes it happen?</label>
       <textarea
         id="lga-guess"
         className="lga-pencil"
