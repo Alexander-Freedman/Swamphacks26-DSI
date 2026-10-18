@@ -48,11 +48,11 @@ describe('session card art on Home', () => {
     }
   })
 
-  it('keeps the any-topic box below the cards', () => {
+  it('leads with the Try any topic box, above the demo cards', () => {
     render(<App />)
     const cards = document.querySelector('.showcases.sessions')!
-    const forms = document.querySelectorAll('.home form, .home input')
-    expect(forms.length).toBeGreaterThan(0)
-    expect(cards.compareDocumentPosition(forms[0]) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy()
+    const box = document.querySelector('.home .learn-box')!
+    expect(box).toBeTruthy()
+    expect(box.compareDocumentPosition(cards) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy()
   })
 })

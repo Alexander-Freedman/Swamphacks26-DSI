@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
-import { AnyTopic, BuildReady } from './components/AnyTopic'
+import { BuildReady } from './components/AnyTopic'
 import { AskHelp } from './components/AskHelp'
 import { ITEM_SCREENS } from './components/helpHints'
 import { BackendDot } from './components/BackendDot'
@@ -22,18 +22,31 @@ import type { Round } from './types'
 import { useExtraRound } from './extras'
 import { misconceptionFor } from './verdict'
 import { LearnSession } from './learn/LearnSession'
+import { LearnTopicBox } from './learn/LearnTopicBox'
 import { HOME, onScreenChange, pushScreen, readScreen, replaceScreen, type Screen } from './url'
 import './App.css'
 
 const BEAT_MS = 400
 
-function Home({ onPick, onSession, onNotebook }: { onPick: (slug: string) => void; onSession: (slug: string) => void; onNotebook: () => void }) {
+function Home({
+  onPick,
+  onSession,
+  onLearn,
+  onNotebook,
+}: {
+  onPick: (slug: string) => void
+  onSession: (slug: string) => void
+  onLearn: (slug: string) => void
+  onNotebook: () => void
+}) {
   // Showcases with a session open that instead; only ones without one get a plain round button.
   const rounds = showcaseSlugs.filter((slug) => !sessionFor(slug))
   return (
     <div className="home sheet">
       <h1>See your thinking in layers.</h1>
       <p className="concept">Type any topic. Watch it come alive.</p>
+      <LearnTopicBox onOpen={onLearn} />
+      {homeSessions.length > 0 && <p className="demos-label">Or try a guided demo</p>}
       {homeSessions.length > 0 && (
         <div className="showcases sessions">
           {homeSessions.map((s, i) => {
@@ -71,7 +84,6 @@ function Home({ onPick, onSession, onNotebook }: { onPick: (slug: string) => voi
           ))}
         </div>
       )}
-      <AnyTopic onOpen={onPick} onSession={onSession} />
       <NotebookLink onOpen={onNotebook} />
     </div>
   )
@@ -264,6 +276,7 @@ export default function App() {
         <Home
           onPick={(slug) => go({ kind: 'round', slug })}
           onSession={(slug) => go({ kind: 'session', slug })}
+          onLearn={(slug) => go({ kind: 'learn', slug })}
           onNotebook={() => go({ kind: 'notebook' })}
         />
       )}
