@@ -417,3 +417,17 @@ def test_legacy_shape_still_routes_to_screens(glive) -> None:
     assert set(res.json()) == {"answer", "hint_only"}
     assert calls[0]["model"] == "gemini-3.5-flash-lite"
     assert calls[0]["system"] == help_chat.SYSTEM_PROMPT
+
+
+def test_generic_history_accepts_assistant_role(glive) -> None:
+    calls, _ = glive
+    body = {
+        **SN2,
+        "history": [
+            {"role": "user", "text": "hi"},
+            {"role": "assistant", "text": "Look at the arrow."},
+        ],
+    }
+    res = client.post("/api/help", json=body)
+    assert res.status_code == 200
+    assert "tutor: Look at the arrow." in calls[0]["prompt"]

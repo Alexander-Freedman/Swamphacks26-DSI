@@ -241,7 +241,7 @@ class HelpLayerIn(BaseModel):
 
 
 class HelpTurnIn(BaseModel):
-    role: Literal["user", "tutor"]
+    role: Literal["user", "tutor", "assistant"]  # the web panel sends "assistant"
     text: Annotated[str, _cut(400)]
 
 
