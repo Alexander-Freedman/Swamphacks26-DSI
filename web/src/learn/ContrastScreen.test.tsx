@@ -39,3 +39,15 @@ describe('ContrastScreen', () => {
     expect(last!.fix).toBe('interest earns interest')
   })
 })
+
+describe('contrast case text', () => {
+  it('splits a long case into one short line per sentence', async () => {
+    const { lines } = await import('./ContrastScreen')
+    expect(lines('On dark soil, 100 brown beetles start. Birds eat 60 green ones. In Case B, mud washes off.')).toEqual([
+      'On dark soil, 100 brown beetles start.',
+      'Birds eat 60 green ones.',
+      'In Case B, mud washes off.',
+    ])
+    expect(lines('Costs $1.50 each. 30% fail.')).toEqual(['Costs $1.50 each.', '30% fail.'])
+  })
+})

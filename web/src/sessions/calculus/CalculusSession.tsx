@@ -40,11 +40,12 @@ const REMIX: Record<string, string> = {
 const slopeWord = (s: number) => (Math.abs(s) < 0.05 ? 'flat' : s > 0 ? 'uphill' : 'downhill')
 
 /** Calculus is one guided path straight from Home: sketch the slope, drag the tangent, fill the area, see what your pencil got wrong. */
-export function CalculusSession({ onDone, topic = GUIDED }: { onDone: () => void; topic?: CalcTopic }) {
-  return <CalcRun topic={topic} onDone={onDone} />
+/** `embedded`: inside a Learn step, so don't scroll the whole page to the top between steps. */
+export function CalculusSession({ onDone, topic = GUIDED, embedded = false }: { onDone: () => void; topic?: CalcTopic; embedded?: boolean }) {
+  return <CalcRun topic={topic} onDone={onDone} embedded={embedded} />
 }
 
-function CalcRun({ topic, onDone }: { topic: CalcTopic; onDone: () => void }) {
+function CalcRun({ topic, onDone, embedded }: { topic: CalcTopic; onDone: () => void; embedded: boolean }) {
   const steps = topic.steps
   const [step, setStep] = useState(1)
   const [reached, setReached] = useState(1)
@@ -68,9 +69,9 @@ function CalcRun({ topic, onDone }: { topic: CalcTopic; onDone: () => void }) {
   const first = useRef(true)
   useEffect(() => {
     if (first.current) return void (first.current = false)
-    window.scrollTo?.({ top: 0 })
+    if (!embedded) window.scrollTo?.({ top: 0 })
     title.current?.focus({ preventScroll: true })
-  }, [step])
+  }, [step, embedded])
 
   // Saved when the mistake card is reached, so leaving early still keeps it.
   const saved = useRef(false)
