@@ -192,7 +192,10 @@ export const E2_CASE: Case = {
   name: 'HO⁻ + (CH₃)₃C–Br',
   picture: () => ({ scene: mechScene(RUNS.e2, 0), vh: RUNS.e2.vh }),
   parts: runParts,
-  names: runNames('e2'),
+  // a getter: mechs.ts and this file import each other through chem.ts, so read MECHS late
+  get names() {
+    return runNames('e2')
+  },
   partsSub: 'An elimination has three players: a base grabs an H, the substrate carbon holds the leaving group, and the leaving group breaks off with its bond’s electrons. Tap each one in HO⁻ + (CH₃)₃C–Br.',
   nuWord: 'base',
   words: { nucleophile: BASE_WORDS, electrophile: SUB_WORDS },
@@ -208,7 +211,10 @@ export const SN1_CASE: Case = {
   name: '(CH₃)₃C–Br in water, room temperature',
   picture: () => ({ scene: mechScene(RUNS.sn1, 0), vh: RUNS.sn1.vh }),
   parts: runParts,
-  names: runNames('sn1'),
+  // a getter: mechs.ts and this file import each other through chem.ts, so read MECHS late
+  get names() {
+    return runNames('sn1')
+  },
   partsSub: 'Every substitution has three players: the nucleophile brings electrons, the substrate carbon receives them, and the leaving group breaks off with its bond’s electrons. Here the nucleophile is water. Tap each one.',
   nuWord: 'nucleophile/base',
   cue: 'room temperature (no heat)',
@@ -224,7 +230,10 @@ export const E1_CASE: Case = {
   name: '(CH₃)₃C–Br in water, heated (Δ)',
   picture: () => ({ scene: mechScene(RUNS.e1, 0), vh: RUNS.e1.vh }),
   parts: runParts,
-  names: runNames('e1'),
+  // a getter: mechs.ts and this file import each other through chem.ts, so read MECHS late
+  get names() {
+    return runNames('e1')
+  },
   partsSub: 'An elimination has three players: a base grabs an H, the substrate carbon holds the leaving group, and the leaving group breaks off with its bond’s electrons. Here the base is water. Tap each one.',
   nuWord: 'nucleophile/base',
   cue: 'heated (Δ)',
