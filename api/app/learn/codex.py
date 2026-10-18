@@ -297,7 +297,7 @@ def extract_json(raw: str) -> dict:
 # ---------------------------------------------------------------------------
 def _quoted(prompt: str, label: str) -> str:
     """The learner text the prompt put under `label:` between triple quotes."""
-    m = re.search(re.escape(label) + r':\s*"""(.*?)"""', prompt, re.S)
+    m = re.search(re.escape(label) + r'(?: \([^)]*\))?:\s*"""(.*?)"""', prompt, re.S)
     return (m.group(1) if m else "").strip()
 
 
