@@ -2,13 +2,17 @@ import { useEffect, useMemo, useRef, useState } from 'react'
 import { computeTruth } from '../truth'
 import type { Confidence, Item } from '../types'
 import { Curve } from './Curve'
+import { CurvePredict } from './CurvePlay'
+import { playMode } from './curveMode'
 
 export type Answer = { value: number | null; optionId: string | null; confidence: Confidence }
 
 // No "how sure are you?" step any more (#194); answers keep a neutral confidence for old notebook entries.
 const NEUTRAL: Confidence = 'pretty sure'
 
-export function Predict({ item, onLock }: { item: Item; onLock: (a: Answer) => void }) {
+// v4: an engine v4 round, whose curve items are guessed on the picture itself (#184).
+export function Predict({ item, onLock, v4 = false }: { item: Item; onLock: (a: Answer) => void; v4?: boolean }) {
+  const mode = v4 ? playMode(item) : null
   const s = item.slider
   const [value, setValue] = useState<number | null>(s ? Math.round((s.min + s.max) / 2 / s.step) * s.step : null)
   const [touched, setTouched] = useState(false)
@@ -25,9 +29,21 @@ export function Predict({ item, onLock }: { item: Item; onLock: (a: Answer) => v
     <div>
       <h2 className="prompt" ref={promptRef} tabIndex={-1}>{item.prompt}</h2>
 
-      {item.input_type === 'slider' && s && <GuessPicture item={item} guess={touched ? value : null} />}
+      {mode && (
+        <CurvePredict
+          item={item}
+          mode={mode}
+          guess={touched ? value : null}
+          onGuess={(v) => {
+            setValue(v)
+            setTouched(true)
+          }}
+        />
+      )}
 
-      {item.input_type === 'slider' && s && (
+      {!mode && item.input_type === 'slider' && s && <GuessPicture item={item} guess={touched ? value : null} />}
+
+      {!mode && item.input_type === 'slider' && s && (
         <div className="slider-row">
           <div className="guess-readout" aria-live="polite">
             {touched ? value : '?'} <small>{s.unit}</small>

@@ -40,9 +40,11 @@ export function Compare(p: {
   const { cases, options, principle, detail, question = "What's the same about how these work?", onAnswer, children } = p
   const [pick, setPick] = useState<string | null>(null)
   const [text, setText] = useState('')
+  // No options (a generated round's compare): say it in your own words, then see the shared idea.
+  const [shown, setShown] = useState(false)
   const id = useId()
   const shared = useRef<HTMLDivElement>(null)
-  const answered = pick != null
+  const answered = pick != null || shown
   const picked = options.find((o) => o.id === pick)
 
   const answer = (o: CompareOption) => {
@@ -99,7 +101,20 @@ export function Compare(p: {
           placeholder="they both…"
           onChange={(e) => setText(e.target.value)}
         />
-        <p className="cmp-then">Then pick the closest:</p>
+        {options.length === 0 && (
+          <button
+            type="button"
+            className="cmp-opt cmp-show"
+            disabled={answered}
+            onClick={() => {
+              setShown(true)
+              onAnswer({ pick: '', right: true, text: text.trim() })
+            }}
+          >
+            Show the shared idea
+          </button>
+        )}
+        {options.length > 0 && <p className="cmp-then">Then pick the closest:</p>}
         <div className="cmp-opts">
           {options.map((o, i) => {
             const state = !answered ? '' : o.right ? ' right' : o.id === pick ? ' wrong' : ''
@@ -116,10 +131,10 @@ export function Compare(p: {
       <div className="cmp-shared" ref={shared} aria-live="polite">
         {answered && (
           <>
-            <p className="cmp-res">
+            {pick != null && <p className="cmp-res">
               {picked?.right ? <span className="cmp-ok">That's it.</span> : <span className="cmp-miss">Not quite.</span>}{' '}
               {!picked?.right && picked?.why}
-            </p>
+            </p>}
             {text.trim() && <p className="cmp-yours">You wrote: “{text.trim()}”</p>}
             <div className="cmp-ink">
               <div className="ss-tag">the shared idea</div>

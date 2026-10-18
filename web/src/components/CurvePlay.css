@@ -1,0 +1,18 @@
+/* v4 curve play (#184): the graph is the input; one instruction line under it, no grid. */
+.cplay { margin: 0 0 16px; }
+.cplay-cap { text-align: center; margin-top: 6px; min-height: 1.6em; font-size: 15px; }
+.cplay-do { color: var(--ink-soft); }
+.cplay-you { color: var(--pencil); font-size: 16px; }
+.cplay-you strong { color: var(--ink); }
+.cplay-reveal { margin: 0 0 8px; }
+.cplay-key { display: flex; flex-wrap: wrap; gap: 6px 18px; justify-content: center; margin: 6px 0 10px; font-size: 15px; }
+.cplay-ink { font-weight: 700; }
+.cplay-explore { border-top: 1.5px dashed var(--ink-soft); padding-top: 12px; margin: 8px 0 12px; }
+.cplay-knob { display: grid; gap: 4px; font-size: 15px; }
+.cplay-knob input { width: 100%; }
+.cplay-try { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; margin-top: 10px; }
+.cplay-try-h { font-size: 14px; color: var(--ink-soft); }
+.cplay-try button { font: inherit; font-size: 14px; padding: 6px 10px; border: 1.5px solid var(--ink); border-radius: var(--radius-ui); background: var(--card); color: var(--ink); cursor: pointer; }
+.cplay-try button[aria-pressed='true'] { background: var(--marker); }
+.cplay-watch { margin: 10px 0 0; font-size: 15px; }
+.cplay-notes { margin: 8px 0 0; padding-left: 18px; font-size: 14px; }

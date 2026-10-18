@@ -185,7 +185,13 @@ export async function loadExtraRound(slug: string): Promise<Round> {
   return round
 }
 
-export type Generated = { status: 'ok'; slug: string } | { status: 'fallback'; suggestions: string[] }
+// nearest: the API's closest ready topics ({slug, topic, kind}); reason: why nothing was built.
+export type Nearest = { slug: string; topic: string; kind?: string }
+export type Generated = { status: 'ok'; slug: string } | { status: 'fallback'; suggestions: string[]; reason?: string; nearest?: Nearest[] }
+
+// Shown when the API says nothing fits but gives no reason, and when the build ran past the wait.
+export const NO_FIT = 'No runnable model fits that topic yet.'
+export const TOO_SLOW = 'No model came back within 45 seconds.'
 
 /**
  * POST /api/rounds {topic}. The backend rate-limits and caps this; the browser only ever calls
@@ -197,7 +203,7 @@ export async function generateRound(topic: string, timeoutMs = GENERATE_TIMEOUT_
   const ctrl = new AbortController()
   const timer = setTimeout(() => ctrl.abort(), timeoutMs)
   try {
-    const body = await getJson<{ status: string; round?: Round; suggestions?: string[]; checks?: ChecksReport | null }>(`${api}/api/rounds`, {
+    const body = await getJson<{ status: string; round?: Round; suggestions?: string[]; checks?: ChecksReport | null; reason?: string; nearest?: Nearest[] }>(`${api}/api/rounds`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ topic }),
@@ -208,9 +214,11 @@ export async function generateRound(topic: string, timeoutMs = GENERATE_TIMEOUT_
       reports.set(body.round.slug, body.checks ?? null)
       return { status: 'ok', slug: body.round.slug }
     }
-    return { status: 'fallback', suggestions: body.suggestions ?? [] }
-  } catch {
-    return { status: 'fallback', suggestions: [] }
+    const nearest = (body.nearest ?? []).filter((n) => n && typeof n.slug === 'string')
+    return { status: 'fallback', suggestions: body.suggestions ?? nearest.map((n) => n.slug), reason: body.reason || NO_FIT, nearest }
+  } catch (err) {
+    const slow = (err as Error)?.name === 'AbortError'
+    return { status: 'fallback', suggestions: [], reason: slow ? TOO_SLOW : NO_FIT }
   } finally {
     clearTimeout(timer)
   }
@@ -222,7 +230,7 @@ export type Build =
   | { kind: 'idle' }
   | { kind: 'building'; topic: string }
   | { kind: 'ready'; topic: string; slug: string }
-  | { kind: 'failed'; topic: string; suggestions: string[] }
+  | { kind: 'failed'; topic: string; suggestions: string[]; reason?: string; nearest?: Nearest[] }
 
 let build: Build = { kind: 'idle' }
 const listeners = new Set<() => void>()
@@ -245,7 +253,11 @@ export async function startBuild(topic: string, timeoutMs?: number): Promise<voi
   if (build.kind === 'building') return
   setBuild({ kind: 'building', topic })
   const res = await generateRound(topic, timeoutMs)
-  setBuild(res.status === 'ok' ? { kind: 'ready', topic, slug: res.slug } : { kind: 'failed', topic, suggestions: res.suggestions })
+  setBuild(
+    res.status === 'ok'
+      ? { kind: 'ready', topic, slug: res.slug }
+      : { kind: 'failed', topic, suggestions: res.suggestions, reason: res.reason, nearest: res.nearest },
+  )
 }
 
 export function clearBuild(): void {
