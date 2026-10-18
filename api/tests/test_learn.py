@@ -561,3 +561,23 @@ def test_watch_numbers() -> None:
         -3,
     ]
     assert router._watch_numbers("CO2 at 10-20 ppm") == [10, 20]
+
+
+def test_rejected_visual_gets_one_retry_with_the_reason(monkeypatch) -> None:
+    real = codex.fake_reply
+    prompts_seen: list[str] = []
+
+    def reply(task, prompt):
+        if task != "visual":
+            return real(task, prompt)
+        prompts_seen.append(prompt)
+        good = real(task, prompt)
+        if len(prompts_seen) == 1:  # first try: a knob that does nothing
+            good["visual"]["spec"]["curve"]["expr"] = "A*(1+3/100)^x"
+        return good
+
+    monkeypatch.setattr(codex, "fake_reply", reply)
+    res = post("topics", topic="bacterial growth")
+    assert res.status_code == 200 and res.json()["visual"] is not None
+    assert len(prompts_seen) == 2
+    assert "REJECTED" in prompts_seen[1] and "knob" in prompts_seen[1]
