@@ -29,7 +29,7 @@ function Fake({ step, locked, guess }: { step: number; locked: boolean; guess?: 
   return <SessionHead chip="Positive test" step={step} total={6} labels={['a', 'b', 'c', 'd', 'e', 'f']} onGo={() => {}} help={{ screen: `P${step}`, locked, guess }} />
 }
 
-const open = () => fireEvent.click(screen.getByRole('button', { name: /^Stuck\? Ask/ }))
+const open = () => fireEvent.click(screen.getByRole('button', { name: /^Ask Onion/ }))
 const ask = (q: string) => {
   fireEvent.change(screen.getByLabelText('Your question'), { target: { value: q } })
   fireEvent.click(screen.getByRole('button', { name: 'Send' }))
@@ -40,14 +40,14 @@ describe('Ask panel (#186)', () => {
     vi.unstubAllEnvs()
     vi.stubEnv('VITE_API_BASE', undefined as unknown as string)
     render(<AskHelp slug="positive-test" kind="round" spot={{ locked: false }} />)
-    expect(screen.queryByRole('button', { name: /^Stuck\? Ask/ })).toBeNull()
+    expect(screen.queryByRole('button', { name: /^Ask Onion/ })).toBeNull()
     fireEvent.keyDown(window, { key: '?' })
     expect(screen.queryByRole('dialog')).toBeNull()
   })
 
   it('is hidden for a topic the help API does not know', () => {
     render(<AskHelp slug="monty-hall" kind="round" spot={{ locked: false }} />)
-    expect(screen.queryByRole('button', { name: /^Stuck\? Ask/ })).toBeNull()
+    expect(screen.queryByRole('button', { name: /^Ask Onion/ })).toBeNull()
   })
 
   it('sends the session, screen, locked flag and guess from the shell', async () => {
@@ -108,7 +108,7 @@ describe('Ask panel (#186)', () => {
     open()
     ask('first')
     expect(screen.getByText('thinking…')).toBeTruthy()
-    expect((screen.getByRole('button', { name: 'Asking…' }) as HTMLButtonElement).disabled).toBe(true)
+    expect((screen.getByRole('button', { name: 'Onion is thinking…' }) as HTMLButtonElement).disabled).toBe(true)
     fireEvent.change(screen.getByLabelText('Your question'), { target: { value: 'second' } })
     fireEvent.keyDown(screen.getByLabelText('Your question'), { key: 'Enter' })
     expect(helpCalls()).toHaveLength(1)
@@ -138,6 +138,6 @@ describe('Ask panel (#186)', () => {
     expect(document.activeElement).toBe(screen.getByLabelText('Your question'))
     fireEvent.keyDown(document.activeElement!, { key: 'Escape' })
     expect(screen.queryByRole('dialog')).toBeNull()
-    await waitFor(() => expect(document.activeElement).toBe(screen.getByRole('button', { name: /^Stuck\? Ask/ })))
+    await waitFor(() => expect(document.activeElement).toBe(screen.getByRole('button', { name: /^Ask Onion/ })))
   })
 })
