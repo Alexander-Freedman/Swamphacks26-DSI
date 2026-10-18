@@ -27,6 +27,12 @@ if [ -n "${VITE_API_BASE:-}" ]; then
   echo "deploy-pages: API base $VITE_API_BASE"
 fi
 
+# Optional: PAGES_CNAME=onionskin.study serves the site on a custom domain. Only set it once the
+# domain's DNS points at GitHub Pages: with a CNAME file, github.io redirects to the domain.
+if [ -n "${PAGES_CNAME:-}" ]; then
+  export VITE_BASE=/   # the custom domain serves from the root, not /Swamphacks26-DSI/
+  echo "deploy-pages: custom domain $PAGES_CNAME (base /)"
+fi
 (cd web && npm ci --no-audit --no-fund >/dev/null && npm run build)
 
 out="$(mktemp -d)"
@@ -47,6 +53,7 @@ fi
 python3 -c 'import json,pathlib; print(json.dumps([{"slug": d["slug"], "topic": d["topic"], "aliases": d.get("aliases", [])} for d in (json.loads(p.read_text()) for p in sorted(pathlib.Path("data/rounds/extra").glob("*.json"))) if d.get("reviewed")]))' \
   > "$out/rounds/extra/index.json"
 touch "$out/.nojekyll"
+if [ -n "${PAGES_CNAME:-}" ]; then echo "$PAGES_CNAME" > "$out/CNAME"; fi
 cp "$out/index.html" "$out/404.html"   # deep links fall back to the app
 
 if grep -rlE 'AIza[0-9A-Za-z_-]{30,}|sk-[A-Za-z0-9_-]{20,}' "$out" >/dev/null 2>&1; then
