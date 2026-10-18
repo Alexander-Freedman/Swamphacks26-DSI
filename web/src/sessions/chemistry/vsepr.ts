@@ -21,7 +21,7 @@ export type Molecule = {
   formula: string
   name: string
   center: 'C' | 'N' | 'O'
-  /** which tetrahedron corners hold H atoms; the rest hold lone pairs */
+  /** how many H atoms; the remaining tetrahedron corners (the top ones) hold lone pairs */
   bonds: number
   shape: Shape
   angle: number
@@ -47,7 +47,8 @@ export const SHAPE_NAME: Record<Shape, string> = {
  * push the bonds together, so the directions are pulled toward their mean before drawing.
  */
 export function bondDirs(m: Molecule): P3[] {
-  const dirs = TETRA.slice(0, m.bonds)
+  // lone pairs take the top corners (drawn on top, as in textbooks); H atoms the rest
+  const dirs = TETRA.slice(4 - m.bonds)
   if (m.bonds === 4) return dirs
   // squeeze each bond toward the bonds' average until the pair angle matches
   const avg = n(dirs.reduce<P3>((s, d) => [s[0] + d[0], s[1] + d[1], s[2] + d[2]], [0, 0, 0]))
@@ -65,7 +66,7 @@ export function bondDirs(m: Molecule): P3[] {
 }
 
 /** Where the lone pairs sit: the tetrahedron corners the H atoms don't use. */
-export const lonePairDirs = (m: Molecule): P3[] => TETRA.slice(m.bonds)
+export const lonePairDirs = (m: Molecule): P3[] => TETRA.slice(0, 4 - m.bonds)
 
 export type ShapeMistake = 'flat-drawing-is-shape' | 'lone-pairs-ignored'
 

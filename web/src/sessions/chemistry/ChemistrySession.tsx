@@ -189,7 +189,7 @@ function project(p: P3, v: View) {
   const sp = Math.sin(v.pitch)
   const y2 = y * cp - z1 * sp
   const z2 = y * sp + z1 * cp
-  return { x: W / 2 + x1 * 110, y: H / 2 - y2 * 110, depth: z2 }
+  return { x: W / 2 + x1 * 132, y: H / 2 + 14 - y2 * 132, depth: z2 }
 }
 
 /** The real molecule: ball and stick, lone pairs as clouds. Turns by itself until you grab it. */
