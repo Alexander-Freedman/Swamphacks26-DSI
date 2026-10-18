@@ -45,10 +45,10 @@ function Calc({ layer }: { layer?: LayerReport }) {
     </>
   )
 }
-const button = () => screen.getByRole('button', { name: /^Stuck\? Ask/ })
+const button = () => screen.getByRole('button', { name: /^Ask Onion/ })
 
 describe('Ask panel on any layer (#243)', () => {
-  it('is collapsed to a small "Stuck? Ask" button by default', () => {
+  it('is collapsed to a small "Ask Onion" button by default', () => {
     render(<><Calc layer={LAYER} /><AskHelp slug="calculus" kind="session" subject="Calculus" /></>)
     expect(button().getAttribute('aria-expanded')).toBe('false')
     expect(screen.queryByRole('dialog')).toBeNull()

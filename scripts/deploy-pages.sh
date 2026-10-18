@@ -52,6 +52,13 @@ if compgen -G "data/rounds/extra/*.json" >/dev/null; then
 fi
 python3 -c 'import json,pathlib; print(json.dumps([{"slug": d["slug"], "topic": d["topic"], "aliases": d.get("aliases", [])} for d in (json.loads(p.read_text()) for p in sorted(pathlib.Path("data/rounds/extra").glob("*.json"))) if d.get("reviewed")]))' \
   > "$out/rounds/extra/index.json"
+# Prebuilt Learn topics ship at /learn/ (index = slug, topic, checked) so ?learn= opens with no backend.
+mkdir -p "$out/learn"
+if compgen -G "data/learn/*.json" >/dev/null; then
+  cp data/learn/*.json "$out/learn/"
+fi
+python3 -c 'import json,pathlib; print(json.dumps([{"slug": d["slug"], "topic": d["topic"], "checked": d.get("checked", False)} for d in (json.loads(p.read_text()) for p in sorted(pathlib.Path("data/learn").glob("*.json")))]))' \
+  > "$out/learn/index.json"
 touch "$out/.nojekyll"
 if [ -n "${PAGES_CNAME:-}" ]; then echo "$PAGES_CNAME" > "$out/CNAME"; fi
 cp "$out/index.html" "$out/404.html"   # deep links fall back to the app

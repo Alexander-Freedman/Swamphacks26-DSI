@@ -42,7 +42,7 @@ const LAYERS: Partial<Record<OrgoStep, Omit<LayerReport, 'facts'>>> = {
 
 /** The SN2 layer for this step, for the topics that work HO⁻ + CH₃Br. */
 export function sn2Layer(topicId: string, step: OrgoStep, layerN: number): LayerReport | undefined {
-  if (topicId !== 'sn2' && topicId !== 'full') return undefined
+  if (topicId !== 'sn2' && topicId !== 'full' && topicId !== 'path') return undefined
   const l = LAYERS[step]
   return l && { ...l, facts: SN2_FACTS, subject: 'Organic chemistry', topic: 'SN2: HO⁻ + CH₃Br', layerN }
 }

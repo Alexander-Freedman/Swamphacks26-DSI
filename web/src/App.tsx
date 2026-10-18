@@ -21,6 +21,7 @@ import { computeTruth, type Computed } from './truth'
 import type { Round } from './types'
 import { useExtraRound } from './extras'
 import { misconceptionFor } from './verdict'
+import { LearnSession } from './learn/LearnSession'
 import { HOME, onScreenChange, pushScreen, readScreen, replaceScreen, type Screen } from './url'
 import './App.css'
 
@@ -219,6 +220,16 @@ export default function App() {
     replaceScreen(HOME)
     setScreen(HOME)
   })
+  if (screen.kind === 'learn') {
+    return (
+      <main className="app">
+        <header className="topbar">
+          <button className="logo" style={{ border: 0, background: 'none', padding: 0 }} onClick={home}>Onionskin</button>
+        </header>
+        <LearnSession key={screen.slug} slug={screen.slug} onDone={home} />
+      </main>
+    )
+  }
   if (session) {
     return (
       <main className="app">

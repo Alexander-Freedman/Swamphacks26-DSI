@@ -1,0 +1,125 @@
+{
+  "slug": "base-rates-and-false-positives",
+  "topic": "base rates and false positives",
+  "checked": true,
+  "rubric": {
+    "entities": [
+      "The total number of people being tested",
+      "The base rate: the fraction of tested people who truly have the condition before seeing a test result",
+      "True cases: people who truly have the condition",
+      "Non-cases: people who truly do not have the condition",
+      "Sensitivity: the fraction of true cases that test positive",
+      "False-positive rate: the fraction of non-cases that incorrectly test positive",
+      "Positive test results, made of true positives plus false positives",
+      "The probability that a person with a positive result truly has the condition"
+    ],
+    "causalLinks": [
+      "Holding test accuracy and total tested people fixed, increasing the base rate increases the number of true cases, so it increases true positives among positive results.",
+      "Holding sensitivity fixed, increasing the number of true cases increases true positives because sensitivity detects a fixed fraction of true cases.",
+      "Holding the false-positive rate fixed, increasing the number of non-cases increases false positives because that error occurs in a fixed fraction of non-cases.",
+      "Holding the base rate fixed, increasing sensitivity increases true positives and therefore increases the chance that a positive result is genuine.",
+      "Holding the base rate fixed, increasing the false-positive rate increases false positives and therefore decreases the chance that a positive result is genuine.",
+      "When the condition is rare, non-cases vastly outnumber true cases; even a small false-positive rate can then produce more false positives than true positives."
+    ],
+    "coreRule": "For a positive test result, the chance the person truly has the condition equals true positives divided by all positive results: (base rate × sensitivity) ÷ [(base rate × sensitivity) + ((1 − base rate) × false-positive rate)]. Equivalently, imagine a large group: count genuine positives from true cases, count mistaken positives from non-cases, then divide genuine positives by their sum.",
+    "whyRuleMatters": "A positive result can arise through two different causal paths: the person has the condition and the test detects it, or the person lacks it and the test makes an error. The result must therefore be judged by the relative numbers flowing through both paths. Comparing only the test's error rate ignores how many far more numerous non-cases are available to generate false alarms.",
+    "whyRuleQuestion": "Why must you count positives coming from people without the condition as well as positives coming from people with it, instead of treating a 99% accurate-looking positive test as a 99% chance of having the condition?",
+    "anchorDescription": "Suppose 10,000 people are tested for a condition that only 10 of them truly have. A test that falsely labels 1% of people without the condition as positive will create about 100 false positive results from the 9,990 people who do not have it.",
+    "anchorPrompt": "Before considering how well the test detects true cases, what does this anchor fact suggest about whether a positive result is automatically strong evidence in this group?",
+    "contrastingCases": [
+      {
+        "label": "Rare condition, same test",
+        "detail": "A condition is present in 1 out of every 1,000 people. Among 100,000 tested people, 100 truly have it and 99,900 do not. The test detects 99 of the 100 true cases and falsely reports positive for 1% of non-cases, creating 999 false positives. Of the 1,098 positive results, only 99 are genuine, so a positive result means about a 9% chance of truly having the condition.",
+        "oneLine": "Rare condition: most positive results are false alarms."
+      },
+      {
+        "label": "Common condition, same test",
+        "detail": "The same test is used where the condition is present in 100 out of every 1,000 people. Among 100,000 tested people, 10,000 truly have it and 90,000 do not. The test detects 9,900 true cases and falsely reports positive for 1% of non-cases, creating 900 false positives. Of the 10,800 positive results, 9,900 are genuine, so a positive result means about a 92% chance of truly having the condition.",
+        "oneLine": "Common condition: most positive results are genuine."
+      },
+      {
+        "label": "Same rarity, lower false-positive rate",
+        "detail": "A condition is present in 1 out of every 1,000 people among 100,000 tested people. The test still detects 99 of the 100 true cases, but it falsely reports positive for 0.01% rather than 1% of the 99,900 non-cases, creating about 10 false positives. Of about 109 positive results, 99 are genuine, so a positive result means about a 91% chance of truly having the condition.",
+        "oneLine": "Rare condition, near-zero false alarms: positives become convincing."
+      }
+    ],
+    "extremeCaseDimensions": [
+      {
+        "key": "base-rate-near-zero",
+        "description": "Push the condition's base rate toward zero while sensitivity and the false-positive rate remain nonzero. Genuine positives become extremely scarce, while false positives from the much larger non-case group can dominate; the chance that a positive is genuine approaches zero."
+      },
+      {
+        "key": "false-positive-rate-near-zero",
+        "description": "Push the false-positive rate toward zero while the base rate and sensitivity remain positive. Almost no non-cases enter the positive-result pool, so nearly every positive result is genuine."
+      },
+      {
+        "key": "sensitivity-near-zero",
+        "description": "Push sensitivity toward zero while the base rate and false-positive rate remain positive. Almost no true cases are detected, but false positives still occur among non-cases; the chance that a positive is genuine approaches zero."
+      },
+      {
+        "key": "base-rate-near-one",
+        "description": "Push the condition's base rate toward one while sensitivity remains positive. Almost everyone tested truly has the condition and there are very few non-cases available to create false positives; the chance that a positive is genuine approaches one."
+      }
+    ],
+    "confusableNeighbors": [
+      {
+        "key": "sensitivity",
+        "label": "Sensitivity",
+        "question": "How is a test's sensitivity different from the chance that someone with a positive result truly has the condition?",
+        "correctDistinction": "Sensitivity starts with people who truly have the condition and asks what fraction test positive. The chance a positive is genuine starts with positive test results and asks what fraction are true cases; it depends on sensitivity, the false-positive rate, and the base rate."
+      },
+      {
+        "key": "specificity",
+        "label": "Specificity",
+        "question": "How is specificity related to, but not the same as, the chance that a positive result is genuine?",
+        "correctDistinction": "Specificity is the fraction of people without the condition who test negative; its complement is the false-positive rate. Higher specificity lowers false positives and usually makes positives more trustworthy, but the chance a positive is genuine also depends on the base rate and sensitivity."
+      }
+    ],
+    "transferStructuralRequirements": [
+      "There must be a hidden target state that is genuinely present in some cases and absent in others.",
+      "The target state must have a prior prevalence or base rate before an observed positive signal.",
+      "A detection or decision process must produce positive signals from some true cases.",
+      "The same process must also produce positive signals from some non-cases through errors or an alternative path.",
+      "To judge a positive signal, the analogy must compare the number of true-origin positives with the total of true-origin and false-origin positives, not merely quote one error rate."
+    ],
+    "referenceTransferExample": "A company's fraud-monitoring system reviews 1,000,000 purchases. Only 100 purchases are actually fraudulent. It flags 95 of those fraudulent purchases, but it also flags 0.1% of the 999,900 legitimate purchases, or about 1,000 legitimate purchases. Thus about 1,095 purchases are flagged, and only 95 are fraud: a flag is evidence worth investigating, but it is not close to proof because legitimate purchases are so numerous."
+  },
+  "misconceptions": [
+    {
+      "id": "accuracy-is-my-chance",
+      "label": "“A 99% test means I’m 99% likely to have it.”",
+      "tell": "They say that a positive result from a highly accurate test directly gives the same probability of having the condition.",
+      "fix": "Test accuracy describes performance across a population, not the makeup of the positive-result group. A positive result's meaning also depends on how common the condition is and how many non-cases can generate false positives."
+    },
+    {
+      "id": "ignore-non-cases",
+      "label": "“A 1% false-positive rate is negligible.”",
+      "tell": "They predict that a 1% false-positive rate cannot matter much, regardless of how rare the condition is.",
+      "fix": "One percent of a huge non-case group can be a large number. Compare that number of false positives with the number of detected true cases."
+    },
+    {
+      "id": "reverse-sensitivity",
+      "label": "“Detection rate equals positive-result reliability.”",
+      "tell": "They treat “the test detects 99% of true cases” as meaning “99% of positive results are true.”",
+      "fix": "These condition on different groups. Detection rate begins with true cases; positive-result reliability begins with positive results, which include false positives from non-cases."
+    }
+  ],
+  "extremeCases": [
+    {
+      "dimension": "base-rate-near-zero",
+      "scenario": "One person in 1,000,000 truly has a condition. A test detects 99% of true cases and falsely reports positive for 1% of people without the condition.",
+      "correctBehavior": "Among 1,000,000 tested people, there is about 1 genuine positive but about 10,000 false positives. A positive result is therefore overwhelmingly likely to be false."
+    },
+    {
+      "dimension": "false-positive-rate-near-zero",
+      "scenario": "One in 1,000 people truly has a condition. A test detects 99% of true cases and falsely reports positive for only 1 in 1,000,000 people without the condition.",
+      "correctBehavior": "Among 1,000,000 tested people, about 990 genuine positives and about 1 false positive occur. Nearly every positive result is genuine."
+    },
+    {
+      "dimension": "sensitivity-near-zero",
+      "scenario": "One in 100 people truly has a condition. A test detects only 1% of true cases and falsely reports positive for 1% of people without the condition.",
+      "correctBehavior": "Among 10,000 tested people, about 1 true positive and about 99 false positives occur. A positive result is unlikely to be genuine despite the condition not being extremely rare."
+    }
+  ],
+  "visual": null
+}

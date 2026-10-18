@@ -4,6 +4,8 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { entries, labelFor } from '../../notebook'
 import { MISTAKES } from './chem'
 import { session } from './index'
+import { OrgoSession } from './OrgoSession'
+import { TOPICS } from './topics'
 
 beforeEach(() => {
   localStorage.clear()
@@ -23,9 +25,8 @@ const choose = (label: string, text: string) => {
   fireEvent.change(sel, { target: { value: String(i) } })
 }
 
-/** Orgo opens on the topic menu; most tests take the guided path through all three steps. */
-const pickTopic = (title: RegExp) => fireEvent.click(screen.getByRole('button', { name: title }))
-const guidedPath = () => pickTopic(/^Start to finish/)
+/** Home opens the short guided path; the other topics are still playable by passing them in. */
+const topicFor = (title: RegExp) => TOPICS.find((t) => title.test(`${t.title} ${t.blurb}`))!
 
 /** Work out HO⁻ + CH₃Br the right way: tap the three parts, answer the three questions, pick SN2. */
 function analyzeSN2() {
@@ -52,9 +53,7 @@ function buildEthanol() {
 describe('orgo session', () => {
   it('build → push → compare, saved to the notebook with the mistakes caught', () => {
     vi.useFakeTimers()
-    const C = session.Component
-    render(<C onDone={() => {}} />)
-    guidedPath()
+    render(<OrgoSession onDone={() => {}} topic={topicFor(/^Start to finish/)} />)
     expect(screen.getByText('Build ethanol')).toBeTruthy()
 
     // a carbon with 5 bonds is named live and on check
@@ -115,8 +114,7 @@ describe('orgo session', () => {
   }, 60000)
 
   it('names dimethyl ether: same formula, different molecule', () => {
-    render(<session.Component onDone={() => {}} />)
-    guidedPath()
+    render(<OrgoSession onDone={() => {}} topic={topicFor(/^Start to finish/)} />)
     add('carbon')
     add('oxygen')
     add('carbon')
@@ -131,8 +129,7 @@ describe('orgo session', () => {
 
   it('names the wrong arrows, and a clean run ends mastered', () => {
     vi.useFakeTimers()
-    render(<session.Component onDone={() => {}} />)
-    guidedPath()
+    render(<OrgoSession onDone={() => {}} topic={topicFor(/^Start to finish/)} />)
     buildEthanol()
     fireEvent.click(screen.getByText('Check it'))
     fireEvent.click(screen.getByText('Find the parts →'))
@@ -152,8 +149,7 @@ describe('orgo session', () => {
 
   it('a session with no mistakes ends with a quiet mastered check', () => {
     vi.useFakeTimers()
-    render(<session.Component onDone={() => {}} />)
-    guidedPath()
+    render(<OrgoSession onDone={() => {}} topic={topicFor(/^Start to finish/)} />)
     buildEthanol()
     fireEvent.click(screen.getByText('Check it'))
     fireEvent.click(screen.getByText('Find the parts →'))
@@ -173,8 +169,7 @@ describe('orgo session', () => {
   }, 60000)
 
   it('Undo steps back one change at a time (button and Ctrl+Z), and a right build shows a big check', () => {
-    render(<session.Component onDone={() => {}} />)
-    guidedPath()
+    render(<OrgoSession onDone={() => {}} topic={topicFor(/^Start to finish/)} />)
     const undo = screen.getByRole('button', { name: /Undo/ }) as HTMLButtonElement
     expect(undo.disabled).toBe(true)
     add('carbon')
@@ -208,12 +203,18 @@ describe('orgo session', () => {
     expect(document.querySelector('.og-correct')).toBeNull()
   })
 
-  it('opens on a topic menu: sections and every mechanism playable', () => {
+  it('opens straight on the guided path: build ethanol, then the SN2 arrows (no menu)', () => {
+    vi.useFakeTimers()
     render(<session.Component onDone={() => {}} />)
-    expect(screen.getByText('What do you want to practice?')).toBeTruthy()
-    for (const sec of ['Molecules', 'Mechanisms', 'Guided path']) expect(screen.getByRole('heading', { name: sec })).toBeTruthy()
-    for (const t of [/^SN2 One/, /^SN1/, /^E2 One/, /^E1/, /^SN2 vs E2/]) expect((screen.getByRole('button', { name: t }) as HTMLButtonElement).disabled).toBe(false)
+    expect(screen.queryByText('What do you want to practice?')).toBeNull()
     expect(screen.queryByText('coming next')).toBeNull()
+    expect(screen.getByText('Build ethanol')).toBeTruthy()
+    expect(screen.getByText('1 of 2')).toBeTruthy()
+    buildEthanol()
+    fireEvent.click(screen.getByText('Check it'))
+    fireEvent.click(screen.getByText(/→$/))
+    expect(screen.getByText('2 of 2')).toBeTruthy()
+    expect(screen.getByRole('heading', { name: 'Show how the electrons move' })).toBeTruthy()
   })
 
   const arrow = (from: string, to: string) => {
@@ -239,8 +240,7 @@ describe('orgo session', () => {
 
   it('Mechanisms > SN1: attacking first is named, then step 2 is drawn on the carbocation', () => {
     vi.useFakeTimers()
-    render(<session.Component onDone={() => {}} />)
-    pickTopic(/^SN1/)
+    render(<OrgoSession onDone={() => {}} topic={topicFor(/^SN1/)} />)
     workItOut('O of water', /^Weak/, /^SN1/)
     expect(screen.getByText('SN1, step 1: the slow step')).toBeTruthy()
     arrow('lone pair on O of water (lower left)', 'central C')
@@ -259,8 +259,7 @@ describe('orgo session', () => {
 
   it('Mechanisms > E2: the base on the carbon is named as SN2; three right arrows match', () => {
     vi.useFakeTimers()
-    render(<session.Component onDone={() => {}} />)
-    pickTopic(/^E2/)
+    render(<OrgoSession onDone={() => {}} topic={topicFor(/^E2/)} />)
     workItOut('O of hydroxide', /^Strong/, /^E2/)
     arrow('lone pair on O of hydroxide (right)', 'central C')
     watch()
@@ -276,8 +275,7 @@ describe('orgo session', () => {
 
   it('Mechanisms > SN2 vs E2: predict each path, both run, the wrong pick is named', () => {
     vi.useFakeTimers()
-    render(<session.Component onDone={() => {}} />)
-    pickTopic(/^SN2 vs E2/)
+    render(<OrgoSession onDone={() => {}} topic={topicFor(/^SN2 vs E2/)} />)
     const run = screen.getByText('Run both') as HTMLButtonElement
     expect(run.disabled).toBe(true)
     const paths = screen.getAllByRole('group', { name: /pick a path/ })
@@ -294,8 +292,7 @@ describe('orgo session', () => {
 
   it('Mechanisms > E1: two steps, the H comes off the carbon next to C⁺', () => {
     vi.useFakeTimers()
-    render(<session.Component onDone={() => {}} />)
-    pickTopic(/^E1/)
+    render(<OrgoSession onDone={() => {}} topic={topicFor(/^E1/)} />)
     workItOut('O of water', /^Weak/, /^E1/)
     arrow('central C–Br bond', 'Br')
     watch()
@@ -313,8 +310,7 @@ describe('orgo session', () => {
       [/^SN1/, /^E1/, 'e1-without-heat', 'room temperature (no heat)'],
       [/^E1/, /^SN1/, 'sn1-with-heat', 'heated (Δ)'],
     ] as const) {
-      const { unmount } = render(<session.Component onDone={() => {}} />)
-      pickTopic(topic)
+      const { unmount } = render(<OrgoSession onDone={() => {}} topic={topicFor(topic)} />)
       expect(screen.getByText(/Here the (nucleophile|base) is water/)).toBeTruthy()
       for (const n of ['O of water', 'central C', 'Br']) fireEvent.click(screen.getByRole('button', { name: n }))
       fireEvent.click(screen.getByText('Size them up →'))
@@ -336,8 +332,7 @@ describe('orgo session', () => {
   })
 
   it('E2: a strong base on a 3° carbon; waiting for a carbocation is named', () => {
-    render(<session.Component onDone={() => {}} />)
-    pickTopic(/^E2/)
+    render(<OrgoSession onDone={() => {}} topic={topicFor(/^E2/)} />)
     expect(screen.getByText(/Tap the base/)).toBeTruthy()
     for (const n of ['O of hydroxide', 'central C', 'Br']) fireEvent.click(screen.getByRole('button', { name: n }))
     fireEvent.click(screen.getByText('Size them up →'))
@@ -350,8 +345,7 @@ describe('orgo session', () => {
   })
 
   it('Molecules > Build ethanol is just the build, then Finish', () => {
-    render(<session.Component onDone={() => {}} />)
-    pickTopic(/^Build ethanol/)
+    render(<OrgoSession onDone={() => {}} topic={topicFor(/^Build ethanol/)} />)
     expect(screen.getByText('Orgo · Build ethanol')).toBeTruthy()
     expect(screen.getByText('1 of 1')).toBeTruthy()
     buildEthanol()
@@ -361,20 +355,16 @@ describe('orgo session', () => {
     expect(entries()[0]).toMatchObject({ session: 'orgo', orgoTopic: 'build-ethanol', misconception: null })
   })
 
-  it('Mechanisms > SN2 works it out before the arrows, and the topics link goes back to the menu', () => {
-    render(<session.Component onDone={() => {}} />)
-    pickTopic(/^SN2 One/)
+  it('Mechanisms > SN2 works it out before the arrows', () => {
+    render(<OrgoSession onDone={() => {}} topic={topicFor(/^SN2 One/)} />)
     expect(screen.getByText('Find the parts')).toBeTruthy()
     expect(screen.getByText('1 of 4')).toBeTruthy()
     expect(screen.queryByText('Build ethanol')).toBeNull()
-    fireEvent.click(screen.getByText('← All orgo topics'))
-    expect(screen.getByText('What do you want to practice?')).toBeTruthy()
   })
 
   it('SN2 step by step: parts, size up (wrong answers named), the chart, then arrows and Finish', () => {
     vi.useFakeTimers()
-    render(<session.Component onDone={() => {}} />)
-    pickTopic(/^SN2 One/)
+    render(<OrgoSession onDone={() => {}} topic={topicFor(/^SN2 One/)} />)
     // parts: a wrong tap gets a hint, not a pass
     expect(screen.getByText(/Tap the nucleophile/)).toBeTruthy()
     fireEvent.click(screen.getByRole('button', { name: 'H of hydroxide' }))

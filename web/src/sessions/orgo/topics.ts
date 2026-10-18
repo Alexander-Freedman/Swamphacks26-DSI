@@ -48,3 +48,6 @@ export const SECTIONS: OrgoSection[] = [
 
 export const TOPICS: OrgoTopic[] = SECTIONS.flatMap((s) => s.topics)
 export const topicById = (id: string | null) => TOPICS.find((t) => t.id === id && t.ready) ?? null
+
+/** What the Organic chemistry card on Home opens: one path, no menu (plan Sat ~9:55 PM). */
+export const GUIDED: OrgoTopic = { id: 'path', title: 'Build → arrows', blurb: 'Build ethanol, then draw the SN2 arrows and watch them run.', steps: ['build', 'push'], ready: true }

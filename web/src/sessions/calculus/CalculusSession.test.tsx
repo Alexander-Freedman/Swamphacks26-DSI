@@ -3,6 +3,8 @@ import { cleanup, fireEvent, render, screen } from '@testing-library/react'
 import { afterEach, beforeAll, describe, expect, it, vi } from 'vitest'
 import { entries, notebook } from '../../notebook'
 import { session } from './index'
+import { CalculusSession } from './CalculusSession'
+import { TOPICS } from './topics'
 import { f, fPrime } from './math'
 import { boxes } from './slopeGeo'
 import { sy } from './plot'
@@ -31,11 +33,11 @@ function draw(g: (x: number) => number) {
   fireEvent.pointerUp(pad, { pointerId: 1 })
 }
 
-const pickTopic = (name: RegExp) => fireEvent.click(screen.getByRole('button', { name }))
+/** Home opens the short guided path; the other topics are still playable by passing them in. */
+const topicFor = (title: RegExp) => TOPICS.find((t) => t.ready && title.test(t.title))!
 
 function playThrough(g: (x: number) => number, guess: number) {
-  render(<Session onDone={() => {}} />)
-  pickTopic(/^Start to finish/)
+  render(<CalculusSession onDone={() => {}} topic={topicFor(/^Start to finish/)} />)
   expect(screen.getByText('Draw the slope.')).toBeTruthy()
   expect((screen.getByText('Check it with a tangent →') as HTMLButtonElement).disabled).toBe(true)
   draw(g)
@@ -115,21 +117,18 @@ describe('calculus session', () => {
     for (const w of [/\bbet(s|ting)?\b/, /lock it in/, /called it/, /how sure/, /\bxp\b/, /\d+\s*(pts|points?)\b/, /\bscore\b/]) expect(text).not.toMatch(w) // scores, not "a point on the curve"
   })
 
-  it('opens on a course menu that lists only the built topics', () => {
+  it('opens straight on the guided path: slope sketch, tangent, area, card (no menu)', () => {
     localStorage.clear()
     render(<Session onDone={() => {}} />)
-    expect(screen.getByText('What do you want to practice?')).toBeTruthy()
-    for (const c of ['Calc 1', 'Calc 3']) expect(screen.getByRole('heading', { name: c })).toBeTruthy()
-    expect(screen.queryByRole('heading', { name: 'Calc 2' })).toBeNull() // nothing built there yet
-    for (const t of [/^The slope of a curve/, /^Area under a curve/, /^Slices of a surface/, /^The gradient/, /^Volume under a surface/]) expect((screen.getByRole('button', { name: t }) as HTMLButtonElement).disabled).toBe(false)
-    expect(screen.queryByRole('button', { name: /^Taylor polynomials/ })).toBeNull()
-    expect(screen.queryByText(/coming next/i)).toBeNull()
+    expect(screen.queryByText('What do you want to practice?')).toBeNull()
+    expect(screen.queryByText('coming next')).toBeNull()
+    expect(screen.getByText('Draw the slope.')).toBeTruthy()
+    expect(screen.getByText('1 of 4')).toBeTruthy()
   })
 
   it('Derivatives > The slope of a curve ends on its own mistake card with Finish', () => {
     localStorage.clear()
-    render(<Session onDone={() => {}} />)
-    pickTopic(/^The slope of a curve/)
+    render(<CalculusSession onDone={() => {}} topic={topicFor(/^The slope of a curve/)} />)
     expect(screen.getByText('Calculus · The slope of a curve')).toBeTruthy()
     draw(f)
     fireEvent.click(screen.getByText('Check it with a tangent →'))
@@ -142,14 +141,11 @@ describe('calculus session', () => {
     expect(screen.queryByText(/More rectangles/)).toBeNull()
     expect(screen.getByText(/Saved to your notebook/)).toBeTruthy()
     expect(entries()[0]).toMatchObject({ session: 'calculus', misconception: 'slope-is-height', calcTopic: 'slope' })
-    fireEvent.click(screen.getByText('← All calculus topics'))
-    expect(screen.getByText('What do you want to practice?')).toBeTruthy()
   })
 
   it('Calc 3 > Slices of a surface: two partial-derivative questions, then find the flat spot', () => {
     localStorage.clear()
-    render(<Session onDone={() => {}} />)
-    pickTopic(/^Slices of a surface/)
+    render(<CalculusSession onDone={() => {}} topic={topicFor(/^Slices of a surface/)} />)
     expect(screen.getByRole('img', { name: /3D surface/ })).toBeTruthy()
     // +x from (1, −1) is downhill; "uphill" is named and you try again
     fireEvent.click(screen.getByRole('button', { name: 'uphill' }))
@@ -168,8 +164,7 @@ describe('calculus session', () => {
 
   it('Calc 3 > The gradient: "straight at the top" and "steeper higher up" are named; walking the arrow reaches the top', () => {
     localStorage.clear()
-    render(<Session onDone={() => {}} />)
-    pickTopic(/^The gradient/)
+    render(<CalculusSession onDone={() => {}} topic={topicFor(/^The gradient/)} />)
     expect(screen.getByText('The gradient.')).toBeTruthy()
     expect(screen.getByRole('img', { name: /3D surface z = f\(x, y\), a long hill/ })).toBeTruthy()
     // A points at the top: named, with how much it climbs; try again
@@ -207,8 +202,7 @@ describe('calculus session', () => {
 
   it('Calc 3 > The gradient: right first time is mastered', () => {
     localStorage.clear()
-    render(<Session onDone={() => {}} />)
-    pickTopic(/^The gradient/)
+    render(<CalculusSession onDone={() => {}} topic={topicFor(/^The gradient/)} />)
     fireEvent.click(screen.getByRole('button', { name: 'arrow B' }))
     fireEvent.click(screen.getByRole('button', { name: /It shrinks to nothing/ }))
     let steps = 0
@@ -231,8 +225,7 @@ describe('calculus session', () => {
 
   it('Calc 3 > Volume under a surface: "more columns = more volume" is named; the sums close in on 8', () => {
     localStorage.clear()
-    render(<Session onDone={() => {}} />)
-    pickTopic(/^Volume under a surface/)
+    render(<CalculusSession onDone={() => {}} topic={topicFor(/^Volume under a surface/)} />)
     expect(screen.getByText('Volume under a surface.')).toBeTruthy()
     expect(screen.getByText('10.50')).toBeTruthy()
     expect((screen.getByText('Drag the pencil on the bar first') as HTMLButtonElement).disabled).toBe(true)
@@ -269,8 +262,7 @@ describe('calculus session', () => {
 
   it('Calc 3 > Volume under a surface: a close guess and the right prediction are mastered', () => {
     localStorage.clear()
-    render(<Session onDone={() => {}} />)
-    pickTopic(/^Volume under a surface/)
+    render(<CalculusSession onDone={() => {}} topic={topicFor(/^Volume under a surface/)} />)
     guessVolume(8.6)
     fireEvent.click(screen.getByText('Use thinner columns →'))
     fireEvent.click(screen.getByRole('button', { name: 'Smaller' }))

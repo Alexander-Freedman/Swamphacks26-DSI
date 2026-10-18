@@ -21,6 +21,8 @@ from app.gen import (
     normalize_topic,
     offline,
 )
+from app.learn.router import router as learn_router
+from app.learn.topics import prebuilt_topics
 from app.rounds import extra_for_topic, extra_rounds, showcase_rounds
 from app.schema import Round
 from app.spec import nearest_topics
@@ -31,12 +33,14 @@ from app.truth import band_for
 async def lifespan(_app: FastAPI):
     # Pick the answer store (Tiger or SQLite fallback) and set up its schema once.
     store = get_store()
+    prebuilt_topics()  # hand-checked Learn topics from data/learn, once
     yield
     if hasattr(store, "close"):
         store.close()
 
 
 app = FastAPI(title="Onionskin API", lifespan=lifespan)
+app.include_router(learn_router)
 
 
 @app.exception_handler(StoreError)
