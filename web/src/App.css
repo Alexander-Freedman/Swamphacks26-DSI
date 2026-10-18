@@ -52,7 +52,7 @@ input[type='range'] { width: 100%; accent-color: var(--pencil); height: 28px; }
 .showcases.sessions .card-title { font-size: 1.3rem; }
 .showcase.has-art { display: flex; flex-direction: column; padding: 0; overflow: hidden; transition: transform 120ms, box-shadow 120ms; }
 .showcase.has-art:hover { transform: translate(-1px, -1px); box-shadow: 4px 4px 0 var(--ink); }
-.card-art { display: block; width: 100%; height: auto; aspect-ratio: 1; border-bottom: 2px solid var(--ink); background: var(--paper); }
+.card-art { display: block; width: 100%; height: 150px; aspect-ratio: auto; object-fit: contain; border-bottom: 2px solid var(--ink); background: var(--paper); }
 .showcase.has-art .card-text { display: block; padding: 12px 14px 14px; }
 .card-title { display: block; font-size: 1.05rem; font-weight: 700; }
 @media (max-width: 640px) {
@@ -66,3 +66,9 @@ input[type='range'] { width: 100%; accent-color: var(--pencil); height: 28px; }
 /* engine v4: your guess drawn on the curve while you slide */
 .guess-picture { margin: 0 0 8px; }
 .guess-picture figcaption { text-align: center; color: var(--pencil); font-size: 15px; }
+
+/* top bar: the logo plus a "Why it works" tab, easy to find from every page */
+.brand { display: inline-flex; align-items: center; gap: 14px; }
+.brand-tab { padding: 4px 10px; border: 1.5px solid var(--ink-soft); border-radius: 4px; background: none; font: 600 0.9rem var(--font-body); color: var(--ink); cursor: pointer; }
+.brand-tab:hover { background: var(--marker-soft); border-color: var(--ink); }
+.brand-tab.is-on { background: var(--marker); border-color: var(--ink); }

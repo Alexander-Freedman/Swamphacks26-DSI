@@ -9,7 +9,7 @@ import { useDrawerKey } from './components/drawerKey'
 import { SessionHowItWorks } from './components/SessionHowItWorks'
 import { sessionHowItWorks } from './components/sessionSpecs'
 import { NotebookLink, NotebookScreen } from './components/Notebook'
-import { ResearchLink, ResearchPage } from './research/ResearchPage'
+import { ResearchPage } from './research/ResearchPage'
 import { record, upsert } from './notebook'
 import { useReset } from './reset'
 import { Predict, type Answer } from './components/Predict'
@@ -35,13 +35,11 @@ function Home({
   onSession,
   onLearn,
   onNotebook,
-  onResearch,
 }: {
   onPick: (slug: string) => void
   onSession: (slug: string) => void
   onLearn: (slug: string) => void
   onNotebook: () => void
-  onResearch: () => void
 }) {
   // Showcases with a session open that instead; only ones without one get a plain round button.
   const rounds = showcaseSlugs.filter((slug) => !sessionFor(slug))
@@ -96,7 +94,6 @@ function Home({
         </div>
       )}
       <NotebookLink onOpen={onNotebook} />
-      <ResearchLink onOpen={onResearch} />
     </div>
   )
 }
@@ -248,7 +245,12 @@ export default function App() {
     return (
       <main className="app">
         <header className="topbar">
-          <button className="logo" style={{ border: 0, background: 'none', padding: 0 }} onClick={home}>Onionskin</button>
+          <span className="brand">
+            <button className="logo" style={{ border: 0, background: 'none', padding: 0 }} onClick={home}>Onionskin</button>
+            <button className="brand-tab" onClick={() => go({ kind: 'research' })}>
+              Why it works
+            </button>
+          </span>
           <div className="topbar-actions">
             <AskHelp key={screen.slug} slug={screen.slug} kind="session" subject={screen.slug.replace(/-/g, ' ')} docked />
           </div>
@@ -261,7 +263,12 @@ export default function App() {
     return (
       <main className="app">
         <header className="topbar">
-          <button className="logo" style={{ border: 0, background: 'none', padding: 0 }} onClick={home}>Onionskin</button>
+          <span className="brand">
+            <button className="logo" style={{ border: 0, background: 'none', padding: 0 }} onClick={home}>Onionskin</button>
+            <button className="brand-tab" onClick={() => go({ kind: 'research' })}>
+              Why it works
+            </button>
+          </span>
           <div className="topbar-actions">
             <AskHelp key={session.slug} slug={session.slug} kind="session" subject={session.title} />
             {sessionHowItWorks[session.slug] && <SessionDrawer key={session.slug} slug={session.slug} />}
@@ -275,7 +282,12 @@ export default function App() {
   return (
     <main className="app">
       <header className="topbar">
-        <button className="logo" style={{ border: 0, background: 'none', padding: 0 }} onClick={home}>Onionskin</button>
+        <span className="brand">
+            <button className="logo" style={{ border: 0, background: 'none', padding: 0 }} onClick={home}>Onionskin</button>
+            <button className={`brand-tab${screen.kind === 'research' ? ' is-on' : ''}`} onClick={() => go({ kind: 'research' })}>
+              Why it works
+            </button>
+          </span>
         {round && <CheckedTag reviewed={round.reviewed} />}
         {screen.kind === 'home' && <BackendDot />}
       </header>
@@ -295,7 +307,6 @@ export default function App() {
           onSession={(slug) => go({ kind: 'session', slug })}
           onLearn={(slug) => go({ kind: 'learn', slug })}
           onNotebook={() => go({ kind: 'notebook' })}
-          onResearch={() => go({ kind: 'research' })}
         />
       )}
     </main>
