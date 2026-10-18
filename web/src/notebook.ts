@@ -56,6 +56,10 @@ const EXTRA_LABELS: Record<string, string> = {
   'too-few': 'A handful of people is enough',
   // calculus, Calc 3 (sessions/calculus/Surface.tsx)
   'partial-wrong-way': 'Walking a slice the wrong way',
+  // calculus, Calc 3 (sessions/calculus/gradientMath.ts, volumeMath.ts)
+  'gradient-points-at-peak': 'Steepest = straight at the top',
+  'gradient-is-height': 'Steeper the higher you go',
+  'more-columns-more-volume': 'More columns = more volume',
   // programming (sessions/programming/stack.ts STACK_MISTAKES)
   'stack-depth-off': 'Miscounting the call stack',
   'returns-before-calls': 'The first call finishes first',
@@ -77,12 +81,25 @@ const EXTRA_LABELS: Record<string, string> = {
   'bromide-poor-leaving': 'Bromide called a poor leaving group',
   'sn1-on-methyl': 'SN1 on a methyl carbon',
   'elimination-no-neighbor': 'Elimination with no neighbor carbon',
+  'neutral-nu-strong': 'Neutral water called strong',
+  'tertiary-miscounted': 'Miscounting a 3° carbon',
+  'sn2-on-tertiary': 'SN2 on a 3° carbon',
+  'carbocation-with-strong-base': 'Waiting for a carbocation with a strong base',
+  'e2-weak-base': 'E2 with a weak base',
+  'e1-without-heat': 'E1 without heat',
+  'sn1-with-heat': 'Ignoring the heat',
   'sn1-attack-first': 'Water attacks before Br leaves',
   'e1-base-first': 'H pulled before Br leaves',
   'e1-base-hits-carbon': 'Water bonds to the C⁺',
   'e2-base-hits-carbon': 'Base attacks the carbon',
   'e2-not-anti': 'Not the H across from Br',
   'ch-bond-lost': 'The C–H electrons go nowhere',
+  'crowding-ignored': 'Crowding ignored',
+  'no-neighbor-h': 'Elimination with no neighbor H',
+  // statistics (sessions/statistics/clt.ts CLT_MISTAKES)
+  'averages-keep-shape': 'Averages keep the original shape',
+  'averages-flat': 'Every average is equally likely',
+  'bigger-sample-wider': 'Bigger samples spread out more',
 }
 
 function store(): Storage | null {
