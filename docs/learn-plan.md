@@ -19,7 +19,7 @@ Every screen has a **why-pane** (desktop: right rail; phone: collapsible strip) 
 
 ## Where the model runs
 
-- **Build time, strongest model:** demo topics are authored on Alex's laptop with Codex (`api/scripts/author_learn_topic.py`) and committed as JSON in `api/data/learn/`. The demo never waits on a model.
+- **Build time, strongest model:** demo topics are authored on Alex's laptop with Codex (`api/scripts/author_learn_topic.py`) and committed as JSON in `data/learn/`. The demo never waits on a model.
 - **Run time, Vultr:** the FastAPI backend shells out to `codex exec` (Codex CLI signed in on the box) for the bounded calls above and for live authoring when a judge types a new topic. Concurrency capped at 2, 60 s timeout, read-only sandbox, scratch dir. Gemini stays as the fallback chain for `/api/rounds` and the help chat (unchanged).
 - **Pages build:** prebuilt Learn topics are published as static files like the extras, so the site works with no backend.
 
@@ -27,7 +27,7 @@ Every screen has a **why-pane** (desktop: right rail; phone: collapsible strip) 
 
 | Who | Owns | Done when |
 |---|---|---|
-| **Alex (this machine)** | `api/app/learn/*`, `api/scripts/author_learn_topic.py`, `api/data/learn/*.json`, `web/src/learn/why.json`, Vultr Codex install | All endpoints in `docs/learn-api.md` answer on Vultr; 3 demo topics + 10 chip topics authored and reviewed. |
+| **Alex (this machine)** | `api/app/learn/*`, `api/scripts/author_learn_topic.py`, `data/learn/*.json`, `web/src/learn/why.json`, Vultr Codex install | All endpoints in `docs/learn-api.md` answer on Vultr; 3 demo topics + 10 chip topics authored and reviewed. |
 | **Alex's bot** | `web/src/learn/*` (except `why.json` and `WhyPane.*`), Home changes, `web/src/learnApi.ts` | Typing a topic on Home opens the six screens against the API; prebuilt topics open with no backend; mistake card saves to the Notebook. |
 | **Luana's bot** | `web/src/sessions/orgo/*`, `web/src/sessions/calculus/*`, `web/src/learn/WhyPane.tsx` + `WhyPane.css`, COMING NEXT removal | Orgo and calculus each open as one guided path (no course menu, no dashed cards); WhyPane renders `why.json` for a given stage key on desktop and phone. |
 

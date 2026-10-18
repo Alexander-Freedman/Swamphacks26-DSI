@@ -52,7 +52,7 @@ Rules every call follows (from the prototype's contract): grade criterion by cri
 
 ## Static files on Pages
 
-`web/public/learn/index.json` = `[ { "slug", "topic", "checked" } ]` and `web/public/learn/<slug>.json` = Topic JSON, copied from `api/data/learn/` at build time (same mechanism as `rounds/extra`). With no backend the six screens still open; the model-graded steps show the pre-authored fallback (misconception card by keyword, extreme cases with their correct behavior) and are labelled "offline check".
+`web/public/learn/index.json` = `[ { "slug", "topic", "checked" } ]` and `web/public/learn/<slug>.json` = Topic JSON, copied from `data/learn/` at build time (same mechanism as `rounds/extra`). With no backend the six screens still open; the model-graded steps show the pre-authored fallback (misconception card by keyword, extreme cases with their correct behavior) and are labelled "offline check".
 
 ## Frontend state (for `web/src/learn/`)
 
