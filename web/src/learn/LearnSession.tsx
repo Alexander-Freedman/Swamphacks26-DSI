@@ -13,6 +13,7 @@ import { DrawScreen } from './draw/DrawScreen'
 import { NeighborScreen } from './NeighborScreen'
 import { TransferScreen } from './TransferScreen'
 import { DoneScreen } from './DoneScreen'
+import { customScreen } from './custom/registry'
 import './learn.css'
 
 const SCREENS: Record<Stage, ComponentType<StageProps>> = {
@@ -88,7 +89,7 @@ export function LearnSession({
     setState((s) => ({ ...s, stage: STAGES[Math.min(STAGES.indexOf(s.stage) + 1, STAGES.length - 1)] }))
   }
   const back = () => (idx === 0 ? onDone() : setState((s) => ({ ...s, stage: STAGES[STAGES.indexOf(s.stage) - 1] })))
-  const Screen = SCREENS[state.stage]
+  const Screen = customScreen(slug, state.stage) ?? SCREENS[state.stage]
 
   return (
     <div className="learn" data-stage={state.stage}>
