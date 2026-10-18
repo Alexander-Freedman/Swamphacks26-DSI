@@ -9,6 +9,7 @@ import { useDrawerKey } from './components/drawerKey'
 import { SessionHowItWorks } from './components/SessionHowItWorks'
 import { sessionHowItWorks } from './components/sessionSpecs'
 import { NotebookLink, NotebookScreen } from './components/Notebook'
+import { ResearchLink, ResearchPage } from './research/ResearchPage'
 import { record, upsert } from './notebook'
 import { useReset } from './reset'
 import { Predict, type Answer } from './components/Predict'
@@ -34,11 +35,13 @@ function Home({
   onSession,
   onLearn,
   onNotebook,
+  onResearch,
 }: {
   onPick: (slug: string) => void
   onSession: (slug: string) => void
   onLearn: (slug: string) => void
   onNotebook: () => void
+  onResearch: () => void
 }) {
   // Showcases with a session open that instead; only ones without one get a plain round button.
   const rounds = showcaseSlugs.filter((slug) => !sessionFor(slug))
@@ -93,6 +96,7 @@ function Home({
         </div>
       )}
       <NotebookLink onOpen={onNotebook} />
+      <ResearchLink onOpen={onResearch} />
     </div>
   )
 }
@@ -279,6 +283,8 @@ export default function App() {
       {screen.kind !== 'home' && <BuildReady onOpen={(slug) => go({ kind: 'round', slug })} />}
       {screen.kind === 'notebook' ? (
         <NotebookScreen onHome={home} />
+      ) : screen.kind === 'research' ? (
+        <ResearchPage onHome={home} />
       ) : round ? (
         <Player key={round.slug} round={round} onDone={home} />
       ) : loading ? (
@@ -289,6 +295,7 @@ export default function App() {
           onSession={(slug) => go({ kind: 'session', slug })}
           onLearn={(slug) => go({ kind: 'learn', slug })}
           onNotebook={() => go({ kind: 'notebook' })}
+          onResearch={() => go({ kind: 'research' })}
         />
       )}
     </main>
