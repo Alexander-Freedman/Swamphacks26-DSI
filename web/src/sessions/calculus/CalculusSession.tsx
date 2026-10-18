@@ -10,12 +10,15 @@ import { reducedMotion, useWidth } from './plot'
 import { SlopeChart } from './SlopeChart'
 import { FINE, fineXs, pencilAt } from './slopeGeo'
 import { GradientStep } from './Gradient'
+import { PolarStep } from './Polar'
+import { SeriesStep } from './Series'
 import { SurfaceStep } from './Surface'
+import { TaylorStep } from './Taylor'
 import { COURSES, type CalcStep, type CalcTopic } from './topics'
 import { VolumeStep } from './Volume'
 import './calculus.css'
 
-const LABEL: Record<CalcStep, string> = { draw: 'Draw the slope', tangent: 'Drag the tangent', area: 'Fill the area', card: 'Your mistake', compare: 'Same idea twice', surface: 'Slices', gradient: 'The gradient', volume: 'Volume' }
+const LABEL: Record<CalcStep, string> = { draw: 'Draw the slope', tangent: 'Drag the tangent', area: 'Fill the area', card: 'Your mistake', compare: 'Same idea twice', surface: 'Slices', gradient: 'The gradient', volume: 'Volume', taylor: 'Taylor terms', converge: 'Stack the terms', polar: 'The rose' }
 
 // One plain-language guidance line per screen.
 const TITLES: Record<CalcStep, [string, string]> = {
@@ -26,6 +29,9 @@ const TITLES: Record<CalcStep, [string, string]> = {
   compare: ['Same idea, twice.', 'Drag time on either graph. Watch which numbers match, then pick what the two have in common.'],
   surface: ['Slices of a surface.', 'With two inputs, x and y, the graph is a surface: a height above every point of the floor. Drag it to turn it around. Slicing it straight along x or y gives an ordinary curve, and that curve’s slope is a partial derivative.'],
   gradient: ['The gradient.', 'On a hill, one direction climbs fastest. The gradient is the arrow on the floor that points that way, and its length is how steep the climb is. Turn the hill around, then pick the arrow you think is steepest.'],
+  taylor: ['Taylor polynomials.', 'A polynomial can copy a curve near one point. Start with one term, predict how far three terms stay close to sin x, then add terms one at a time and drag the dot to measure the gap.'],
+  converge: ['Does it add up?', 'Adding infinitely many pieces can still give a number. Each term is a bar; stack the bars and see whether the top levels off or keeps climbing. Predict first, then slide the terms.'],
+  polar: ['Polar curves.', 'Instead of y = f(x), give a distance r for each angle θ. Predict how many petals r = cos 3θ draws, then sweep θ round and watch the rose and the ordinary graph draw together.'],
   volume: ['Volume under a surface.', 'Stand columns on the floor under a curved roof and add up their volumes, like rectangles under a curve but in 3D. Guess the real volume first, then make the columns thinner and watch the total close in.'],
 }
 const REMIX: Record<string, string> = {
@@ -164,6 +170,9 @@ function CalcRun({ topic, onTopics, onDone }: { topic: CalcTopic; onTopics: () =
       {cur === 'surface' && <SurfaceStep onDone={onDone} topic={topic.id} />}
       {cur === 'gradient' && <GradientStep onDone={onDone} topic={topic.id} />}
       {cur === 'volume' && <VolumeStep onDone={onDone} topic={topic.id} />}
+      {cur === 'taylor' && <TaylorStep onDone={onDone} topic={topic.id} />}
+      {cur === 'converge' && <SeriesStep onDone={onDone} topic={topic.id} />}
+      {cur === 'polar' && <PolarStep onDone={onDone} topic={topic.id} />}
     </Frame>
   )
 }

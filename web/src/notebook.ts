@@ -60,6 +60,10 @@ const EXTRA_LABELS: Record<string, string> = {
   'gradient-points-at-peak': 'Steepest = straight at the top',
   'gradient-is-height': 'Steeper the higher you go',
   'more-columns-more-volume': 'More columns = more volume',
+  // calculus, Calc 2 (sessions/calculus/taylorMath.ts, seriesMath.ts, polarMath.ts)
+  'taylor-good-everywhere': 'More terms = close everywhere',
+  'terms-shrink-so-it-converges': 'Terms shrink, so it adds up',
+  'polar-negative-r-ignored': 'Negative r = another petal',
   // orgo (sessions/orgo/chem.ts MISTAKES)
   'carbon-five-bonds': 'A carbon with 5 bonds',
   'hydrogen-two-bonds': 'Hydrogen with 2 bonds',

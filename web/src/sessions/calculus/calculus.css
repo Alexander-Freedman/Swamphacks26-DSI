@@ -244,3 +244,37 @@
 .calc-sums td { text-align: right; }
 .calc-sums tr.on { background: var(--marker-soft); font-weight: 700; }
 .calc-correct + .calc-k { margin-top: 14px; }
+
+/* Calc 2: Taylor polynomials (sin x in ink, the polynomial in pencil, the ±0.1 tube and the gap band) */
+.calc-tay-tube { fill: var(--marker-soft); stroke: none; }
+.calc-tay-band { fill: var(--marker); opacity: 0.85; }
+.calc-tay-radius line { stroke: var(--called); stroke-width: 3; stroke-linecap: round; }
+.calc-tay-formula { font: 700 15px var(--calc-mono); margin: 8px 4px 2px; overflow-wrap: anywhere; }
+.calc-tay-lab { margin-top: 8px; }
+.calc-tay-lab .calc-small, .calc-pol-controls .calc-small { font-weight: 400; }
+.calc-tay .calc-rule sub { font-size: 0.7em; }
+
+/* Calc 2: does it add up? (bars on the ground, the same bars stacked on the running total) */
+.calc-ser-bar { fill: var(--calc-rect); stroke: var(--ink); stroke-width: 1; }
+.calc-ser-block { fill: var(--marker); stroke: var(--ink); stroke-width: 1; }
+.calc-ser-block.alt { fill: var(--marker-soft); }
+.calc-ser-total { fill: none; stroke: var(--ink); stroke-width: 2.5; stroke-linejoin: round; }
+.calc-ser-limit { stroke: var(--called); stroke-width: 2; stroke-dasharray: 6 4; }
+.calc-ser-group line { stroke: var(--called); stroke-width: 2.5; stroke-linecap: round; }
+.calc-ser-lab { margin-top: 8px; }
+.calc-ser-sums { font-size: 15px; margin: 10px 0 0; color: var(--ink-soft); display: grid; gap: 2px; }
+.calc-ser-sums b { color: var(--ink); }
+
+/* Calc 2: polar curves (the rose beside the ordinary r-vs-θ graph, one dot mirrored on both) */
+.calc-pol-charts { margin-top: 0; align-items: start; }
+.calc-pol-rosewrap { display: flex; justify-content: center; }
+.calc-pol-rose { touch-action: none; cursor: crosshair; }
+.calc-pol-grid circle, .calc-pol-grid line { fill: none; stroke: var(--grid); stroke-width: 1; }
+.calc-pol-ray { stroke: var(--ink-soft); stroke-width: 1.5; stroke-dasharray: 3 4; }
+.calc-pol-arm { stroke: var(--ink); stroke-width: 3; stroke-linecap: round; }
+.calc-pol-arm.neg { stroke: var(--off); }
+.calc-pol-ghost { fill: none; stroke: var(--pencil); stroke-width: 2; stroke-dasharray: 4 4; opacity: 0.6; }
+.calc-pol-neg { fill: var(--marker-soft); }
+.calc-pol-dot { fill: var(--marker); stroke: var(--ink); stroke-width: 3; }
+.calc-pol-dot.neg { stroke: var(--off); }
+.calc-pol-controls .calc-row { margin-top: 10px; }

@@ -2,7 +2,7 @@
 // purpose instead of a fixed path. A topic is a list of steps from the session. Topics that aren't
 // built yet stay on the menu as "coming next" so the whole map of the subject is visible.
 
-export type CalcStep = 'draw' | 'tangent' | 'area' | 'card' | 'compare' | 'surface' | 'gradient' | 'volume'
+export type CalcStep = 'draw' | 'tangent' | 'area' | 'card' | 'compare' | 'surface' | 'gradient' | 'volume' | 'taylor' | 'converge' | 'polar'
 
 export type CalcTopic = {
   id: string
@@ -72,15 +72,15 @@ export const COURSES: CalcCourse[] = [
         title: 'Series',
         blurb: 'Adding up infinitely many pieces, and when that gives a number.',
         topics: [
-          soon('taylor', 'Taylor polynomials', 'Add terms one at a time and watch the polynomial hug the curve.'),
-          soon('converge', 'Does it add up?', 'Stack the terms as bars and see whether the total levels off.'),
+          { id: 'taylor', title: 'Taylor polynomials', blurb: 'Add terms one at a time and watch the polynomial hug the curve.', steps: ['taylor'], ready: true },
+          { id: 'converge', title: 'Does it add up?', blurb: 'Stack the terms as bars and see whether the total levels off.', steps: ['converge'], ready: true },
         ],
       },
       {
         id: 'polar',
         title: 'Parametric and polar',
         blurb: 'Curves drawn by a moving point instead of y = f(x).',
-        topics: [soon('polar', 'Polar curves', 'Sweep an angle around and watch r trace a rose.')],
+        topics: [{ id: 'polar', title: 'Polar curves', blurb: 'Sweep an angle around and watch r trace a rose.', steps: ['polar'], ready: true }],
       },
     ],
   },

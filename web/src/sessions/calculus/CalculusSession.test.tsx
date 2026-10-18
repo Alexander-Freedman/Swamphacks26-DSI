@@ -6,6 +6,7 @@ import { session } from './index'
 import { f, fPrime } from './math'
 import { boxes } from './slopeGeo'
 import { sy } from './plot'
+import { TOPICS } from './topics'
 
 vi.setConfig({ testTimeout: 30000 })
 
@@ -121,8 +122,8 @@ describe('calculus session', () => {
     expect(screen.getByText('What do you want to practice?')).toBeTruthy()
     for (const c of ['Calc 1', 'Calc 2', 'Calc 3']) expect(screen.getByRole('heading', { name: c })).toBeTruthy()
     expect((screen.getByRole('button', { name: /^Slices of a surface/ }) as HTMLButtonElement).disabled).toBe(false)
-    expect((screen.getByRole('button', { name: /^Taylor polynomials/ }) as HTMLButtonElement).disabled).toBe(true)
-    expect(screen.getAllByText('coming next').length).toBeGreaterThan(5)
+    expect((screen.getByRole('button', { name: /^Taylor polynomials/ }) as HTMLButtonElement).disabled).toBe(false)
+    expect(screen.queryAllByText('coming next')).toHaveLength(TOPICS.filter((t) => !t.ready).length)
   })
 
   it('Derivatives > The slope of a curve ends on its own mistake card with Finish', () => {
@@ -278,5 +279,184 @@ describe('calculus session', () => {
     expect(screen.getByText('✓ mastered')).toBeTruthy()
     expect(entries()[0]).toMatchObject({ misconception: null, calcTopic: 'double' })
     expect((entries()[0] as unknown as { mastered: boolean }).mastered).toBe(true)
+  })
+
+  const mastered = () => (entries()[0] as unknown as { mastered: boolean }).mastered
+
+  // the Taylor chart is 640 wide in jsdom: x = −7 … 7 over 590 px from 36
+  const taylorPx = (x: number) => 36 + ((x + 7) / 14) * 590
+
+  it('Calc 2 > Taylor polynomials: "close everywhere" is named; the gap grows past the edge; 8 terms finishes', () => {
+    localStorage.clear()
+    render(<Session onDone={() => {}} />)
+    pickTopic(/^Taylor polynomials/)
+    expect(screen.getByText('Taylor polynomials.')).toBeTruthy()
+    const slider = screen.getByLabelText(/Terms:/) as HTMLInputElement
+    expect(slider.disabled).toBe(true)
+    expect(slider.value).toBe('1')
+    expect(screen.queryByText(/within 0\.1 out to/)).toBeNull()
+    fireEvent.click(screen.getByRole('button', { name: /^Everywhere: 3 terms/ }))
+    expect(screen.getByText(/Not quite/)).toBeTruthy()
+    expect(screen.getByText(/can’t wave up and down forever/)).toBeTruthy()
+    fireEvent.click(screen.getByRole('button', { name: 'Out to about x = 1' }))
+    expect(screen.getByText(/stays within 0\.1 out to x ≈ 0\.85/)).toBeTruthy()
+    fireEvent.click(screen.getByRole('button', { name: 'Out to about x = 2.5' }))
+    expect(screen.getByText('Correct!')).toBeTruthy()
+    expect(slider.disabled).toBe(false)
+    expect(slider.value).toBe('3')
+    expect(screen.getByText(/x⁵\/120/)).toBeTruthy()
+    expect(screen.getByText(/within 0\.1 out to x ≈ ±2\.[45]/)).toBeTruthy()
+
+    // drag the dot out to x = 6: the pencil is far off; back at 1 it's within 0.1
+    const chart = screen.getByLabelText('drag the dot along x to read the gap')
+    fireEvent.pointerDown(chart, { clientX: taylorPx(6), clientY: 100, pointerId: 5 })
+    fireEvent.pointerUp(chart, { pointerId: 5 })
+    expect(screen.getByText(/more than 0\.1 off/)).toBeTruthy()
+    expect(screen.getByText('6.0')).toBeTruthy()
+    fireEvent.pointerDown(chart, { clientX: taylorPx(1), clientY: 100, pointerId: 5 })
+    fireEvent.pointerUp(chart, { pointerId: 5 })
+    expect(screen.getByText(/· within 0\.1/)).toBeTruthy()
+
+    fireEvent.click(screen.getByRole('button', { name: /^Yes: every new term helps/ }))
+    expect(screen.getByText(/gap jumps from about 6 to about 50/)).toBeTruthy()
+    fireEvent.click(screen.getByRole('button', { name: /^Only near the centre/ }))
+    expect(screen.getByText(/Slide to all 8 terms/)).toBeTruthy()
+    expect(screen.queryByText(/Saved to your notebook/)).toBeNull()
+    fireEvent.change(slider, { target: { value: '8' } })
+    expect(screen.getByText(/x¹⁵\/15!/)).toBeTruthy()
+    expect(screen.getByText(/Saved to your notebook/)).toBeTruthy()
+    expect(screen.getByText(/Caught: “More terms = close everywhere”/)).toBeTruthy()
+    expect(screen.queryByText('✓ mastered')).toBeNull()
+    expect(entries()).toHaveLength(1)
+    expect(entries()[0]).toMatchObject({ session: 'calculus', misconception: 'taylor-good-everywhere', calcTopic: 'taylor' })
+    expect(mastered()).toBe(false)
+    expect(notebook()[0].label).toBe('More terms = close everywhere')
+  })
+
+  it('Calc 2 > Taylor polynomials: right both times is mastered', () => {
+    localStorage.clear()
+    render(<Session onDone={() => {}} />)
+    pickTopic(/^Taylor polynomials/)
+    fireEvent.click(screen.getByRole('button', { name: 'Out to about x = 2.5' }))
+    fireEvent.click(screen.getByRole('button', { name: /^Only near the centre/ }))
+    fireEvent.change(screen.getByLabelText(/Terms:/), { target: { value: '8' } })
+    expect(screen.getByText('✓ mastered')).toBeTruthy()
+    expect(entries()[0]).toMatchObject({ misconception: null, calcTopic: 'taylor' })
+    expect(mastered()).toBe(true)
+  })
+
+  it('Calc 2 > Does it add up?: the halving stack stops at 2, "terms shrink so it adds up" is named for the harmonic one', () => {
+    localStorage.clear()
+    render(<Session onDone={() => {}} />)
+    pickTopic(/^Does it add up/)
+    expect(screen.getByText('Does it add up?', { selector: 'h1, h2' })).toBeTruthy()
+    const harmonicBtn = screen.getByRole('button', { name: '1 + ½ + ⅓ + ¼ + …' }) as HTMLButtonElement
+    expect(harmonicBtn.disabled).toBe(true)
+    expect(screen.getByRole('img', { name: /hidden until you predict/ })).toBeTruthy()
+    fireEvent.click(screen.getByRole('button', { name: /^It keeps climbing/ }))
+    expect(screen.getByText(/Not quite/)).toBeTruthy()
+    expect(screen.getByText(/never gets past it/)).toBeTruthy()
+    fireEvent.click(screen.getByRole('button', { name: 'It levels off at 2' }))
+    expect(screen.getByText('Correct!')).toBeTruthy()
+    expect(screen.getByText('levels off at 2')).toBeTruthy()
+    expect(harmonicBtn.disabled).toBe(false)
+    const slider = screen.getByLabelText(/Terms:/) as HTMLInputElement
+    fireEvent.change(slider, { target: { value: '20' } })
+    expect(screen.getByRole('img', { name: /20 terms of 1 \+ ½ \+ ¼ \+ ⅛ \+ …: the stack is 2\.00 high$/ })).toBeTruthy()
+
+    fireEvent.click(screen.getByText('Switch to 1 + ½ + ⅓ + … →'))
+    expect(screen.getByText(/Does this stack level off\?/)).toBeTruthy()
+    expect(screen.getByRole('img', { name: /hidden until you predict/ })).toBeTruthy()
+    fireEvent.click(screen.getByRole('button', { name: /^Yes: the bars shrink to nothing/ }))
+    expect(screen.getByText(/Every doubling adds another ½/)).toBeTruthy()
+    fireEvent.click(screen.getByRole('button', { name: /^No: it keeps climbing, slower and slower/ }))
+    expect(screen.getByText('diverges', { selector: 'b' })).toBeTruthy()
+    expect(screen.getByText(/Slide to all 60 terms/)).toBeTruthy()
+    expect(screen.queryByText(/Saved to your notebook/)).toBeNull()
+    fireEvent.change(slider, { target: { value: '60' } })
+    expect(screen.getByText('4.680')).toBeTruthy()
+    expect(screen.getByText('14.39')).toBeTruthy()
+    expect(screen.getByText(/Saved to your notebook/)).toBeTruthy()
+    expect(screen.getByText(/Caught: “Terms shrink, so it adds up”/)).toBeTruthy()
+    expect(screen.queryByText('✓ mastered')).toBeNull()
+    expect(entries()).toHaveLength(1)
+    expect(entries()[0]).toMatchObject({ session: 'calculus', misconception: 'terms-shrink-so-it-converges', calcTopic: 'converge' })
+    expect(mastered()).toBe(false)
+    expect(notebook()[0].label).toBe('Terms shrink, so it adds up')
+  })
+
+  it('Calc 2 > Does it add up?: both predictions right is mastered', () => {
+    localStorage.clear()
+    render(<Session onDone={() => {}} />)
+    pickTopic(/^Does it add up/)
+    fireEvent.click(screen.getByRole('button', { name: 'It levels off at 2' }))
+    fireEvent.click(screen.getByRole('button', { name: '1 + ½ + ⅓ + ¼ + …' }))
+    fireEvent.click(screen.getByRole('button', { name: /^No: it keeps climbing, slower and slower/ }))
+    fireEvent.change(screen.getByLabelText(/Terms:/), { target: { value: '60' } })
+    expect(screen.getByText('✓ mastered')).toBeTruthy()
+    expect(entries()[0]).toMatchObject({ misconception: null, calcTopic: 'converge' })
+    expect(mastered()).toBe(true)
+  })
+
+  it('Calc 2 > Polar curves: 6 petals is named; the sweep flips the dot where r < 0; the dots mirror each other', () => {
+    localStorage.clear()
+    render(<Session onDone={() => {}} />)
+    pickTopic(/^Polar curves/)
+    expect(screen.getByText('Polar curves.')).toBeTruthy()
+    const slider = screen.getByLabelText(/^θ:/) as HTMLInputElement
+    expect(slider.disabled).toBe(true)
+    fireEvent.click(screen.getByRole('button', { name: '6 petals' }))
+    expect(screen.getByText(/Not quite/)).toBeTruthy()
+    expect(screen.getByText(/hump below the axis is r < 0/)).toBeTruthy()
+    fireEvent.click(screen.getByRole('button', { name: '3 petals' }))
+    expect(screen.getByText('Correct!')).toBeTruthy()
+    expect(slider.disabled).toBe(false)
+    expect(screen.getByText(/Sweep all the way round/)).toBeTruthy()
+
+    fireEvent.change(slider, { target: { value: '60' } })
+    expect(screen.getByText(/negative: the dot is on the opposite side/)).toBeTruthy()
+    expect(screen.getByText('0 petals drawn')).toBeTruthy()
+    fireEvent.change(slider, { target: { value: '90' } })
+    expect(screen.getByText('1 petal drawn')).toBeTruthy()
+    // drag on the rose (320 px square in jsdom, centre at 160): straight left is θ = 180°
+    const rose = screen.getByLabelText('drag around the rose to set the angle θ')
+    fireEvent.pointerDown(rose, { clientX: 40, clientY: 160, pointerId: 6 })
+    fireEvent.pointerUp(rose, { pointerId: 6 })
+    expect(slider.value).toBe('180')
+    expect(screen.getByText('2 petals drawn')).toBeTruthy()
+    // and on the ordinary graph (320 wide in jsdom: θ = 0 … 2π over 274 px from 34): three quarters along is 270°
+    const graph = screen.getByLabelText('drag along the graph to set the angle θ')
+    fireEvent.pointerDown(graph, { clientX: 34 + 0.75 * 274, clientY: 100, pointerId: 7 })
+    fireEvent.pointerUp(graph, { pointerId: 7 })
+    expect(slider.value).toBe('270')
+    expect(screen.getByText('3 petals drawn · now retracing')).toBeTruthy()
+    expect(screen.queryByText(/Where is the dot\?/)).toBeNull()
+
+    fireEvent.change(slider, { target: { value: '360' } })
+    expect(screen.getByText(/complete at 210°/)).toBeTruthy()
+    expect(screen.getByText(/Where is the dot\?/)).toBeTruthy()
+    fireEvent.click(screen.getByRole('button', { name: /^Nowhere: a negative r/ }))
+    expect(screen.getByText(/walks backwards through the origin/)).toBeTruthy()
+    expect(screen.queryByText(/Saved to your notebook/)).toBeNull()
+    fireEvent.click(screen.getByRole('button', { name: /^1 unit out the opposite way/ }))
+    expect(screen.getByText(/Saved to your notebook/)).toBeTruthy()
+    expect(screen.getByText(/Caught: “Negative r = another petal”/)).toBeTruthy()
+    expect(screen.queryByText('✓ mastered')).toBeNull()
+    expect(entries()).toHaveLength(1)
+    expect(entries()[0]).toMatchObject({ session: 'calculus', misconception: 'polar-negative-r-ignored', calcTopic: 'polar' })
+    expect(mastered()).toBe(false)
+    expect(notebook()[0].label).toBe('Negative r = another petal')
+  })
+
+  it('Calc 2 > Polar curves: 3 petals and the flipped dot, first time, is mastered', () => {
+    localStorage.clear()
+    render(<Session onDone={() => {}} />)
+    pickTopic(/^Polar curves/)
+    fireEvent.click(screen.getByRole('button', { name: '3 petals' }))
+    fireEvent.change(screen.getByLabelText(/^θ:/), { target: { value: '360' } })
+    fireEvent.click(screen.getByRole('button', { name: /^1 unit out the opposite way/ }))
+    expect(screen.getByText('✓ mastered')).toBeTruthy()
+    expect(entries()[0]).toMatchObject({ misconception: null, calcTopic: 'polar' })
+    expect(mastered()).toBe(true)
   })
 })
