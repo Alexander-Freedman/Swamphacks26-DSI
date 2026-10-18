@@ -1,0 +1,11 @@
+{
+  "slug": "sn2-reaction",
+  "recorded": "2026-10-18 03:18",
+  "responses": {
+    "guess|the nucleophile hits the carbon from the back and kicks the leaving group out in one step": {
+      "classification": "concrete",
+      "misconceptionId": null,
+      "message": "Your guess already names something testable: an attack from the back that pushes the leaving group out in one step. Next, we’ll test that idea against how the real system behaves."
+    }
+  }
+}
