@@ -1,7 +1,8 @@
 import { useCallback, useEffect, useId, useRef, useState, type FormEvent, type KeyboardEvent as ReactKeyboardEvent } from 'react'
 import { apiBase } from '../extras'
-import { askHelp, MAX_QUESTION } from './askHelpApi'
+import { askHelp, askLayer, MAX_QUESTION, type HelpTurn } from './askHelpApi'
 import { HELP_TOPICS, startersFor } from './helpHints'
+import { layerFor, PRIVACY_LINE } from './askLayer'
 import { useHelpSpot, type HelpSpot } from './session/helpSpot'
 import './AskHelp.css'
 
@@ -16,11 +17,12 @@ function typing(el: Element | null): boolean {
 }
 
 /**
- * "Ask" button + panel beside How it works (#186). Sessions report their screen through the shell
- * (session/helpSpot); the round player passes `spot`. Hidden without a backend or for a topic
- * the help API doesn't know.
+ * "Stuck? Ask" button + panel beside How it works (#186). Sessions report their screen through the shell
+ * (session/helpSpot); the round player passes `spot`. On every session screen (#243): a screen that
+ * reports a LayerHelp (or any session but the 3 probability ones) uses the generic request; the
+ * round player stays hidden without a backend or for a topic the help API doesn't know.
  */
-export function AskHelp({ slug, kind, spot: given }: { slug: string; kind: 'session' | 'round'; spot?: HelpSpot | null }) {
+export function AskHelp({ slug, kind, spot: given, subject = '' }: { slug: string; kind: 'session' | 'round'; spot?: HelpSpot | null; subject?: string }) {
   const reported = useHelpSpot()
   const topic = HELP_TOPICS[slug]
   const [open, setOpen] = useState(false)
@@ -32,9 +34,11 @@ export function AskHelp({ slug, kind, spot: given }: { slug: string; kind: 'sess
   const box = useRef<HTMLTextAreaElement>(null)
   const panel = useRef<HTMLDivElement>(null)
   const titleId = useId()
-  const enabled = apiBase() !== null && !!topic
-
   const spot = given !== undefined ? given : reported
+  // sessions always get the panel (the static hint covers no backend); rounds need the help API
+  const enabled = kind === 'session' || (apiBase() !== null && !!topic)
+  const generic = kind === 'session' && (!!spot?.layer || !topic)
+  const layer = generic && open ? layerFor(spot, subject) : null
   // Unknown step: the session's guess screen, as not locked, so the server only ever hints.
   const known = !!spot?.screen && spot.screen.startsWith(topic?.prefix ?? '?')
   const screen = known ? spot!.screen! : topic?.guessScreen ?? ''
@@ -82,7 +86,11 @@ export function AskHelp({ slug, kind, spot: given }: { slug: string; kind: 'sess
     setBusy(true)
     setText('')
     setTurns((t) => [...t, { q: question }].slice(-KEEP))
-    const reply = await askHelp({ slug, kind, screen, locked, guess: known ? spot?.guess : null, question })
+    const history: HelpTurn[] = turns.flatMap((t) => (t.a ? [{ role: 'user' as const, text: t.q }, { role: 'assistant' as const, text: t.a }] : [])).slice(-KEEP)
+    const l = generic ? layerFor(spot, subject) : null
+    const reply = l
+      ? await askLayer({ subject: l.subject, topic: l.topic, layerN: l.layerN, title: l.title, onScreen: l.onScreen, facts: l.facts, lastAction: l.lastAction, history, question, hint: l.hint })
+      : await askHelp({ slug, kind, screen, locked, guess: known ? spot?.guess : null, question })
     setTurns((t) => t.map((x, i) => (i === t.length - 1 ? { ...x, a: reply.answer, hint: reply.hintOnly } : x)))
     inFlight.current = false
     setBusy(false)
@@ -100,12 +108,12 @@ export function AskHelp({ slug, kind, spot: given }: { slug: string; kind: 'sess
     }
   }
 
-  const where = spot?.label && spot.step && spot.total ? `${spot.label} · ${spot.step} of ${spot.total}` : 'this screen'
+  const where = layer ? layer.title : spot?.label && spot.step && spot.total ? `${spot.label} · ${spot.step} of ${spot.total}` : 'this screen'
 
   return (
     <>
-      <button ref={button} className="hiw-btn ask-btn" onClick={() => (open ? close() : setOpen(true))} aria-expanded={open} aria-controls={open ? `${titleId}-panel` : undefined}>
-        Ask <kbd aria-hidden="true">?</kbd>
+      <button ref={button} className="hiw-btn ask-btn" onClick={() => (open ? close() : setOpen(true))} aria-keyshortcuts="?" aria-expanded={open} aria-controls={open ? `${titleId}-panel` : undefined}>
+        Stuck? Ask
       </button>
       {open && (
         <div className="ask-panel" id={`${titleId}-panel`} role="dialog" aria-modal="false" aria-labelledby={titleId} ref={panel}>
@@ -116,12 +124,12 @@ export function AskHelp({ slug, kind, spot: given }: { slug: string; kind: 'sess
             </button>
           </header>
           <p className="ask-where">
-            About <b>{where}</b>. {locked ? 'Your guess is in, so I can explain the real answer.' : 'Before you check your guess, you get hints, not the answer.'}
+            About <b>{where}</b>.{layer ? '' : locked ? ' Your guess is in, so I can explain the real answer.' : ' Before you check your guess, you get hints, not the answer.'}
           </p>
           <div className="ask-log" aria-live="polite">
             {turns.length === 0 && (
               <div className="ask-starters" role="group" aria-label="starter questions">
-                {startersFor(known ? screen : undefined, locked).map((q) => (
+                {(layer ? layer.suggested : startersFor(known ? screen : undefined, locked)).map((q) => (
                   <button key={q} className="ask-starter" disabled={busy} onClick={() => void send(q)}>{q}</button>
                 ))}
               </div>
@@ -161,6 +169,7 @@ export function AskHelp({ slug, kind, spot: given }: { slug: string; kind: 'sess
               <button type="submit" className="ask-send" disabled={busy || !text.trim()}>{busy ? 'Asking…' : 'Send'}</button>
             </div>
           </form>
+          <p className="ask-privacy">{PRIVACY_LINE}</p>
         </div>
       )}
     </>
