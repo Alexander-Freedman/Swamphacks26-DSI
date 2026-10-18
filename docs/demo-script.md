@@ -12,8 +12,8 @@ Name: **Onionskin**. Headline **"See your thinking in layers."** Subline **"Type
 
 ## Confirm before each judging block
 - [ ] Home shows two cards, **Organic chemistry** and **Calculus**, plus the topic box. (The first click right after load can be ignored while the page settles: wait a second after Home appears.)
-- [ ] **Organic chemistry** opens "What do you want to practice?" with **Molecules** (Build ethanol), **Mechanisms** (SN2, SN1, E2, E1) and **Guided path** (Start to finish).
-- [ ] **Calculus** opens the Calc 1 / Calc 2 / Calc 3 menu; **The slope of a curve** and **Area under a curve** open (not "COMING NEXT"); one rectangle shows **7.5**, exact **4.57**.
+- [ ] **Organic chemistry** opens straight on **Build ethanol** ("1 of 2"), no menu (#253). Step 2 is the SN2 arrows + scrubber.
+- [ ] **Calculus** opens straight on **Draw the slope.** ("1 of 4": sketch → tangent → area → card), no menu (#253); one rectangle shows **7.5**, exact **4.57**.
 - [ ] Reset before each judge: open with `?reset=1` or `Shift+R` on Home (clears answers and notebook).
 - [ ] #218 (SN2 vs E2) *if merged*: only then may the narrator mention it; otherwise SN2 is the mechanism we show.
 
@@ -41,27 +41,24 @@ Timings are rough, from walking the live site at 1440×900 with a real person's 
 | Time | Judge sees / does | Narrator says | Driver clicks |
 |---|---|---|---|
 | **0:00**<br>Hook | Home: **Onionskin · See your thinking in layers.** Two cards: **Organic chemistry**, **Calculus**. | "ChatGPT tells you the answer. Onionskin builds you a world where you find out you were wrong, and why." | Taps **Organic chemistry**. |
-| **0:10**<br>Pick a topic | "What do you want to practice?" Molecules · Mechanisms · Guided path. | "Pick what you want to practice. Let's build a molecule." | Taps **Build ethanol** (Molecules). Hands over the trackpad. |
+| **0:10**<br>Straight in | **Build ethanol, 1 of 2**: no menu, the first screen is already interactive. | "No menu. You're building a molecule in one tap." | Hands over the trackpad. |
 | **0:15**<br>Build, one mistake named live | Empty paper, palette **C H O N Br**, **↶ Undo**, **Clear**, "target: ethanol C₂H₆O". Judge drags atoms on and bonds them. **Deliberate mistake:** a 5th bond on a carbon → **"A carbon with 5 bonds"** shows under the formula right away. | "Ethanol, C₂H₆O. Each atom has slots: carbon four, oxygen two, hydrogen one. Watch what happens with one bond too many." … "It names the mistake as I make it." | If the judge builds cleanly, the driver drags one extra H onto a full carbon. |
-| **0:35**<br>Undo → Finish ✓ | **↶ Undo** takes the 5th bond back. Judge fills the last H's, taps **Check it** → "Correct!", **✓ ethanol CH₃–CH₂–OH**, then **Finish ✓** → "Saved to your notebook. ✓ mastered". | "Undo, finish it … and it checks the actual structure, not just the count." | Taps **← All orgo topics**. |
-| **0:55**<br>SN2, 1 of 4: Find the parts | Mechanisms → **SN2**. "Find the parts": tap the nucleophile, substrate carbon and leaving group in **HO⁻ + CH₃Br** (O of hydroxide, the carbon, Br). "All three found." | "Mechanisms, step by step. First find the three players: who has electrons to give, which carbon takes them, what leaves." | **Size them up →** |
-| **1:10**<br>2 of 4: Size them up | Three questions: nucleophile **Strong**, carbon **Methyl**, leaving group **Good**, each with a one-line reason. | "Strong nucleophile, methyl carbon, good leaving group." | **Pick the mechanism →** |
-| **1:20**<br>3 of 4: Pick off the chart | The chart: carbon (methyl, 1°, 2°, 3°) × nucleophile (strong, weak). The judge's row and column meet at **?**; they pick **SN2 · 1 STEP** and the reason shows. | "Your answers land on one square of the chart. That square is SN2: nothing blocks the back side, so it happens in one step." | **Show how the electrons move →** |
-| **1:35**<br>4 of 4: Draw the arrows | HO⁻ + CH₃Br. The judge drags two curved arrows (lone pair on O → carbon; C–Br bond → Br), then **Show me**: the real arrows ink over theirs and the reaction plays: **CH₃OH + Br⁻**. | "Draw where the electrons go. Arrows start on electrons. … Pencil is you, ink is reality: in from the back, bromide leaves with the bond's two electrons." | Drag stalls: **Draw with lists**. |
-| **2:00**<br>Calculus: slope | Home → **Calculus** → Calc 1 / Derivatives → **The slope of a curve**. Judge pencils the slope, then **Check it with a tangent** and drags the tangent along the curve; the true slope inks over the sketch. | "Calculus, same idea. Draw how steep this curve is. Now drag the tangent: the real slope draws itself over your pencil. The top of the hill is high, but it's flat there: slope zero." | Sketch copied the curve's height → the named mistake is **"Slope = height of the curve"**. |
-| **2:30**<br>Calculus: area | Back → Calc 1 / Integrals → **Area under a curve**. Guess the area; one rectangle says **7.5**; **Fill it with rectangles**, slider **1 → 200**; the sum settles on **4.57**. | "Guess the area. One rectangle says 7.5. Thinner and thinner: 4.8, 4.6, and it lands on 4.57. Code computes every number." | Drags the slider slowly. |
-| **2:50**<br>Close | Back on the Calculus menu: Calc 2 and Calc 3 chapters (Calc 3 **Slices of a surface** is a 3D surface). | "Orgo and calculus today, three courses of calculus on the menu. Every wrong idea goes in your notebook. Onionskin. See your thinking in layers." | **Stop talking. Hand over for questions.** |
+| **0:35**<br>Undo → Finish ✓ | **↶ Undo** takes the 5th bond back. Judge fills the last H's, taps **Check it** → "Correct!", **✓ ethanol CH₃–CH₂–OH**, then the next button → step 2. | "Undo, finish it … and it checks the actual structure, not just the count." | Taps **Show how the electrons move →**. |
+| **0:55**<br>2 of 2: Draw the arrows | HO⁻ + CH₃Br. The judge drags two curved arrows (lone pair on O → carbon; C–Br bond → Br), then **Show me**: the real arrows ink over theirs and the reaction plays: **CH₃OH + Br⁻**. Drag the scrubber back and forth to replay it. | "Draw where the electrons go. Arrows start on electrons. … Pencil is you, ink is reality: in from the back, bromide leaves with the bond's two electrons." | Drag stalls: **Draw with lists**. |
+| **1:30**<br>Calculus: slope | Home → **Calculus** opens straight on **Draw the slope.** Judge pencils the slope, then **Check it with a tangent** and drags the tangent along the curve; the true slope inks over the sketch. | "Calculus, same idea. Draw how steep this curve is. Now drag the tangent: the real slope draws itself over your pencil. The top of the hill is high, but it's flat there: slope zero." | Sketch copied the curve's height → the named mistake is **"Slope = height of the curve"**. |
+| **2:10**<br>Calculus: area | Next screen (3 of 4): guess the area; one rectangle says **7.5**; **Fill it with rectangles**, slider **1 → 200**; the sum settles on **4.57**. | "Guess the area. One rectangle says 7.5. Thinner and thinner: 4.8, 4.6, and it lands on 4.57. Code computes every number." | Drags the slider slowly. |
+| **2:40**<br>Close | 4 of 4: the card names what the pencil got wrong, saved to the notebook. | "Every wrong idea goes in your notebook. Onionskin. See your thinking in layers." | **Stop talking. Hand over for questions.** |
 
 **Typed topics:** a typed topic plays as a number slider in the round player, not a draggable curve yet, and the live behaviour of "derivative of x squared" wasn't confirmed in the last walk. So the 3:00 doesn't type a topic. If a judge asks, tap a **hand-checked** chip (e.g. **Exponential doubling**) and say "type any topic and it builds a small model you can run; the numbers are computed in code".
-**If the judge is fast:** Calc 3 → **Slices of a surface**: turn the 3D surface and slice it.
-**If the judge is slow:** skip Size them up's reasons (tap through) and the area guess (go straight to rectangles). **Never cut** the live-named 5th bond, the arrows, or the tangent.
+**If the judge is fast:** go back to Home and type a topic (Learn session, docs/learn-plan.md) once it's live.
+**If the judge is slow:** skip the area guess (go straight to rectangles). **Never cut** the live-named 5th bond, the arrows, or the tangent.
 
 ## The 90-second version (rushed judge)
 | Time | What happens |
 |---|---|
 | 0:00 | Chatbot line. **Organic chemistry → Build ethanol**: driver forces a 5th bond → "A carbon with 5 bonds" named live → **↶ Undo** → **Check it** → **Finish ✓**. |
-| 0:30 | **← All orgo topics → SN2**: tap the three parts, Strong / Methyl / Good, pick **SN2** on the chart, two arrows, **Show me**. |
-| 1:00 | **Calculus → The slope of a curve**: drag the tangent over the sketch. If time: **Area under a curve**, rectangles 1 → 200, 7.5 → 4.57. |
+| 0:30 | Step 2: two arrows, **Show me**, scrub the reaction. |
+| 1:00 | **Calculus**: sketch, drag the tangent over it. If time: next screen, rectangles 1 → 200, 7.5 → 4.57. |
 | 1:25 | "Onionskin. See your thinking in layers." Stop at 1:30. |
 
 ## Fallbacks (driver decides, no discussion at the table)
