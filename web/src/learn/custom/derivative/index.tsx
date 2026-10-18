@@ -17,7 +17,7 @@ function Tool({ stage, lead, topic, next }: { stage: string; lead: string; topic
   return (
     <section className="learn-step learn-tool" aria-label={stage}>
       <p className="learn-tool-lead">{lead}</p>
-      <CalculusSession topic={topic} onDone={next} />
+      <CalculusSession topic={topic} onDone={next} embedded />
     </section>
   )
 }
