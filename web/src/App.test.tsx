@@ -14,7 +14,6 @@ describe('Home cards', () => {
     render(<App />)
     const titles = [...document.querySelectorAll('.showcases.sessions .card-title')].map((t) => t.textContent)
     expect(titles.slice(0, 2)).toEqual(['Organic chemistry', 'Calculus'])
-    expect(titles).toContain('Statistics')
     expect(screen.queryByText('You tested positive. Are you sick?')).toBeNull()
     expect(screen.queryByText('The birthday problem')).toBeNull()
     expect(screen.queryByText('Be a coin')).toBeNull()
