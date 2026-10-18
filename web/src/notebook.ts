@@ -96,6 +96,13 @@ const EXTRA_LABELS: Record<string, string> = {
   'ch-bond-lost': 'The C–H electrons go nowhere',
   'crowding-ignored': 'Crowding ignored',
   'no-neighbor-h': 'Elimination with no neighbor H',
+  // orgo, Peel SN2 (sessions/orgo/layers.ts LAYER_MISTAKES)
+  'attack-the-bromine': 'Br as the target',
+  'attack-the-oxygen': 'The attacker as the target',
+  'attack-a-hydrogen': 'An H as the target',
+  'bromine-pair-attacks': 'Br’s lone pair attacks',
+  'ts-not-at-top': 'Transition state off the top',
+  'crowded-carbon-faster': 'More groups, faster SN2',
   // statistics (sessions/statistics/clt.ts CLT_MISTAKES)
   'averages-keep-shape': 'Averages keep the original shape',
   'averages-flat': 'Every average is equally likely',

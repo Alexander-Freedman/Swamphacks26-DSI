@@ -4,7 +4,7 @@
 
 import type { MechId } from './mechs'
 
-export type OrgoStep = 'build' | 'parts' | 'size' | 'decide' | 'push' | 'compare' | 'contrast'
+export type OrgoStep = 'build' | 'parts' | 'size' | 'decide' | 'push' | 'compare' | 'contrast' | 'layers'
 
 export type OrgoTopic = {
   id: string
@@ -31,7 +31,8 @@ export const SECTIONS: OrgoSection[] = [
     title: 'Mechanisms',
     blurb: 'Work it out step by step: find the parts, size them up, pick the mechanism, then draw the arrows.',
     topics: [
-      { id: 'sn2', title: 'SN2', blurb: 'One step: the nucleophile hits the back side as the leaving group leaves.', steps: ['parts', 'size', 'decide', 'push'], ready: true },
+      { id: 'sn2-layers', title: 'Peel SN2', blurb: 'One picture, five layers: atoms, electron pairs, arrows, the energy hill, crowding.', steps: ['layers'], ready: true },
+      { id: 'sn2', title: 'SN2 step by step', blurb: 'One step: the nucleophile hits the back side as the leaving group leaves.', steps: ['parts', 'size', 'decide', 'push'], ready: true },
       { id: 'sn1', title: 'SN1', blurb: 'Two steps: the leaving group goes first, then the carbocation is attacked.', steps: ['parts', 'size', 'decide', 'push'], ready: true, mech: 'sn1' },
       { id: 'e2', title: 'E2', blurb: 'One step: a base pulls a proton as the double bond forms.', steps: ['parts', 'size', 'decide', 'push'], ready: true, mech: 'e2' },
       { id: 'e1', title: 'E1', blurb: 'Two steps: carbocation first, then a proton leaves.', steps: ['parts', 'size', 'decide', 'push'], ready: true, mech: 'e1' },

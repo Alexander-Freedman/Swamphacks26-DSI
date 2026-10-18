@@ -220,3 +220,58 @@
 .orgo .og-why-big { font: 600 16px/1.4 var(--font-body); margin: 0; }
 .orgo .og-decide .og-principle { margin-top: 0; padding-top: 10px; }
 .orgo .og-analyze .og-scene { max-height: 46vh; }
+
+/* Peel SN2: one picture, a layer slider under it, one thing to do per layer. No grid in the play area. */
+.orgo .og-peel { display: grid; gap: 12px; max-width: 760px; }
+.orgo .og-peel .ss-title { margin-bottom: 0; }
+.orgo .og-peel-scene { background-image: none; }
+.orgo .og-pairhit { cursor: pointer; outline: none; }
+.orgo .og-pairhit circle { fill: var(--marker-soft); fill-opacity: 0.55; stroke: var(--pencil); stroke-width: 1.5; stroke-dasharray: 2 3; }
+.orgo .og-pairhit:hover circle, .orgo .og-pairhit:focus-visible circle { stroke: var(--ink); stroke-dasharray: none; fill: var(--marker); }
+.orgo .og-pairhit.ok circle { fill: var(--marker); stroke: var(--ink); stroke-dasharray: none; stroke-width: 2.5; }
+.orgo .og-pairhit.off circle { stroke: var(--off); stroke-dasharray: none; stroke-width: 2.5; }
+.orgo .og-fc { display: flex; flex-wrap: wrap; gap: 4px 14px; margin: 8px 0 0; font: 14px var(--font-mono); color: var(--ink); }
+.orgo .og-fc span:first-child { color: var(--ink-soft); flex-basis: 100%; }
+.orgo .og-axis { stroke: var(--ink-soft); stroke-width: 1.5; }
+.orgo .og-tip { fill: var(--ink-soft); }
+.orgo .og-hill-l { font: 13px var(--font-hand); fill: var(--ink-soft); }
+.orgo .og-hill-ts { font: 700 14px var(--font-body); fill: var(--ink); }
+.orgo .og-hill-curve { fill: none; stroke: var(--ink); stroke-width: 3; stroke-linecap: round; }
+.orgo .og-hill-dot { cursor: grab; outline: none; }
+.orgo .og-dot { fill: var(--marker); stroke: var(--ink); stroke-width: 2.5; }
+.orgo .og-dot.ok { fill: var(--called); }
+.orgo .og-dot.off { stroke: var(--off); }
+.orgo .og-hill-dot:focus-visible .og-dot { stroke-width: 4; }
+.orgo .og-hill-dot:focus-visible .og-hit { stroke: var(--marker-soft); stroke-width: 3; }
+.orgo .og-dragline { touch-action: none; }
+.orgo .og-bulk { fill: var(--marker-soft); fill-opacity: 0.6; stroke: var(--pencil); stroke-width: 1.5; stroke-dasharray: 3 3; }
+.orgo .og-path { stroke: var(--ink); stroke-width: 2.5; stroke-dasharray: 6 5; }
+.orgo .og-path.off { stroke: var(--off); }
+.orgo .og-block path { stroke: var(--off); stroke-width: 3.5; stroke-linecap: round; fill: none; }
+.orgo .og-block text { font: 700 13px var(--font-body); fill: var(--off); }
+
+.orgo .og-layers { display: grid; gap: 4px; padding: 10px 12px 8px; background: var(--card); border: 2px solid var(--ink); border-radius: 4px; }
+.orgo .og-layer-range { width: 100%; height: 34px; margin: 0; accent-color: var(--ink); cursor: pointer; }
+.orgo .og-stops { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 4px; }
+.orgo .og-stop { width: 100%; display: grid; justify-items: center; gap: 2px; padding: 4px 2px; background: none; border: 2px solid transparent; border-radius: 4px; color: var(--ink-soft); font: inherit; cursor: pointer; min-height: 44px; }
+.orgo .og-stop.on { border-color: var(--ink); color: var(--ink); background: var(--marker-soft); }
+.orgo .og-stop:focus-visible { outline: 2px solid var(--ink); outline-offset: 1px; }
+.orgo .og-stop-n { font: 700 14px var(--font-mono); }
+.orgo .og-stop.done .og-stop-n { color: var(--called); }
+.orgo .og-stop-l { font: 600 13px/1.15 var(--font-body); text-align: center; }
+
+.orgo .og-doit { display: grid; gap: 4px; }
+.orgo .og-doit .og-row { margin-top: 4px; }
+.orgo .og-nq { font: 700 18px var(--font-display); color: var(--off); margin-bottom: 4px; }
+.orgo .og-okwhy { font: 400 15px var(--font-body); color: var(--ink-soft); flex-basis: 100%; }
+.orgo .og-kinds { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 6px; }
+.orgo .og-kind { display: grid; gap: 2px; justify-items: center; padding: 8px 4px; background: var(--card); color: var(--ink); border: 2px solid var(--ink); border-radius: 4px; font: inherit; cursor: pointer; min-height: 52px; }
+.orgo .og-kind b { font: 700 17px var(--font-display); }
+.orgo .og-kind span { font-size: 12px; color: var(--ink-soft); overflow-wrap: anywhere; }
+.orgo .og-kind.on { background: var(--marker); box-shadow: 0 3px 0 var(--ink); }
+.orgo .og-order { margin: 6px 0 0; font: 700 16px var(--font-body); }
+@media (max-width: 420px) { .orgo .og-stop-l { font-size: 11px; } .orgo .og-kind span { font-size: 10px; } }
+@media (prefers-reduced-motion: reduce) {
+  .orgo .og-ink-arrow .og-arrow-line { animation: none; stroke-dashoffset: 0; }
+  .orgo .og-ink-arrow .og-arrow-head { animation: none; opacity: 1; }
+}
