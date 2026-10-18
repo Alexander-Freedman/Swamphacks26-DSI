@@ -100,7 +100,12 @@ export function mockGraders(topic: Topic) {
     stress({ fix, caseIndex }: StressRequest): StressResponse {
       const c = topic.extremeCases[caseIndex]
       const survives = !!c && overlap(fix, c.correctBehavior) >= 2
-      return { offline: true, verdict: survives ? 'survives' : 'breaks', critique: c?.correctBehavior ?? '' }
+      return {
+        offline: true,
+        verdict: survives ? 'survives' : 'breaks',
+        critique: c?.correctBehavior ?? '',
+        piece: survives ? null : (c?.predict?.piece ?? null),
+      }
     },
     why({ answer }: WhyRequest): WhyResponse {
       const ok = overlap(answer, r.whyRuleMatters) >= 2

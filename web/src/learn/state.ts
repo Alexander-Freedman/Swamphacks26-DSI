@@ -11,6 +11,7 @@ export const initialState = (): LearnState => ({
   fix: '',
   stressHistory: [],
   stressCritiques: [],
+  stressChoices: {},
   whyResult: null,
   revealResult: null,
   drawRule: '',

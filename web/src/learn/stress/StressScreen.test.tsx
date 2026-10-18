@@ -6,103 +6,120 @@ import bundled from '../../../../data/learn/compound-interest.json'
 import { createMockLearnApi } from '../../learnApi'
 import { initialState } from '../state'
 import type { LearnApi, LearnState, StressResponse, Topic } from '../types'
-import { latestByCase } from './stress'
+import { latestByCase, withPiece } from './stress'
 import { StressScreen } from './StressScreen'
 
 afterEach(cleanup)
 
-const topic = bundled as unknown as Topic
+const base = bundled as unknown as Topic
+// Predict data for the three cases (the real files get theirs from the authoring pass).
+const topic: Topic = {
+  ...base,
+  extremeCases: base.extremeCases.slice(0, 3).map((c, i) => ({
+    ...c,
+    predict: {
+      question: `What happens in case ${i + 1}?`,
+      choices: [
+        { text: `right answer ${i + 1}`, correct: true, misconceptionId: null },
+        { text: `wrong answer ${i + 1}`, correct: false, misconceptionId: 'simple-interest' },
+        { text: `other wrong ${i + 1}`, correct: false, misconceptionId: null },
+      ],
+      piece: `piece ${i + 1}`,
+    },
+  })),
+}
 const seen: { state: LearnState | null } = { state: null }
 
-function Harness({ api, fix = '', next = () => {} }: { api: LearnApi; fix?: string; next?: () => void }) {
+function Harness({ api, fix = '', next = () => {}, t = topic }: { api: LearnApi; fix?: string; next?: () => void; t?: Topic }) {
   const [state, setState] = useState<LearnState>({ ...initialState(), stage: 'stress', fix })
   useEffect(() => {
     seen.state = state
   }, [state])
-  return <StressScreen topic={topic} state={state} update={(p) => setState((s) => ({ ...s, ...p }))} next={next} api={api} />
+  return <StressScreen topic={t} state={state} update={(p) => setState((s) => ({ ...s, ...p }))} next={next} api={api} />
 }
 
-/** A grader that answers each case in order from a script. */
-function scripted(verdicts: StressResponse['verdict'][]): LearnApi {
-  const base = createMockLearnApi()
+/** A grader that answers each check in order from a script. */
+function scripted(results: Pick<StressResponse, 'verdict' | 'piece'>[]): LearnApi {
+  const api = createMockLearnApi()
   let i = 0
-  return { ...base, stress: async () => ({ verdict: verdicts[i++], critique: `critique ${i}` }) }
+  return { ...api, stress: async () => ({ ...results[i], critique: `critique ${++i}` }) }
 }
 
 const card = (n: number) => screen.getByRole('listitem', { name: `case ${n}` })
-async function testCase(n: number) {
-  await act(async () => void fireEvent.click(within(card(n)).getByRole('button')))
+async function pick(n: number, text: RegExp) {
+  await act(async () => void fireEvent.click(within(card(n)).getByRole('button', { name: text })))
 }
 
-describe('StressScreen', () => {
-  it('shows the fix as a chip and three extreme cards', () => {
+describe('StressScreen: predict, then check', () => {
+  it('shows the rule and three cards; only the first is open', () => {
     render(<Harness api={createMockLearnApi()} fix="it grows on itself" />)
     expect(screen.getByText('“it grows on itself”')).toBeTruthy()
-    for (let n = 1; n <= 3; n++) expect(within(card(n)).getByText(topic.extremeCases[n - 1].scenario)).toBeTruthy()
+    expect(card(1).className).not.toContain('is-locked')
+    expect(card(2).className).toContain('is-locked')
+    expect(within(card(2)).queryByRole('button', { name: /answer/ })).toBeNull()
   })
 
-  it('asks for a fix first when there is none', () => {
+  it('asks for a rule first when there is none', () => {
     render(<Harness api={createMockLearnApi()} />)
-    expect((within(card(1)).getByRole('button', { name: 'Test it' }) as HTMLButtonElement).disabled).toBe(true)
-    fireEvent.change(screen.getByLabelText('your fix'), { target: { value: 'rate and time decide it' } })
-    fireEvent.click(screen.getByRole('button', { name: 'Use it' }))
-    expect((within(card(1)).getByRole('button', { name: 'Test it' }) as HTMLButtonElement).disabled).toBe(false)
+    expect(screen.getByLabelText('your fix')).toBeTruthy()
+    expect((within(card(1)).getByRole('button', { name: /right answer 1/ }) as HTMLButtonElement).disabled).toBe(true)
   })
 
-  it('stamps each card and saves the history', async () => {
-    render(<Harness api={scripted(['survives', 'breaks'])} fix="my fix" />)
-    await testCase(1)
-    expect(within(card(1)).getByText('survives')).toBeTruthy()
-    expect(within(card(1)).getByText('critique 1')).toBeTruthy()
-    await testCase(2)
-    expect(within(card(2)).getByText('breaks')).toBeTruthy()
-    expect(seen.state!.stressHistory).toEqual([
-      { caseIndex: 0, fix: 'my fix', verdict: 'survives' },
-      { caseIndex: 1, fix: 'my fix', verdict: 'breaks' },
-    ])
-    expect(seen.state!.stressCritiques).toHaveLength(2)
+  it('a pick shows the truth, then whether the rule covered it', async () => {
+    render(<Harness api={scripted([{ verdict: 'survives', piece: null }])} fix="it grows on itself" />)
+    await pick(1, /right answer 1/)
+    expect(within(card(1)).getByText('Right.')).toBeTruthy()
+    expect(within(card(1)).getByText('✓ Your rule covered this.')).toBeTruthy()
+    expect(seen.state!.stressChoices[0]).toBe(0)
+    expect(latestByCase(seen.state!.stressHistory).get(0)?.verdict).toBe('survives')
+    expect(card(2).className).not.toContain('is-locked')
   })
 
-  it('a break lets you revise the fix and retry that card', async () => {
-    render(<Harness api={scripted(['breaks', 'survives'])} fix="old fix" />)
-    await testCase(1)
-    const retry = within(card(1)).getByRole('button') as HTMLButtonElement
-    expect(retry.disabled).toBe(true) // same fix: revise first
-    fireEvent.click(screen.getByRole('button', { name: 'Revise' }))
-    fireEvent.change(screen.getByLabelText('your fix'), { target: { value: 'new fix' } })
-    fireEvent.click(screen.getByRole('button', { name: 'Use it' }))
-    expect(within(card(1)).getByRole('button', { name: 'Retry with the new fix' })).toBeTruthy()
-    await testCase(1)
-    expect(within(card(1)).getByText('survives')).toBeTruthy()
-    expect(latestByCase(seen.state!.stressHistory).get(0)).toEqual({ caseIndex: 0, fix: 'new fix', verdict: 'survives' })
+  it('a miss names the missing piece; one tap adds it to the rule', async () => {
+    render(<Harness api={scripted([{ verdict: 'breaks', piece: 'interest is paid on past interest' }])} fix="money grows" />)
+    await pick(1, /wrong answer 1/)
+    expect(within(card(1)).getByText('Not quite.')).toBeTruthy()
+    fireEvent.click(within(card(1)).getByRole('button', { name: /add to your rule: interest is paid on past interest/ }))
+    expect(seen.state!.fix).toBe('money grows; and interest is paid on past interest')
+    expect(within(card(1)).getByRole('button', { name: /added to your rule/ }).hasAttribute('disabled')).toBe(true)
   })
 
-  it('two survives on different cases open the why question', async () => {
-    render(<Harness api={scripted(['survives', 'survives'])} fix="my fix" />)
-    await testCase(1)
-    expect(screen.queryByText(topic.rubric.whyRuleQuestion)).toBeNull()
-    await testCase(2)
-    expect(screen.getByText(topic.rubric.whyRuleQuestion)).toBeTruthy()
-    fireEvent.change(screen.getByLabelText('why answer'), { target: { value: 'each year earns interest on last year interest so it multiplies' } })
-    await act(async () => void fireEvent.click(screen.getByRole('button', { name: 'Check it' })))
-    expect(seen.state!.whyResult).not.toBeNull()
+  it('after all three cards: the grown rule and the why question', async () => {
+    render(<Harness api={scripted([{ verdict: 'survives' }, { verdict: 'breaks', piece: 'p2' }, { verdict: 'survives' }])} fix="it grows" />)
+    await pick(1, /right answer 1/)
+    await pick(2, /wrong answer 2/)
+    fireEvent.click(within(card(2)).getByRole('button', { name: /add to your rule: p2/ }))
+    await pick(3, /right answer 3/)
+    expect(screen.getByText('Your rule now')).toBeTruthy()
+    expect(screen.getByText('“it grows; and p2”', { selector: '.st-rule' })).toBeTruthy()
+    expect(screen.getByLabelText('why answer')).toBeTruthy()
   })
 
-  it('three breaks bring the reveal, tied to the broken case', async () => {
-    const api = scripted(['breaks', 'breaks', 'breaks'])
-    render(<Harness api={api} fix="it adds the same amount each year" />)
-    await testCase(1)
-    await testCase(2)
-    await testCase(3)
-    expect(await screen.findByText(topic.rubric.coreRule)).toBeTruthy()
-    expect(seen.state!.revealResult?.confirmCase).toBe(topic.extremeCases[0].correctBehavior)
-    expect(screen.queryByRole('button', { name: /retry/i })).toBeNull()
+  it('a case without predict data checks the rule directly', async () => {
+    const noCards: Topic = { ...base, extremeCases: base.extremeCases.map((c) => ({ ...c, predict: null })) }
+    render(<Harness api={scripted([{ verdict: 'survives' }])} fix="it grows" t={noCards} />)
+    await act(async () => void fireEvent.click(within(card(1)).getByRole('button', { name: 'Test my rule' })))
+    expect(within(card(1)).getByText('✓ Your rule covered this.')).toBeTruthy()
   })
 
-  it('says when the answer came from the offline check', async () => {
-    render(<Harness api={createMockLearnApi()} fix="my fix" />)
-    await testCase(1)
-    expect(screen.getByText(/Checked against the topic's notes/)).toBeTruthy()
+  it('a rate limit (429) gets a friendly line, not the server-down line', async () => {
+    const api: LearnApi = {
+      ...createMockLearnApi(),
+      stress: async () => ({ offline: true, reason: 'network', detail: 'slow down: too many answers this hour' }),
+    }
+    render(<Harness api={api} fix="it grows on itself" />)
+    await pick(1, /right answer 1/)
+    expect(screen.getByText(/Lots of people are trying this right now/)).toBeTruthy()
+  })
+
+  it('a curve topic shows each card its curve at that extreme, with the watch line', () => {
+    render(<Harness api={createMockLearnApi()} fix="it grows on itself" />)
+    expect(within(card(1)).getByRole('img')).toBeTruthy()
+  })
+
+  it('a topic without a visual keeps plain text cards', () => {
+    render(<Harness api={createMockLearnApi()} fix="x" t={{ ...topic, visual: null }} />)
+    expect(screen.queryAllByRole('img')).toHaveLength(0)
   })
 
   it('Next always moves on', () => {
@@ -111,28 +128,11 @@ describe('StressScreen', () => {
     fireEvent.click(screen.getByRole('button', { name: 'Next' }))
     expect(moved).toBe(true)
   })
-
-  it('a rate limit (429) gets a friendly line, not the server-down line', async () => {
-    const api: LearnApi = { ...createMockLearnApi(), stress: async () => ({ offline: true, reason: 'network', detail: 'slow down: too many answers this hour' }) }
-    render(<Harness api={api} fix="it grows on itself" />)
-    await testCase(1)
-    expect(screen.getByText(/Lots of people are trying this right now/)).toBeTruthy()
-    expect(screen.queryByText(/can't reach the server/)).toBeNull()
-  })
-
-  it('a curve topic shows each card its curve at that extreme, with the watch line', () => {
-    render(<Harness api={createMockLearnApi()} fix="it grows on itself" />)
-    for (const n of [1, 2, 3]) expect(within(card(n)).getByRole('img')).toBeTruthy()
-    expect(within(card(1)).getByText('yearly rate (%) = 5')).toBeTruthy()
-    expect(within(card(1)).getByText(/grows to \$4,322 by year 30/)).toBeTruthy()
-    expect(within(card(2)).getByText('yearly rate (%) = 0')).toBeTruthy()
-    expect(within(card(3)).getByText('yearly rate (%) = 10')).toBeTruthy()
-  })
-
-  it('a topic without a visual keeps plain text cards', () => {
-    const plain = { ...topic, visual: null }
-    render(<StressScreen topic={plain} state={{ ...initialState(), stage: 'stress', fix: 'x' }} update={() => {}} next={() => {}} api={createMockLearnApi()} />)
-    expect(screen.queryAllByRole('img')).toHaveLength(0)
-  })
 })
 
+describe('withPiece', () => {
+  it('adds a clause, or starts the rule', () => {
+    expect(withPiece('money grows.', 'on past interest')).toBe('money grows; and on past interest')
+    expect(withPiece('', 'on past interest')).toBe('on past interest')
+  })
+})

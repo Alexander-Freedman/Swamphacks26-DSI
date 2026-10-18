@@ -87,7 +87,7 @@ describe('mock graders', () => {
   })
   it('stress returns the pre-authored correct behavior with a keyword verdict', () => {
     const r = g.stress({ fix: 'with nothing added the balance stays exactly the same', caseIndex: 1, history: [] })
-    expect(r).toEqual({ offline: true, verdict: 'survives', critique: topic.extremeCases[1].correctBehavior })
+    expect(r).toEqual({ offline: true, verdict: 'survives', critique: topic.extremeCases[1].correctBehavior, piece: null })
     expect(g.stress({ fix: 'hmm', caseIndex: 2, history: [] }).verdict).toBe('breaks')
   })
   it('draw grades all four criteria', () => {
