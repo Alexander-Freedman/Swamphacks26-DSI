@@ -151,3 +151,16 @@ describe('AnchorScreen', () => {
     expect(screen.getByText('offline check')).toBeTruthy()
   })
 })
+
+describe('guess question wording', () => {
+  it('a topic that is already a question is used as the question', async () => {
+    const { cleanup: c, render: r, screen: s } = await import('@testing-library/react')
+    const { GuessScreen } = await import('./GuessScreen')
+    const { initialState: init } = await import('./state')
+    const { createMockLearnApi: mk } = await import('../learnApi')
+    const t = { ...(bundled as unknown as Topic), topic: 'why we have seasons' }
+    r(<GuessScreen topic={t} state={{ ...init(), stage: 'guess' }} update={() => {}} next={() => {}} api={mk()} />)
+    expect(s.getByText('Why we have seasons? Say it in your own words.')).toBeTruthy()
+    c()
+  })
+})
