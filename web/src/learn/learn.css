@@ -60,3 +60,12 @@
 @media (min-width: 721px) {
   .app:has(.learn) .topbar { width: min(1100px, calc(100vw - 32px)); margin-left: calc(50% - min(550px, 50vw - 16px)); }
 }
+
+/* the top bar stays put while you scroll (logo, Research tab, Ask Onion always one tap away) */
+.app:has(.learn) .topbar,
+.app:has(.rs-page) .topbar {
+  position: sticky; top: 0; z-index: 20; padding: 10px 0; margin-bottom: 12px;
+  background: var(--paper); box-shadow: 0 1px 0 var(--grid);
+}
+.app:has(.learn) .learn-why { top: 72px; }
+.app:has(.learn) .learn-card { scroll-margin-top: 80px; }
