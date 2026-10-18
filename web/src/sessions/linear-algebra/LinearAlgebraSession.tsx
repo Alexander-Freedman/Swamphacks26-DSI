@@ -193,7 +193,8 @@ const px = (p: V) => ({ x: S / 2 + p.x * U, y: S / 2 - p.y * U })
 
 function Plane({ m, onDrag, squashed }: { m: M; onDrag?: (which: 'i' | 'j', p: V) => void; squashed: boolean }) {
   const svg = useRef<SVGSVGElement>(null)
-  const [held, setHeld] = useState<'i' | 'j' | null>(null)
+  // a ref, not state: a move can arrive before React re-renders after the press
+  const held = useRef<'i' | 'j' | null>(null)
   const toWorld = (e: PointerEvent<SVGSVGElement>): V | null => {
     const ctm = svg.current?.getScreenCTM?.()
     if (!ctm) return null
@@ -201,9 +202,9 @@ function Plane({ m, onDrag, squashed }: { m: M; onDrag?: (which: 'i' | 'j', p: V
     return { x: (p.x - S / 2) / U, y: (S / 2 - p.y) / U }
   }
   const move = (e: PointerEvent<SVGSVGElement>) => {
-    if (!held || !onDrag) return
+    if (!held.current || !onDrag) return
     const w = toWorld(e)
-    if (w) onDrag(held, { x: Math.max(-4, Math.min(4, w.x)), y: Math.max(-4, Math.min(4, w.y)) })
+    if (w) onDrag(held.current, { x: Math.max(-4, Math.min(4, w.x)), y: Math.max(-4, Math.min(4, w.y)) })
   }
   const key = (which: 'i' | 'j') => (e: KeyboardEvent<SVGGElement>) => {
     if (!onDrag) return
@@ -237,7 +238,7 @@ function Plane({ m, onDrag, squashed }: { m: M; onDrag?: (which: 'i' | 'j', p: V
         onKeyDown={key(which)}
         onPointerDown={(e) => {
           if (!onDrag) return
-          setHeld(which)
+          held.current = which
           svg.current?.setPointerCapture?.(e.pointerId)
         }}
       >
@@ -248,7 +249,7 @@ function Plane({ m, onDrag, squashed }: { m: M; onDrag?: (which: 'i' | 'j', p: V
     )
   }
   return (
-    <svg ref={svg} className="sj-svg la-plane" viewBox={`0 0 ${S} ${S}`} role="group" aria-label="the plane" onPointerMove={move} onPointerUp={() => setHeld(null)} onPointerCancel={() => setHeld(null)}>
+    <svg ref={svg} className="sj-svg la-plane" viewBox={`0 0 ${S} ${S}`} role="group" aria-label="the plane" onPointerMove={move} onPointerUp={() => (held.current = null)} onPointerCancel={() => (held.current = null)}>
       <defs>
         {(['i', 'j'] as const).map((w) => (
           <marker key={w} id={`la-head-${w}`} viewBox="0 0 10 10" refX="8" refY="5" markerWidth="5" markerHeight="5" orient="auto-start-reverse">
