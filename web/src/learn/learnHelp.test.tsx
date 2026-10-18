@@ -15,6 +15,8 @@ describe('Ask Onion on Learn steps', () => {
       const h = learnHelp(T, { ...initialState(), stage, fix: 'tilt decides' })
       expect(h.topic).toBe('why we have seasons')
       expect(h.onScreen.length).toBeGreaterThan(10)
+      expect(h.hint).not.toBe(h.title) // a real nudge, not the step name
+      expect(h.hint.includes(T.rubric.coreRule)).toBe(false)
       const leaked = h.facts.some((f) => f.includes(T.rubric.coreRule))
       expect(leaked).toBe(stage === 'done')
     }
