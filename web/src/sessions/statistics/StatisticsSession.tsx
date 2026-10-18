@@ -173,17 +173,17 @@ function CltRun({ topic, onTopics, onDone }: { topic: StatTopic; onTopics: () =>
               )}
             </div>
           )}
+          {phase === 'done' && (
+            <EndBar
+              caught={null}
+              rematch="right"
+              line={mistakes.length ? <>Caught: {mistakes.map((m) => `“${CLT_MISTAKES[m].label}”`).join(', ')}.</> : <span className="st-mastered">✓ mastered</span>}
+              remix="Next: the law of large numbers."
+              onDone={onDone}
+            />
+          )}
         </div>
       </div>
-      {phase === 'done' && (
-        <EndBar
-          caught={null}
-          rematch="right"
-          line={mistakes.length ? <>Caught: {mistakes.map((m) => `“${CLT_MISTAKES[m].label}”`).join(', ')}.</> : <span className="st-mastered">✓ mastered</span>}
-          remix="Next: the law of large numbers."
-          onDone={onDone}
-        />
-      )}
     </Frame>
   )
 }
