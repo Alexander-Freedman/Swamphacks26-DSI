@@ -2,20 +2,24 @@ import { useCallback, useEffect, useRef, useState, type ReactNode } from 'react'
 import { EndBar, Frame, SessionHead, Title } from '../../components/session/Shell'
 import { record } from '../../notebook'
 import { BIO_MISTAKES, type BioMistake } from './mistakes'
+import { HeartStep, KidneyStep, MuscleStep } from './AnatomySteps'
 import { CodonsStep, MutateStep, TranscribeStep, TranslateStep } from './Steps'
 import { CHAPTERS, type BioStep, type BioTopic } from './topics'
 import './biology.css'
 
 export const SLUG = 'biology'
-const LABEL: Record<BioStep, string> = { transcribe: 'Copy', codons: 'Codons', translate: 'Protein', mutate: 'Mutations' }
+const LABEL: Record<BioStep, string> = { transcribe: 'Copy', codons: 'Codons', translate: 'Protein', mutate: 'Mutations', heart: 'Heart', kidney: 'Kidney', muscle: 'Muscle' }
 // Each step's title, and one plain sentence: what you're doing and why.
 const TITLES: Record<BioStep, [string, string]> = {
   transcribe: ['Copy the gene into RNA', 'A gene is stored as DNA in the nucleus, but proteins are built outside it. So the cell copies the gene into messenger RNA (mRNA). You’re the RNA polymerase: pair an RNA base with each base of the DNA template strand.'],
   codons: ['Read it in threes', 'A ribosome reads the mRNA in groups of bases called codons, and each codon picks one amino acid. Predict how big a codon is, then find where reading starts.'],
   translate: ['Build the protein', 'The ribosome moves along one codon at a time. A tRNA whose anticodon pairs with that codon brings one amino acid. Look up each codon in the table and pick its amino acid.'],
   mutate: ['Change one letter', 'A mutation is a change in the DNA, so the mRNA changes too. Predict what each change does to the protein, then see the old and new proteins side by side.'],
+  heart: ['Follow the blood', 'Predict where one drop of blood goes next. It moves only when you’re right.'],
+  kidney: ['Inside a nephron', 'Predict what the kidney filters, keeps and lets go. The picture fills in as you go.'],
+  muscle: ['Muscle contraction', 'Predict what happens inside a sarcomere when a muscle contracts. Watch it move.'],
 }
-const REMIX: Record<string, string> = { 'dna-protein': 'Next time: a different gene, different changes.' }
+const REMIX: Record<string, string> = { 'dna-protein': 'Next time: a different gene, different changes.', heart: 'Next: the kidney.', kidney: 'Next: muscle contraction.', muscle: 'Next: the heart.' }
 
 /** Biology opens on a menu: pick a chapter and a topic. */
 export function BiologySession({ onDone }: { onDone: () => void }) {
@@ -107,6 +111,9 @@ function BioRun({ topic, onTopics, onDone }: { topic: BioTopic; onTopics: () => 
       {block('codons', <CodonsStep {...props('codons')} />)}
       {block('translate', <TranslateStep {...props('translate')} />)}
       {block('mutate', <MutateStep {...props('mutate')} />)}
+      {block('heart', <HeartStep {...props('heart')} />)}
+      {block('kidney', <KidneyStep {...props('kidney')} />)}
+      {block('muscle', <MuscleStep {...props('muscle')} />)}
       {finished && (
         <div ref={end}>
           <EndBar

@@ -114,3 +114,41 @@
   .bio .bio-pop, .bio .bio-codon { animation: none; }
   .bio .bio-pol, .bio .bio-ribo { transition: none; }
 }
+
+/* anatomy: picture beside one question, so a screen fits one window */
+.bio .bio-walk { display: grid; grid-template-columns: minmax(0, 1.15fr) minmax(260px, 1fr); gap: 18px; align-items: start; max-width: 1000px; margin: 0 auto; }
+.bio .bio-walk-pic .bio-svg { max-height: min(62vh, 520px); }
+.bio .bio-walk-q { display: grid; gap: 10px; }
+.bio .bio-walk .bio-choices { grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); }
+.bio .bio-tag { font: 700 12px var(--font-mono); text-transform: uppercase; letter-spacing: 0.08em; color: var(--ink-soft); }
+@media (max-width: 760px) { .bio .bio-walk { grid-template-columns: minmax(0, 1fr); gap: 10px; } .bio .bio-walk-pic .bio-svg { max-height: 34vh; } }
+.bio .bio-organ { fill: var(--card); stroke: var(--ink); stroke-width: 2; stroke-dasharray: 5 4; }
+.bio .bio-organ-t { font: 700 14px var(--font-display); fill: var(--ink); }
+.bio .bio-chamber { fill: #fbeceb; stroke: var(--ink); stroke-width: 2.5; }
+.bio .bio-chamber.bio-thick { stroke-width: 6; }
+.bio .bio-chamber-t { font: 12px var(--font-hand); fill: var(--ink); }
+.bio .bio-vessel { fill: none; stroke-width: 7; stroke-linecap: round; stroke-linejoin: round; }
+.bio .bio-vessel-off { stroke: var(--grid, #e6e0d2); }
+.bio .bio-blue { stroke: #6f9be8; }
+.bio .bio-red { stroke: #e05a4f; }
+.bio .bio-valve path { stroke: var(--ink); stroke-width: 3; fill: none; }
+.bio .bio-valve text, .bio .bio-valve-t { font: 11px var(--font-hand); fill: var(--ink-soft); }
+.bio .bio-drop { stroke: var(--ink); stroke-width: 2; transition: transform 700ms ease-in-out, fill 400ms; }
+.bio .bio-blue-fill { fill: #6f9be8; }
+.bio .bio-red-fill { fill: #e05a4f; }
+.bio .bio-glom { fill: #f2a7a0; stroke: #e05a4f; stroke-width: 3; stroke-dasharray: 3 2; }
+.bio .bio-capsule { fill: none; stroke: var(--ink); stroke-width: 3; }
+.bio .bio-tubule { fill: none; stroke: var(--ink); stroke-width: 10; stroke-linecap: round; opacity: 0.85; }
+.bio .bio-back { stroke: #e05a4f; stroke-width: 2.5; stroke-dasharray: 4 3; fill: none; }
+.bio .bio-adh { stroke: #6f9be8; stroke-width: 3; }
+.bio .bio-glu { fill: #ffe08a; stroke: var(--ink); }
+.bio .bio-h2o { fill: #a9c8f5; stroke: var(--ink); }
+.bio .bio-urea { fill: #9fd8a8; stroke: var(--ink); }
+.bio .bio-prot { fill: #c9a3e6; stroke: var(--ink); }
+.bio .bio-zline { stroke: var(--ink); stroke-width: 5; }
+.bio .bio-actin { stroke: #e05a4f; stroke-width: 4; stroke-linecap: round; }
+.bio .bio-myosin { stroke: var(--ink); stroke-width: 9; stroke-linecap: round; }
+.bio .bio-head { stroke: var(--ink); stroke-width: 2.5; fill: none; }
+.bio .bio-band { fill: none; stroke: var(--ink); stroke-width: 2; }
+.bio .bio-slide { transition: transform 900ms ease-in-out; }
+@media (prefers-reduced-motion: reduce) { .bio .bio-drop, .bio .bio-slide { transition: none; } }

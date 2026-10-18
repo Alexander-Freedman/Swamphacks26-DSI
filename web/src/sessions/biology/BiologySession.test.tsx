@@ -20,10 +20,11 @@ const label = (m: keyof typeof BIO_MISTAKES) => screen.getByText(BIO_MISTAKES[m]
 describe('biology session', () => {
   it('opens on a chapter menu: DNA → RNA → protein is ready, the rest are coming next', () => {
     render(<session.Component onDone={() => {}} />)
-    for (const ch of ['Cells', 'Genetics', 'Cell division', 'Physiology']) expect(screen.getByRole('heading', { name: ch })).toBeTruthy()
+    for (const ch of ['Cells', 'Genetics', 'Cell division', 'Anatomy and physiology']) expect(screen.getByRole('heading', { name: ch })).toBeTruthy()
     expect((screen.getByRole('button', { name: /^DNA → RNA → protein/ }) as HTMLButtonElement).disabled).toBe(false)
     for (const t of [/^Cell respiration/, /^Punnett squares/, /^Mitosis vs meiosis/, /^Action potential/]) expect((screen.getByRole('button', { name: t }) as HTMLButtonElement).disabled).toBe(true)
     expect(screen.getAllByText('coming next')).toHaveLength(4)
+    for (const t of [/^The heart/, /^The kidney/, /^Muscle contraction/]) expect((screen.getByRole('button', { name: t }) as HTMLButtonElement).disabled).toBe(false)
   })
 
   it('DNA → RNA → protein: predict, pair, read, translate, mutate; wrong answers named and saved', () => {
@@ -85,6 +86,41 @@ describe('biology session', () => {
     expect(e).toMatchObject({ mistakes: ['rna-has-thymine', 'copied-not-paired', 'too-few-bases-per-codon', 'starts-at-first-base', 'read-anticodon', 'stop-has-amino-acid', 'every-change-breaks-protein', 'frameshift-one-change'] })
     expect(document.body.textContent).not.toMatch(/lock it in|called it|\bbet\b|how sure|points|\bXP\b/i)
   }, 60000)
+
+  it('the heart: wrong sides named, the drop follows each right answer to the body, saved', () => {
+    render(<session.Component onDone={() => {}} />)
+    click(/^The heart/)
+    click(/^Left atrium/)
+    expect(label('heart-sides-swapped')).toBeTruthy()
+    const go = (a: RegExp) => {
+      click(a)
+      expect(screen.getByText('✓ Correct!')).toBeTruthy()
+    }
+    go(/^Right atrium/)
+    for (const [a, next] of [[/^Tricuspid/, 1], [/^To the lungs/, 1], [/^It picks up/, 1], [/^Left atrium/, 1], [/^Mitral/, 1], [/^Thicker/, 0]] as const) {
+      click(next || a.source !== '^Tricuspid' ? 'Next question →' : 'Next question →')
+      go(a)
+    }
+    click('Finish ✓')
+    expect(entries()[0]).toMatchObject({ session: 'biology', bioTopic: 'heart', misconception: 'heart-sides-swapped' })
+  })
+
+  it('kidney and muscle play end to end', () => {
+    for (const [topic, answers] of [
+      [/^The kidney/, [/^Proteins/, /^Proximal tubule/, /^About 1.5 L/, /^About half/, /^Less, and darker/]],
+      [/^Muscle contraction/, [/^Thin and thick filaments slide/, /^The A band/, /^Ca²⁺ binding/, /^Lets the head let go/]],
+    ] as const) {
+      const { unmount } = render(<session.Component onDone={() => {}} />)
+      click(topic)
+      answers.forEach((a, i) => {
+        if (i) click('Next question →')
+        click(a)
+      })
+      click('Finish ✓')
+      expect(screen.getByText(/Saved to your notebook/)).toBeTruthy()
+      unmount()
+    }
+  })
 
   it('the notebook shows the same names as the session', () => {
     for (const [id, m] of Object.entries(BIO_MISTAKES)) expect(labelFor('biology', id)).toBe(m.label)
