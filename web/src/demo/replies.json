@@ -1,0 +1,22 @@
+{
+ "base-rates-and-false-positives/guess": {
+  "request": {
+   "text": "If the test is 99% accurate, a positive means I'm about 99% likely to be sick."
+  },
+  "reply": {
+   "classification": "concrete",
+   "misconceptionId": "accuracy-is-my-chance",
+   "message": "Your guess that a 99% accurate test makes a positive result mean a 99% chance of being sick already gives us something testable. Next, we’ll test that claim against how the testing system works."
+  }
+ },
+ "base-rates-and-false-positives/anchor": {
+  "request": {
+   "answer": "At people who truly have it (%) 0.1 I predict about 39%. Not automatically. About 100 false alarms against only 10 real cases means most positives are wrong."
+  },
+  "reply": {
+   "verdict": "unresolved",
+   "feedback": "Your claim that a positive is “not automatically” strong evidence fits the roughly 100 false alarms versus only 10 real cases among 10,000 people. But your prediction of “about 39%” is unclear and seems to conflict with that reasoning.",
+   "followUpQuestion": "Using this same group, what does your “39%” describe, and how does it fit with about 100 false alarms and only 10 people who truly have the condition?"
+  }
+ }
+}

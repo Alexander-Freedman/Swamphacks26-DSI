@@ -1,0 +1,24 @@
+{
+  "home": "false positives",
+  "base-rates-and-false-positives": {
+    "guess answer": "If the test is 99% accurate, a positive means I'm about 99% likely to be sick.",
+    "anchor answer": "Not automatically. About 100 false alarms against only 10 real cases means most positives are wrong.",
+    "rule When": "the condition is rare",
+    "rule then": "most positives are false alarms",
+    "rule because": "healthy people vastly outnumber sick ones",
+    "why answer": "Because a positive can come from a sick person the test catches or a healthy person it mislabels, and when sick people are rare the mislabeled healthy ones outnumber them.",
+    "draw rule": "Chance a positive is real = true positives / all positives",
+    "draw notes": "sick people the test catches, plus healthy people it wrongly flags, both feed the positives",
+    "neighbor answer": "Sensitivity is how often sick people test positive; whether a positive is real also depends on how many healthy people get false alarms.",
+    "transfer answer": "A smoke alarm in a kitchen: most beeps are burnt toast, not fires, because real fires are rare and toast happens every day."
+  },
+  "derivative": {
+    "guess answer": "The derivative is how much a function changes overall.",
+    "rule When": "you shrink the interval around one moment",
+    "rule then": "the average rate settles on the speed right then",
+    "rule because": "the derivative is the local rate, not the total change",
+    "why answer": "Because the derivative only looks at a tiny interval right around the moment, so a shrinking window shows the local rate.",
+    "draw rule": "Derivative = the limit of change in output over change in input as the interval shrinks",
+    "draw notes": "shrink the interval, and the average rate turns into the rate at one point"
+  }
+}
