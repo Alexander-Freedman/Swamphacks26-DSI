@@ -1,0 +1,114 @@
+{
+  "schema_version": 1,
+  "slug": "caffeine-half-life",
+  "topic": "Caffeine half-life",
+  "concept": "exponential decay",
+  "reviewed": true,
+  "misconceptions": [
+    {
+      "id": "linear-elimination",
+      "label": "Two half-lives and it's gone",
+      "why_tempting": "Half gone in 5 hours sounds like all gone in 10.",
+      "refutation": "Each 5 hours removes half of what's left: 100 to 50 to 25 to 12.5 percent.",
+      "source_url": "https://en.wikipedia.org/wiki/Caffeine",
+      "source_note": "Page says 'In healthy adults, caffeine's half-life is between 3 and 7 hours' (5 h used here); that this mistake is common is unverified"
+    },
+    {
+      "id": "halves-once",
+      "label": "It only halves once",
+      "why_tempting": "The half-life sounds like a one-time drop, then it levels off.",
+      "refutation": "The halving repeats every half-life, so the amount keeps shrinking.",
+      "source_url": "https://en.wikipedia.org/wiki/Caffeine",
+      "source_note": "Page says 'In healthy adults, caffeine's half-life is between 3 and 7 hours' (5 h used here); that this mistake is common is unverified"
+    }
+  ],
+  "items": [
+    {
+      "id": "model",
+      "prompt": "Caffeine's half-life is about 5 hours. You drink a coffee at 9 a.m. What percent of that caffeine is still in your body at midnight, 15 hours later?",
+      "input_type": "slider",
+      "slider": {
+        "min": 0.0,
+        "max": 100.0,
+        "step": 1.0,
+        "unit": "%"
+      },
+      "options": [],
+      "bands": [
+        {
+          "min": 0.0,
+          "max": 5.0,
+          "misconception_id": "linear-elimination"
+        },
+        {
+          "min": 6.0,
+          "max": 20.0,
+          "misconception_id": null
+        },
+        {
+          "min": 21.0,
+          "max": 100.0,
+          "misconception_id": "halves-once"
+        }
+      ],
+      "sketch_rules": [],
+      "truth": {
+        "widget": "curve",
+        "expr": "100 * (0.5 ^ (x / t))",
+        "preset": null,
+        "x_min": 0.0,
+        "x_max": 24.0,
+        "x_label": "hours",
+        "y_label": "caffeine remaining (%)",
+        "ask_x": 15.0,
+        "ask_y": null,
+        "show": null,
+        "area_from": null,
+        "area_to": null
+      },
+      "answer_expr": "12.5",
+      "answer_claimed": 12.5,
+      "explore": {
+        "param": "t",
+        "label": "half-life (hours)",
+        "min": 2.0,
+        "max": 10.0,
+        "step": 0.5,
+        "default": 5.0
+      },
+      "targets": [
+        "halves-once",
+        "linear-elimination"
+      ],
+      "variables": [],
+      "extremes": [
+        {
+          "param": "t",
+          "value": 2.0,
+          "watch": "A 2-hour half-life means 7.5 halvings by midnight: only about 0.55% is left.",
+          "truth_value": 0.5524271728019903
+        },
+        {
+          "param": "t",
+          "value": 10.0,
+          "watch": "A 10-hour half-life means 1.5 halvings by midnight: about 35% is still in you.",
+          "truth_value": 35.35533905932738
+        }
+      ],
+      "truth_value": 12.5,
+      "computed": true,
+      "approximate": false
+    }
+  ],
+  "spec_version": 4,
+  "compare": null,
+  "aliases": [
+    "caffeine half life",
+    "caffeine half-life",
+    "caffeine",
+    "half life of caffeine",
+    "how long does caffeine last",
+    "drug half life",
+    "biological half life"
+  ]
+}
