@@ -10,7 +10,7 @@ export function CaseCurve({ topic, index }: { topic: Topic; index: number }) {
   if (!pic) return null
   return (
     <figure className="lcv-pic">
-      <Curve t={pic.spec.curve} f={pic.f} />
+      <Curve small t={pic.spec.curve} f={pic.f} />
       {pic.caption && <figcaption>{pic.caption}</figcaption>}
     </figure>
   )

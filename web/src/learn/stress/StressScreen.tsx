@@ -105,7 +105,7 @@ export function StressScreen({ topic, state, update, next, api }: StageProps) {
               <p className="st-scenario">{c.scenario}</p>
               {pictures[i] && (
                 <figure className="st-pic">
-                  <Curve t={pictures[i]!.spec.curve} f={pictures[i]!.f} />
+                  <Curve small t={pictures[i]!.spec.curve} f={pictures[i]!.f} />
                   <figcaption>
                     <span className="st-pic-at">{pictures[i]!.at}</span>
                     {pictures[i]!.watch && <span className="st-pic-watch">{pictures[i]!.watch}</span>}
