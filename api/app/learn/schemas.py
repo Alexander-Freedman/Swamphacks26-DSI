@@ -30,27 +30,27 @@ class Strict(BaseModel):
 # ---------------------------------------------------------------------------
 class ContrastingCase(Strict):
     label: str = Field(max_length=80)
-    detail: str = Field(max_length=600)
+    detail: str = Field(max_length=1200)
     oneLine: str = Field(max_length=140)
 
 
 class ExtremeCaseDimension(Strict):
     key: Slug
-    description: str = Field(max_length=600)
+    description: str = Field(max_length=1200)
 
 
 class ConfusableNeighbor(Strict):
     key: Slug
     label: str = Field(max_length=80)
     question: str = Field(max_length=300)
-    correctDistinction: str = Field(max_length=600)
+    correctDistinction: str = Field(max_length=1200)
 
 
 class Rubric(Strict):
     entities: list[str] = Field(min_length=2, max_length=10)
     causalLinks: list[str] = Field(min_length=1, max_length=10)
     coreRule: str = Field(max_length=400)
-    whyRuleMatters: str = Field(max_length=600)
+    whyRuleMatters: str = Field(max_length=1200)
     whyRuleQuestion: str = Field(max_length=300)
     anchorDescription: str = Field(max_length=400)
     anchorPrompt: str = Field(max_length=300)
@@ -58,7 +58,7 @@ class Rubric(Strict):
     extremeCaseDimensions: list[ExtremeCaseDimension] = Field(min_length=3, max_length=5)
     confusableNeighbors: list[ConfusableNeighbor] = Field(max_length=2)
     transferStructuralRequirements: list[str] = Field(min_length=1, max_length=6)
-    referenceTransferExample: str = Field(max_length=600)
+    referenceTransferExample: str = Field(max_length=1200)
 
     @field_validator("extremeCaseDimensions")
     @classmethod
