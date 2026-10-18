@@ -49,7 +49,7 @@ class ConfusableNeighbor(Strict):
 class Rubric(Strict):
     entities: list[str] = Field(min_length=2, max_length=10)
     causalLinks: list[str] = Field(min_length=1, max_length=10)
-    coreRule: str = Field(max_length=400)
+    coreRule: str = Field(max_length=700)
     whyRuleMatters: str = Field(max_length=1200)
     whyRuleQuestion: str = Field(max_length=300)
     anchorDescription: str = Field(max_length=400)
