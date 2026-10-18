@@ -30,65 +30,94 @@ function Cites({ ids }: { ids: string[] }) {
   )
 }
 
+function HomeLink({ onHome, className }: { onHome?: () => void; className: string }) {
+  return (
+    <a
+      className={className}
+      href={import.meta.env.BASE_URL}
+      onClick={(e) => {
+        if (!onHome) return
+        e.preventDefault()
+        onHome()
+      }}
+    >
+      ← Home
+    </a>
+  )
+}
+
 export function ResearchPage({ onHome }: { onHome?: () => void }) {
   return (
-    <div className="sheet rs">
-      <h1 className="rs-title">The research behind Onionskin</h1>
-      <p className="concept">
-        Every step in a lesson comes from published learning-science research. Here is each decision, why it works, and the papers
-        it rests on, linked so you can check them yourself.
-      </p>
+    <div className="rs-page">
+      <HomeLink onHome={onHome} className="rs-home" />
 
-      <h2 className="rs-h">Every step, and why</h2>
-      <ol className="rs-steps">
-        {decisions.map((d) => (
-          <li key={d.step} className="rs-step">
-            <h3>{d.step}</h3>
-            <p className="rs-what">{d.what}</p>
-            <p className="rs-why">{d.why}</p>
-            <Cites ids={d.sources} />
-          </li>
-        ))}
-      </ol>
+      <header className="sheet rs-summary">
+        <h1 className="rs-title">The research behind Onionskin</h1>
+        <p className="concept">
+          Every step in a lesson comes from published learning-science research. Each decision below says what the step does,
+          why it works, and which papers back it, numbered so you can check them yourself at the bottom.
+        </p>
+        <ul className="rs-short">
+          <li>You guess first, because a committed wrong guess makes the real answer stick.</li>
+          <li>You build and test your own model, because comparing cases and pushing to extremes beats being told.</li>
+          <li>No points, streaks or leaderboards: the reward is understanding, and extra rewards can crowd it out.</li>
+        </ul>
+      </header>
 
-      <h2 className="rs-h">Questions</h2>
-      <div className="rs-faq">
-        {faq.map((f) => (
-          <details key={f.q} className="rs-q">
-            <summary>{f.q}</summary>
-            <p>{f.a}</p>
-            <Cites ids={f.sources} />
-          </details>
-        ))}
+      <div className="rs-cols">
+        <section className="sheet rs-col" aria-labelledby="rs-steps-h">
+          <h2 className="rs-h" id="rs-steps-h">
+            Every step, and why it works
+          </h2>
+          <ol className="rs-steps">
+            {decisions.map((d) => (
+              <li key={d.step} className="rs-step">
+                <h3>{d.step}</h3>
+                <p className="rs-what">{d.what}</p>
+                <p className="rs-why">{d.why}</p>
+                <Cites ids={d.sources} />
+              </li>
+            ))}
+          </ol>
+        </section>
+
+        <section className="sheet rs-col" aria-labelledby="rs-faq-h">
+          <h2 className="rs-h" id="rs-faq-h">
+            Questions
+          </h2>
+          <div className="rs-faq">
+            {faq.map((f) => (
+              <details key={f.q} className="rs-q">
+                <summary>{f.q}</summary>
+                <p>{f.a}</p>
+                <Cites ids={f.sources} />
+              </details>
+            ))}
+          </div>
+        </section>
       </div>
 
-      <h2 className="rs-h">Sources</h2>
-      <ol className="rs-sources">
-        {sources.map((s) => (
-          <li key={s.id} id={`src-${s.id}`}>
-            <span className="rs-ref">
-              {s.authors} ({s.year}).{' '}
-              <a href={s.url} target="_blank" rel="noopener noreferrer">
-                {s.title}
-              </a>
-              . <i>{s.venue}</i>.
-            </span>
-            <span className="rs-finding">{s.finding}</span>
-          </li>
-        ))}
-      </ol>
-
-      <a
-        className="nb-back"
-        href={import.meta.env.BASE_URL}
-        onClick={(e) => {
-          if (!onHome) return
-          e.preventDefault()
-          onHome()
-        }}
-      >
-        ← Home
-      </a>
+      <section className="sheet rs-bottom" aria-labelledby="rs-src-h">
+        <h2 className="rs-h" id="rs-src-h">
+          Sources
+        </h2>
+        <p className="rs-note">Every link below was checked to open the paper or its publisher page.</p>
+        <ol className="rs-sources">
+          {sources.map((s) => (
+            <li key={s.id} id={`src-${s.id}`}>
+              <span className="rs-ref">
+                {s.authors} ({s.year}).{' '}
+                <a href={s.url} target="_blank" rel="noopener noreferrer">
+                  {s.title}
+                </a>
+                . <i>{s.venue}</i>.
+              </span>
+              <span className="rs-finding">{s.finding}</span>
+            </li>
+          ))}
+        </ol>
+        <HomeLink onHome={onHome} className="nb-back rs-home-bottom" />
+      </section>
     </div>
   )
 }

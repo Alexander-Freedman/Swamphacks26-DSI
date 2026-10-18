@@ -35,10 +35,14 @@ describe('research page', () => {
     expect(links.every((a) => a.target === '_blank' && a.rel.includes('noopener'))).toBe(true)
   })
 
-  it('Home links to it and ?research=1 opens it', () => {
+  it('a "Why it works" tab next to the logo opens it, and ?research=1 opens it directly', async () => {
+    const { fireEvent } = await import('@testing-library/react')
     history.replaceState(null, '', import.meta.env.BASE_URL)
     render(<App />)
-    expect(screen.getByText('The research behind it').closest('a')?.getAttribute('href')).toBe(`${import.meta.env.BASE_URL}?research=1`)
+    fireEvent.click(screen.getByRole('button', { name: 'Why it works' }))
+    expect(screen.getByRole('heading', { name: 'The research behind Onionskin' })).toBeTruthy()
+    expect(location.search).toBe('?research=1')
+    expect(screen.getAllByText('← Home').length).toBe(2) // top and bottom
     cleanup()
     history.replaceState(null, '', `${import.meta.env.BASE_URL}?research=1`)
     render(<App />)
