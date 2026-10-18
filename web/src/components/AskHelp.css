@@ -1,8 +1,12 @@
 /* Ask panel (#186): a small side panel that leaves the screen visible; a bottom sheet on phones. */
 .topbar-actions { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; justify-content: flex-end; }
-.hiw-btn.ask-btn { border-radius: 4px; padding: 3px 9px; font-size: 0.8rem; font-weight: 600; background: transparent; border: 1px solid var(--ink-soft); color: var(--ink-soft); }
-.hiw-btn.ask-btn:hover { color: var(--ink); border-color: var(--ink); background: var(--marker-soft); }
-.hiw-btn.ask-btn[aria-expanded='true'] { background: var(--marker); color: var(--ink); border-color: var(--ink); }
+.hiw-btn.ask-btn {
+  display: inline-grid; place-items: center; width: 42px; height: 42px; padding: 0; border-radius: 50%;
+  background: var(--card); border: 2px solid var(--ink); color: var(--ink); box-shadow: 2px 2px 0 var(--ink); text-decoration: none; cursor: pointer;
+}
+.hiw-btn.ask-btn:hover { background: var(--marker-soft); transform: translate(-1px, -1px); box-shadow: 3px 3px 0 var(--ink); }
+.hiw-btn.ask-btn[aria-expanded='true'] { background: var(--marker); box-shadow: none; transform: translate(2px, 2px); }
+.ask-onion { display: block; }
 .ask-privacy { margin: 0; font-size: 0.75rem; line-height: 1.35; color: var(--ink-soft); }
 
 .ask-panel {

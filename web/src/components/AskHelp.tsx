@@ -22,6 +22,17 @@ function typing(el: Element | null): boolean {
  * reports a LayerHelp (or any session but the 3 probability ones) uses the generic request; the
  * round player stays hidden without a backend or for a topic the help API doesn't know.
  */
+/** A small onion: layered rings and a sprout, drawn in ink so it matches the pencil-and-ink look. */
+function OnionIcon() {
+  return (
+    <svg className="ask-onion" viewBox="0 0 32 32" width="24" height="24" aria-hidden="true" focusable="false">
+      <path d="M16 3c-1 2.5-1.2 4.3-.6 6.3M16 3c1.6 2 2.4 3.9 2.1 6.1" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" />
+      <path d="M16 9c-6.5 1.8-11 7.4-9.6 13.2C7.6 27 11.4 29.5 16 29.5s8.4-2.5 9.6-7.3C27 16.4 22.5 10.8 16 9Z" fill="var(--marker)" stroke="currentColor" strokeWidth="1.8" strokeLinejoin="round" />
+      <path d="M16 9.6c-3.6 2.6-5.6 6.9-5 11.6.4 3.6 2.2 6.6 5 8.2M16 9.6c3.6 2.6 5.6 6.9 5 11.6-.4 3.6-2.2 6.6-5 8.2M16 9.6v19.8" fill="none" stroke="currentColor" strokeWidth="1.3" strokeLinecap="round" opacity="0.7" />
+    </svg>
+  )
+}
+
 /** `docked`: open as a full-height panel on the right that the page makes room for (Learn pages). */
 export function AskHelp({
   slug,
@@ -132,8 +143,9 @@ export function AskHelp({
 
   return (
     <>
-      <button ref={button} className="hiw-btn ask-btn" onClick={() => (open ? close() : setOpen(true))} aria-keyshortcuts="?" aria-expanded={open} aria-controls={open ? `${titleId}-panel` : undefined}>
-        Ask Onion
+      <button ref={button} className="hiw-btn ask-btn" title="Ask Onion" onClick={() => (open ? close() : setOpen(true))} aria-keyshortcuts="?" aria-expanded={open} aria-controls={open ? `${titleId}-panel` : undefined}>
+        <OnionIcon />
+        <span className="sr-only">Ask Onion</span>
       </button>
       {open && (
         <div className={`ask-panel${docked ? ' ask-docked' : ''}`} id={`${titleId}-panel`} role="dialog" aria-modal="false" aria-labelledby={titleId} ref={panel}>
