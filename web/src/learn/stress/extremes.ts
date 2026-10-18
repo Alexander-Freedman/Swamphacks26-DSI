@@ -30,11 +30,15 @@ export function extremeCurve(topic: Topic, i: number): ExtremeCurve | null {
   if (!spec || !e) return null
   const knobs: Record<string, number> = {}
   for (const v of spec.variables ?? []) knobs[v.name] = v.value
+  // the knob sits at its default unless this extreme is the knob (an extreme can move a variable instead)
+  if (spec.curve.knob) knobs[spec.curve.knob.param] = spec.curve.knob.default
   knobs[e.param] = e.value
   try {
     const f = curveFn(spec.curve, knobs)
     if (!Number.isFinite(f(spec.curve.x_max))) return null
-    const label = spec.curve.knob?.param === e.param ? spec.curve.knob.label : e.param
+    // the knob's label, or the variable's meaning ("how far north the city is"), else its name
+    const variable = (spec.variables as { name: string; meaning?: string }[] | undefined)?.find((v) => v.name === e.param)
+    const label = spec.curve.knob?.param === e.param ? spec.curve.knob.label : (variable?.meaning ?? e.param)
     return { spec, f, at: `${label} = ${e.value}`, watch: e.watch ?? '' }
   } catch {
     return null
