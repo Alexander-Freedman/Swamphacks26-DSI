@@ -21,7 +21,7 @@ describe('LearnSession shell', () => {
     fireEvent.click(screen.getByRole('button', { name: 'Back' }))
     expect(screen.getByRole('region', { name: 'transfer' })).toBeTruthy()
     fireEvent.click(screen.getByRole('button', { name: 'Next' }))
-    fireEvent.click(screen.getByRole('button', { name: 'Finish' }))
+    fireEvent.click(screen.getByRole('button', { name: 'Try another topic' }))
     expect(onDone).toHaveBeenCalled()
   })
 
