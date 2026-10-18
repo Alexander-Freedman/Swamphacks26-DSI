@@ -31,16 +31,16 @@ Updated Sat Oct 17 morning. Supersedes #70.
 | #29 | Story: pitch, Devpost, video script | open | AI-disclosure draft to #questions |
 | #45, #47, #48 | Skeleton/CI, pipeline, first deploy | mostly done | close #45/#47; #48 waits on the host account |
 
-### @luanamaldaner (orgo, Home, notebook, look)
-Updated Sat ~7:30 PM. Orgo build/push #204, Undo #209 and the topic menu #211 are merged.
+### @luanamaldaner (orgo + calculus paths, WhyPane)
+Updated Sat ~11 PM. **Plan from Sat ~9:55 PM (docs/learn-plan.md) replaces the layers split:** Home leads with "Try any topic" → six-screen Learn session + why-pane; orgo + calculus stay as short demos. Learn screens + Home = @Alexander-Freedman's side, API `api/app/learn` = @Alexander-Freedman.
 | Issue / PR | What | Status | Next step |
 |---|---|---|---|
-| #213 / #215 | Orgo: SN1, E2, E1 (draw the arrows per step, watch it run, mistakes named) | PR up | review, merge |
-| #216 / #218 | Orgo: SN2 vs E2 side by side (same HO⁻, predict each path, one slider) | PR up, stacked on #215 | merge after #215 |
-| #194 / #205 | No betting language, confidence picker gone, new headline | PR up | review, merge (blocks "no bets" in the Devpost) |
-| #214 | Home leads with subjects: orgo, calculus | PR up | review, merge |
-| #68 | Extremes slider for generated topics | open | cut if short on time |
-| #11 | Pen input | parked | not in the demo |
+| #248 / #253 | Orgo + calculus: one guided path each from Home (orgo: build ethanol → SN2 arrows; calc: sketch → tangent → area → card), no menus | PR up, tests green locally | review, merge |
+| (#1 item 2) | No COMING NEXT / disabled cards anywhere | covered by #251 | #251 needs its 7 menu tests updated |
+| #255 | WhyPane + WithWhy layout from why.json (desktop rail, phone strip) | PR up | review, merge; Learn screens drop it in |
+| #239 | Biology: anatomy chapter | paused (new plan first) | finish only if time after the demo path |
+| #237 #240 #241 #242 | Extra calc topics | open, no entry point now that calc is one path | close or keep for later |
+| #68, #11 | Extremes slider, pen input | parked | not in the demo |
 
 ## Next (gate order)
 1. **Sat 1:30 PM: user tests round 1** (both). 3-5 people, one session each, kit in docs/user-testing.md (#120). Log guess, confidence, verdict, one quote. Top 3 fixes go in as issues.
