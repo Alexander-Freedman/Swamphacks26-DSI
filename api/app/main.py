@@ -47,7 +47,7 @@ app.add_middleware(
     allow_origins=[
         o
         for o in os.environ.get(
-            "MM_CORS_ORIGINS", "https://alexander-freedman.github.io,http://localhost:5173"
+            "MM_CORS_ORIGINS", "https://alexander-freedman.github.io,https://onionskin.study,http://localhost:5173"
         ).split(",")
         if o
     ],
