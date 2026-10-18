@@ -1,0 +1,20 @@
+/* Physics: ink drawings on the paper grid; the fired ball in marker yellow. */
+.phys .ph-field { max-height: 50vh; }
+.phys .ph-ground { stroke: var(--ink); stroke-width: 3; }
+.phys .ph-cliff { fill: var(--grid); stroke: var(--ink); stroke-width: 2; }
+.phys .ph-ball { fill: var(--card); stroke: var(--ink); stroke-width: 2.5; }
+.phys .ph-ball.fired { fill: var(--marker); }
+.phys .ph-ghost { fill: none; stroke: var(--ink-soft); stroke-width: 1.5; }
+.phys .ph-ghost.fired { stroke: var(--ink); fill: var(--marker-soft); }
+.phys .ph-link { stroke: var(--off); stroke-width: 1; stroke-dasharray: 3 4; }
+.phys .ph-lab { font: 700 12px var(--font-mono); fill: var(--ink); }
+.phys .ph-tick { font: 11px var(--font-mono); fill: var(--ink-soft); text-anchor: middle; }
+.phys .ph-target { fill: var(--called); fill-opacity: 0.35; stroke: var(--called); stroke-width: 1.5; }
+.phys .ph-flag { stroke: var(--ink); stroke-width: 2; }
+.phys .ph-flagcloth { fill: var(--off); }
+.phys .ph-path { fill: none; stroke: var(--ink); stroke-width: 2.5; stroke-linecap: round; }
+.phys .ph-path.old { stroke: var(--pencil); stroke-width: 1.5; stroke-dasharray: 4 4; }
+.phys .ph-path.best { stroke: var(--called); stroke-width: 3.5; }
+.phys .ph-launcher { fill: var(--ink); }
+.phys .ph-launch { margin-top: 10px; }
+.phys .ph-mastered { font-weight: 700; color: var(--called); }
