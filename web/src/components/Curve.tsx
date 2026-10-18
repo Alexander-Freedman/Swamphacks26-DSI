@@ -23,10 +23,15 @@ type Props = {
   // A dashed guide at the x the question asks about; the limit's point as a hollow dot.
   mark?: number | null
   hole?: boolean
+  // The small pictures on the stress and contrast cards: drawn 640 wide but shown ~300 wide with big text,
+  // so they get wide margins and fewer ticks or the numbers run into each other and the axis titles.
+  small?: boolean
 }
 
-const H = 280
-const PAD = { l: 52, r: 20, t: 30, b: 44 }
+const LAYOUT = {
+  full: { H: 280, PAD: { l: 52, r: 20, t: 30, b: 44 }, tickGap: 20, tickDy: 5, yTitleDy: 14, xMax: 9 },
+  small: { H: 360, PAD: { l: 104, r: 36, t: 64, b: 112 }, tickGap: 40, tickDy: 11, yTitleDy: 22, xMax: 5 },
+}
 
 const short = (v: number) => {
   const a = Math.abs(v)
@@ -61,9 +66,11 @@ function FitText({ text, max, ...rest }: { text: string; max: number } & SVGProp
   )
 }
 
-export function Curve({ t, f, guess, point, pointLabel, tangent, guessSlope, area, mark, hole }: Props) {
+export function Curve({ t, f, guess, point, pointLabel, tangent, guessSlope, area, mark, hole, small }: Props) {
   const narrow = useNarrow()
-  const W = narrow ? 360 : 640
+  const L = small ? LAYOUT.small : LAYOUT.full
+  const { H, PAD } = L
+  const W = narrow && !small ? 360 : 640
   const { x_min: lo, x_max: hi } = t
   const prob = t.preset === 'birthday_match_probability'
   const axis = point?.axis ?? 'x'
@@ -79,6 +86,13 @@ export function Curve({ t, f, guess, point, pointLabel, tangent, guessSlope, are
   const yLo = Math.min(0, ...ys, guessY ?? 0, areaH ?? 0)
   let yHi = Math.max(prob ? 1 : -Infinity, ...ys, guessY ?? -Infinity, areaH ?? -Infinity)
   if (!(yHi > yLo)) yHi = yLo + 1
+  // The y axis ends on a labeled tick (0, 50, 100), not just past the last one, so the top has a number.
+  const yTicks = prob ? [] : niceTicks(yLo, yHi, small ? 3 : 4)
+  if (yTicks.length >= 2 && yTicks[yTicks.length - 1] < yHi - 1e-9) {
+    const top = Math.round((yTicks[yTicks.length - 1] + yTicks[1] - yTicks[0]) * 1e6) / 1e6
+    yTicks.push(top)
+    yHi = top
+  }
   const xAt = (x: number) => PAD.l + ((Math.min(Math.max(x, lo), hi) - lo) / (hi - lo)) * (W - PAD.l - PAD.r)
   const yAt = (y: number) => H - PAD.b - ((y - yLo) / (yHi - yLo)) * (H - PAD.t - PAD.b)
   const d = pts.map(([x, y], i) => `${i ? 'L' : 'M'}${xAt(x).toFixed(1)},${yAt(y).toFixed(1)}`).join('')
@@ -86,8 +100,7 @@ export function Curve({ t, f, guess, point, pointLabel, tangent, guessSlope, are
   const offRight = xGuess != null && xGuess > hi
   const offLeft = xGuess != null && xGuess < lo
   // Skip an x tick that would sit under the truth's label.
-  const ticks = niceTicks(lo, hi, narrow ? 5 : 9).filter((x) => !point || axis !== 'x' || Math.abs(xAt(x) - xAt(point.x)) > 26)
-  const yTicks = prob ? [] : niceTicks(yLo, yHi, 4)
+  const ticks = niceTicks(lo, hi, narrow || small ? 5 : L.xMax).filter((x) => !point || axis !== 'x' || Math.abs(xAt(x) - xAt(point.x)) > 26)
   // Keep hand-written labels inside the plot on a phone.
   const clampX = (x: number, half: number) => Math.min(Math.max(x, PAD.l + half), W - PAD.r - half)
   const px = point ? xAt(point.x) : 0
@@ -130,15 +143,15 @@ export function Curve({ t, f, guess, point, pointLabel, tangent, guessSlope, are
         </>
       )}
       {yTicks.map((y) => (
-        <text key={y} className="curve-tick" x={PAD.l - 6} y={yAt(y) + 5} textAnchor="end">{short(y)}</text>
+        <text key={y} className="curve-tick" x={PAD.l - (small ? 14 : 6)} y={yAt(y) + L.tickDy} textAnchor="end">{short(y)}</text>
       ))}
       {!prob && t.y_label && (
-        <FitText className="curve-tick curve-ylabel" x={PAD.l} y={PAD.t - 14} text={t.y_label} max={W - PAD.l - 4} />
+        <FitText className="curve-tick curve-ylabel" x={PAD.l} y={PAD.t - L.yTitleDy} text={t.y_label} max={W - PAD.l - 4} />
       )}
       {ticks.map((x) => (
-        <text key={x} className="curve-tick" x={xAt(x)} y={H - PAD.b + 20} textAnchor="middle">{short(x)}</text>
+        <text key={x} className="curve-tick" x={xAt(x)} y={H - PAD.b + L.tickGap} textAnchor="middle">{short(x)}</text>
       ))}
-      <FitText className="curve-tick" x={(W + PAD.l) / 2} y={H - 4} textAnchor="middle" text={t.x_label} max={W - PAD.l - 8} />
+      <FitText className="curve-tick" x={(W + PAD.l) / 2} y={H - (small ? 12 : 4)} textAnchor="middle" text={t.x_label} max={W - PAD.l - 8} />
       <defs>
         <clipPath id={clip}>
           <rect x={PAD.l} y={PAD.t - 6} width={W - PAD.l - PAD.r} height={H - PAD.t - PAD.b + 6} />

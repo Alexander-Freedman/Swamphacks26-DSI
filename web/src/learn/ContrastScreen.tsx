@@ -1,6 +1,6 @@
 // Stage 3, Contrast: two pre-authored cases side by side, the one difference highlighted.
 // The learner writes a one-line "fix" for why they turn out differently. No model call.
-import { useState } from 'react'
+import { useRef, useState } from 'react'
 import { CaseCurve } from './contrast-visual/CaseCurve'
 import { composeRule, shortPiece, splitRule } from './rule'
 import type { StageProps } from './types'
@@ -28,6 +28,7 @@ export function ContrastScreen({ topic, state, update, next }: StageProps) {
   const cases = topic.rubric.contrastingCases.slice(0, 2)
   const [parts, setParts] = useState<[string, string, string]>(() => splitRule(state.fix))
   const [focus, setFocus] = useState(0)
+  const inputs = useRef<(HTMLInputElement | null)[]>([])
   const chips = [...new Set(topic.rubric.entities.map(shortPiece))].filter(Boolean).slice(0, 8)
   const set = (k: number, v: string) => {
     const p = [...parts] as [string, string, string]
@@ -67,6 +68,9 @@ export function ContrastScreen({ topic, state, update, next }: StageProps) {
               aria-label={`rule ${f.word}`}
               placeholder={f.hint}
               value={parts[k]}
+              ref={(el) => {
+                inputs.current[k] = el
+              }}
               onFocus={() => setFocus(k)}
               onChange={(e) => set(k, e.target.value)}
             />
@@ -75,7 +79,18 @@ export function ContrastScreen({ topic, state, update, next }: StageProps) {
       </div>
       <div className="lcs-chips" role="group" aria-label="pieces you can use">
         {chips.map((c) => (
-          <button key={c} type="button" className="lcs-chip" onClick={() => set(focus, parts[focus] ? `${parts[focus]} ${c}` : c)}>
+          <button
+            key={c}
+            type="button"
+            className="lcs-chip"
+            onClick={() => {
+              set(focus, parts[focus] ? `${parts[focus]} ${c}` : c)
+              // back into the blank, so typing (even a space) carries on there instead of pressing the chip again
+              const el = inputs.current[focus]
+              el?.focus()
+              requestAnimationFrame(() => el?.setSelectionRange(el.value.length, el.value.length))
+            }}
+          >
             {c}
           </button>
         ))}
