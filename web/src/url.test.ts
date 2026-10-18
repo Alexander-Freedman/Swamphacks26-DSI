@@ -60,3 +60,10 @@ describe('onScreenChange', () => {
     expect(cb).toHaveBeenCalledTimes(1)
   })
 })
+
+describe('learn screens', () => {
+  it('reads and writes ?learn=', () => {
+    expect(readScreen('?learn=compound-interest')).toEqual({ kind: 'learn', slug: 'compound-interest' })
+    expect(screenUrl({ kind: 'learn', slug: 'a b' }, '/')).toBe('/?learn=a%20b')
+  })
+})
