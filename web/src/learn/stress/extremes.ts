@@ -23,11 +23,26 @@ export function extremesOf(topic: Topic): Extreme[] {
   )
 }
 
+/** Every number written in a card ("1,000 kilograms", "0.5%"), commas dropped. */
+const numbersIn = (text: string) => (text.match(/-?\d[\d,]*\.?\d*/g) ?? []).map((n) => Number(n.replace(/,/g, '')))
+
+/**
+ * Does extremes[i] belong to card i? Reviewed topics are lined up by hand (data/learn, checked by the API).
+ * A topic built live is not: its extremes come out separately from its cases, so card i only gets
+ * extremes[i] when the card itself states that value. Otherwise the picture would be drawn at a setting
+ * the card never mentions (water at density 500 under a card about water at 1,000).
+ */
+export function belongsToCard(topic: Topic, i: number, e: Extreme): boolean {
+  if (topic.checked) return true
+  const scenario = topic.extremeCases?.[i]?.scenario ?? ''
+  return numbersIn(scenario).some((n) => Math.abs(n - e.value) <= Math.abs(e.value) * 1e-9)
+}
+
 /** The picture for stress card i, or null: no curve visual, no extreme for this card, or an expression that won't evaluate. */
 export function extremeCurve(topic: Topic, i: number): ExtremeCurve | null {
   const spec = curveSpec(topic)
   const e = extremesOf(topic)[i]
-  if (!spec || !e) return null
+  if (!spec || !e || !belongsToCard(topic, i, e)) return null
   const knobs: Record<string, number> = {}
   for (const v of spec.variables ?? []) knobs[v.name] = v.value
   // the knob sits at its default unless this extreme is the knob (an extreme can move a variable instead)

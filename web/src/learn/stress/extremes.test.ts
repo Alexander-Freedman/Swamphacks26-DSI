@@ -36,4 +36,14 @@ describe('stress pictures: the curve at each extreme, computed in code', () => {
     ;(broken.visual!.spec as { curve: { expr: string } }).curve.expr = 'P*(('
     expect(extremeCurve(broken, 0)).toBeNull()
   })
+
+  it('a topic built live only draws a card at an extreme the card itself states', () => {
+    const live = { ...JSON.parse(JSON.stringify(topic)), checked: false } as Topic
+    // compound-interest's cards say 5%, 0% and 10%: each one names its own extreme, so the pictures stay
+    expect([0, 1, 2].map((i) => extremeCurve(live, i)?.at)).toEqual(['yearly rate (%) = 5', 'yearly rate (%) = 0', 'yearly rate (%) = 10'])
+    // a card about a different setting (live Bernoulli: a card at density 1,000 got an extreme at 500) gets no picture
+    live.extremeCases[0].scenario = '$1,000 at 7% a year, left alone for 30 years.'
+    expect(extremeCurve(live, 0)).toBeNull()
+    expect(extremeCurve({ ...live, checked: true }, 0)?.at).toBe('yearly rate (%) = 5')
+  })
 })
