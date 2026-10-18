@@ -14,3 +14,9 @@ export const isRateLimited = (o: Offline) => /slow down|limit reached|HTTP 429/i
 
 export const offlineLine = (o: Offline) =>
   isRateLimited(o) ? 'Lots of people are trying this right now. Give it a minute, then test again.' : offlineText(o)
+
+/** Append a piece to the rule as one more clause. */
+export const withPiece = (rule: string, piece: string) => {
+  const base = rule.trim().replace(/[.\s;]+$/, '')
+  return base ? `${base}; and ${piece}` : piece
+}
