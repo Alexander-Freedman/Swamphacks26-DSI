@@ -1,0 +1,126 @@
+{
+  "slug": "supply-and-demand",
+  "topic": "supply and demand",
+  "checked": true,
+  "rubric": {
+    "entities": [
+      "The price buyers pay per unit of a good or service.",
+      "Quantity demanded: how many units buyers are willing and able to buy at a particular price, holding other relevant conditions fixed.",
+      "Quantity supplied: how many units sellers are willing and able to offer at a particular price, holding other relevant conditions fixed.",
+      "Market equilibrium: a price and quantity at which quantity demanded equals quantity supplied.",
+      "Shortage: quantity demanded exceeds quantity supplied at the current price.",
+      "Surplus: quantity supplied exceeds quantity demanded at the current price.",
+      "Demand shifters: non-price conditions such as buyers' income, tastes, expectations, number of buyers, and prices of related goods.",
+      "Supply shifters: non-price conditions such as input costs, technology, seller expectations, number of sellers, taxes, and regulation."
+    ],
+    "causalLinks": [
+      "Holding demand conditions fixed, a higher price causes quantity demanded to decrease: each additional unit costs buyers more, so fewer purchases are worth making or affordable.",
+      "Holding supply conditions fixed, a higher price causes quantity supplied to increase: selling an additional unit becomes more worthwhile and can cover the rising cost of producing extra units.",
+      "If quantity demanded exceeds quantity supplied at the current price, buyers compete for too few units; this creates upward pressure on price, which reduces quantity demanded and raises quantity supplied.",
+      "If quantity supplied exceeds quantity demanded at the current price, sellers compete for too few buyers; this creates downward pressure on price, which raises quantity demanded and reduces quantity supplied.",
+      "An increase in demand at every price, such as more buyers wanting the product, creates a shortage at the former equilibrium price; price and equilibrium quantity tend to rise if supply is unchanged.",
+      "An increase in supply at every price, such as lower production costs, creates a surplus at the former equilibrium price; price tends to fall and equilibrium quantity tends to rise if demand is unchanged."
+    ],
+    "coreRule": "In a competitive market with flexible prices, the price tends to move toward the level where quantity demanded equals quantity supplied: a shortage pushes price up, while a surplus pushes price down. A change in price moves buyers and sellers along their existing demand and supply schedules; a non-price change shifts a schedule and changes the equilibrium.",
+    "whyRuleMatters": "Price is not chosen by a rule that simply rewards sellers or buyers. When buyers want more than sellers offer, unsuccessful buyers and sellers can gain from higher bids, so price rises until fewer units are wanted and more are offered. When sellers offer more than buyers want, unsold units make price cuts worthwhile, so price falls until more units are wanted and fewer are offered. The equality is the stopping point because neither shortage nor surplus remains to push price further.",
+    "whyRuleQuestion": "Why does a shortage push the price upward rather than merely causing sellers to keep the same price and sell out forever?",
+    "anchorDescription": "At a fixed concert-ticket price of $20, suppose 500 people want tickets but only 300 tickets are available. Two hundred willing buyers cannot get one; that is a shortage.",
+    "anchorPrompt": "If the ticket price can change and no other conditions change, what direction will the price tend to move, and why?",
+    "contrastingCases": [
+      {
+        "label": "More buyers want coffee",
+        "detail": "A café sells 100 cups of coffee each morning for $3. At that price, 100 customers want coffee and the café offers 100 cups. A nearby office opens, and now 140 customers want coffee at $3 while the café still offers 100 cups. There is a shortage of 40 cups, so the market price tends to rise; at the new higher price, the café may offer more cups and some buyers choose not to buy.",
+        "oneLine": "More coffee buyers create a shortage and upward price pressure."
+      },
+      {
+        "label": "Coffee becomes cheaper to make",
+        "detail": "A café sells 100 cups each morning for $3, with 100 customers wanting coffee and 100 cups offered. A new machine lowers the cost of making coffee, so the café and competing cafés can profitably offer 140 cups at $3 while customers still want 100. There is a surplus of 40 cups, so the market price tends to fall; the lower price encourages more purchases and makes fewer cups worth supplying.",
+        "oneLine": "Cheaper coffee production creates a surplus and downward price pressure."
+      },
+      {
+        "label": "A price rise, not more demand",
+        "detail": "A bakery initially sells 100 loaves at $4, where buyers want 100 loaves and bakeries offer 100. The price rises to $5 because flour costs rose. At $5, buyers may want only 80 loaves while bakeries offer 80; this is movement along the same demand schedule caused by price, not an increase in demand for bread.",
+        "oneLine": "A higher bread price lowers quantity demanded; demand did not increase."
+      }
+    ],
+    "extremeCaseDimensions": [
+      {
+        "key": "fixed-price-shortage",
+        "description": "Hold price below the market-clearing level while demand and supply conditions remain fixed; quantity demanded greatly exceeds quantity supplied, producing a large shortage, rationing, queues, or strong upward price pressure if price controls are removed."
+      },
+      {
+        "key": "fixed-price-surplus",
+        "description": "Hold price above the market-clearing level while demand and supply conditions remain fixed; quantity supplied greatly exceeds quantity demanded, producing a large surplus, unsold inventory, or strong downward price pressure if price controls are removed."
+      },
+      {
+        "key": "demand-collapse",
+        "description": "Push a non-price demand shifter sharply downward while supply is initially unchanged, such as buyers no longer valuing the product; at the old price there is a surplus, and the new equilibrium has a lower price and lower quantity."
+      },
+      {
+        "key": "supply-collapse",
+        "description": "Push a non-price supply shifter sharply downward while demand is initially unchanged, such as a key input becoming unavailable; at the old price there is a shortage, and the new equilibrium has a higher price and lower quantity."
+      }
+    ],
+    "confusableNeighbors": [
+      {
+        "key": "demand-vs-quantity-demanded",
+        "label": "Demand versus quantity demanded",
+        "question": "If the price of the same loaf of bread rises and people buy fewer loaves, did demand fall or did quantity demanded fall?",
+        "correctDistinction": "Quantity demanded falls because a price change moves along the existing demand schedule. Demand falls only when a non-price condition changes so buyers want fewer loaves at every possible price; that shift can itself change the equilibrium price and quantity."
+      },
+      {
+        "key": "supply-vs-quantity-supplied",
+        "label": "Supply versus quantity supplied",
+        "question": "If a higher market price leads farms to bring more strawberries to market, did supply increase or did quantity supplied increase?",
+        "correctDistinction": "Quantity supplied increases because the price change moves along the existing supply schedule. Supply increases only when a non-price condition, such as lower fertilizer cost or better technology, makes sellers offer more at every price; this tends to lower equilibrium price and raise equilibrium quantity when demand is unchanged."
+      }
+    ],
+    "transferStructuralRequirements": [
+      "There must be a limited good, service, slot, or resource exchanged between people who want units and people who can provide units.",
+      "At any proposed exchange price or equivalent cost, the number wanted and the number offered must be separately identifiable.",
+      "A mismatch must create a directional adjustment incentive: excess would-be users creates pressure toward a higher effective price or allocation cost, while excess providers creates pressure toward a lower effective price or allocation cost.",
+      "Changing the exchange price must reduce the number of units wanted and increase the number offered, all else equal.",
+      "A non-price change must be distinguishable from a price change: it shifts willingness or ability to buy or provide at each price, rather than merely moving along an unchanged relationship.",
+      "The process must have a balance point where units wanted equal units offered, so the mismatch-driven pressure stops."
+    ],
+    "referenceTransferExample": "Consider freelance video editors rather than physical goods. At $40 per hour, clients want 500 editing hours this month but editors offer only 300 hours, so clients compete for scarce editor time and the hourly rate tends to rise. At a higher rate, some clients postpone projects and more editors accept work, moving toward equal hours wanted and offered. If easy-to-use editing software lowers editors' time cost, more editing hours are offered at every hourly rate; the new balance tends to have a lower hourly rate and more hours of editing purchased."
+  },
+  "misconceptions": [
+    {
+      "id": "price-only-benefits-sellers",
+      "label": "“Higher prices just mean sellers are greedy.”",
+      "tell": "The learner predicts that a shortage can persist at the same price without any force changing buyers' or sellers' behavior.",
+      "fix": "In a competitive market, a shortage means some willing buyers go without, creating reasons to bid more and for sellers to expand output. A higher price also limits purchases to buyers who value the unit enough and encourages additional supply."
+    },
+    {
+      "id": "price-change-is-demand-change",
+      "label": "“If people buy less, demand fell.”",
+      "tell": "The learner says demand fell whenever the price rises and buyers purchase fewer units.",
+      "fix": "A price rise normally causes a fall in quantity demanded along the same demand schedule. Demand itself changes only when a non-price factor changes what buyers would purchase at every price."
+    },
+    {
+      "id": "supply-demand-always-mean-price-rises",
+      "label": "“More supply and demand both make prices rise.”",
+      "tell": "The learner predicts that an increase in supply raises the market price because there is more product to sell.",
+      "fix": "More supply at the old price creates excess inventory, so sellers have reason to cut price. With demand unchanged, greater supply tends to lower price and raise the quantity exchanged."
+    }
+  ],
+  "extremeCases": [
+    {
+      "dimension": "fixed-price-shortage",
+      "scenario": "A city caps apartment rent at $900 per month. At that rent, 2,000 households want apartments but landlords offer only 1,200 apartments.",
+      "correctBehavior": "There is a shortage of 800 apartments. People may queue, search longer, or use other rationing methods; if the cap were removed and conditions stayed the same, rent would tend to rise."
+    },
+    {
+      "dimension": "demand-collapse",
+      "scenario": "A disease warning makes most customers avoid a salad bar. At the former price of $12 per meal, restaurants still prepare 500 meals but customers now want only 150.",
+      "correctBehavior": "There is a surplus of 350 meals at the former price. With supply otherwise unchanged and prices flexible, the price and number of meals sold tend to fall."
+    },
+    {
+      "dimension": "supply-collapse",
+      "scenario": "A storm closes the only road bringing strawberries into town. At the former price of $4 per basket, shoppers want 1,000 baskets but stores can receive only 200.",
+      "correctBehavior": "There is a shortage of 800 baskets at the former price. With prices flexible, the price tends to rise, reducing purchases and encouraging any available suppliers to bring in more baskets."
+    }
+  ],
+  "visual": null
+}

@@ -36,7 +36,7 @@ class ContrastingCase(Strict):
 
 class ExtremeCaseDimension(Strict):
     key: Slug
-    description: str = Field(max_length=300)
+    description: str = Field(max_length=600)
 
 
 class ConfusableNeighbor(Strict):
