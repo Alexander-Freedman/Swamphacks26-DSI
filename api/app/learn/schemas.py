@@ -9,12 +9,13 @@ length limits in the schema itself. Limits stay on the pydantic side, where we v
 
 from __future__ import annotations
 
+import copy
 import json
 import tempfile
 from pathlib import Path
 from typing import Literal
 
-from pydantic import BaseModel, ConfigDict, Field, field_validator, model_validator
+from pydantic import BaseModel, ConfigDict, Field, ValidationError, field_validator, model_validator
 
 from app.schema import Slug, SpecCase
 
@@ -133,6 +134,43 @@ class Topic(Strict):
         return next((n for n in self.rubric.confusableNeighbors if n.key == key), None)
 
 
+def _clip_text(text: str, limit: int) -> str:
+    """Shorten to `limit` chars, ending at a sentence (or word) boundary when one is close."""
+    if len(text) <= limit:
+        return text
+    cut = text[: limit - 1]
+    for end in (". ", "; ", ", ", " "):
+        i = cut.rfind(end)
+        if i >= limit * 0.6:
+            return cut[: i + (1 if end != " " else 0)].rstrip(",; ") + ("" if end == ". " else "…")
+    return cut + "…"
+
+
+def validate_clipped(model: type[BaseModel], data: dict) -> BaseModel:
+    """Validate a model-written reply, trimming over-long strings and lists instead of failing.
+
+    The author call writes free text; a line a little over its cap shouldn't throw away the lesson.
+    Any other validation error still raises.
+    """
+    data = copy.deepcopy(data)
+    for _ in range(20):
+        try:
+            return model.model_validate(data)
+        except ValidationError as err:
+            fixable = [e for e in err.errors() if e["type"] in ("string_too_long", "too_long")]
+            if len(fixable) != len(err.errors()):
+                raise
+            for e in fixable:
+                *path, last = e["loc"]
+                node = data
+                for key in path:
+                    node = node[key]
+                limit = int(e["ctx"]["max_length"])
+                value = node[last]
+                node[last] = _clip_text(value, limit) if isinstance(value, str) else value[:limit]
+    return model.model_validate(data)
+
+
 def topic_from_authored(slug: str, name: str, authored: Authored, *, checked: bool) -> Topic:
     data = authored.model_dump()
     misconceptions = data.pop("misconceptions")
@@ -141,7 +179,7 @@ def topic_from_authored(slug: str, name: str, authored: Authored, *, checked: bo
         slug=slug,
         topic=name,
         checked=checked,
-        rubric=Rubric.model_validate(data),
+        rubric=validate_clipped(Rubric, data),
         misconceptions=misconceptions,
         extremeCases=cases,
         visual=None,

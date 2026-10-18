@@ -20,7 +20,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 from pydantic import ValidationError  # noqa: E402
 
 from app.learn import codex, prompts  # noqa: E402
-from app.learn.schemas import Authored, Topic, schema_file, topic_from_authored  # noqa: E402
+from app.learn.schemas import Authored, Topic, schema_file, topic_from_authored, validate_clipped  # noqa: E402
 from app.learn.topics import LEARN_DIR, slug_for  # noqa: E402
 
 
@@ -31,7 +31,7 @@ def author(name: str) -> Topic:
         schema=schema_file(Authored),
         timeout_s=float(os.environ.get("MM_CODEX_AUTHOR_TIMEOUT_S", codex.AUTHOR_TIMEOUT_S)),
     )
-    return topic_from_authored(slug_for(name), name, Authored.model_validate(raw), checked=True)
+    return topic_from_authored(slug_for(name), name, validate_clipped(Authored, raw), checked=True)
 
 
 def summary(t: Topic) -> str:

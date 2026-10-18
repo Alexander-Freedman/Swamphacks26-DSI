@@ -401,3 +401,26 @@ def test_graded_daily_cap(monkeypatch) -> None:
     monkeypatch.setattr(router, "GRADED_DAILY_CAP", 1)
     assert post(f"{SLUG}/guess", text="interest is the same every year").status_code == 200
     assert post(f"{SLUG}/guess", text="interest is the same every year").status_code == 429
+
+
+def test_overlong_author_text_is_trimmed_not_rejected() -> None:
+    from app.learn.schemas import Rubric, validate_clipped
+
+    data = json.loads((FIXTURES / f"{SLUG}.json").read_text(encoding="utf-8"))["rubric"]
+    data["coreRule"] = "First sentence of the rule. " * 60
+    data["entities"] = [f"thing {i}" for i in range(14)]
+    r = validate_clipped(Rubric, data)
+    assert len(r.coreRule) <= 700 and r.coreRule.endswith(".")
+    assert len(r.entities) == 10
+
+
+def test_other_validation_errors_still_raise() -> None:
+    import pytest
+    from pydantic import ValidationError
+
+    from app.learn.schemas import Rubric, validate_clipped
+
+    data = json.loads((FIXTURES / f"{SLUG}.json").read_text(encoding="utf-8"))["rubric"]
+    del data["coreRule"]
+    with pytest.raises(ValidationError):
+        validate_clipped(Rubric, data)
