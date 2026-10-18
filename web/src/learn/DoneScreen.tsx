@@ -1,7 +1,8 @@
 // Done: the mistake card, what they did, and the Notebook save.
 import { useEffect, useState } from 'react'
 import { NOTEBOOK_HREF, upsert } from '../notebook'
-import type { LearnNotebookEntry, StageProps } from './types'
+import { customScreen } from './custom/registry'
+import type { LearnNotebookEntry, Stage, StageProps } from './types'
 import './learn-draw-finish.css'
 
 const TRANSFER = { maps: 'it maps', partial: 'partly maps', 'too-abstract': 'too abstract', fails: "didn't map" } as const
@@ -11,6 +12,8 @@ export function DoneScreen({ topic, state, next }: StageProps) {
   const [at] = useState(() => new Date().toISOString())
   const shown = state.drawVerdicts.filter((c) => c.verdict === 'demonstrated').length
   const survived = state.stressHistory.filter((h) => h.verdict === 'survives').length
+  // A topic's own tool (calculus, orgo) replaces the generic step and records no verdict: it was done, not skipped.
+  const missing = (st: Stage) => (customScreen(topic.slug, st) ? 'done' : 'skipped')
 
   useEffect(() => {
     const entry: LearnNotebookEntry = {
@@ -44,10 +47,10 @@ export function DoneScreen({ topic, state, next }: StageProps) {
       )}
       <ul className="ldf-summary">
         <li>
-          Stress test: {state.stressHistory.length ? `${survived} of ${state.stressHistory.length} cases survived` : 'skipped'}
+          Stress test: {state.stressHistory.length ? `${survived} of ${state.stressHistory.length} cases survived` : missing('stress')}
         </li>
-        <li>Sketch: {state.drawVerdicts.length ? `${shown} of ${state.drawVerdicts.length} parts shown` : 'skipped'}</li>
-        <li>Other world: {state.transferResult ? TRANSFER[state.transferResult.verdict] : 'skipped'}</li>
+        <li>Sketch: {state.drawVerdicts.length ? `${shown} of ${state.drawVerdicts.length} parts shown` : missing('draw')}</li>
+        <li>Other world: {state.transferResult ? TRANSFER[state.transferResult.verdict] : missing('transfer')}</li>
       </ul>
       <p className="ldf-saved">Saved to your notebook.</p>
       <div className="ldf-actions">
