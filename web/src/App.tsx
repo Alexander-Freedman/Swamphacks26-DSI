@@ -225,7 +225,7 @@ export default function App() {
         <header className="topbar">
           <button className="logo" style={{ border: 0, background: 'none', padding: 0 }} onClick={home}>Onionskin</button>
           <div className="topbar-actions">
-            <AskHelp key={session.slug} slug={session.slug} kind="session" />
+            <AskHelp key={session.slug} slug={session.slug} kind="session" subject={session.title} />
             {sessionHowItWorks[session.slug] && <SessionDrawer key={session.slug} slug={session.slug} />}
           </div>
         </header>
