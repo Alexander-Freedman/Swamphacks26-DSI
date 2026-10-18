@@ -93,6 +93,9 @@ export function LearnSession({
 
   return (
     <div className="learn" data-stage={state.stage}>
+      <aside className="learn-why" aria-label="Why this step">
+        {WhyPaneComponent ? <WhyPaneComponent stage={state.stage} /> : <WhyFallback stage={state.stage} />}
+      </aside>
       <div className="learn-main sheet">
         <div className="learn-bar">
           <button className="learn-back" onClick={back}>Back</button>
@@ -108,9 +111,6 @@ export function LearnSession({
         </div>
         <Screen key={state.stage} topic={topic} state={state} update={update} next={next} api={api} />
       </div>
-      <aside className="learn-why" aria-label="Why this step">
-        {WhyPaneComponent ? <WhyPaneComponent stage={state.stage} /> : <WhyFallback stage={state.stage} />}
-      </aside>
     </div>
   )
 }

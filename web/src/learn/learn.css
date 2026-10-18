@@ -1,5 +1,9 @@
 /* Learn session shell: plain paper, 4px corners. */
-.learn { display: grid; grid-template-columns: minmax(0, 1fr) 280px; gap: 24px; align-items: start; }
+/* wider than the page column, same left edge as the sessions; why rail left, the work right */
+.learn {
+  display: grid; grid-template-columns: 250px minmax(0, 1fr); gap: 28px; align-items: start;
+  width: min(1100px, calc(100vw - 32px)); margin-left: calc(50% - min(550px, 50vw - 16px));
+}
 .learn-main { min-width: 0; }
 .learn-bar { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; margin-bottom: 16px; }
 .learn-back { border-radius: 4px; }
@@ -21,7 +25,7 @@
 .learn-why-fallback p { margin: 6px 0; }
 .learn-why-source { opacity: 0.7; font-size: 0.85rem; }
 @media (max-width: 720px) {
-  .learn { grid-template-columns: minmax(0, 1fr); gap: 12px; }
-  .learn-why { position: static; order: -1; }
+  .learn { grid-template-columns: minmax(0, 1fr); gap: 12px; width: auto; margin-left: 0; }
+  .learn-why { position: static; }
 }
 .learn-thinking { font-style: italic; opacity: 0.8; }

@@ -1,0 +1,131 @@
+{
+  "slug": "sn2-reaction",
+  "topic": "SN2 reaction",
+  "checked": true,
+  "rubric": {
+    "entities": [
+      "The substrate: a molecule whose carbon atom is bonded to a leaving group, an atom or group that can depart with the bonding electrons.",
+      "The nucleophile: an electron-rich atom or ion that donates an electron pair to make a new bond to that carbon.",
+      "The leaving group: the atom or group displaced from the carbon; better leaving groups stabilize the electrons they take away more readily.",
+      "The reacting carbon and its crowding: a carbon attached to few bulky carbon-containing groups is easier to reach from behind than a crowded carbon.",
+      "The backside approach path: the side of the carbon directly opposite its bond to the leaving group.",
+      "The transition state: the brief, high-energy arrangement in which the new bond is partly forming while the old bond is partly breaking.",
+      "Nucleophile concentration and substrate concentration: the amounts of both collision partners available to form the transition state.",
+      "Solvent: the liquid surrounding the reactants; polar aprotic solvents often leave negatively charged nucleophiles more available to attack.",
+      "Three-dimensional arrangement at the reacting carbon: its handed arrangement reverses when substitution occurs at a stereocenter."
+    ],
+    "causalLinks": [
+      "Increasing nucleophile concentration increases the reaction rate because more nucleophile–substrate encounters can form the single transition state.",
+      "Increasing substrate concentration increases the reaction rate because more molecules bearing the carbon–leaving-group bond are available for nucleophilic attack.",
+      "Increasing crowding around the reacting carbon decreases the reaction rate because the nucleophile cannot readily approach along the required backside path.",
+      "Improving leaving-group ability increases the reaction rate because breaking the carbon–leaving-group bond is already underway in the transition state, so a group that stabilizes departing electrons lowers the barrier.",
+      "Using a polar aprotic solvent often increases the rate for an anionic nucleophile because the solvent does not strongly cage that nucleophile, leaving it more able to attack.",
+      "Backside attack causes inversion at a chiral reacting carbon because the new bond forms from the side opposite the departing group as the old bond breaks.",
+      "A primary carbon center generally reacts faster than a secondary one, while a tertiary carbon center is usually effectively blocked from this pathway, because steric obstruction rises sharply with substitution."
+    ],
+    "coreRule": "In the standard SN2 mechanism, a nucleophile attacks the carbon from the side opposite the leaving group while the carbon–leaving-group bond breaks in the same single step. Therefore the rate is proportional to both nucleophile concentration and substrate concentration, rate = k[nucleophile][substrate], and the reaction is favored by an accessible, especially primary, carbon, a good leaving group, a strong available nucleophile, and commonly a polar aprotic solvent; attack at a chiral carbon gives inversion of configuration.",
+    "whyRuleMatters": "The rate depends on both reactants because neither can first make a stable intermediate: they must meet in one properly aligned, crowded transition state. The nucleophile must approach from behind because electron donation into the antibonding part of the carbon–leaving-group bond is aligned on that opposite side; front-side approach has poor orbital overlap and clashes with the leaving group. This is why SN2 is not a one-reactant, carbocation-forming process and why it reverses the arrangement at the carbon.",
+    "whyRuleQuestion": "Why does an SN2 reaction require a backside approach and depend on both nucleophile and substrate concentration, instead of first losing the leaving group to make a separate intermediate?",
+    "anchorDescription": "In an SN2 reaction, the incoming electron-rich nucleophile reaches the carbon from the side opposite the group that leaves. As the new bond begins to form, the old bond begins to break in that same event.",
+    "anchorPrompt": "If a carbon is surrounded by three bulky carbon-containing groups, what does this anchor fact predict about a nucleophile's ability to reach it from behind?",
+    "contrastingCases": [
+      {
+        "label": "Same nucleophile, different crowding",
+        "detail": "Sodium iodide provides iodide, an electron-rich negatively charged atom. With 1-bromopropane, the carbon bonded to bromine is attached to only one other carbon, so iodide can attack it relatively easily. With tert-butyl bromide, that carbon is attached to three carbon-containing groups, which block the required opposite-side approach; under ordinary SN2 conditions it reacts extremely slowly or not detectably by SN2.",
+        "oneLine": "Iodide attacks primary bromide; tertiary bromide blocks backside access."
+      },
+      {
+        "label": "Same substrate, different solvent",
+        "detail": "A solution contains 1-bromobutane and sodium cyanide, which supplies cyanide as the nucleophile. In dimethyl sulfoxide, a polar aprotic liquid, cyanide is relatively available and substitution is fast; in methanol, a polar protic liquid, hydrogen bonding strongly surrounds cyanide and makes it less reactive, so substitution is much slower.",
+        "oneLine": "Cyanide substitutes faster in dimethyl sulfoxide than methanol."
+      },
+      {
+        "label": "Same connectivity, opposite three-dimensional result",
+        "detail": "A chiral sample of 2-bromobutane has bromine attached to a carbon bearing four different attachments. When azide ion replaces bromine by SN2, azide attacks from the opposite side, so the product has the opposite three-dimensional arrangement at that carbon; it is not formed with retention of the original arrangement.",
+        "oneLine": "Backside replacement at chiral carbon reverses its arrangement."
+      }
+    ],
+    "extremeCaseDimensions": [
+      {
+        "key": "carbon-crowding",
+        "description": "Push crowding at the carbon bearing the leaving group from methyl or primary to tertiary. Predict that backside access and SN2 rate fall sharply, with a tertiary center ordinarily not undergoing SN2."
+      },
+      {
+        "key": "nucleophile-availability",
+        "description": "Push the amount of an available nucleophile toward zero while holding substrate and conditions fixed. Predict that the SN2 rate approaches zero; doubling available nucleophile concentration doubles the initial rate in the standard rate regime."
+      },
+      {
+        "key": "leaving-group-quality",
+        "description": "Compare otherwise identical substrates whose departing groups differ in ability to stabilize the electrons after departure. Predict that the substrate with the better leaving group reacts faster by SN2."
+      },
+      {
+        "key": "solvent-caging",
+        "description": "Push an anionic nucleophile from a polar aprotic environment toward a strongly hydrogen-bonding polar protic environment while holding other factors comparable. Predict that strong solvent caging lowers nucleophile availability and usually slows SN2."
+      },
+      {
+        "key": "stereochemical-geometry",
+        "description": "Use a chiral carbon at which substitution occurs cleanly by SN2. Predict one opposite-side attack pathway and inversion of the carbon's three-dimensional configuration, rather than retention or a mixture caused by a free planar intermediate."
+      }
+    ],
+    "confusableNeighbors": [
+      {
+        "key": "sn1-reaction",
+        "label": "SN1 reaction",
+        "question": "How would you distinguish an SN2 substitution from an SN1 substitution if changing nucleophile concentration changes the rate?",
+        "correctDistinction": "SN2 makes and breaks bonds in one bimolecular step, so its rate depends on nucleophile and substrate concentration and it gives backside inversion. SN1 first forms a carbocation-like intermediate, so its rate is ordinarily independent of nucleophile concentration; it is favored by substrates that can stabilize that intermediate and can give stereochemical scrambling. Both can replace a leaving group with a nucleophile, but they use different rate-determining structures."
+      },
+      {
+        "key": "e2-elimination",
+        "label": "E2 elimination",
+        "question": "How can a strong base reacting with an alkyl halide give E2 elimination rather than SN2 substitution?",
+        "correctDistinction": "Both SN2 and E2 are concerted, bimolecular reactions that are hindered by crowding. In SN2, the reagent attacks the carbon bearing the leaving group and forms a new carbon–nucleophile bond; in E2, a base removes a neighboring hydrogen while the leaving group departs and a carbon–carbon double bond forms. Bulky, strongly basic reagents often favor E2 because reaching a hydrogen can be easier than reaching the crowded substitution carbon."
+      }
+    ],
+    "transferStructuralRequirements": [
+      "Two distinct participants must act together in the rate-limiting event; increasing either participant's available amount increases the event rate.",
+      "The incoming participant must reach one specific, geometrically constrained access path rather than any side.",
+      "Its arrival directly displaces the current occupant in one coupled event; there is no stable, separately formed vacancy or intermediate.",
+      "Obstruction near the required access path reduces or prevents success.",
+      "The direction of entry determines an opposite-side or reversed final arrangement relative to the departing occupant."
+    ],
+    "referenceTransferExample": "A tightly fitted, one-slot connector holds an old plug. A replacement plug can succeed only by entering through the rear access channel; as it pushes in, it ejects the old plug through the front in one continuous motion. More replacement plugs and more occupied connectors create more replacement events, but boxes piled around the rear channel stop the operation; because the plug enters from the opposite side, the connector's directional marker ends up reversed relative to the departing plug. This preserves simultaneous two-party action, constrained rear access, crowding sensitivity, direct displacement, and inversion-like orientation change."
+  },
+  "misconceptions": [
+    {
+      "id": "leaving-group-first",
+      "label": "The leaving group goes first",
+      "tell": "“The bromine leaves to make a carbocation, then the nucleophile attacks.”",
+      "fix": "That describes the usual SN1 sequence, not SN2. In SN2, nucleophile attack and leaving-group departure occur together in one transition state, so both reactants affect the rate."
+    },
+    {
+      "id": "any-side-attack",
+      "label": "It can attack from either side",
+      "tell": "“The nucleophile can come in from whichever side is open, so a chiral carbon keeps or randomly changes its arrangement.”",
+      "fix": "Effective SN2 attack is from the side opposite the leaving group. This geometry produces inversion at a chiral reacting carbon."
+    },
+    {
+      "id": "stronger-means-faster-alone",
+      "label": "Only nucleophile strength matters",
+      "tell": "“A very strong nucleophile will make a tertiary alkyl halide undergo fast SN2.”",
+      "fix": "A strong nucleophile cannot overcome a blocked backside path easily. Steric crowding at a tertiary carbon usually prevents SN2 even when the nucleophile is strong."
+    }
+  ],
+  "extremeCases": [
+    {
+      "dimension": "carbon-crowding",
+      "scenario": "Iodide ion is mixed separately with methyl bromide and with tert-butyl bromide under the same polar aprotic conditions. Methyl bromide has no carbon-containing group besides the reacting carbon, whereas tert-butyl bromide has three around it.",
+      "correctBehavior": "Methyl bromide undergoes rapid SN2 substitution. Tert-butyl bromide is too crowded for ordinary SN2 backside attack and shows essentially no SN2 reaction."
+    },
+    {
+      "dimension": "nucleophile-availability",
+      "scenario": "Two otherwise identical mixtures contain 0.10 moles per liter of 1-bromopropane. One has 0.10 moles per liter of cyanide ion and the other has 0.20 moles per liter of cyanide ion.",
+      "correctBehavior": "At the start, the mixture with 0.20 moles per liter cyanide ion reacts about twice as fast. If cyanide ion concentration approaches zero, the SN2 rate approaches zero."
+    },
+    {
+      "dimension": "stereochemical-geometry",
+      "scenario": "A pure chiral form of 2-bromobutane reacts with azide ion under conditions chosen for SN2 substitution. The carbon bonded to bromine has four different attachments, so its three-dimensional arrangement can be identified.",
+      "correctBehavior": "Azide replaces bromine through opposite-side attack. The product has the inverted three-dimensional arrangement at that carbon, not retention of the starting arrangement."
+    }
+  ],
+  "visual": null
+}
