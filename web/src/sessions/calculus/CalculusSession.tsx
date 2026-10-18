@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { record } from '../../notebook'
 import { Frame, SessionHead, Title } from '../../components/session/Shell'
+import { readyTopics } from '../../components/subject/ready'
 import { AreaChart, GuessBar, MiniRects, MiniTangent, PositionChart, VelocityChart } from './AreaCharts'
 import {
   coverage, exactArea, f, F, fmt, fPrime, LABELS, mastered, nToSlider, ONE_RECT, readArea, readSketch, resample,
@@ -59,7 +60,7 @@ function CalcMenu({ onPick }: { onPick: (t: CalcTopic) => void }) {
       </div>
       <Title h="What do you want to practice?" sub="Pick a course and a chapter, then a topic." headingRef={title} />
       <div className="calc-menu">
-        {COURSES.map((c) => (
+        {COURSES.map((c) => ({ ...c, sections: readyTopics(c.sections) })).filter((c) => c.sections.length > 0).map((c) => (
           <section key={c.id} className="calc-course" aria-labelledby={`calc-c-${c.id}`}>
             <h2 id={`calc-c-${c.id}`} className="calc-course-title">{c.title}</h2>
             <p className="calc-sec-blurb">{c.blurb}</p>
@@ -69,10 +70,9 @@ function CalcMenu({ onPick }: { onPick: (t: CalcTopic) => void }) {
                 {c.sections.length > 1 && <p className="calc-sec-blurb">{s.blurb}</p>}
                 <div className="calc-topics">
                   {s.topics.map((t) => (
-                    <button key={t.id} className="calc-topic" disabled={!t.ready} onClick={() => onPick(t)} aria-describedby={`calc-t-${t.id}`}>
+                    <button key={t.id} className="calc-topic" onClick={() => onPick(t)} aria-describedby={`calc-t-${t.id}`}>
                       <span className="calc-topic-title">{t.title}</span>
                       <span id={`calc-t-${t.id}`} className="calc-topic-blurb">{t.blurb}</span>
-                      {!t.ready && <span className="calc-soon">coming next</span>}
                     </button>
                   ))}
                 </div>

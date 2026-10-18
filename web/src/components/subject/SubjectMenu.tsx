@@ -1,9 +1,10 @@
 import { useRef } from 'react'
 import { Frame, Title } from '../session/Shell'
+import { readyTopics } from './ready'
 import './subject.css'
 
-// The menu every subject opens on: chapters, then topics. Topics not built yet stay on the
-// menu as "coming next" so the whole map of the subject is visible (same look as orgo's).
+// The menu every subject opens on: chapters, then topics. Only built topics are listed;
+// chapters with nothing built yet stay off the menu (same look as orgo's).
 
 export type MenuTopic = { id: string; title: string; blurb: string; ready: boolean }
 export type MenuSection<T extends MenuTopic = MenuTopic> = { id: string; title: string; blurb: string; topics: T[] }
@@ -17,16 +18,15 @@ export function SubjectMenu<T extends MenuTopic>({ subject, className, sections,
       </div>
       <Title h="What do you want to practice?" sub="Pick a chapter, then a topic." headingRef={title} />
       <div className="sj-menu">
-        {sections.map((s) => (
+        {readyTopics(sections).map((s) => (
           <section key={s.id} aria-labelledby={`sj-sec-${s.id}`}>
             <h3 id={`sj-sec-${s.id}`} className="sj-sec-title">{s.title}</h3>
             <p className="sj-sec-blurb">{s.blurb}</p>
             <div className="sj-topics">
               {s.topics.map((t) => (
-                <button key={t.id} className="sj-topic" disabled={!t.ready} onClick={() => onPick(t)} aria-describedby={`sj-t-${t.id}`}>
+                <button key={t.id} className="sj-topic" onClick={() => onPick(t)} aria-describedby={`sj-t-${t.id}`}>
                   <span className="sj-topic-title">{t.title}</span>
                   <span id={`sj-t-${t.id}`} className="sj-topic-blurb">{t.blurb}</span>
-                  {!t.ready && <span className="sj-soon">coming next</span>}
                 </button>
               ))}
             </div>

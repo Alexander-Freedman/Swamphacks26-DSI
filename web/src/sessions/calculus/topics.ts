@@ -1,6 +1,6 @@
 // What you can practice in calculus, grouped by course (Calc 1, 2, 3) and chapter, so you pick on
 // purpose instead of a fixed path. A topic is a list of steps from the session. Topics that aren't
-// built yet stay on the menu as "coming next" so the whole map of the subject is visible.
+// built yet are listed here (the map of the subject) but stay off the menu until built.
 
 export type CalcStep = 'draw' | 'tangent' | 'area' | 'card' | 'compare' | 'surface' | 'gradient' | 'volume'
 

@@ -1,6 +1,6 @@
 // What you can practice in biology, grouped by chapter, so you pick on purpose instead of a
-// fixed path. A topic is a list of steps from the session. Topics that aren't built yet stay
-// on the menu as "coming next" so the whole map of the subject is visible.
+// fixed path. A topic is a list of steps from the session. Topics that aren't built yet are listed
+// here (the map of the subject) but stay off the menu until built.
 
 export type BioStep = 'transcribe' | 'codons' | 'translate' | 'mutate'
 

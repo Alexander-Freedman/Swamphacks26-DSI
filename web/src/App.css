@@ -47,8 +47,9 @@ input[type='range'] { width: 100%; accent-color: var(--pencil); height: 28px; }
 .showcase .blurb { display: block; font-weight: 400; color: var(--ink-soft); margin-top: 4px; }
 .prompt:focus { outline: none; }
 
-/* Session cards with art: 3 columns, big art on top; phone: rows with a 120px thumb. */
-.showcases.sessions { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 14px; }
+/* Session cards with art: the two built subjects side by side, big art on top; phone: rows with a 120px thumb. */
+.showcases.sessions { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; }
+.showcases.sessions .card-title { font-size: 1.3rem; }
 .showcase.has-art { display: flex; flex-direction: column; padding: 0; overflow: hidden; transition: transform 120ms, box-shadow 120ms; }
 .showcase.has-art:hover { transform: translate(-1px, -1px); box-shadow: 4px 4px 0 var(--ink); }
 .card-art { display: block; width: 100%; height: auto; aspect-ratio: 1; border-bottom: 2px solid var(--ink); background: var(--paper); }
