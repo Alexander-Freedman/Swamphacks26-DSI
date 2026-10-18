@@ -40,15 +40,19 @@ const REMIX: Record<string, string> = {
 type M = keyof typeof MISTAKES
 const SIZE_SUB = (nu: string) => `Three questions decide the mechanism: how strong is the ${nu}, what kind of carbon holds the leaving group, and does the leaving group leave easily?`
 
+/** What a finished run reports: the mistakes it caught, by label (none means mastered). */
+export type OrgoResult = { mistakes: string[] }
+
 /**
  * Orgo is one guided path straight from Home: build ethanol, then draw the SN2 arrows and scrub the reaction.
- * `embedded`: inside a Learn step, so don't scroll the whole page to the top between steps.
+ * `embedded`: inside a Learn step, so don't scroll the whole page to the top between steps,
+ * and don't point at a next orgo topic (the Learn session decides what comes next).
  */
-export function OrgoSession({ onDone, topic = GUIDED, embedded = false }: { onDone: () => void; topic?: OrgoTopic; embedded?: boolean }) {
+export function OrgoSession({ onDone, topic = GUIDED, embedded = false }: { onDone: (r: OrgoResult) => void; topic?: OrgoTopic; embedded?: boolean }) {
   return <OrgoTopicRun topic={topic} onDone={onDone} embedded={embedded} />
 }
 
-function OrgoTopicRun({ topic, onDone, embedded }: { topic: OrgoTopic; onDone: () => void; embedded: boolean }) {
+function OrgoTopicRun({ topic, onDone, embedded }: { topic: OrgoTopic; onDone: (r: OrgoResult) => void; embedded: boolean }) {
   const steps = topic.steps
   const [step, setStep] = useState(1)
   const [reached, setReached] = useState(1)
@@ -139,8 +143,8 @@ function OrgoTopicRun({ topic, onDone, embedded }: { topic: OrgoTopic; onDone: (
               <span className="og-mastered">✓ mastered</span>
             )
           }
-          remix={REMIX[topic.id] ?? ''}
-          onDone={onDone}
+          remix={embedded ? '' : (REMIX[topic.id] ?? '')}
+          onDone={() => onDone({ mistakes: mistakes.map((m) => MISTAKES[m].label) })}
         />
         </div>
       )}
