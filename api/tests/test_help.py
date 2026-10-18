@@ -431,3 +431,24 @@ def test_generic_history_accepts_assistant_role(glive) -> None:
     res = client.post("/api/help", json=body)
     assert res.status_code == 200
     assert "tutor: Look at the arrow." in calls[0]["prompt"]
+
+
+def test_layer_help_tries_codex_first(monkeypatch) -> None:
+    from app import help as help_chat
+
+    monkeypatch.setenv("MM_HELP_CODEX", "1")
+    monkeypatch.setenv("MM_CODEX_FAKE", "1")
+    ctx = help_chat.LayerContext(
+        subject="why we have seasons",
+        topic="why we have seasons",
+        layer_n=2,
+        layer_title="One true fact",
+        on_screen="One true fact is shown about the axis.",
+        facts=["The axis stays pointed the same way."],
+        last_action="",
+        history=[],
+        hint="Use the fact",
+    )
+    reply = help_chat.answer_generic(ctx, "Can you give me a hint?", "203.0.113.9")
+    assert reply.as_dict()["source"] == "model"
+    assert "prediction" in reply.as_dict()["answer"]
