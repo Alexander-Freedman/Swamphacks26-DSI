@@ -1,6 +1,6 @@
 /* General chemistry: ink atoms on paper, lone pairs as marker clouds. */
 .chem .ch-viewcard { display: grid; }
-.chem .ch-svg { max-height: 50vh; margin: 0 auto; }
+.chem .ch-svg { max-height: 44vh; margin: 0 auto; }
 .chem .ch-model { cursor: grab; }
 .chem .ch-model:active { cursor: grabbing; }
 .chem .ch-model:focus-visible { outline: 2px dashed var(--ink); outline-offset: 2px; }
