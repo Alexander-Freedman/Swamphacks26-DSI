@@ -113,13 +113,13 @@ export function AskHelp({ slug, kind, spot: given, subject = '' }: { slug: strin
   return (
     <>
       <button ref={button} className="hiw-btn ask-btn" onClick={() => (open ? close() : setOpen(true))} aria-keyshortcuts="?" aria-expanded={open} aria-controls={open ? `${titleId}-panel` : undefined}>
-        Stuck? Ask
+        Ask Onion
       </button>
       {open && (
         <div className="ask-panel" id={`${titleId}-panel`} role="dialog" aria-modal="false" aria-labelledby={titleId} ref={panel}>
           <header className="ask-head">
-            <h2 id={titleId}>Stuck? Ask.</h2>
-            <button className="hiw-close" onClick={close} aria-label="Close the ask panel">
+            <h2 id={titleId}>Ask Onion</h2>
+            <button className="hiw-close" onClick={close} aria-label="Close Ask Onion">
               Close <kbd>Esc</kbd>
             </button>
           </header>
@@ -160,13 +160,13 @@ export function AskHelp({ slug, kind, spot: given, subject = '' }: { slug: strin
               maxLength={MAX_QUESTION}
               aria-describedby={`${titleId}-count`}
               value={text}
-              placeholder="What's confusing here?"
+              placeholder="Ask Onion what's confusing here"
               onChange={(e) => setText(e.target.value.slice(0, MAX_QUESTION))}
               onKeyDown={onBoxKey}
             />
             <div className="ask-row">
               <span id={`${titleId}-count`} className={'ask-count' + (text.length >= MAX_QUESTION ? ' full' : '')}>{text.length}/{MAX_QUESTION}</span>
-              <button type="submit" className="ask-send" disabled={busy || !text.trim()}>{busy ? 'Asking…' : 'Send'}</button>
+              <button type="submit" className="ask-send" disabled={busy || !text.trim()}>{busy ? 'Onion is thinking…' : 'Send'}</button>
             </div>
           </form>
           <p className="ask-privacy">{PRIVACY_LINE}</p>
