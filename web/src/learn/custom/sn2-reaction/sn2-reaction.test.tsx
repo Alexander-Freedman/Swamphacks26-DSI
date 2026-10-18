@@ -1,5 +1,5 @@
 // @vitest-environment jsdom
-import { cleanup, fireEvent, render, screen } from '@testing-library/react'
+import { cleanup, fireEvent, render, screen, within } from '@testing-library/react'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { createMockLearnApi } from '../../../learnApi'
 import { LearnSession } from '../../LearnSession'
@@ -58,4 +58,24 @@ describe('sn2-reaction: orgo tools inside the Learn steps', () => {
     expect(learnForCard('orgo')).toBe('sn2-reaction')
     expect(learnForCard('calculus')).toBe('derivative')
   })
+
+  it('finishing the anchor tool (build ethanol, Check it, Finish, Done) moves the Learn session on to contrast', async () => {
+    open('anchor')
+    const step = await screen.findByRole('region', { name: 'anchor' })
+    const add = (name: string) => fireEvent.click(within(step).getByRole('button', { name: `add ${name}` }))
+    const pick = (re: RegExp) => fireEvent.focus(within(step).getByRole('button', { name: re }))
+    add('carbon')
+    add('carbon')
+    add('oxygen')
+    add('hydrogen')
+    pick(/^carbon C0, /)
+    for (let i = 0; i < 3; i++) add('hydrogen')
+    pick(/^carbon C1, /)
+    for (let i = 0; i < 2; i++) add('hydrogen')
+    fireEvent.click(within(step).getByText('Check it'))
+    fireEvent.click(within(step).getByText('Finish ✓'))
+    fireEvent.click(within(step).getByRole('button', { name: 'Done' }))
+    expect(await screen.findByRole('region', { name: 'contrast' })).toBeTruthy()
+  })
 })
+
