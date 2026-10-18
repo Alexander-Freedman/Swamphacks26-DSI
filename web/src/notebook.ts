@@ -60,6 +60,10 @@ const EXTRA_LABELS: Record<string, string> = {
   'gradient-points-at-peak': 'Steepest = straight at the top',
   'gradient-is-height': 'Steeper the higher you go',
   'more-columns-more-volume': 'More columns = more volume',
+  // calculus, Calc 2 (sessions/calculus/usubMath.ts, enclosedMath.ts, revolutionMath.ts)
+  'usub-changes-area': 'Stretching the axis changes the area',
+  'enclosed-top-only': 'Area between = area under the top curve',
+  'disc-radius-not-squared': 'Disc volume = π · r · thickness',
   // orgo (sessions/orgo/chem.ts MISTAKES)
   'carbon-five-bonds': 'A carbon with 5 bonds',
   'hydrogen-two-bonds': 'Hydrogen with 2 bonds',

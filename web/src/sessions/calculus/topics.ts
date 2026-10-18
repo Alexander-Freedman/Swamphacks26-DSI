@@ -2,7 +2,7 @@
 // purpose instead of a fixed path. A topic is a list of steps from the session. Topics that aren't
 // built yet stay on the menu as "coming next" so the whole map of the subject is visible.
 
-export type CalcStep = 'draw' | 'tangent' | 'area' | 'card' | 'compare' | 'surface' | 'gradient' | 'volume'
+export type CalcStep = 'draw' | 'tangent' | 'area' | 'card' | 'compare' | 'surface' | 'gradient' | 'volume' | 'usub' | 'enclosed' | 'revolution'
 
 export type CalcTopic = {
   id: string
@@ -62,9 +62,9 @@ export const COURSES: CalcCourse[] = [
         title: 'Integrals, harder',
         blurb: 'Reshape the problem until it’s one you already know.',
         topics: [
-          soon('usub', 'u-substitution', 'Stretch the x-axis so a messy area becomes a simple one.'),
-          soon('enclosed', 'Area enclosed by two curves', 'Top curve minus bottom curve, one thin strip at a time.'),
-          soon('revolution', 'Volumes of revolution', 'Spin a curve around an axis and stack the discs into a solid.'),
+          { id: 'usub', title: 'u-substitution', blurb: 'Stretch the x-axis so a messy area becomes a simple one.', steps: ['usub'], ready: true },
+          { id: 'enclosed', title: 'Area enclosed by two curves', blurb: 'Top curve minus bottom curve, one thin strip at a time.', steps: ['enclosed'], ready: true },
+          { id: 'revolution', title: 'Volumes of revolution', blurb: 'Spin a curve around an axis and stack the discs into a solid.', steps: ['revolution'], ready: true },
         ],
       },
       {

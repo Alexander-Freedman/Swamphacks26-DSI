@@ -9,13 +9,16 @@ import {
 import { reducedMotion, useWidth } from './plot'
 import { SlopeChart } from './SlopeChart'
 import { FINE, fineXs, pencilAt } from './slopeGeo'
+import { EnclosedStep } from './Enclosed'
 import { GradientStep } from './Gradient'
 import { SurfaceStep } from './Surface'
 import { COURSES, type CalcStep, type CalcTopic } from './topics'
+import { RevolutionStep } from './Revolution'
+import { UsubStep } from './Usub'
 import { VolumeStep } from './Volume'
 import './calculus.css'
 
-const LABEL: Record<CalcStep, string> = { draw: 'Draw the slope', tangent: 'Drag the tangent', area: 'Fill the area', card: 'Your mistake', compare: 'Same idea twice', surface: 'Slices', gradient: 'The gradient', volume: 'Volume' }
+const LABEL: Record<CalcStep, string> = { draw: 'Draw the slope', tangent: 'Drag the tangent', area: 'Fill the area', card: 'Your mistake', compare: 'Same idea twice', surface: 'Slices', gradient: 'The gradient', volume: 'Volume', usub: 'The stretch', enclosed: 'Between two curves', revolution: 'Spin and stack' }
 
 // One plain-language guidance line per screen.
 const TITLES: Record<CalcStep, [string, string]> = {
@@ -27,6 +30,9 @@ const TITLES: Record<CalcStep, [string, string]> = {
   surface: ['Slices of a surface.', 'With two inputs, x and y, the graph is a surface: a height above every point of the floor. Drag it to turn it around. Slicing it straight along x or y gives an ordinary curve, and that curve’s slope is a partial derivative.'],
   gradient: ['The gradient.', 'On a hill, one direction climbs fastest. The gradient is the arrow on the floor that points that way, and its length is how steep the climb is. Turn the hill around, then pick the arrow you think is steepest.'],
   volume: ['Volume under a surface.', 'Stand columns on the floor under a curved roof and add up their volumes, like rectangles under a curve but in 3D. Guess the real volume first, then make the columns thinner and watch the total close in.'],
+  usub: ['u-substitution.', 'The integrand 2x·cos(x²) is messy, but with u = x² it turns into plain cos(u). Substituting is stretching the x-axis into a u-axis: the lines show where each x goes. Predict what the stretch does to the area, then drag it and watch.'],
+  enclosed: ['Area enclosed by two curves.', 'A line and a parabola cross twice and trap a region between them. Each thin strip of that region reaches from the bottom curve up to the top one. Say which curve is on top and what to add up, then sweep a strip across.'],
+  revolution: ['Volumes of revolution.', 'Spin the curve y = √x around the x-axis and it sweeps out a solid. Slice that solid into discs: each is a circle of radius √x, a little thick. Add up the discs and the total closes in on the volume.'],
 }
 const REMIX: Record<string, string> = {
   slope: 'Next: the area under the same curve.',
@@ -164,6 +170,9 @@ function CalcRun({ topic, onTopics, onDone }: { topic: CalcTopic; onTopics: () =
       {cur === 'surface' && <SurfaceStep onDone={onDone} topic={topic.id} />}
       {cur === 'gradient' && <GradientStep onDone={onDone} topic={topic.id} />}
       {cur === 'volume' && <VolumeStep onDone={onDone} topic={topic.id} />}
+      {cur === 'usub' && <UsubStep onDone={onDone} topic={topic.id} />}
+      {cur === 'enclosed' && <EnclosedStep onDone={onDone} topic={topic.id} />}
+      {cur === 'revolution' && <RevolutionStep onDone={onDone} topic={topic.id} />}
     </Frame>
   )
 }

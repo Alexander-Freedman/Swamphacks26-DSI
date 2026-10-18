@@ -244,3 +244,29 @@
 .calc-sums td { text-align: right; }
 .calc-sums tr.on { background: var(--marker-soft); font-weight: 700; }
 .calc-correct + .calc-k { margin-top: 14px; }
+
+/* Calc 2, u-substitution: strips that keep their area while the axis stretches; rubber bands from each x to its u */
+.calc-usub-strip { fill: var(--calc-rect); stroke: var(--ink); stroke-width: 1; }
+.calc-usub-strip.alt { fill: rgba(27, 35, 64, 0.24); }
+.calc-usub-bands line { stroke: var(--off); stroke-width: 1.5; stroke-dasharray: 3 3; opacity: 0.85; }
+.calc-usub-bands.done line { stroke: var(--called); stroke-dasharray: none; }
+
+/* Calc 2, area between two curves: the parabola in green, the strip you drag, what it has painted */
+.calc-enc-bot { stroke: var(--called); }
+.calc-enc-botlab { fill: var(--called); }
+.calc-l.enc { border-top: 3px solid var(--called); }
+.calc-enc-swept { fill: var(--marker); opacity: 0.75; }
+.calc-enc-strip { fill: var(--marker); stroke: var(--ink); stroke-width: 1.5; }
+
+/* Calc 2, volumes of revolution: the curve on the floor, the solid it sweeps out, the discs, the real outline */
+.calc-rev-plane { fill: var(--marker-soft); stroke: none; }
+.calc-rev-curve { fill: none; stroke: var(--ink); stroke-width: 3; stroke-linecap: round; stroke-linejoin: round; }
+.calc-rev-skin { fill: var(--marker); stroke: var(--ink); stroke-width: 0.5; stroke-opacity: 0.5; stroke-linejoin: round; }
+.calc-rev-face { fill: #d9d5e8; stroke: var(--ink); stroke-width: 1; stroke-linejoin: round; }
+.calc-rev-disc { fill: var(--marker); stroke: var(--ink); stroke-width: 0.8; stroke-linejoin: round; }
+.calc-rev-disc.alt { fill: #d9d5e8; }
+.calc-rev-disc.ask { fill: var(--called); stroke-width: 1.2; }
+.calc-rev.fine .calc-rev-disc { stroke-width: 0.3; }
+.calc-rev-outline polyline { fill: none; stroke: var(--ink); stroke-width: 2; stroke-dasharray: 5 4; }
+.calc-l.dash { border-top: 2px dashed var(--ink); }
+.calc-l.rev-ask { height: 12px; background: var(--called); border: 1.5px solid var(--ink); }
