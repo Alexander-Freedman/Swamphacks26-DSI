@@ -92,6 +92,10 @@ const EXTRA_LABELS: Record<string, string> = {
   'ch-bond-lost': 'The C–H electrons go nowhere',
   'crowding-ignored': 'Crowding ignored',
   'no-neighbor-h': 'Elimination with no neighbor H',
+  // statistics (sessions/statistics/clt.ts CLT_MISTAKES)
+  'averages-keep-shape': 'Averages keep the original shape',
+  'averages-flat': 'Every average is equally likely',
+  'bigger-sample-wider': 'Bigger samples spread out more',
 }
 
 function store(): Storage | null {
