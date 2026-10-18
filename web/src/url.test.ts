@@ -17,6 +17,23 @@ describe('readScreen', () => {
   })
 })
 
+describe('the published static site opens on How we built it', () => {
+  afterEach(() => vi.unstubAllEnvs())
+  it('bare URL is the built page; the app Home is ?app=1', () => {
+    vi.stubEnv('PROD', true)
+    expect(readScreen('')).toEqual({ kind: 'built' })
+    expect(readScreen('?app=1')).toEqual(HOME)
+    expect(screenUrl(HOME, BASE)).toBe('/Swamphacks26-DSI/?app=1')
+    expect(screenUrl({ kind: 'built' }, BASE)).toBe(BASE)
+  })
+  it('with a live server, Home stays the bare URL', () => {
+    vi.stubEnv('PROD', true)
+    vi.stubEnv('VITE_API_BASE', 'https://api.test')
+    expect(readScreen('')).toEqual(HOME)
+    expect(screenUrl(HOME, BASE)).toBe(BASE)
+  })
+})
+
 describe('screenUrl', () => {
   it('keeps the base path', () => {
     expect(screenUrl(HOME, BASE)).toBe(BASE)

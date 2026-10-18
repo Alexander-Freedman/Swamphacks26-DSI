@@ -1,5 +1,6 @@
 // Stage 2, anchor: one true fact, then a prediction from it. Curve topics predict ON the graph (a pencil
 // mark at the year asked about) and then see the real curve next to the mark. One retry on a follow-up.
+import { checkLabel } from '../demo/demo'
 import { useCallback, useMemo, useRef, useState, type KeyboardEvent, type PointerEvent } from 'react'
 import { Curve } from '../components/Curve'
 import { useNarrow } from '../components/useNarrow'
@@ -105,7 +106,7 @@ function Verdict({ r }: { r: AnchorResponse }) {
     <div className="lga-result" role="status">
       <span className={`lga-stamp ${ok ? 'is-ok' : 'is-not'}`}>{ok ? 'SPOT ON' : 'NOT YET'}</span>
       <p className="lga-line">{r.feedback}</p>
-      {r.offline && <p className="learn-offline">offline check</p>}
+      {r.offline && <p className="learn-offline">{checkLabel()}</p>}
     </div>
   )
 }

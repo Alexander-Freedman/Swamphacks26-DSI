@@ -1,5 +1,6 @@
 // Stage 1, guess: a one-line pencil guess before seeing anything, plus how sure you are.
 // The check classifies the guess and may spot a known wrong idea; only its label shows here (the fix comes at the end).
+import { checkLabel } from '../demo/demo'
 import { useCallback, useState } from 'react'
 import type { GuessRequest, StageProps } from './types'
 import { useGraded } from './useGraded'
@@ -74,7 +75,7 @@ export function GuessScreen({ topic, state, update, next, api }: StageProps) {
         <div className="lga-result" role="status">
           <p className="lga-line">{r.message}</p>
           {tag && <p className="lga-tag">sounds like: {tag.label}</p>}
-          {r.offline && <p className="learn-offline">offline check</p>}
+          {r.offline && <p className="learn-offline">{checkLabel()}</p>}
         </div>
       )}
 

@@ -1,6 +1,7 @@
 // Top of Home: "Try any topic" opens a six-screen Learn session (docs/learn-plan.md).
 // Chips are the prebuilt Learn topics. Typed text opens the closest prebuilt topic; anything else
 // is built live by the backend (1 to 2 minutes), or says it needs the backend when there is none.
+import { hasScript, isStatic } from '../demo/demo'
 import { useEffect, useId, useState, type FormEvent } from 'react'
 import { keywords, learnApi, overlap } from '../learnApi'
 import { offlineLine } from './offlineLine'
@@ -69,14 +70,19 @@ export function LearnTopicBox({ onOpen, api = learnApi }: { onOpen: (slug: strin
   return (
     <section className="anytopic learn-box" aria-labelledby={`${id}-h`}>
       <h2 id={`${id}-h`} className="anytopic-title">
-        Try any topic
+        {isStatic() ? 'Pick a lesson' : 'Try any topic'}
       </h2>
+      {isStatic() && (
+        <p className="anytopic-static">
+          10 ready-made lessons. <b>★ Recorded AI demos</b> show the real feedback our AI gave; the rest use a quick keyword check.
+        </p>
+      )}
       <form className="anytopic-form" onSubmit={submit}>
         <input
           aria-label="topic to learn"
           value={text}
           onChange={(e) => setText(e.target.value)}
-          placeholder="e.g. why we have seasons, recursion"
+          placeholder={isStatic() ? 'search the lessons, e.g. seasons' : 'e.g. why we have seasons, recursion'}
           maxLength={120}
           disabled={busy}
         />
@@ -89,18 +95,18 @@ export function LearnTopicBox({ onOpen, api = learnApi }: { onOpen: (slug: strin
       </p>
       {topics.length > 0 && (
         <div className="anytopic-chips" role="group" aria-label="Ready-made topics">
-          {[...topics.filter((t) => t.checked), ...topics.filter((t) => !t.checked)]
+          {[...topics.filter((t) => isStatic() && hasScript(t.slug)), ...topics.filter((t) => t.checked && !(isStatic() && hasScript(t.slug))), ...topics.filter((t) => !t.checked)]
             .slice(0, more ? undefined : FIRST_CHIPS)
             .map((t) => (
               <button
                 key={t.slug}
                 type="button"
-                className={'anytopic-chip' + (t.checked ? '' : ' is-new')}
+                className={'anytopic-chip' + (t.checked ? '' : ' is-new') + (isStatic() && hasScript(t.slug) ? ' is-demo' : '')}
                 onClick={() => onOpen(t.slug)}
                 disabled={busy}
-                title={t.checked ? undefined : 'Built live by someone, not yet reviewed'}
+                title={isStatic() && hasScript(t.slug) ? 'Recorded AI demo' : t.checked ? undefined : 'Built live by someone, not yet reviewed'}
               >
-                {t.topic}
+                {isStatic() && hasScript(t.slug) ? `★ ${t.topic}` : t.topic}
               </button>
             ))}
           {topics.length > FIRST_CHIPS && (

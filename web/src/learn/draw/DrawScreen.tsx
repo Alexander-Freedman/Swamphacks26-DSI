@@ -1,4 +1,5 @@
 // Draw it: sketch the model from memory, write its rule in one line, then see it graded part by part.
+import { notesLine } from '../../demo/demo'
 import { useCallback, useRef, useState, type PointerEvent, type RefObject } from 'react'
 import type { DrawCriterion, DrawCriterionId, DrawRequest, DrawResponse, StageProps } from '../types'
 import { useGraded } from '../useGraded'
@@ -138,7 +139,7 @@ export function DrawScreen({ topic, state, update, next, api }: StageProps) {
         </ul>
       )}
       {result?.followUpQuestion && <p className="dr-follow">{result.followUpQuestion}</p>}
-      {result?.offline && <p className="learn-offline">Checked against the topic's notes (the live checker is busy or offline).</p>}
+      {result?.offline && <p className="learn-offline">{notesLine()}</p>}
       <button className="dr-next" onClick={next} disabled={busy}>Next</button>
     </section>
   )

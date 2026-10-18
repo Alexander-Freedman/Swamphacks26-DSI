@@ -1,4 +1,6 @@
 /* How we built it: wide like the research page, screenshots first, short captions. */
+/* a cool gray page, so the paper-colored screenshots and cards stand out from it */
+body:has(.bt-page) { background: #e6ebf0; }
 .bt-page { display: grid; gap: 22px; line-height: 1.5; }
 @media (min-width: 721px) {
   .bt-page, .app:has(.bt-page) .topbar { width: min(1100px, calc(100vw - 32px)); margin-left: calc(50% - min(550px, 50vw - 16px)); }
@@ -55,3 +57,9 @@
   .bt-arrow { transform: rotate(90deg); margin: 0 auto; }
   .bt-flow { flex-direction: column; align-items: stretch; }
 }
+
+/* the way into the app: the one loud button on the page */
+.bt-go-row { display: flex; align-items: center; gap: 14px; flex-wrap: wrap; margin-top: 16px; }
+.bt-go-row span { color: var(--ink-soft); }
+.bt-go { padding: 12px 22px; border: 2px solid var(--ink); border-radius: var(--radius-ui); background: var(--marker); font: 800 1.05rem var(--font-body); box-shadow: var(--shadow); }
+.bt-go:hover { filter: brightness(0.97); }

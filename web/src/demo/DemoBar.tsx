@@ -3,18 +3,33 @@
 import { fillStep, hasScript, isStatic } from './demo'
 import './demo.css'
 
+const DEMOS: [string, string][] = [
+  ['derivative', 'Calculus'],
+  ['sn2-reaction', 'Organic chemistry'],
+  ['base-rates-and-false-positives', 'Base rates'],
+]
+
 export function DemoBar({ slug }: { slug: string }) {
   if (!isStatic()) return null
   if (!hasScript(slug))
     return (
       <p className="demo-note sheet">
-        The live AI is retired, so answers here get a quick built-in check. For the full experience, try a recorded demo from Home.
+        <strong>No AI on this lesson.</strong> Our AI grader is retired, so your answers get a quick keyword check against our answer key, not
+        real feedback. For the AI's real feedback, try a recorded demo:{' '}
+        {DEMOS.map(([slug, label], i) => (
+          <span key={slug}>
+            {i ? (i === DEMOS.length - 1 ? ' or ' : ', ') : ''}
+            <a href={`${import.meta.env.BASE_URL}?learn=${slug}`}>{label}</a>
+          </span>
+        ))}
+        .
       </p>
     )
   return (
     <>
       <p className="demo-note sheet">
-        <strong>Recorded demo.</strong> The live AI is retired. Use the example answer on any step to see the AI's real feedback to it.
+        <strong>Recorded AI demo.</strong> On each step, press <b>Use the example answer</b> (bottom right) to see the real feedback our AI gave
+        it. If you write your own answer instead, you get a quick keyword check, not AI feedback.
       </p>
       <button
         className="demo-fill"

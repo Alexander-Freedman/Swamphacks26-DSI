@@ -44,7 +44,7 @@ describe('GuessScreen', () => {
     fireEvent.change(screen.getByLabelText('how sure'), { target: { value: '80' } })
     fireEvent.click(screen.getByRole('button', { name: 'Submit' }))
     expect(await screen.findByText('sounds like: Interest happens once')).toBeTruthy()
-    expect(screen.getByText('offline check')).toBeTruthy()
+    expect(screen.getByText('quick keyword check, no AI')).toBeTruthy()
     expect(screen.queryByText(/30 times/)).toBeNull() // the fix waits for the end
     expect(state()).toMatchObject({ guess: 'you add 7% a single time and stop at $1,070', confidence: 80, misconceptionId: 'interest-paid-once' })
     expect(state().guessResult?.classification).toBe('concrete')
@@ -62,7 +62,7 @@ describe('GuessScreen', () => {
     await act(async () => d.resolve({ classification: 'vague', misconceptionId: null, message: 'Say a bit more.' }))
     expect(screen.queryByText('thinking…')).toBeNull()
     expect(screen.getByText('Say a bit more.')).toBeTruthy()
-    expect(screen.queryByText('offline check')).toBeNull()
+    expect(screen.queryByText('quick keyword check, no AI')).toBeNull()
   })
 
   it('offline: says so and lets the learner continue', async () => {
@@ -148,7 +148,7 @@ describe('AnchorScreen', () => {
     fireEvent.change(screen.getByLabelText('anchor answer'), { target: { value: 'no idea' } })
     fireEvent.click(screen.getByRole('button', { name: 'Submit' }))
     expect(await screen.findByText('NOT YET')).toBeTruthy()
-    expect(screen.getByText('offline check')).toBeTruthy()
+    expect(screen.getByText('quick keyword check, no AI')).toBeTruthy()
   })
 })
 

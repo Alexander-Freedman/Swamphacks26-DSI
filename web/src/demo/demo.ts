@@ -16,6 +16,12 @@ const SCRIPT = script as unknown as Record<string, Record<string, string>> & { h
 /** No AI server in this build: the recorded replies are the only AI there is. */
 export const isStatic = () => apiBase() === null
 
+/** The tag on an answer checked without the AI. */
+export const checkLabel = () => (isStatic() ? 'quick keyword check, no AI' : 'offline check')
+/** The line under a step that was checked against the topic's notes instead of the AI. */
+export const notesLine = () =>
+  isStatic() ? 'Quick keyword check against our notes, not AI feedback.' : "Checked against the topic's notes (the live checker is busy or offline)."
+
 /** This topic has a demo script (and recorded replies for it). */
 export const hasScript = (slug: string) => slug !== 'home' && !!SCRIPT[slug]
 
