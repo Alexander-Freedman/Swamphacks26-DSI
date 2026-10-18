@@ -187,6 +187,13 @@ def _vet_visual(topic: Topic, reply: VisualReply) -> Visual | None:
     c = case.curve
     if visual.widget != "curve" or case.widget is not SpecWidget.curve or c is None:
         raise SpecRejected("not a curve")
+    # The model often also lists the knob as a fixed variable; the knob wins, drop the duplicate
+    # (otherwise every check sees two values for one name and the knob looks like it does nothing).
+    if any(v.name == c.knob.param for v in case.variables):
+        case = case.model_copy(
+            update={"variables": [v for v in case.variables if v.name != c.knob.param]}
+        )
+        visual = visual.model_copy(update={"spec": case})
     if c.mode != "value" or c.ask_x is None:
         raise SpecRejected("the curve must ask for y at ask_x")
     if case.prediction.input != "slider":

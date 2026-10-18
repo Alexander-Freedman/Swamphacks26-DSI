@@ -596,3 +596,28 @@ def test_overlong_label_in_a_live_curve_is_trimmed_not_dropped(monkeypatch) -> N
     monkeypatch.setattr(codex, "fake_reply", reply)
     res = post("topics", topic="gas pressure")
     assert res.status_code == 200 and res.json()["visual"] is not None
+
+
+def test_knob_also_listed_as_a_variable_is_deduplicated(monkeypatch) -> None:
+    real = codex.fake_reply
+
+    def reply(task, prompt):
+        r = real(task, prompt)
+        if task == "visual" and r.get("visual"):
+            spec = r["visual"]["spec"]
+            knob = spec["curve"]["knob"]
+            spec["variables"].append(
+                {
+                    "name": knob["param"],
+                    "meaning": "the knob again",
+                    "unit": "",
+                    "value": knob["default"],
+                }
+            )
+        return r
+
+    monkeypatch.setattr(codex, "fake_reply", reply)
+    body = post("topics", topic="spring stretch").json()
+    assert body["visual"] is not None
+    knob = body["visual"]["spec"]["curve"]["knob"]["param"]
+    assert knob not in [v["name"] for v in body["visual"]["spec"]["variables"]]
