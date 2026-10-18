@@ -143,6 +143,41 @@ describe('calculus session', () => {
     expect(entries()[0]).toMatchObject({ session: 'calculus', misconception: 'slope-is-height', calcTopic: 'slope' })
   })
 
+  it('a topic that ends on the tangent (Learn: derivative anchor) finishes on the end bar, not a blank page', () => {
+    localStorage.clear()
+    const onDone = vi.fn()
+    render(<CalculusSession onDone={onDone} topic={{ id: 'slope', title: 'The slope of a curve', blurb: '', steps: ['draw', 'tangent'], ready: true }} embedded />)
+    draw(f)
+    fireEvent.click(screen.getByText('Check it with a tangent →'))
+    const chart = screen.getByLabelText('drag the point along the curve')
+    fireEvent.pointerDown(chart, { clientX: px(0.2), clientY: 100, pointerId: 2 })
+    fireEvent.pointerMove(chart, { clientX: px(4), clientY: 100, pointerId: 2 })
+    fireEvent.pointerUp(chart, { pointerId: 2 })
+    fireEvent.click(screen.getByText('Finish ✓'))
+    expect(screen.getByText('Drag the tangent.')).toBeTruthy()
+    expect(screen.getByText(/Saved to your notebook/)).toBeTruthy()
+    expect(screen.getByText(/Slope = height of the curve/)).toBeTruthy()
+    // embedded in Learn: no "Next: the area…" pointer to another calculus topic
+    expect(screen.queryByText(/Next:/)).toBeNull()
+    expect(entries()[0]).toMatchObject({ session: 'calculus', misconception: 'slope-is-height', calcTopic: 'slope' })
+    fireEvent.click(screen.getByRole('button', { name: 'Done' }))
+    expect(onDone).toHaveBeenCalled()
+  })
+
+  it('a topic that is only the area (Learn: derivative neighbor) finishes on the end bar', () => {
+    localStorage.clear()
+    render(<CalculusSession onDone={() => {}} topic={{ id: 'area', title: 'Area under a curve', blurb: '', steps: ['area'], ready: true }} embedded />)
+    const bar = screen.getByLabelText('your area guess, in squares')
+    fireEvent.pointerDown(bar, { clientX: 14 + (4.6 / 10) * 612, clientY: 40, pointerId: 3 })
+    fireEvent.pointerUp(bar, { pointerId: 3 })
+    fireEvent.click(screen.getByText('Fill it with rectangles →'))
+    fireEvent.change(screen.getByLabelText(/Rectangles/), { target: { value: '100' } })
+    fireEvent.click(screen.getByText('Finish ✓'))
+    expect(screen.getByText('Fill the area.')).toBeTruthy()
+    expect(screen.getByText(/Saved to your notebook/)).toBeTruthy()
+    expect(entries()[0]).toMatchObject({ session: 'calculus', calcTopic: 'area' })
+  })
+
   it('Calc 3 > Slices of a surface: two partial-derivative questions, then find the flat spot', () => {
     localStorage.clear()
     render(<CalculusSession onDone={() => {}} topic={topicFor(/^Slices of a surface/)} />)
