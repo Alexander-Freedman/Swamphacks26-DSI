@@ -1,0 +1,173 @@
+{
+  "slug": "compound-interest",
+  "topic": "compound interest",
+  "checked": true,
+  "rubric": {
+    "entities": [
+      "the principal (the money put in at the start)",
+      "the interest rate per period",
+      "the number of periods",
+      "the current balance",
+      "the interest added each period"
+    ],
+    "causalLinks": [
+      "a higher rate adds a bigger share of the balance each period, so the balance grows faster",
+      "more periods means more rounds of interest, and each round works on a bigger balance than the last",
+      "a bigger balance makes the next interest payment bigger, which makes the balance bigger again",
+      "a bigger principal scales every later balance by the same factor"
+    ],
+    "coreRule": "value after n periods = principal x (1 + rate per period)^n: each period's interest is computed on the current balance, past interest included",
+    "whyRuleMatters": "Interest is paid on the whole current balance, not just the original deposit, so each period's interest includes interest on earlier interest. That feedback is why the number of periods is an exponent and why growth speeds up instead of staying flat.",
+    "whyRuleQuestion": "Why is the number of years an exponent in the formula, instead of a multiplier the way it is for simple interest?",
+    "anchorDescription": "At the end of each year the bank adds 7% of whatever is in the account at that moment, including interest it added in earlier years.",
+    "anchorPrompt": "You put in $1,000 at 7% a year. What is in the account after year 1, and after year 2? Say why year 2 adds more than year 1.",
+    "contrastingCases": [
+      {
+        "label": "Interest on interest",
+        "detail": "Alex puts $1,000 in an account that pays 7% a year on the current balance. Year 1 adds $70 (balance $1,070). Year 2 adds 7% of $1,070, which is $74.90 (balance $1,144.90). After 30 years: about $7,612.",
+        "oneLine": "$1,000 at 7% on the current balance: $7,612 after 30 years"
+      },
+      {
+        "label": "Same $70 every year",
+        "detail": "Sam puts $1,000 in an account that pays $70 every year, always 7% of the original $1,000. Year 1 adds $70, year 2 adds $70. After 30 years: $1,000 + 30 x $70 = $3,100.",
+        "oneLine": "$1,000 plus a flat $70 a year: $3,100 after 30 years"
+      },
+      {
+        "label": "Monthly instead of yearly",
+        "detail": "Jo's account pays 7% a year but splits it into twelve monthly payments of about 0.58% each, every one on the current balance. After 30 years: about $8,116, more than yearly compounding's $7,612, because interest starts earning interest sooner.",
+        "oneLine": "7% split into monthly payments: $8,116 after 30 years"
+      }
+    ],
+    "extremeCaseDimensions": [
+      {
+        "key": "many-periods",
+        "description": "push the number of periods very high (hundreds of years) and ask what the balance does"
+      },
+      {
+        "key": "zero-rate",
+        "description": "set the rate to exactly 0% for any number of periods"
+      },
+      {
+        "key": "tiny-principal",
+        "description": "start with almost nothing (one cent) at a high rate for a long time"
+      },
+      {
+        "key": "huge-rate",
+        "description": "set the rate to 100% or more per period and watch a single period"
+      }
+    ],
+    "confusableNeighbors": [
+      {
+        "key": "simple-interest",
+        "label": "Simple interest",
+        "question": "How does compound interest differ from simple interest, and when do the two give the same number?",
+        "correctDistinction": "Simple interest pays a fixed share of the original principal each period, so the balance grows in a straight line; compound interest pays on the current balance, so each payment is bigger than the last. They give the same number after exactly one period, and compound pulls ahead every period after that: simple interest is the first-year slice of compound interest, repeated."
+      },
+      {
+        "key": "apr-vs-apy",
+        "label": "APR vs APY",
+        "question": "A card says 24% APR, but the money owed grows by more than 24% in a year. Why, and which number tells you the real yearly growth?",
+        "correctDistinction": "APR is the stated rate before compounding (24% a year charged as twelve 2% monthly steps); APY is the actual yearly growth after compounding those steps, about 26.8%. APY comes from applying the compound rule to the APR's per-period rate, so the gap between them is exactly the interest on interest."
+      }
+    ],
+    "transferStructuralRequirements": [
+      "a stock that carries over from one period to the next",
+      "a per-period change that is a fixed fraction of the current stock, not of the starting stock",
+      "repeated periods, so the change in one period raises the base for the next",
+      "growth that is multiplicative over time (an exponent), not additive"
+    ],
+    "referenceTransferExample": "A rumor in a school: each day, every person who knows it tells 10% as many new people as already know. 100 people on day 1 become 110, then 121, then 133; after 30 days about 1,745 know it, not the 400 you would get from adding 10 a day."
+  },
+  "misconceptions": [
+    {
+      "id": "simple-interest",
+      "label": "Interest is the same amount every year",
+      "tell": "They work out $1,000 at 7% for 30 years as 1,000 + 30 x 70 = $3,100.",
+      "fix": "Each year's interest is 7% of the current balance, which already holds past interest, so the yearly addition grows: the 30-year total is about $7,612."
+    },
+    {
+      "id": "interest-paid-once",
+      "label": "Interest happens once",
+      "tell": "They add 7% a single time and stop at $1,070.",
+      "fix": "The 7% is applied every period on whatever is there, so over 30 years it is applied 30 times, each time on a bigger balance."
+    },
+    {
+      "id": "rate-is-all-that-matters",
+      "label": "Rate matters, time does not",
+      "tell": "They expect doubling the rate to matter more than doubling the years.",
+      "fix": "Time is the exponent: at 7%, 15 years turns $1,000 into $2,759 and 30 years into $7,612. Extra years multiply the result; extra rate points only add to the base."
+    }
+  ],
+  "extremeCases": [
+    {
+      "dimension": "many-periods",
+      "scenario": "$1 at 5% a year, left alone for 500 years.",
+      "correctBehavior": "It grows to about $39 billion; with enough periods even a small rate overwhelms any flat yearly addition."
+    },
+    {
+      "dimension": "zero-rate",
+      "scenario": "$1,000 at 0% a year, left for 40 years.",
+      "correctBehavior": "The balance stays exactly $1,000; with nothing added there is nothing to compound."
+    },
+    {
+      "dimension": "tiny-principal",
+      "scenario": "One cent at 10% a year for 200 years.",
+      "correctBehavior": "It becomes about $1.9 million; the principal only scales the result, the growth factor comes from rate and time."
+    }
+  ],
+  "visual": {
+    "widget": "curve",
+    "spec": {
+      "widget": "curve",
+      "approximate": false,
+      "variables": [
+        { "name": "P", "meaning": "money put in at the start", "unit": "$", "value": 1000 }
+      ],
+      "curve": {
+        "expr": "P*(1+r/100)^x",
+        "mode": "value",
+        "x_min": 0,
+        "x_max": 40,
+        "x_label": "years",
+        "y_label": "value ($)",
+        "ask_x": 30,
+        "ask_y": null,
+        "area_from": null,
+        "area_to": null,
+        "knob": {
+          "param": "r",
+          "label": "yearly rate (%)",
+          "min": 1,
+          "max": 15,
+          "step": 0.5,
+          "default": 7
+        }
+      },
+      "sampler": null,
+      "prediction": {
+        "prompt": "You put $1,000 in an account paying 7% a year on the current balance. After 30 years, how much is in the account?",
+        "input": "slider",
+        "slider": { "min": 1000, "max": 9000, "step": 100, "unit": "$" },
+        "options": []
+      },
+      "bands": [
+        { "min": 1000, "max": 1200, "misconception_id": "interest-paid-once" },
+        { "min": 1300, "max": 6900, "misconception_id": "simple-interest" },
+        { "min": 7000, "max": 9000, "misconception_id": null }
+      ],
+      "extremes": [
+        {
+          "param": "r",
+          "value": 1,
+          "watch": "At 1% the curve is nearly a straight line: 30 years gives only $1,348."
+        },
+        {
+          "param": "r",
+          "value": 15,
+          "watch": "At 15% the value passes $66,000 by year 30; the curve bends hard upward."
+        }
+      ],
+      "answer_claimed": 7612.26
+    }
+  }
+}

@@ -1,0 +1,115 @@
+{
+  "slug": "ohm-s-law",
+  "topic": "Ohm's law",
+  "checked": true,
+  "rubric": {
+    "entities": [
+      "Voltage: the electrical potential difference between two points, measured in volts; it is the electrical push across a component.",
+      "Electric current: the rate at which electric charge flows through a component, measured in amperes.",
+      "Resistance: how strongly a component opposes electric current, measured in ohms.",
+      "An ohmic component under unchanged physical conditions, especially approximately constant temperature: the context in which its resistance stays constant."
+    ],
+    "causalLinks": [
+      "For an ohmic component whose temperature and physical state stay unchanged, increasing the voltage across it causes the current through it to increase in direct proportion: twice the voltage causes twice the current.",
+      "Holding voltage fixed, increasing resistance causes current to decrease: doubling the resistance halves the current.",
+      "Holding current fixed, increasing resistance requires a proportionally larger voltage across the component.",
+      "If temperature or the component's physical state changes enough to change its resistance, the simple constant-resistance prediction can fail; Ohm's law applies only over a range where resistance is effectively constant."
+    ],
+    "coreRule": "For an ohmic component at approximately constant temperature, voltage equals current times resistance: V = I × R, where V is voltage in volts, I is current in amperes, and R is resistance in ohms. Equivalently, current equals voltage divided by resistance.",
+    "whyRuleMatters": "Voltage creates an electric field that pushes charge carriers through the material. In an ohmic material, more push makes carriers drift faster, while collisions with the material impede that motion by a fixed amount per unit current; with the material unchanged, this produces a straight-line proportional relationship rather than current rising independently of voltage or resistance.",
+    "whyRuleQuestion": "Why does doubling the voltage double the current only when the component's resistance stays unchanged, instead of producing the same current or an arbitrary increase?",
+    "anchorDescription": "A 6-ohm resistor is a component that opposes charge flow. If its temperature stays about the same, applying more electrical push across it makes more charge flow through it.",
+    "anchorPrompt": "If the electrical push across the same 6-ohm resistor is increased while its temperature stays the same, should the charge flow increase, decrease, or stay unchanged? Why?",
+    "contrastingCases": [
+      {
+        "label": "Same voltage, different opposition",
+        "detail": "Two separate circuits each use a 12-volt battery. One contains a 6-ohm resistor and the other contains a 12-ohm resistor, with no other important resistance. The first circuit carries 2 amperes of current; the second carries 1 ampere. The same electrical push does not guarantee the same charge flow because the components oppose flow by different amounts.",
+        "oneLine": "Same 12 volts; 6 ohms passes twice 12 ohms."
+      },
+      {
+        "label": "Same resistance, different push",
+        "detail": "Two separate circuits each contain a 6-ohm resistor at the same temperature. A 6-volt source drives 1 ampere through one resistor, while a 12-volt source drives 2 amperes through the other. The resistor is unchanged, so doubling the electrical push doubles the charge flow.",
+        "oneLine": "Same 6 ohms; 12 volts doubles current from 6 volts."
+      },
+      {
+        "label": "Same voltage reading, different component behavior",
+        "detail": "A 12-volt source is connected first to a 6-ohm resistor and then to a small lamp filament. The resistor can be predicted with a constant 2-ampere current if its temperature stays constant. The lamp filament heats substantially, its resistance changes, and its current need not be 2 amperes; a bare voltage reading is not enough unless the component is ohmic under the conditions.",
+        "oneLine": "A hot lamp is not automatically a 6-ohm resistor."
+      }
+    ],
+    "extremeCaseDimensions": [
+      {
+        "key": "applied-voltage",
+        "description": "Push the voltage across one fixed ohmic resistor toward zero or to a much larger value while its temperature remains approximately constant. Current approaches zero with zero voltage and changes in the same proportion as voltage."
+      },
+      {
+        "key": "resistance-value",
+        "description": "Hold voltage fixed while making the resistance extremely large or extremely small. Very large resistance makes current approach zero; extremely small resistance permits very large current only if the source and wires can supply it, so real source and wire resistance become important."
+      },
+      {
+        "key": "temperature-stability",
+        "description": "Push the component away from constant-temperature conditions, such as heating a lamp filament strongly. Its resistance can change, so the constant-resistance form of Ohm's law no longer predicts current accurately."
+      }
+    ],
+    "confusableNeighbors": [
+      {
+        "key": "electric-power",
+        "label": "Electric power",
+        "question": "A resistor has twice the voltage across it. Does that mean it necessarily uses only twice as much power? Distinguish current from power.",
+        "correctDistinction": "Ohm's law relates voltage, current, and resistance. Electric power is the rate electrical energy is converted, and for a component it is P = V × I, where P is power, V is voltage, and I is current. With fixed resistance, doubling voltage doubles current and therefore makes power four times as large."
+      },
+      {
+        "key": "resistance-vs-resistivity",
+        "label": "Resistivity",
+        "question": "Are two wires made of the same material guaranteed to have the same resistance? Why or why not?",
+        "correctDistinction": "Resistance is the opposition of a particular object and depends on its material, length, and thickness. Resistivity is a property of the material itself; two same-material wires can have different resistance because a longer wire has more resistance and a thicker wire has less."
+      }
+    ],
+    "transferStructuralRequirements": [
+      "There must be a driving difference across a path, analogous to electrical voltage.",
+      "There must be a flow or response through that path, analogous to electric current.",
+      "There must be an opposition parameter that stays approximately constant over the stated conditions.",
+      "With that opposition fixed, the response must be directly proportional to the driving difference and inversely proportional to the opposition.",
+      "If the opposition changes with temperature, speed, pressure, or another condition, the simple linear prediction must be limited or revised."
+    ],
+    "referenceTransferExample": "Water flowing through a particular pipe can be modeled over a gentle-flow range: the pressure drop from one end to the other is the driving difference, water flow rate is the response, and the pipe's hydraulic resistance is the opposition. If that resistance stays constant, doubling the pressure drop doubles the flow rate; a narrower or longer pipe has greater resistance and gives less flow for the same pressure drop. This analogy stops being simply linear if turbulent flow makes the hydraulic resistance change with flow speed."
+  },
+  "misconceptions": [
+    {
+      "id": "voltage-is-current",
+      "label": "“Voltage is the amount of current.”",
+      "tell": "The learner says a 12-volt battery always sends 12 amperes through anything connected to it.",
+      "fix": "Voltage is electrical push, while current is the resulting rate of charge flow. The current also depends on the total resistance in the path."
+    },
+    {
+      "id": "resistance-consumes-current",
+      "label": "“The resistor uses up current.”",
+      "tell": "The learner predicts less current leaves a resistor than enters it in a steady single-loop circuit.",
+      "fix": "In a steady circuit, charge is not used up, so the same current enters and leaves a resistor. The resistor produces a voltage drop and converts electrical energy to other forms, often heat."
+    },
+    {
+      "id": "ohms-law-always-applies",
+      "label": "“Every component has fixed resistance.”",
+      "tell": "The learner uses one resistance value to predict a hot light bulb, diode, or electronic device at every voltage.",
+      "fix": "Ohm's law in its constant-resistance form describes ohmic behavior over suitable conditions. Some components change resistance with temperature or have inherently non-linear current-voltage behavior."
+    }
+  ],
+  "extremeCases": [
+    {
+      "dimension": "applied-voltage",
+      "scenario": "A 10-ohm resistor remains near room temperature. With 0 volts across it, then with 20 volts across it, compare the charge flow.",
+      "correctBehavior": "At 0 volts, no current flows through the resistor. At 20 volts, 2 amperes flow; if the voltage were doubled again without heating the resistor appreciably, the current would double again."
+    },
+    {
+      "dimension": "resistance-value",
+      "scenario": "A 12-volt source is connected first to a 1,000,000-ohm resistor and then to a 1-ohm resistor, one at a time. Assume the source can maintain 12 volts for this comparison.",
+      "correctBehavior": "The 1,000,000-ohm resistor carries only 0.000012 amperes, while the 1-ohm resistor carries 12 amperes. In a real circuit, such a low resistance may make the source voltage sag or wires heat, so their resistance can no longer be ignored."
+    },
+    {
+      "dimension": "temperature-stability",
+      "scenario": "A small lamp filament is connected to a battery and becomes much hotter while it glows. Its resistance is measured when cool and then assumed unchanged to predict its hot current.",
+      "correctBehavior": "That prediction can be wrong because the hot filament has higher resistance than its cool value. The constant-resistance version of Ohm's law applies only if the relevant resistance remains effectively constant."
+    }
+  ],
+  "visual": null
+}

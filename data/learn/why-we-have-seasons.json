@@ -1,0 +1,125 @@
+{
+  "slug": "why-we-have-seasons",
+  "topic": "why we have seasons",
+  "checked": true,
+  "rubric": {
+    "entities": [
+      "Earth's tilted rotation axis (about 23.5 degrees from upright relative to its path around the Sun)",
+      "Earth's yearly orbit around the Sun",
+      "A hemisphere: either Earth's Northern or Southern half",
+      "Sun angle: how directly sunlight strikes a patch of ground",
+      "Day length: hours of sunlight in a 24-hour day",
+      "Solar energy received per square metre of ground",
+      "Seasonal temperature pattern",
+      "Earth–Sun distance"
+    ],
+    "causalLinks": [
+      "As Earth moves around the Sun, its fixed tilted axis makes one hemisphere lean toward the Sun and, about half an orbit later, lean away from it.",
+      "When a hemisphere leans toward the Sun, the Sun is higher in its sky; sunlight hits a smaller ground area more directly, so energy received per square metre increases.",
+      "When a hemisphere leans toward the Sun, it also has longer daylight hours; the extra time receiving sunlight increases its total daily solar energy.",
+      "More daily solar energy tends to warm land, water, and air over time, producing that hemisphere's summer; less daily solar energy produces winter.",
+      "When the Northern Hemisphere leans toward the Sun, the Southern Hemisphere leans away, so their seasonal patterns are opposite.",
+      "Earth is closest to the Sun in early January and farthest away in early July, but this modest distance change affects both hemispheres together and does not cause their opposite seasons."
+    ],
+    "coreRule": "A hemisphere has summer when Earth's axial tilt makes it face toward the Sun, because it receives both more direct sunlight and longer days; it has winter when the tilt makes it face away, because sunlight is less direct and days are shorter. The two hemispheres therefore have opposite seasons.",
+    "whyRuleMatters": "Tilt changes the concentration and duration of incoming sunlight for each hemisphere. A higher Sun spreads the same incoming light over less ground, and a longer day supplies that energy for more hours. Distance alone cannot explain seasons because both hemispheres are nearly the same distance from the Sun at the same time, yet one can be in summer while the other is in winter.",
+    "whyRuleQuestion": "Why does a hemisphere's tilt toward the Sun cause more warming specifically through both a higher Sun angle and longer days, rather than simply because Earth is closer to the Sun?",
+    "anchorDescription": "Earth's rotation axis stays pointed in nearly the same direction in space as Earth travels around the Sun. In June, the Northern Hemisphere is tilted toward the Sun while the Southern Hemisphere is tilted away.",
+    "anchorPrompt": "Using that fact, which hemisphere should have longer daylight in June, and why?",
+    "contrastingCases": [
+      {
+        "label": "Same Earth–Sun distance, opposite seasons",
+        "detail": "On about June 21, New York City in the Northern Hemisphere and Buenos Aires in the Southern Hemisphere are essentially the same distance from the Sun because they are on the same Earth. New York has roughly 15 hours of daylight and is entering summer, while Buenos Aires has roughly 9.5 hours of daylight and is entering winter. The difference comes from which hemisphere is tilted toward the Sun, not from distance.",
+        "oneLine": "Same distance: New York summer, Buenos Aires winter."
+      },
+      {
+        "label": "Summer despite being farther from the Sun",
+        "detail": "Around July 4, Earth is at its farthest point from the Sun for the year. The Northern Hemisphere is nevertheless in summer: London has long days and a high midday Sun because the Northern Hemisphere is tilted toward the Sun. Around January 3, Earth is closest to the Sun, yet London is in winter.",
+        "oneLine": "Northern summer occurs when Earth is farthest from the Sun."
+      },
+      {
+        "label": "Same date, different Sun angles",
+        "detail": "On about December 21, a noon Sun in Miami, Florida is much higher in the sky than a noon Sun in Fairbanks, Alaska. Both places are in the Northern Hemisphere and face the same seasonal tilt, but Miami receives more direct sunlight and is much warmer; Fairbanks has very short days and can have no sunrise near this date.",
+        "oneLine": "Same winter date: Miami's Sun is higher than Fairbanks'."
+      }
+    ],
+    "extremeCaseDimensions": [
+      {
+        "key": "axial-tilt-zero",
+        "description": "Reduce Earth's axial tilt to 0 degrees while keeping its orbit. Every latitude would keep nearly the same noon Sun angle and day length all year, so the tilt-driven annual seasons would largely disappear."
+      },
+      {
+        "key": "hemisphere-orientation",
+        "description": "Compare a hemisphere maximally tilted toward the Sun with the same hemisphere maximally tilted away. The toward-Sun case has its year's most direct sunlight and longest days; the away-from-Sun case has its least direct sunlight and shortest days."
+      },
+      {
+        "key": "latitude-near-pole",
+        "description": "Move a location toward a pole at a solstice. Seasonal day-length changes become extreme: near or beyond the Arctic or Antarctic Circle, a summer solstice can bring 24 hours of daylight and the opposite winter solstice can bring 24 hours without sunrise."
+      },
+      {
+        "key": "sun-angle-low-versus-high",
+        "description": "Hold incoming sunlight available but change its angle from nearly overhead to very low. Nearly overhead light is concentrated onto less ground and heats it more per square metre; low-angle light is spread over more ground and heats it less per square metre."
+      }
+    ],
+    "confusableNeighbors": [
+      {
+        "key": "earth-sun-distance",
+        "label": "Earth–Sun distance",
+        "question": "If Earth is closest to the Sun in early January, why is it winter in the Northern Hemisphere then but summer in the Southern Hemisphere?",
+        "correctDistinction": "Earth–Sun distance changes slightly over the year and affects both hemispheres at once. Axial tilt determines which hemisphere gets more direct sunlight and longer days, producing opposite seasons; the January closeness only slightly modifies the sunlight received by both hemispheres."
+      },
+      {
+        "key": "daily-weather",
+        "label": "Daily weather",
+        "question": "How can a cold summer day or a warm winter day occur if seasons are caused by sunlight?",
+        "correctDistinction": "A season is the months-long pattern caused by changing average solar energy from tilt. Daily weather is short-term variation from moving air masses, clouds, storms, and ocean conditions, which can temporarily oppose the seasonal average without changing the underlying tilt-driven pattern."
+      }
+    ],
+    "transferStructuralRequirements": [
+      "A stable directional bias must be carried through a cycle, so that its orientation relative to a source changes predictably.",
+      "The changing orientation must alter how strongly an input is concentrated, delivered, or exposed to one receiver versus another.",
+      "A second exposure-duration effect should reinforce the concentration effect: the favored receiver gets input for longer, while the unfavored receiver gets it for less time.",
+      "Opposed receivers must trade places over the cycle, yielding opposite outcomes even though their shared distance from the source is the same.",
+      "The output should reflect accumulated input over time, so its maximum or minimum may lag behind the orientation extreme."
+    ],
+    "referenceTransferExample": "Imagine a rotating display platform carrying two solar panels on opposite sides of a fixed, slightly tilted axle as it circles a lamp once per minute. During one half of the circle, the north-side panel faces the lamp more directly and remains illuminated longer each rotation, so its battery gains charge faster; the south-side panel gets shallower, shorter illumination. Half a circuit later the roles reverse. Moving the whole platform slightly closer or farther from the lamp changes both panels together, but cannot explain why one charges faster while the other charges more slowly."
+  },
+  "misconceptions": [
+    {
+      "id": "closer-means-summer",
+      "label": "Summer is when Earth is closer",
+      "tell": "“It is summer because Earth moves closer to the Sun, so January should be summer everywhere.”",
+      "fix": "Earth is closest to the Sun in early January, when the Northern Hemisphere has winter and the Southern Hemisphere has summer. Seasons come mainly from axial tilt changing Sun angle and day length in opposite ways across the hemispheres."
+    },
+    {
+      "id": "tilt-means-one-side-always-hot",
+      "label": "The tilted side stays hot",
+      "tell": "“The Northern Hemisphere is tilted toward the Sun, so it is always warmer than the Southern Hemisphere.”",
+      "fix": "Earth's axis keeps its direction as Earth orbits, so each hemisphere is tilted toward the Sun for roughly half the year and away for the other half. The favored hemisphere switches, creating opposite seasons."
+    },
+    {
+      "id": "hot-temperature-is-the-season",
+      "label": "One cold day cancels summer",
+      "tell": "“A cold or rainy day means it cannot be summer.”",
+      "fix": "Seasons describe the longer-term average heating pattern, not every day's weather. Clouds, wind, and storms can make individual days unusually cold or warm while the seasonal sunlight pattern remains in place."
+    }
+  ],
+  "extremeCases": [
+    {
+      "dimension": "axial-tilt-zero",
+      "scenario": "Imagine Earth with no axial tilt at all, but with the same 365-day orbit around the Sun. A city at 40 degrees north would have nearly the same daylight length and noon Sun height on every date.",
+      "correctBehavior": "The usual annual summer and winter pattern would largely vanish. The city could still have weather and climate differences, but not strong tilt-driven seasons."
+    },
+    {
+      "dimension": "hemisphere-orientation",
+      "scenario": "At the June solstice, the Northern Hemisphere is tilted most toward the Sun; about six months later at the December solstice, it is tilted most away. Consider the same place, such as Chicago.",
+      "correctBehavior": "Near the June solstice, Chicago has its longest days and most direct yearly sunlight; near the December solstice, it has its shortest days and least direct yearly sunlight. Temperature usually lags these sunlight extremes by several weeks because land and water take time to warm and cool."
+    },
+    {
+      "dimension": "latitude-near-pole",
+      "scenario": "At the June solstice, Utqiagvik, Alaska, is about 71 degrees north of the equator. It lies north of the Arctic Circle.",
+      "correctBehavior": "The Sun stays above the horizon for about 24 hours, giving continuous daylight. Near the December solstice, the same place has a period when the Sun does not rise, the opposite seasonal extreme."
+    }
+  ],
+  "visual": null
+}

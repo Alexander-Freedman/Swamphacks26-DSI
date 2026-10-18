@@ -1,0 +1,121 @@
+{
+  "slug": "opportunity-cost",
+  "topic": "opportunity cost",
+  "checked": true,
+  "rubric": {
+    "entities": [
+      "A scarce resource that can be used in more than one way, such as one hour, $20, or a seat in a class.",
+      "The chosen option: the use of the resource that is actually selected.",
+      "The next-best feasible alternative: the most valuable option given up because the resource was used for the chosen option.",
+      "Benefits or value from each feasible option, measured on the same relevant basis for the decision.",
+      "Constraints that determine feasibility, such as available time, money, skills, rules, and information."
+    ],
+    "causalLinks": [
+      "Using a scarce resource for the chosen option makes that same unit unavailable for competing feasible options, because the resource cannot be allocated twice at the same time.",
+      "As the value of the best feasible alternative rises, the opportunity cost of choosing a fixed option rises by the same amount, because more valuable foregone benefit is sacrificed.",
+      "When a constraint makes an alternative infeasible, that alternative stops determining opportunity cost, because it was not a real available choice.",
+      "Improving the value of the chosen option does not by itself increase its opportunity cost; opportunity cost is set by the value of the best alternative forgone, not by the chosen option's own payoff.",
+      "If a new feasible alternative becomes more valuable than the previously best forgone alternative, it becomes the opportunity cost, because opportunity cost tracks the single best rejected option."
+    ],
+    "coreRule": "For a choice among feasible alternatives, the opportunity cost of the chosen option is the value of the single best feasible alternative that is not chosen—the benefit you give up by using the scarce resource this way. Choose an option when its benefit is at least as large as that opportunity cost, using the same relevant measure of value.",
+    "whyRuleMatters": "A choice uses resources that could have produced something else, so its real tradeoff is not automatically the money paid or the sum of every rejected option. Only the best alternative matters because you could have selected only one alternative with that same resource; choosing a lower-ranked rejected option would not recover the value of the best one.",
+    "whyRuleQuestion": "Why is the opportunity cost the value of the best feasible alternative forgone, rather than the price paid or the total value of every alternative you did not choose?",
+    "anchorDescription": "Maya has one free evening. She can earn $60 by working a shift or attend a concert she values at $45, but she cannot do both. If she attends the concert, the work shift is no longer available that evening.",
+    "anchorPrompt": "If Maya attends the concert, what benefit does she give up, and what fact about her evening makes that tradeoff unavoidable?",
+    "contrastingCases": [
+      {
+        "label": "Same concert price, different forgone alternative",
+        "detail": "Maya pays $20 for a concert ticket and spends her one free evening there. In Case A, her only other feasible plan is watching a movie at home that she values at $10. In Case B, she could instead work a shift and earn $80. The ticket costs $20 in both cases, but attending has a much larger opportunity cost in Case B because the best available alternative is more valuable.",
+        "oneLine": "Same $20 ticket; giving up $80 differs from giving up $10."
+      },
+      {
+        "label": "A tempting but infeasible job",
+        "detail": "Noah spends Saturday hiking. A friend says Noah gave up a $200 catering job, but the job requires a food-safety certificate Noah does not have, so he could not legally take it. Noah could have worked his regular $70 shift instead. The $200 job is not the opportunity cost because it was not feasible; the relevant forgone alternative is the $70 shift.",
+        "oneLine": "An unavailable $200 job cannot be the cost of hiking."
+      },
+      {
+        "label": "Many rejected plans, one best alternative",
+        "detail": "Priya uses $100 to buy a textbook. She could instead have bought headphones she values at $75, a restaurant meal she values at $40, or a game she values at $30. Her opportunity cost is $75, not $145, because the same $100 could have funded only one of those alternatives.",
+        "oneLine": "Three rejected purchases do not create a $145 opportunity cost."
+      }
+    ],
+    "extremeCaseDimensions": [
+      {
+        "key": "best-alternative-value",
+        "description": "Hold the chosen option and constraints fixed while push the value of the best feasible forgone alternative from nearly zero to very high. The opportunity cost moves with that alternative's value, even if the money price of the chosen option does not change."
+      },
+      {
+        "key": "feasibility-boundary",
+        "description": "Push a seemingly valuable alternative across the boundary from genuinely available to unavailable because of time, eligibility, budget, or a rule. Once unavailable, it cannot be the foregone alternative that sets opportunity cost."
+      },
+      {
+        "key": "alternative-ranking-switch",
+        "description": "Change the relative values of two or more feasible rejected alternatives until a different one becomes the highest-valued. Opportunity cost switches to the newly highest-valued rejected alternative rather than adding their values together."
+      },
+      {
+        "key": "resource-scarcity",
+        "description": "Push the relevant resource from abundant enough to do both activities to scarce enough that choosing one prevents the other. When both can be done without displacing one another, there is no opportunity cost between those two uses for that resource unit; when they compete, a forgone benefit appears."
+      }
+    ],
+    "confusableNeighbors": [
+      {
+        "key": "sunk-cost",
+        "label": "Sunk cost",
+        "question": "Ava already paid $30 for a nonrefundable ticket, but can now either use two hours to attend or work a job that pays $70. Which part is sunk cost, and which part is opportunity cost?",
+        "correctDistinction": "The $30 already paid is a sunk cost: it cannot be recovered regardless of Ava's current choice, so it should not determine the forward-looking tradeoff. The $70 she could earn by working is the opportunity cost of attending if working is her best feasible alternative; past payments can matter only insofar as they change future options or benefits."
+      },
+      {
+        "key": "monetary-price",
+        "label": "Monetary price",
+        "question": "Why can two people face the same $15 lunch price but have different opportunity costs of taking an hour to eat it?",
+        "correctDistinction": "Price is the direct money payment for the lunch. Opportunity cost is the value of the best use of the money and time forgone; one person may be giving up a $30 work shift while another is giving up an hour with no better competing use. Price can be one component of a decision's tradeoff, but it is not automatically the opportunity cost."
+      }
+    ],
+    "transferStructuralRequirements": [
+      "There must be a limited resource or capacity that cannot be committed to all competing uses at once.",
+      "There must be a chosen use and at least one other genuinely feasible use that is displaced by the choice.",
+      "The alternatives' benefits must be comparable on a relevant basis for the decision, even if they are not all measured in dollars.",
+      "The opportunity cost must be the value of the highest-valued displaced feasible alternative, not the chosen option's price and not a sum of all rejected alternatives.",
+      "Changing feasibility or which rejected option ranks highest must change which alternative determines the opportunity cost."
+    ],
+    "referenceTransferExample": "A hospital has one operating room free from 1:00 to 3:00 p.m. It schedules a surgery expected to create $8,000 of patient benefit. The best other feasible use of that same room and time is an urgent procedure expected to create $6,500 of patient benefit; a training session worth $1,000 is another option. Scheduling the first surgery has an opportunity cost of $6,500, not $7,500 and not the operating room's hourly budget cost, because only one competing use could occupy the room during those hours and the urgent procedure is the best forgone one."
+  },
+  "misconceptions": [
+    {
+      "id": "price-is-the-cost",
+      "label": "“The price is the opportunity cost.”",
+      "tell": "“The opportunity cost of a $20 movie is always $20.”",
+      "fix": "$20 is its money price, but the opportunity cost is the value of the best feasible thing given up to spend the relevant money and time. It can be lower, equal, or higher than $20 depending on the alternatives."
+    },
+    {
+      "id": "add-all-rejected-options",
+      "label": "“Add every rejected option.”",
+      "tell": "“If I skip a $50 dinner, $30 game, and $20 book to buy shoes, the opportunity cost is $100.”",
+      "fix": "With the same limited resource, you normally could have chosen only one alternative. The opportunity cost is the value of the single best feasible rejected alternative, $50 in this example."
+    },
+    {
+      "id": "count-impossible-option",
+      "label": "“The most valuable imagined option counts.”",
+      "tell": "“I gave up a $500 freelance job to rest, even though I lacked the required software and could not accept it.”",
+      "fix": "An opportunity cost comes from a feasible alternative actually available at the time of choice. An impossible option may be desirable, but it was not sacrificed by this decision."
+    }
+  ],
+  "extremeCases": [
+    {
+      "dimension": "best-alternative-value",
+      "scenario": "Lee spends one free hour playing a game. On one day, the best other use is scrolling social media worth almost nothing to Lee; on another day, the best other use is a paid tutoring session that would earn $50.",
+      "correctBehavior": "The game's opportunity cost is near zero on the first day and $50 on the second. The game itself did not change; the best forgone feasible alternative did."
+    },
+    {
+      "dimension": "feasibility-boundary",
+      "scenario": "Rosa takes a day off to visit family. A $300 overtime shift is mentioned, but it requires certification Rosa does not have; her actual available alternative is a $120 regular shift.",
+      "correctBehavior": "The relevant opportunity cost is the value of the $120 regular shift, not $300. The overtime shift was never a feasible option for Rosa."
+    },
+    {
+      "dimension": "alternative-ranking-switch",
+      "scenario": "Sam uses one Saturday to repair a bicycle. At first, the best alternative is a $90 delivery shift, while a picnic is worth $40 to Sam. Later the delivery shift is cancelled, but Sam is invited to a workshop he values at $110.",
+      "correctBehavior": "Before cancellation, repairing the bicycle gives up the $90 delivery shift. After the workshop becomes the best feasible rejected option, the opportunity cost becomes $110; Sam does not add $90 and $110 together."
+    }
+  ],
+  "visual": null
+}
