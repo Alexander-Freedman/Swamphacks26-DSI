@@ -145,7 +145,7 @@ export function AskHelp({
     <>
       <button ref={button} className="hiw-btn ask-btn" title="Ask Onion" onClick={() => (open ? close() : setOpen(true))} aria-keyshortcuts="?" aria-expanded={open} aria-controls={open ? `${titleId}-panel` : undefined}>
         <OnionIcon />
-        <span className="sr-only">Ask Onion</span>
+        <span className="ask-label">Ask Onion</span>
       </button>
       {open && (
         <div className={`ask-panel${docked ? ' ask-docked' : ''}`} id={`${titleId}-panel`} role="dialog" aria-modal="false" aria-labelledby={titleId} ref={panel}>

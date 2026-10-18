@@ -1,12 +1,13 @@
 /* Ask panel (#186): a small side panel that leaves the screen visible; a bottom sheet on phones. */
 .topbar-actions { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; justify-content: flex-end; }
 .hiw-btn.ask-btn {
-  display: inline-grid; place-items: center; width: 42px; height: 42px; padding: 0; border-radius: 50%;
+  display: inline-flex; align-items: center; gap: 6px; height: 38px; padding: 0 12px 0 7px; border-radius: 4px;
   background: var(--card); border: 2px solid var(--ink); color: var(--ink); box-shadow: 2px 2px 0 var(--ink); text-decoration: none; cursor: pointer;
 }
 .hiw-btn.ask-btn:hover { background: var(--marker-soft); transform: translate(-1px, -1px); box-shadow: 3px 3px 0 var(--ink); }
 .hiw-btn.ask-btn[aria-expanded='true'] { background: var(--marker); box-shadow: none; transform: translate(2px, 2px); }
-.ask-onion { display: block; }
+.ask-onion { display: block; flex: none; }
+.ask-label { font: 700 0.9rem var(--font-body); white-space: nowrap; }
 .ask-privacy { margin: 0; font-size: 0.75rem; line-height: 1.35; color: var(--ink-soft); }
 
 .ask-panel {
