@@ -2,7 +2,7 @@
 import { cleanup, render, screen } from '@testing-library/react'
 import { afterEach, describe, expect, it } from 'vitest'
 import data from './research.json'
-import { ResearchPage } from './ResearchPage'
+import { ONION_FACTS, ResearchPage } from './ResearchPage'
 import App from '../App'
 
 afterEach(cleanup)
@@ -47,6 +47,33 @@ describe('research page', () => {
     history.replaceState(null, '', `${import.meta.env.BASE_URL}?research=1`)
     render(<App />)
     expect(screen.getByRole('heading', { name: 'The research behind Onionskin' })).toBeTruthy()
+    history.replaceState(null, '', import.meta.env.BASE_URL)
+  })
+})
+
+
+describe('research page: FAQ and Ask Onion', () => {
+  it('questions start folded and open on tap', async () => {
+    const { fireEvent } = await import('@testing-library/react')
+    render(<ResearchPage />)
+    const qs = [...document.querySelectorAll('details.rs-q')] as HTMLDetailsElement[]
+    expect(qs.length).toBe(data.faq.length)
+    expect(qs.every((q) => !q.open)).toBe(true)
+    fireEvent.click(qs[0].querySelector('summary')!)
+    expect(qs[0].open).toBe(true)
+  })
+
+  it("Onion's facts are only our research and fit the help request limits", () => {
+    expect(ONION_FACTS[0]).toMatch(/Only answer from the research listed here/)
+    expect(ONION_FACTS.slice(0, 12).every((f) => f.length <= 200)).toBe(true)
+    expect(ONION_FACTS[1]).toMatch(/^Guess first \(Richland/) // the citation survives the cut
+    expect(ONION_FACTS[0].length).toBeLessThanOrEqual(200)
+  })
+
+  it('the research page has Ask Onion in its top bar', () => {
+    history.replaceState(null, '', `${import.meta.env.BASE_URL}?research=1`)
+    render(<App />)
+    expect(screen.getByRole('button', { name: 'Ask Onion' })).toBeTruthy()
     history.replaceState(null, '', import.meta.env.BASE_URL)
   })
 })

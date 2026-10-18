@@ -1,6 +1,7 @@
 // "The research": every decision in a Learn session, why it works, and the papers behind it,
 // with links so anyone can check. Data in research.json (sources verified one by one).
 import data from './research.json'
+import { useReportSpot } from '../components/session/helpSpot'
 import './research.css'
 
 type Source = { id: string; authors: string; year: number; title: string; venue: string; url: string; finding: string }
@@ -12,6 +13,17 @@ const decisions = data.decisions as Decision[]
 const faq = data.faq as Faq[]
 const number = new Map(sources.map((s, i) => [s.id, i + 1]))
 const byId = new Map(sources.map((s) => [s.id, s]))
+
+// What Ask Onion may use on this page: our own research, nothing else.
+export const ONION_FACTS = [
+  "Only answer from the research listed here. If asked about a study that isn't listed, say it isn't part of Onionskin's research and point to the Sources list.",
+  ...decisions.map((d) => {
+    const who = d.sources.map((id) => byId.get(id)).filter(Boolean).map((s) => `${s!.authors.split(/,| &| and/)[0]} ${s!.year}`)
+    const line = `${d.step} (${who.join('; ')}): ${d.why}`
+    return line.length <= 200 ? line : `${line.slice(0, 199).replace(/\s+\S*$/, '')}…`
+  }),
+]
+const ONION_ON_SCREEN = `The research page: why each Onionskin step works, with ${sources.length} cited papers. Questions answered here: ${faq.map((f) => f.q).join(' ')}`
 
 function Cites({ ids }: { ids: string[] }) {
   const known = ids.filter((id) => byId.has(id))
@@ -47,6 +59,20 @@ function HomeLink({ onHome, className }: { onHome?: () => void; className: strin
 }
 
 export function ResearchPage({ onHome }: { onHome?: () => void }) {
+  useReportSpot({
+    label: 'The research',
+    chip: 'Research · why it works',
+    layer: {
+      subject: 'the research behind Onionskin',
+      topic: 'the research behind Onionskin',
+      layerN: 1,
+      title: 'The research',
+      onScreen: ONION_ON_SCREEN.slice(0, 590),
+      facts: ONION_FACTS.slice(0, 12),
+      suggested: ['Why no points or streaks?', 'What does the research say about guessing first?', 'Is this backed by real studies?'],
+      hint: 'Open a question above, or check the Sources list: every paper is linked.',
+    },
+  })
   return (
     <div className="rs-page">
       <HomeLink onHome={onHome} className="rs-home" />
@@ -70,11 +96,11 @@ export function ResearchPage({ onHome }: { onHome?: () => void }) {
         </h2>
         <div className="rs-faq">
           {faq.map((f) => (
-            <article key={f.q} className="rs-q">
-              <h3>{f.q}</h3>
+            <details key={f.q} className="rs-q">
+              <summary>{f.q}</summary>
               <p>{f.a}</p>
               <Cites ids={f.sources} />
-            </article>
+            </details>
           ))}
         </div>
       </section>
