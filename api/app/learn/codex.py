@@ -15,7 +15,8 @@ Every Learn judgment goes through run_json() so the invocation is right in one p
 
 Env: MM_CODEX_BIN (path; default: resolved on PATH), MM_CODEX_MODEL (unset = the CLI's
 default), MM_CODEX_CONCURRENCY (2), MM_CODEX_TIMEOUT_S (60; authoring passes its own),
-MM_CODEX_FAKE=1 (canned replies by task name, so tests and CI never need codex).
+MM_CODEX_FAKE=1 (canned replies by task name, so tests and CI never need codex;
+MM_CODEX_FAKE_VISUAL=none makes the fake visual call answer "no curve fits").
 """
 
 from __future__ import annotations
@@ -404,7 +405,64 @@ def fake_reply(task: str, prompt: str) -> dict:
             "critique": "Your example keeps a base, a rate and repeated steps that feed back.",
             "missingPiece": None,
         }
+    if task == "visual":
+        if os.environ.get("MM_CODEX_FAKE_VISUAL") == "none":
+            return {"fits": False, "visual": None}
+        return fake_visual(_listed_ids(prompt, "Misconception ids"))
     raise CodexError(f"no fake reply for task {task!r}")
+
+
+def fake_visual(ids: list[str]) -> dict:
+    """A curve that passes every check for the fake authored topic (steps that compound).
+
+    MM_CODEX_FAKE_VISUAL=none makes the fake say no curve fits instead.
+    """
+    same, once = (ids + ["same-amount-each-step", "one-step-only"])[:2]
+    spec = {
+        "widget": "curve",
+        "approximate": False,
+        "variables": [{"name": "A", "meaning": "amount at the start", "unit": "", "value": 100}],
+        "curve": {
+            "expr": "A*(1+r/100)^x",
+            "mode": "value",
+            "x_min": 0,
+            "x_max": 20,
+            "x_label": "steps",
+            "y_label": "amount",
+            "ask_x": 10,
+            "ask_y": None,
+            "area_from": None,
+            "area_to": None,
+            "knob": {
+                "param": "r",
+                "label": "share added each step (%)",
+                "min": 0,
+                "max": 30,
+                "step": 1,
+                "default": 10,
+            },
+        },
+        "sampler": None,
+        "prediction": {
+            "prompt": "Start with 100. Each step adds 10% of what is there now. After 10 steps, "
+            "how much is there?",
+            "input": "slider",
+            "slider": {"min": 0, "max": 600, "step": 10, "unit": ""},
+            "options": [],
+        },
+        "bands": [
+            {"min": 0, "max": 150, "misconception_id": once},
+            {"min": 160, "max": 230, "misconception_id": same},
+            {"min": 240, "max": 290, "misconception_id": None},
+            {"min": 300, "max": 600, "misconception_id": same},
+        ],
+        "extremes": [
+            {"param": "r", "value": 0, "watch": "At 0% nothing is ever added: still 100."},
+            {"param": "r", "value": 30, "watch": "At 30% a step, 10 steps reach about 1,379."},
+        ],
+        "answer_claimed": 259.37,
+    }
+    return {"fits": True, "visual": {"widget": "curve", "spec": spec}}
 
 
 def fake_authored(name: str) -> dict:
