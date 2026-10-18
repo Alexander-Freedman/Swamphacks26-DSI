@@ -1,6 +1,6 @@
 // Top of Home: "Try any topic" opens a six-screen Learn session (docs/learn-plan.md).
 // Chips are the prebuilt Learn topics. Typed text opens the closest prebuilt topic; anything else
-// is built live by the backend (about a minute), or says it needs the backend when there is none.
+// is built live by the backend (1 to 2 minutes), or says it needs the backend when there is none.
 import { useEffect, useId, useState, type FormEvent } from 'react'
 import { keywords, learnApi, overlap } from '../learnApi'
 import { offlineLine } from './offlineLine'
@@ -24,11 +24,15 @@ export function matchLearnTopic(text: string, topics: TopicSummary[]): string | 
   return best?.slug ?? null
 }
 
+/** Chips shown before Show more: the reviewed topics come first. */
+const FIRST_CHIPS = 6
+
 export function LearnTopicBox({ onOpen, api = learnApi }: { onOpen: (slug: string) => void; api?: LearnApi }) {
   const [topics, setTopics] = useState<TopicSummary[]>([])
   const [text, setText] = useState('')
   const [busy, setBusy] = useState(false)
   const [note, setNote] = useState<string | null>(null)
+  const [more, setMore] = useState(false)
   const id = useId()
 
   useEffect(() => {
@@ -81,15 +85,29 @@ export function LearnTopicBox({ onOpen, api = learnApi }: { onOpen: (slug: strin
         </button>
       </form>
       <p className="anytopic-status" aria-live="polite">
-        {busy ? 'Building your lesson: cases, extreme tests and common mistakes. About a minute.' : note}
+        {busy ? 'Building your lesson: cases, extreme tests, common mistakes and a graph if one fits. This takes 1 to 2 minutes.' : note}
       </p>
-      {topics.some((t) => t.checked) && (
+      {topics.length > 0 && (
         <div className="anytopic-chips" role="group" aria-label="Ready-made topics">
-          {topics.filter((t) => t.checked).map((t) => (
-            <button key={t.slug} type="button" className="anytopic-chip" onClick={() => onOpen(t.slug)} disabled={busy}>
-              {t.topic}
+          {[...topics.filter((t) => t.checked), ...topics.filter((t) => !t.checked)]
+            .slice(0, more ? undefined : FIRST_CHIPS)
+            .map((t) => (
+              <button
+                key={t.slug}
+                type="button"
+                className={'anytopic-chip' + (t.checked ? '' : ' is-new')}
+                onClick={() => onOpen(t.slug)}
+                disabled={busy}
+                title={t.checked ? undefined : 'Built live by someone, not yet reviewed'}
+              >
+                {t.topic}
+              </button>
+            ))}
+          {topics.length > FIRST_CHIPS && (
+            <button type="button" className="anytopic-chip more" aria-expanded={more} onClick={() => setMore((m) => !m)}>
+              {more ? 'Show fewer' : `Show ${topics.length - FIRST_CHIPS} more`}
             </button>
-          ))}
+          )}
         </div>
       )}
     </section>

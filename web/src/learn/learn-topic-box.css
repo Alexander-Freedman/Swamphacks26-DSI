@@ -5,3 +5,5 @@
 .home .demos-label { margin: 26px 0 8px; font-size: 0.95rem; color: var(--ink-soft); }
 .learn-box .anytopic-chips { margin-top: 14px; gap: 10px; }
 .learn-box .anytopic-status:not(:empty) { margin: 10px 0 0; }
+.learn-box .anytopic-chip.is-new { border-style: dashed; }
+.learn-box .anytopic-chip.more { border-color: var(--ink-soft); color: var(--ink-soft); font-weight: 600; }
