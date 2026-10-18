@@ -1,6 +1,6 @@
 # Source of truth (read this first)
 
-**Verified Sun Oct 18, ~3:45 AM ET** against `main` @ 1695e43 and the live server. If any other doc disagrees with this file or the [README](../README.md), this file and the README win. The README is the accurate product description; this file adds what's live, what's open, judging logistics, exact wording, and fallbacks.
+**Verified Sun Oct 18, ~3:45 AM ET** (Tiger correction ~4:05 AM) against `main` @ 1695e43 and the live server. If any other doc disagrees with this file or the [README](../README.md), this file and the README win. The README is the accurate product description; this file adds what's live, what's open, judging logistics, exact wording, and fallbacks.
 
 **Stale docs (don't trust for current facts):** `docs/README.md` (says "nothing is picked yet"), `strategy.md`, `scorecard.md`, `product-spec.md`, `build-plan(s).md`, `experience.md`, `story.md`, `pitch.md`, `user-testing.md` (written for the old birthday/coin sessions). `learn-plan.md` and `learn-api.md` are the current design and API contract.
 
@@ -64,7 +64,7 @@ Details if asked:
 - **Truth is computed in code, never by a model.** Graph values come from `api/app/spec.py` and `truth.py`. A model-proposed graph is attached only if it passes `compile_case` (bands cover the slider, the knob moves the curve, allowed functions only), its claimed answer matches the computed one within 2%, and every number in its captions matches. Otherwise the topic is text-only. Live tonight: Charles's law, terminal velocity and the ideal gas law got graphs; recursion correctly got none.
 - Ask Onion order (`api/app/help.py`, Learn path): Codex, then Gemini 3.5 Flash-Lite, then Gemma 4, then a topic-specific hint from the screen. A reply with numbers not in the screen's facts becomes the fixed line *"I'd rather not guess a number: check the readout on screen."*
 - Over-long model text is trimmed at a sentence boundary instead of rejecting the lesson.
-- Data: answer events in Tiger Data (Postgres plus TimescaleDB), SQLite fallback. Ready-made topics also ship as static JSON on Pages, so they open with no backend.
+- **Data: we do NOT use Tiger Data in the current product.** The server is connected to Tiger (the env var is set, no fallback warning), but no screen calls `/api/answers`, so nothing is written (checked at 4 AM: no web code calls it; 2 stray writes in 12 hours). Learner data stays in the browser (the Notebook). **Don't claim Tiger to judges.** Ready-made topics ship as static JSON on Pages, so they open with no backend.
 - Limits: 60 graded answers per IP per hour, 800 per day site-wide; 6 live-built topics per IP per hour.
 - **Measured times** (live API, tonight): guess 4.3 s, anchor 4.9 s, stress 4.5 s per card, transfer 6.1 s, Ask Onion about 4 s, a brand-new typed topic **1 to 2.5 minutes** (lesson plus graph check).
 
@@ -87,6 +87,7 @@ Details if asked:
 | "24 sources, each link checked" | "all peer-reviewed" | Kasneci & Kasneci 2026 is an arXiv preprint. |
 | "Drawing to learn (Schmeck 2014)" | "drawing doubles recall" | That's Wammes 2016, about word lists. |
 | "No recorded user tests yet" (if asked) | invented tester quotes | There are none in the repo. |
+| "Learner data stays in your browser" | "We store answers in Tiger Data" | Wired up, but nothing calls it. |
 
 ## 8. Who owns what, how we work
 

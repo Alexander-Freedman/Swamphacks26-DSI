@@ -39,7 +39,7 @@ No points, XP, streaks or leaderboards: expected rewards can crowd out interest 
 - **Web** (`web/`): React + TypeScript + Vite, deployed to GitHub Pages at onionskin.study. Ready-made topics ship as static JSON, so they open even without the backend.
 - **API** (`api/`): FastAPI on a Vultr VM behind Caddy (HTTPS). Lessons are authored and answers graded by OpenAI's Codex CLI running on the server, with a fixed grading contract: judge piece by piece, never give the answer mid-attempt, one targeted follow-up, quote the learner's own words, hold the verdict under pushback.
 - **Truth is computed in code, never by a model.** Every graph is a formula the app evaluates itself; a model-proposed graph is only shown if the app's checker recomputes its answer and every number in its captions. A bad graph never ships; a missing one is fine.
-- **Data**: answer events in Tiger Data (Postgres + TimescaleDB), with SQLite as a fallback.
+- **Data**: no accounts and no server-side learner data. The Notebook lives in your browser. (The API has a Tiger Data store wired up from an earlier version, but the current lessons don't send it anything.)
 - **Topics** (`data/learn/`): the ten reviewed lessons, each with its cases, extreme tests, three-choice prediction cards, common misconceptions and, where one fits, a graph.
 
 ## How we used AI
