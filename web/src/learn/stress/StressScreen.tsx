@@ -6,6 +6,7 @@ import { notesLine } from '../../demo/demo'
 import { useCallback, useMemo, useState } from 'react'
 import { Curve } from '../../components/Curve'
 import type { StageProps, StressRequest, WhyRequest } from '../types'
+import { recordLearnEvent, roomLine, type Room } from '../learnEvents'
 import { useGraded } from '../useGraded'
 import { extremeCurve } from './extremes'
 import { latestByCase, offlineLine, withPiece } from './stress'
@@ -41,9 +42,14 @@ export function StressScreen({ topic, state, update, next, api }: StageProps) {
     })
   }
 
+  // how everyone else predicted each card (Tiger Data continuous aggregate), once this learner has picked
+  const [rooms, setRooms] = useState<Record<number, Room | null>>({})
   const pick = (i: number, k: number) => {
     if (state.stressChoices[i] != null) return
     update({ stressChoices: { ...state.stressChoices, [i]: k } })
+    void recordLearnEvent({ slug: topic.slug, step: 'stress', caseIndex: i, choice: k }).then((room) =>
+      setRooms((r) => ({ ...r, [i]: room })),
+    )
     void check(i)
   }
 
@@ -137,6 +143,7 @@ export function StressScreen({ topic, state, update, next, api }: StageProps) {
                       <strong>{picked.correct ? 'Right.' : 'Not quite.'}</strong> {c.correctBehavior}
                     </p>
                   )}
+                  {picked && roomLine(rooms[i]) && <p className="st-room">{roomLine(rooms[i])}</p>}
                 </>
               )}
               {open && !c.predict && !h && checking !== i && (
